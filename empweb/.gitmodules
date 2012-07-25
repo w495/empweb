@@ -1,0 +1,6 @@
+[submodule "deps/cowboy"]
+	path = deps/cowboy
+	url = git://github.com/extend/cowboy.git
+[submodule "deps/ejson"]
+	path = deps/ejson
+	url = git://github.com/benoitc/ejson.git

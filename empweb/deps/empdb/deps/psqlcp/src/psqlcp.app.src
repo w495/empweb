@@ -1,0 +1,28 @@
+{application, psqlcp, [
+    {description, "psqlcp"},
+    {vsn, "0.1"},
+    {applications, [kernel, stdlib]},
+    {modules, [psqlcp, psqlcp_worker]},
+    {registered, [psqlcp]},
+    {mod, {psqlcp, []}},
+    {env, [
+        {pools, [
+            {fk, [
+                {size, 10},
+                {max_overflow, 10},
+                {hostname, "127.0.0.1"},
+                {database, "fk"},
+                {username, "w-495"},
+                {password, "eiir"}
+            ]},
+            {tvu, [
+                {size, 10},
+                {max_overflow, 10},
+                {hostname, "127.0.0.1"},
+                {database, "tvu"},
+                {username, "w-495"},
+                {password, "eiir"}
+            ]}
+        ]}
+    ]}
+]}. 

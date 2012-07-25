@@ -1,0 +1,33 @@
+%% Feel free to use, reuse and abuse the code in this file.
+
+{application, empdb, [
+    {description, "empdb"},
+    {vsn, "0.1.0"},
+    {modules, []},
+    {registered, [empdb_sup]},
+    {applications, [
+        kernel,
+        stdlib
+    ]},
+    {mod, {empdb_app, []}},
+    {env, [
+        {pools, [
+            {fk, [
+                {size, 10},
+                {max_overflow, 10},
+                {hostname, "127.0.0.1"},
+                {database, "fk"},
+                {username, "w-495"},
+                {password, "eiir"}
+            ]},
+            {tvu, [
+                {size, 10},
+                {max_overflow, 10},
+                {hostname, "127.0.0.1"},
+                {database, "tvu"},
+                {username, "w-495"},
+                {password, "eiir"}
+            ]}
+        ]}
+    ]}
+]}.

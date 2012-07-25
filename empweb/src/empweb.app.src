@@ -1,0 +1,19 @@
+%% Feel free to use, reuse and abuse the code in this file.
+
+{application, empweb, [
+    {description, "empweb"},
+    {vsn, "0.1.0"},
+    {modules, []},
+    {registered, [empweb_sup]},
+    {applications, [
+        kernel,
+        stdlib,
+        crypto,
+        public_key,
+        ssl,
+        cowboy,
+        empdb
+    ]},
+    {mod, {empweb_app, []}},
+    {env, []}
+]}.

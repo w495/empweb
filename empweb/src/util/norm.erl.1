@@ -1,0 +1,236 @@
+%%%
+%%% @file norm.erl 
+%%%
+%%%     Модуль преобразования строковых данных
+%%%         к определенным типам.
+%%%
+%%%     Сами типы описаны в отдельно модуле (см ?CONVERTER).
+%%%     Это сделано с целью разделить
+%%%         обязанности между модулями.
+%%%
+%%%
+
+-module(norm).
+
+-vsn(1.2).
+-authors([cff, w495]).
+
+
+-record(?MODULE, {
+    status  :: 'ok' | 'error', 
+    return   :: proplists(),
+    errors   :: proplists()
+}).
+
+
+-export([
+    norm/2,
+    test/0,
+    test/1
+]).
+
+
+
+-define(CONVERTER, norm_types).
+-define(UNIQ_UNDEFINED, norm_types_undefined_85781335610871709617).
+
+%%%
+%%% @doc
+%%%
+%%%     Преобразует значения Data к типам описанным в Type_rules.
+%%%     Возвращает proplist с ключами и преобразованными значениями
+%%%
+%%%         Data -> [{Dkey, Value}]
+%%%         Type_rules ->
+%%%             [{Tkey, Types}] | [{Key, Types, Default}]
+%%%         Types -> [Type]
+%%%
+%%%         Dkey -> string() | atom()
+%%%         Value -> any()
+%%%
+%%%         Tkey -> string() | atom()
+%%%             % Tkey имеет больший приоритет чем Dkey,
+%%%             % Если Dkey не будет в Type_rules,
+%%%             %   то в выходной список пара не попадет.
+%%%         Type -> atom()
+%%%             % но должен быть определен в ?CONVERTER
+%%%         Default -> any()
+%%%             % значение по умолчанию.
+%%%             % Если значение не определено,
+%%%             % но при этом Tkey не был найден в Data,
+%%%             % то вызывается исключение.
+%%%             % Default может принимать любые значения
+%%%             % в том числе и undefined.
+%%%             % Для выявления неопределенности
+%%%             % используется макрос ?UNIQ_UNDEFINED.
+%%%
+%%%     Обертка функции norm/3
+%%%
+norm(Data, Type_rules)
+        when erlang:is_list(Data)
+            andalso erlang:is_list(Type_rules) ->
+    norm(Data, Type_rules, [], false).
+
+%%%
+%%% @doc
+%%%
+%%%     Преобразует значения Data к типам описанным в Type_rules.
+%%%     Возвращает proplist с ключами и преобразованными значениями
+%%%
+norm(_Data, [], Return, Has_err) ->
+    case Has_err of
+        false -> {ok, Return};
+        _ -> {error, Return}
+    end;
+
+    
+norm(Data, [{Key, Types}|Rest], Return, Has_err) ->
+    norm(Data, [{Key, Types, ?UNIQ_UNDEFINED}|Rest], Return, Has_err);
+
+norm(Data, [{{_raw_key, New_key}, {value, Value}, _default}|Rest], Return, Has_err) ->
+    norm(Data, Rest, [{convert:to_atom(New_key), Value} | Return], Has_err);
+
+norm(Data, [{{Raw_key, New_key}, {list, Types}, Default}|Rest], Return, Has_err) ->
+
+    Key = case proplists:is_defined(Raw_key, Data) of
+        true -> Raw_key;
+        _ -> convert:to_binary(Raw_key)
+    end,
+    
+    Raw_values = proplists:get_all_values(Key, Data),
+    Values =
+        [
+            case to_spec_type(Raw_value, Types) of
+                {done, Value} ->
+                    Value;
+                {predefined, _} ->
+                    Default;
+                {error, Value} ->
+                    {invalid_types, [{value, Value}, {types, Types}]}
+            end
+            || Raw_value <- Raw_values
+        ],
+    norm(Data, Rest, [{convert:to_atom(New_key), Values} | Return], Has_err);
+
+
+%%%
+%%% norm:norm([{"a", "1"}], [{{[a,b,c], z},[integer]}]) == [{z,1}]
+%%% norm:norm([{"b", "1"}], [{{[a,b,c], z},[integer]}]) == [{z,1}]
+%%% norm:norm([{"c", "1"}], [{{[a,b,c], z},[integer]}]) == [{z,1}]
+%%%
+
+norm(Data, [{{[Mb_key|_rmb_keys] = Raw_keys, New_key}, Types, Default}|Rest], Return ,Has_err)
+        when erlang:is_binary(Mb_key) orelse erlang:is_atom(Mb_key) ->
+    norm(Data, [{{Raw_keys, New_key}, Types, Default}|Rest], Return, Raw_keys, Has_err);
+
+norm(Data, [{{Raw_key, New_key}, Types, Default}|Rest], Return ,Has_err) ->
+
+    Key = case proplists:is_defined(Raw_key, Data) of
+        true -> Raw_key;
+        _ -> convert:to_binary(Raw_key)
+    end,
+
+    case proplists:get_value(Key, Data, Default) of
+        ?UNIQ_UNDEFINED ->
+            norm(Data, Rest, [{convert:to_atom(New_key), {no_param, Key}} | Return], true or Has_err);
+        Raw_value ->
+            case to_spec_type(Raw_value, Types) of
+                {done, Value} ->
+                    norm(Data, Rest, [{convert:to_atom(New_key), Value} | Return], Has_err);
+                {predefined, _} ->
+                    norm(Data, Rest, [{convert:to_atom(New_key), Default} | Return], Has_err);
+                {error, Value} ->
+                    norm(Data, Rest, [{convert:to_atom(New_key), {invalid_types, [{value, Value}, {types, Types}]}} | Return], true or Has_err)
+            end
+    end;
+
+norm(Data, [{Key, Types, Default}|Rest], Return, Has_err) ->
+    norm(Data, [{{Key, Key}, Types, Default}|Rest], Return, Has_err).
+
+norm(Data, [{{[], New_key}, _types, ?UNIQ_UNDEFINED}|Rest], Return, Raw_keys, Has_err) ->
+    norm(Data, Rest, [{convert:to_atom(New_key), {no_param, Raw_keys}} | Return], true or Has_err);
+    
+
+norm(Data, [{{[], New_key}, _types, Default}|Rest], Return, _raw_keys, Has_err) ->
+    norm(Data, Rest, [{convert:to_atom(New_key), Default} | Return], Has_err);
+
+norm(Data, [{{[Mb_key|Rmb_keys], New_key}, Types, Default}|Rest], Return, Raw_keys, Has_err)
+        when erlang:is_binary(Mb_key) orelse erlang:is_atom(Mb_key) ->
+    case {
+            proplists:is_defined(Mb_key, Data),
+            proplists:is_defined(Mb_keyl = convert:to_binary(Mb_key), Data)
+        } of
+            {true, _} ->
+                norm(Data, [{{Mb_key, New_key}, Types, Default}|Rest], Return, Has_err);
+            {false, true} ->
+                norm(Data, [{{Mb_keyl, New_key}, Types, Default}|Rest], Return, Has_err);
+            {_, _} ->
+                norm(Data, [{{Rmb_keys, New_key}, Types, Default}|Rest], Return, Raw_keys, Has_err)
+    end.
+
+
+%%%
+%%% @doc
+%%%
+%%%     Преобразует значение Value к указанным типам.
+%%%     Обертка функции to_spec_type/3
+%%%
+to_spec_type(Value, Type_rules) ->
+    to_spec_type(?CONVERTER, Value, Type_rules).
+
+
+spec_type_done(Converter, Value, Type)
+        when erlang:is_atom(Type)->
+    {done, Converter:Type(Value)};
+
+spec_type_done(_converter, _value, Type)
+        when erlang:is_function(Type, 0) ->
+    {done, Type()};
+    
+spec_type_done(_converter, Value, Type)
+        when erlang:is_function(Type, 1) ->
+    {done, Type(Value)}.
+
+%%%
+%%% @doc
+%%%
+%%%     Преобразует значение Value к указанным типам.
+%%%         Для работы нужно указать модуль Converter,
+%%%             где должны быть описаны правила преобразования.
+%%%
+
+to_spec_type(_converter, Value, predefined) ->
+    {predefined, Value};
+
+to_spec_type(_converter, Value, any) ->
+    {done, Value};
+    
+to_spec_type(_converter, Value, []) ->
+    {error, Value};
+
+to_spec_type(_converter, Value, [[]|_rest]) ->
+    {done, Value};
+
+to_spec_type(Converter, Value, [Type|Rest]) ->
+    try
+        spec_type_done(Converter, Value, Type)
+    catch
+        throw : {type_error, Error} ->
+            throw({type_error, Error});
+        _t : _e ->
+            to_spec_type(Converter, Value, Rest)
+    end.
+
+
+invalid_types_error(Key, Value, Types) ->
+    throw({error, {invalid_types, {Key, Value, Types}}}).
+
+no_param_error(Key) ->
+    throw({error, {no_param, Key}}).
+
+
+test() ->
+    ok.
+
+test(speed) ->
+    ok.
