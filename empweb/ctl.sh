@@ -15,6 +15,8 @@
         IP="localhost"
     fi
 
+    IP="localhost"
+
     MAIN_NODE="$NAME@$IP"
     MAIN_APP=$NAME"_app"
 

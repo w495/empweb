@@ -15,7 +15,10 @@
 -export([
     register/1,
     login/1,
-    logout/1
+    logout/1,
+    get_friends/1,
+    add_friend/1,
+    delete_friend/1
 ]).
 
 %%
@@ -34,6 +37,14 @@ login(Params)->
 logout(Params)->
     domain_user:logout(Params).
 
+get_friends(Params)->
+    domain_user:get_friends(Params).
+
+add_friend(Params)->
+    domain_user:add_friend(Params).
+
+delete_friend(Params)->
+    domain_user:delete_friend(Params).
 
 %%
 %% Local Functions

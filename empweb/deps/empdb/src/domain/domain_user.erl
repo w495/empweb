@@ -15,7 +15,10 @@
 -export([
     register/1,
     login/1,
-    logout/1
+    logout/1,
+    get_friends/1,
+    add_friend/1,
+    delete_friend/1
 ]).
 
 %%

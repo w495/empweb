@@ -100,7 +100,7 @@ add_friend(Con, Proplist)->
     dao:pgret(
         dao:equery(Con, 
             <<"insert into friend (user_id, friend_id) "
-            "values ($user_id, $friend_id)">>, 
+            "values ($user_id, $friend_id) returning id; ">>, 
             Proplist
         )
     ).
@@ -109,7 +109,7 @@ delete_friend(Con, Proplist)->
     dao:pgret(
         dao:equery(Con, 
             <<"delete from friend where "
-            " user_id=$user_id and friend_id=$friend_id;">>, 
+            " user_id=$user_id and friend_id=$friend_id">>, 
             Proplist
         )
     ).

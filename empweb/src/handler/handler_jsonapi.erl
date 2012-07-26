@@ -65,6 +65,8 @@ handle_params(Data, Function) ->
             case erlang:apply(Function, [Data]) of
                 {ok, Result} -> 
                     {[{<<"ok">>, convert(Result)}]};
+                ok -> 
+                    {[{<<"ok">>, <<"ok">>}]};
                 {error, Err} ->
                     X=erlang:list_to_binary(io_lib:format("~p",[Err])),
                     io:format("X = ~p", [X]),
@@ -86,8 +88,7 @@ handle_params(Data, Function) ->
 %%      "fname":"fname",
 %%      "sname":"sname",
 %%      "birthday" : "sdsd",
-%%      "city":"city",
-%%      "money":"0.0"
+%%      "city":"city"
 %%     }
 %% }
 %%%
