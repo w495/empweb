@@ -11,6 +11,8 @@
         crypto,
         public_key,
         ssl,
+        mnesia,
+        amnesia,
         cowboy,
         empdb
     ]},

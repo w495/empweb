@@ -2,6 +2,27 @@
 -define(__EMPWEB_474797140__, true).
 
 
+-record(empweb_ctl, {
+    ctl,
+    act,
+    opt = []
+}).
+
+
+-record(empweb_resp, {
+    status = 200,
+    format  = json,
+    cookies = [],
+    headers = [],
+    body = []
+}).
+
+-record(http_resp, {
+    status = 200,
+    headers = [],
+    body = []
+}).
+
 %%
 %% ========================================================================= 
 %% =========================================================================

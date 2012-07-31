@@ -25,7 +25,7 @@
     ERL_MAX_ETS_TABLES=140000
     export ERL_MAX_ETS_TABLES
 
-    OTHERBINPATH="./deps/*/ebin"
+    OTHERBINPATH=`find ./deps  -path '*.git' -prune -o  -type d -name 'ebin' -printf '%h/%f '`
     LOCALLBINPATH=`find ./ebin -type d -printf '%h/%f '`
     BINPATH=${OTHERBINPATH}" "${LOCALLBINPATH}
     SESSIONDBPATH='"./priv/session-db/'$MAIN_NODE'/"'

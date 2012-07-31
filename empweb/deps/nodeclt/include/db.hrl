@@ -1,4 +1,4 @@
--include("web_session.hrl").
+-include("biz_session.hrl").
 
 -define(GLOBAL_TABLES,[]).
 
@@ -6,8 +6,8 @@
         [
             {?SESSION_TABLE_NAME, [{disc_copies, [node()]},
                 {local_content, true},
-                {record_name, web_session},
-                {attributes, record_info(fields, web_session)}]}
+                {record_name, biz_session},
+                {attributes, record_info(fields, biz_session)}]}
         ]
 ).
 

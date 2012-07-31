@@ -76,8 +76,52 @@ create table user_(
 
 
 
-insert into user_ (nick, name, email, phash)
-    values ('admin', 'admin', 'w@w-495.ru', '21232F297A57A5A743894A0E4A801FC3');
+/**
+ * Группа пользователей
+**/
+create sequence seq_user_group_id;
+create table user_group (
+    id int primary key default nextval('seq_user_group_id'),
+    name varchar(1024),
+    description varchar(1024),
+    issystem bool default false,
+    deleted bool default false
+);
+
+/**
+ * Типы прав
+**/
+create sequence seq_perm_type;
+create table perm_type (
+    id      int primary key default nextval('seq_perm_type'),
+    name    varchar(1024) unique
+);
+
+/**
+ * Типы cущностей прав
+**/
+create sequence seq_perm_entity_type;
+create table perm_entity_type (
+    id      int primary key default nextval('seq_perm_entity_type'),
+    name    varchar(1024) unique
+);
+
+
+/**
+ * Права
+**/
+create sequence seq_perm;
+create table perm (
+    id              int primary key default nextval('seq_perm'),
+    perm_type_id    int references perm_type(id),
+    entity_type_id  int references perm_entity_type(id),
+    entity_id       int,
+    name            varchar(1024),
+    description     varchar(1024),
+    type            int
+);
+
+
 
 
 create sequence seq_friend_id;
@@ -88,4 +132,24 @@ create table friend(
 );
 
 
-    
+
+
+-------------------------------------------------------------------------------
+-- СВЯЗКИ МНОГИЕ КО МНОГИМ
+-------------------------------------------------------------------------------
+
+/**
+ * Многие ко многим для прав и групп
+**/
+create table perm2group (
+    perm_id int references perm(id) not null,
+    group_id int references user_group(id) not null
+);
+
+/**
+ * Многие ко многим для пользователей и групп
+**/
+create table user2group (
+    user_id int references user_(id) not null,
+    group_id int references user_group(id) not null
+);

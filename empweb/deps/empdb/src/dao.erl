@@ -11,6 +11,33 @@
 %%% Спецификации
 %%% 
 
+fields(Fields) ->
+    fields_([], Fields).
+
+fields(Table, Fields) ->
+    fields_([convert:to_binary(Table), <<".">>], Fields).
+
+
+fields_(_, []) ->
+   <<"*">>;
+
+fields_(Table, Fields) ->
+    [[_|First]|Res] = lists:map(fun(Field)->
+        [<<",">> ,[convert:to_binary(Table), convert:to_binary(Field)]]
+    end,Fields),
+    [<<" ">>, [First|Res], <<" ">>].
+
+fieldvars(Fields) ->
+    [[_|First]|Res] = lists:map(fun(Field)->
+        [<<",">> , [<<"$">>, convert:to_binary(Field)]]
+    end,Fields),
+    [<<" ">>, [First|Res], <<" ">>].
+
+fields_fieldvars(Fields) ->
+    [[_|First]|Res] = lists:map(fun(Field)->
+        [<<",">> , [convert:to_binary(Field), <<"=$">>, convert:to_binary(Field)]]
+    end,Fields),
+    [<<" ">>, [First|Res], <<" ">>].
 
 pg2rs({ok, _, Vals}, Record_name) ->
     [list_to_tuple([Record_name | tuple_to_list(X)]) || X <- Vals];
@@ -391,7 +418,7 @@ equery(Con, Qfunction, Params) when erlang:is_function(Qfunction) ->
 %%%
 equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
     case is_proplist(Params) of
-        true -> 
+        true ->
             {NewQuery, Values} = equery_pl(Query, Params),
             io:format("NewQuery = ~p~n", [NewQuery]),
             psqlcp:equery(Con, NewQuery, Values);
@@ -512,7 +539,7 @@ equery_construct(Query, Name, Cnt) ->
         Query,
         memo:lsave(fun equery_construct_re/1, [Name]),
         ?SVAR ++ convert:to_list(Cnt),
-        [{return,list}]
+        [global, {return,list}]
     ).
 
 %%%

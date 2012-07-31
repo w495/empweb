@@ -26,9 +26,9 @@ start(StartApps) ->
             true ->
                 recover_if_needed(),
                 catch deps:ensure(),
-                ok = nodeclt_amnesia:ensure_mnesia_dir(),
+                ok = amnesia:ensure_mnesia_dir(),
                 ok = start_applications([mnesia]),
-                ok = nodeclt_amnesia:init();
+                ok = amnesia:init();
             false ->
                 done
         end,
