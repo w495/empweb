@@ -36,22 +36,36 @@ fields()->
         id,
         nick,
         name,
-        description,
         phash,
         email,
         phone,
         fname,
         sname,
-        city,
-        married_id,
-        mother_id ,
-        father_id,
-        emotion_id,
-        money,
-        status_id ,
-        country_id,
-        deleted
+        'extract(epoch from birthday) as birthday',
+        male    ,
+        city    ,
+        married_status,
+        married_id    ,
+        description   ,
+        money         ,
+        status_id     ,
+        authority_id  ,
+        country_id    ,
+        emotion_id    ,
+        mother_id     ,
+        father_id     ,
+        community_id  ,
+        employment    ,
+        hobby         ,
+        allow_auction_offer
+        %,
+        %userpic_body_id    ,
+        %userpic_head_id    
     ].
+
+
+selectables() ->
+    fields().
 
 
 filter_fields(List) ->
@@ -84,7 +98,7 @@ get(Con, {id, Id}, Fields)->
         dao:equery(Con,
             [
                 <<"select ">>,
-                dao:fields(Fields),
+                dao:fields(Fields, selectables()),
                 <<" from user_ where id = $1">>
             ],
             [Id]
@@ -96,7 +110,7 @@ get(Con, {name, Name}, Fields)->
         dao:equery(Con,
             [
                 <<"select ">>,
-                dao:fields(Fields),
+                dao:fields(Fields, selectables()),
                 <<" from user_ where name = $1">>
             ],
             [Name]
@@ -109,7 +123,7 @@ get(Con, {nick, Nick}, Fields)->
         dao:equery(Con,
             [
                 <<"select ">>,
-                dao:fields(Fields),
+                dao:fields(Fields, selectables()),
                 <<" from user_ where nick = $1">>
             ],
             [Nick]
@@ -121,7 +135,7 @@ get(Con, _, Fields)->
         dao:equery(Con,
             [
                 <<"select ">>,
-                dao:fields(Fields),
+                dao:fields(Fields, selectables()),
                 <<" from user_">>
             ]
         )
@@ -167,7 +181,7 @@ get_perm(Con, {id, Id}, Fields) ->
     dao:pgret(
         dao:equery(Con,[
             <<"select distinct ">>,
-                dao:fields(Fields),
+                dao:table_fields(perm, Fields),
             <<" from perm "
                 "join perm2group on "
                     " perm2group.perm_id = perm.id "
@@ -182,7 +196,7 @@ get_perm(Con, {nick, Nick}, Fields) ->
     dao:pgret(
         dao:equery(Con,[
             <<"select distinct ">>,
-                dao:fields(perm, Fields),
+                dao:table_fields(perm, Fields),
             <<" from perm "
                 "join perm2group on "
                     " perm2group.perm_id = perm.id "
@@ -205,7 +219,7 @@ get_group(Con, {id, Id}, Fields) ->
     dao:pgret(
         dao:equery(Con,[
             <<"select distinct ">>,
-                dao:fields(Fields),
+                dao:table_fields(user_group, Fields),
             <<" from user_group "
                 "join user2group on "
                     " user2group.group_id = user_group.id "

@@ -11,33 +11,93 @@
 %%% Спецификации
 %%% 
 
+%%% -----------------------------------------------------------------------
+
+fields(all) ->
+    fields([], all);
+
 fields(Fields) ->
-    fields_([], Fields).
+    fields(Fields, []).
 
-fields(Table, Fields) ->
-    fields_([convert:to_binary(Table), <<".">>], Fields).
+fields(Fields, all) ->
+    fields(Fields, <<"*">>);
 
+fields(Fields, Default) ->
+    fields(Fields, Default, []).
 
-fields_(_, []) ->
-   <<"*">>;
+fields(all, Default, Additions) ->
+    fields_([], [], Default, Additions);
 
-fields_(Table, Fields) ->
+fields(Fields, Default, Additions) ->
+    fields_([], Fields, Default, Additions).
+    
+%%% -----------------------------------------------------------------------
+
+table_fields(Table, Fields) ->
+    table_fields(Table, Fields, []).
+
+table_fields(Table, Fields, Default) ->
+    table_fields(Table, Fields, Default, []).
+
+table_fields(Table, Fields, Default, Additions) ->
+    fields_([convert:to_binary(Table), <<".">>], Fields, Default, Additions).
+
+%%% -----------------------------------------------------------------------
+
+fields_(_, [], [], _additions) ->
+   <<>>;
+
+fields_(Table, [], [D|Rest] = Default, Additions) when erlang:is_atom(D) ->
+    fields_(Table, Default, [], Additions);
+
+fields_(_, [], Default, _additions) ->
+   Default;
+
+fields_(Table, Fields, _default, Additions) ->
     [[_|First]|Res] = lists:map(fun(Field)->
         [<<",">> ,[convert:to_binary(Table), convert:to_binary(Field)]]
-    end,Fields),
+    end,lists:append(Fields, Additions)),
     [<<" ">>, [First|Res], <<" ">>].
+
+%%% -----------------------------------------------------------------------
+
 
 fieldvars(Fields) ->
+    fieldvars(Fields, []).
+
+fieldvars(Fields, Default) ->
+    fieldvars(Fields, Default, []).
+
+fieldvars([], Default, _additions) ->
+    Default;
+fieldvars(Fields, _default, Additions) ->
     [[_|First]|Res] = lists:map(fun(Field)->
         [<<",">> , [<<"$">>, convert:to_binary(Field)]]
-    end,Fields),
+    end,lists:append(Fields, Additions)),
     [<<" ">>, [First|Res], <<" ">>].
 
-fields_fieldvars(Fields) ->
+%%% -----------------------------------------------------------------------
+
+fields_fieldvars(Fields)->
+    fields_fieldvars(Fields, []).
+
+fields_fieldvars(Fields, Default)->
+    fields_fieldvars(Fields, Default, []).
+
+fields_fieldvars([], Default, _additions) ->
+    Default;
+fields_fieldvars(Fields, _default, Additions) ->
     [[_|First]|Res] = lists:map(fun(Field)->
         [<<",">> , [convert:to_binary(Field), <<"=$">>, convert:to_binary(Field)]]
     end,Fields),
     [<<" ">>, [First|Res], <<" ">>].
+
+
+
+
+
+
+
 
 pg2rs({ok, _, Vals}, Record_name) ->
     [list_to_tuple([Record_name | tuple_to_list(X)]) || X <- Vals];
@@ -423,6 +483,7 @@ equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
             io:format("NewQuery = ~p~n", [NewQuery]),
             psqlcp:equery(Con, NewQuery, Values);
         _ ->
+            io:format("Query = ~p~n", [list_to_binary(Query)]),
             psqlcp:equery(Con, Query, Params)
     end.
 
