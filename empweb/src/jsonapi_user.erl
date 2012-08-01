@@ -1,37 +1,50 @@
+%%
+%% @file    jsonapi_user.erl 
+%%          "Контроллер" для функций работы с пользователями.
+%%
+
 -module(jsonapi_user).
+-behavior(empweb_http_hap).
+
+%% ---------------------------------------------------------------------------
+%% Заголовочные файлы
+%% ---------------------------------------------------------------------------
 
 -include("empweb.hrl").
-
 -include_lib("norm/include/norm.hrl").
 
+%% ---------------------------------------------------------------------------
+%% Экспортируемые функции
+%% ---------------------------------------------------------------------------
+
 -export([
-    init/2,
-    get/2,
-    register/2,
-    update/2,
-    login/2,
-    logout/2,
-    delete_friend/2,
-    add_friend/2,
-    add_friend/2,
-    get_friends/2,
+    init/3,
+    handle/2,
     at_list_one/1,
     terminate/2
 ]).
 
+%% ---------------------------------------------------------------------------
+%% Внешние функции
+%% ---------------------------------------------------------------------------
 
--record(jsonapi_user,{
-    params  =   [],
-    is_auth =   false,
-    action
-}).
+%%
+%% @doc Инициализация запроса
+%%
+init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
+    ?debug("~n init : Hap = ~p", [Hap]),
+    {ok,
+        Req,
+        #empweb_hap{
+            action=Action,
+            params=Params,
+            is_auth=Is_auth
+        }
+    }.
 
-init(Req, Params)->
-    {ok, Req, #jsonapi_user{params=Params}}.
-
-
-register(Req, #jsonapi_user{params=Params}) ->
+handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = nick,
@@ -71,18 +84,76 @@ register(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            {ok, Body} = biz_user:register(Data#norm.return),
-            {ok, #empweb_resp{
-                status  = ok,
-                format = json,
-                body = Body
-            }, []}
+            {ok,jsonapi:resp(biz_user:register(Data#norm.return)),Hap}
         end
-    ).
+    );
 
-get_friends(Req, #jsonapi_user{params=Params}) ->
-    io:format("Params = ~p", [Params]),
+
+handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = nick,
+                types = [string]
+            },
+            #norm_rule{
+                key = pass,
+                types = [string]
+            }
+        ]),
+        fun(Data)->
+            %% Если logout выполнился успешно,
+            %%  то устанавливаем клиенту cookie.
+            case biz_user:logout([
+                {session_id, empweb_http:auth_cookie(Req)}
+                | Data#norm.return
+            ]) of
+                {ok, Body} ->
+                    {ok,
+                        (jsonapi:resp({ok, Body}))#empweb_resp{
+                            cookies = [empweb_http:make_auth_cookie(Body)]
+                        },
+                        Hap
+                    };
+                Some ->
+                    {ok, jsonapi:resp(Some), Hap}
+            end
+        end
+    );
+
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = nick,
+                types = [string]
+            }
+        ]),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_user:logout([
+                        {session_id, empweb_http:auth_cookie(Req)}
+                        | Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap) ->
+    ?debug("Params = ~p", [Params]),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = user_id,
@@ -90,25 +161,17 @@ get_friends(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            jsonapi:is_auth(Req,
-                fun
-                    ({ok, Body})->
-                        {ok, #empweb_resp{
-                            status  = ok,
-                            format = json,
-                            body = {[{ok, Body}]}
-                        }, []};
-                    ({error, Error})->
-                        {error, Error}
-                end,
-                [biz_user:get_friends(Data#norm.return)]
-            )
+            {ok,jsonapi:resp(biz_user:get_friends(Data#norm.return)),Hap}
         end
-    ).
+    );
 
-add_friend(Req, #jsonapi_user{params=Params}) ->
-    io:format("Params = ~p", [Params]),
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) ->
+    ?debug("Params = ~p", [Params]),
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = user_id,
@@ -120,25 +183,17 @@ add_friend(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            jsonapi:is_auth(Req,
-                fun
-                    ({ok, Body})->
-                        {ok, #empweb_resp{
-                            status  = ok,
-                            format = json,
-                            body = {[{ok, Body}]}
-                        }, []};
-                    ({error, Error})->
-                        {error, Error}
-                end,
-                [biz_user:add_friend(Data#norm.return)]
-            )
+            {ok,jsonapi:resp(biz_user:add_friend(Data#norm.return)),Hap}
         end
-    ).
+    );
 
-delete_friend(Req, #jsonapi_user{params=Params}) ->
-    io:format("Params = ~p", [Params]),
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Hap) ->
+    ?debug("Params = ~p", [Params]),
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = user_id,
@@ -150,26 +205,20 @@ delete_friend(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            jsonapi:is_auth(Req,
-                fun
-                    ({ok, Body})->
-                        {ok, #empweb_resp{
-                            status  = ok,
-                            format = json,
-                            body = {[{ok, Body}]}
-                        }, []};
-                    ({error, Error})->
-                        {error, Error}
-                end,
-                [biz_user:delete_friend(Data#norm.return)]
-            )
+            {ok,jsonapi:resp(biz_user:delete_friend(Data#norm.return)),Hap}
         end
-    ).
+    );
 
-
-get(Req, #jsonapi_user{params=Params}) ->
-    io:format("Params = ~p", [Params]),
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
+    %%
+    %% Для вызова данной функции достаточно иметь
+    %% хотя бы один параметр из перечисленных
+    %%
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = id,
@@ -188,30 +237,22 @@ get(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            jsonapi:is_auth(Req,
-                fun
-                    ({ok, Body})->
-                        {ok, #empweb_resp{
-                            status  = ok,
-                            format = json,
-                            body = {[{ok, Body}]}
-                        }, []};
-                    ({error, Error})->
-                        {error, Error}
-                end,
-                [biz_user:get(at_list_one(Data#norm.return))]
-            )
+            case at_list_one(Data#norm.return) of
+                {ok, Tuple} ->
+                    {ok,jsonapi:resp(biz_user:get(Tuple)),Hap};
+                _ ->
+                    {ok,jsonapi:resp({error, no_param}), Hap}
+            end
         end
-    ).
+    );
 
-at_list_one([]) ->
-    {error, <<"no parm">>};
-at_list_one([Return|_]) ->
-    Return.
-
-
-update(Req, #jsonapi_user{params=Params}) ->
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap) ->
+    ?debug("~n update : Hap = ~p", [Hap]),
     jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key = id,
@@ -269,66 +310,26 @@ update(Req, #jsonapi_user{params=Params}) ->
             }
         ]),
         fun(Data)->
-            jsonapi:is_auth(Req,
-                fun
-                    ({ok, Body})->
-                        {ok, #empweb_resp{
-                            status  = ok,
-                            format = json,
-                            body = {[{ok, Body}]}
-                        }, []};
-                    ({error, Error})->
-                        {error, Error}
-                end,
-                [biz_user:update(Data#norm.return)]
-            )
+            {ok,jsonapi:resp(biz_user:update(Data#norm.return)),Hap}
         end
-    ).
+    );
 
-login(Req, #jsonapi_user{params=Params}) ->
-    jsonapi:handle_params(
-        norm:norm(Params, [
-            #norm_rule{
-                key = nick,
-                types = [string]
-            },
-            #norm_rule{
-                key = pass,
-                types = [string]
-            }
-        ]),
-        fun(Data)->
-            {ok, Body} = biz_user:login(Data#norm.return),
-            {ok, #empweb_resp{
-                status  = ok,
-                format = json,
-                cookies = [empweb_http:make_auth_cookie(Body)],
-                body = Body
-            }, []}
-        end
-    ).
 
-logout(Req, #jsonapi_user{params=Params}) ->
-    jsonapi:handle_params(
-        norm:norm(Params, [
-            #norm_rule{
-                key = nick,
-                types = [string]
-            }
-        ]),
-        fun(Data)->
-            {ok, Body} = biz_user:logout([
-                {session_id, empweb_http:auth_cookie(Req)}
-                | Data#norm.return
-            ]),
-            {ok, #empweb_resp{
-                status  = ok,
-                format = json,
-                body = Body
-            }, []}
-        end
-    ).
+handle(_req, Hap) ->
+    {ok,jsonapi:forbidden(), Hap}.
 
-terminate(Req, #jsonapi_user{params=Params})->
 
+terminate(_req, _hap)->
+    ?debug("~n :: terminate ~p~n", [_hap]),
+    
     ok.
+
+%% ---------------------------------------------------------------------------
+%% Внутрениие функции
+%% ---------------------------------------------------------------------------
+
+at_list_one([]) ->
+    {error, no_param};
+at_list_one([Return|_]) ->
+    {ok, Return}.
+

@@ -3,16 +3,18 @@
 %% Description: TODO: Add description to biz_user
 -module(biz_user).
 
-%%
-%% Include files
-%%
+%% ---------------------------------------------------------------------------
+%% Заголовочные файлы
+%% ---------------------------------------------------------------------------
 
+-include("empweb.hrl").
 -include("biz_session.hrl").
 
 
-%%
-%% Exported Functions
-%%
+%% ---------------------------------------------------------------------------
+%% Экспортируемые функции
+%% ---------------------------------------------------------------------------
+
 -export([
     register/1,
     update/1,
@@ -25,9 +27,10 @@
     delete_friend/1
 ]).
 
-%%
-%% API Functions
-%%
+%% ---------------------------------------------------------------------------
+%% Внешние функции
+%% ---------------------------------------------------------------------------
+
 
 is_auth({session_id, Session_id})->
     case biz_session:get(Session_id) of
@@ -53,7 +56,6 @@ update(Params)->
                 |Params
             ])
     end.
-
 
 logout(Params)->
     case domain_user:logout(Params) of
@@ -100,12 +102,6 @@ get(Params) ->
     ).
 
 
-
-
-% logout(Session_id) ->
-%     biz_session:remove(Session_id).
-
-
 get_friends(Params)->
     domain_user:get_friends(Params).
 
@@ -115,13 +111,8 @@ add_friend(Params)->
 delete_friend(Params)->
     domain_user:delete_friend(Params).
 
-%%
-%% Local Functions
-%%
-
-
 login(Params) ->
-    io:format("login(Params) -> Params = ~p~n", [Params]),
+    ?debug("login(Params) -> Params = ~p~n", [Params]),
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
     Phash = phash(Pass),
@@ -131,8 +122,8 @@ login(Params) ->
         {ok, [{Userpl}]} ->
             Perm_names = proplists:get_value(perm_names, Userpl),
             P = proplists:get_value(phash, Userpl),
-            io:format("login(Params) -> P  = ~p~n", [P ]),
-            io:format("login(Params) -> Phash  = ~p~n", [Phash]),
+            ?debug("login(Params) -> P  = ~p~n", [P ]),
+            ?debug("login(Params) -> Phash  = ~p~n", [Phash]),
             if
 %                 EC >= Max_auth_error ->
 %                     throw({auth_count_overflow, Max_auth_error});
@@ -162,6 +153,10 @@ login(Params) ->
             _ ->
                 throw(bad_user)
     end.
+
+%% ---------------------------------------------------------------------------
+%% Внутрениие функции
+%% ---------------------------------------------------------------------------
 
 phash(Pass) ->
     hexstring(erlang:md5(Pass)).

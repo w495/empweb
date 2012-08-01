@@ -3,6 +3,7 @@
 
 -export([
     start/0,
+    is_auth/1,
     new/1,
     get/1,
     gen_uid/1,
@@ -24,6 +25,18 @@
 start() ->
     %%% Зачем нам нужна амнезия ?
     biz_session_amnesia:start().
+
+is_auth({session_id, Session_id})->
+    case biz_session:get(Session_id) of
+        [] ->
+            false;
+        [_H=#biz_session{perm_names=PList}|_T] ->
+            true
+    end;
+
+is_auth(Session_id)->
+    is_auth({session_id, Session_id}).
+
 
 gen_uid(Login) ->
     Uid = <<(uuid:to_string(uuid:v4()))/binary,(convert:to_binary(Login))/binary>>,

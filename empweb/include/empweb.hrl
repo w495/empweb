@@ -2,6 +2,9 @@
 -define(__EMPWEB_474797140__, true).
 
 
+%%
+%%
+%%
 -record(empweb_ctl, {
     ctl,
     act,
@@ -9,6 +12,21 @@
 }).
 
 
+%%
+%%
+%%
+-record(empweb_hap, {
+    handler,
+    action,
+    params = [],
+    is_auth = true
+}).
+
+
+%%
+%% @doc Временный контейнер для ответа сервера.
+%%      При прочих равных условиях лучше использовать его.
+%%
 -record(empweb_resp, {
     status = 200,
     format  = json,
@@ -17,11 +35,36 @@
     body = []
 }).
 
+
+%%
+%%
+%%
 -record(http_resp, {
     status = 200,
     headers = [],
     body = []
 }).
+
+
+
+%%
+%% =========================================================================
+%% =========================================================================
+%%
+
+%%
+%% =========================================================================
+%% =========================================================================
+%%
+
+-define(debug(S),       io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE])).
+-define(debug(S, P),    io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE|P])).
+
+-define(d(S),       io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE])).
+-define(d(S, P),    io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE|P])).
+
+
+
 
 %%
 %% ========================================================================= 

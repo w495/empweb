@@ -56,15 +56,14 @@ create table userpic_head(
     id          int primary key default nextval('seq_userpic_head_id'),
     file        varchar(1024)   default  null,
     deleted     bool default false
-)
+);
 
 create sequence seq_userpic_body_id;
 create table userpic_body(
     id          int primary key default nextval('seq_userpic_body_id'),
     file        varchar(1024)   default  null,
     deleted     bool default false
-)
-
+);
 
 
 /**

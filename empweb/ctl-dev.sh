@@ -8,25 +8,26 @@
     PATH=$PATH:/usr/local/lib/
     export PATH
 
-    IP=`ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | \
+
+    IP=`ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1'  --max-count=1 | \
         cut -d: -f2 | awk '{print $1}'`
 
     if [ "" = "$IP" ]; then
         IP="localhost"
     fi
 
+
     MAIN_NODE="$NAME@$IP"
-    MAIN_APP="empweb_app"
+    MAIN_APP=$NAME"_app"
 
     CTRL_NODE="$NAME`date +_nodeclt_%H_%M_%S_%N`b@$IP"
     ERL_ARGS="+K true +A 128 +P 1000000"
     ERL_MAX_ETS_TABLES=140000
     export ERL_MAX_ETS_TABLES
 
-    OTHERBINPATH="./deps/*/ebin"
+    OTHERBINPATH=`find ./deps  -path '*.git' -prune -o  -type d -name 'ebin' -printf '%h/%f '`
     LOCALLBINPATH=`find ./ebin -type d -printf '%h/%f '`
     BINPATH=${OTHERBINPATH}" "${LOCALLBINPATH}
-    SESSIONDBPATH='"./priv/session-db/'$MAIN_NODE'/"'
 # ---------------------------------------------------------------------------
     if [ "" = "$ACTION"   ]; then
         echo "

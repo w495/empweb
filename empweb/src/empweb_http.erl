@@ -31,6 +31,115 @@ make_auth_cookie(Body) ->
     }.
 
 
+%%
+%% В старом стиле для классических контроллеров
+%%
+call(Req, {Ctl,Act,Opt}) ->
+    ?debug("call ::: {Ctl,Act,Opt} = ~p~n", [{Ctl,Act,Opt}]),
+    call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt});
+
+%%
+%% В новом стиле для хендлеров
+%%
+call(Req, {Handler,{Action,Params}} = Hao) ->
+    ?debug("call Hao= ~p~n", [Hao]),
+    call(
+        Req,
+        #empweb_hap{
+            handler=Handler,
+            action=Action,
+            params=Params
+        }
+    );
+
+call(Req, {Handler,{Action,Params,Is_auth}}=Hao) ->
+    ?debug("call Hao = ~p~n", [Hao]),
+    call(
+        Req,
+        #empweb_hap{
+            handler=Handler,
+            action=Action,
+            params=Params,
+            is_auth=Is_auth
+        }
+    );
+
+%%
+%% В старом стиле для классических контроллеров
+%%
+call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt} = Action) ->
+    ?debug("call ::: Action = ~p~n", [Action]),
+    case call_init(Req, Action) of
+        {ok, Nreq, State} ->
+            call_handle(Nreq, Action, State);
+        {error, Error} ->
+            {error, Error}
+    end;
+
+%%
+%% В новом стиле для хендлеров
+%%
+call(Req, #empweb_hap{handler=Handler,action=Action,params=Params} = Hao) ->
+    case call_init(Req, Hao) of
+        {ok, Nreq, State} ->
+            ?debug("~ncall_init(Req, Hao)  = ~p~n", [{ok, Nreq, State}]),
+            call_handle(Nreq, Hao, State);
+        {error, Error} ->
+            {error, Error}
+    end;
+
+call(Req, Some) ->
+    {error, unknown_function}.
+
+    
+%%
+%% В старом стиле для классических контроллеров
+%%
+call_init(Req, #empweb_ctl{ctl=Ctl,opt=Opt} = Action) ->
+    ?debug("call_init ::: Action = ~p~n", [Action]),
+    %% Третий аргумент оставлен для совместимости с cowboy
+    Ctl:init([], Req, Opt);
+
+%%
+%% В новом стиле для хендлеров
+%%
+call_init(Req, #empweb_hap{handler=Handler}=Hao) ->
+    %% Третий аргумент оставлен для совместимости с cowboy
+    Handler:init([], Req, Hao).
+
+%%
+%% В старом стиле для классических контроллеров
+%%
+call_handle(Req, #empweb_ctl{ctl=Ctl,act=Act}=Action, State) ->
+    ?debug("call_handle ::: Action = ~p~n", [Action]),
+    case Ctl:Act(Req, State) of
+        {ok, Reply, Nstate} ->
+            ?debug("call_handle ::: Reply, Nstate = ~p ~p ~n", [Reply, Nstate]),
+            ok = Ctl:terminate(Req, Nstate),
+            ?debug("call_handle ::: Reply = ~p ~n", [Reply]),
+            {ok, Reply};
+        Error ->
+            ?debug("call_handle ::: Error = ~p~n", [Error]),
+            Ctl:ternimate(Req, State),
+            {error, Error}
+    end;
+
+%%
+%% В новом стиле для хендлеров
+%%
+call_handle(Req, #empweb_hap{handler=Handler,action=Action}=Hap, State) ->
+    ?debug("call_handle ::: Action = ~p~n", [Action]),
+    case Handler:handle(Req, State) of
+        {ok, Reply, Nstate} ->
+            ?debug("call_handle ::: Reply, Nstate = ~p ~p ~n", [Reply, Nstate]),
+            ok = Handler:terminate(Req, Nstate),
+            ?debug("call_handle ::: Reply = ~p ~n", [Reply]),
+            {ok, Reply};
+        Error ->
+            ?debug("call_handle ::: Error = ~p~n", [Error]),
+            Handler:ternimate(Req, State),
+            {error, Error}
+    end.
 
 
 resp(#empweb_resp{cookies=Cookies} = Empweb_resp)
@@ -43,8 +152,8 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Options})->
-                cowboy_cookies:cookie(Name, Value, Options)
+            ({Name, Value, Params})->
+                cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
 
     #http_resp{
@@ -63,8 +172,8 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Options})->
-                cowboy_cookies:cookie(Name, Value, Options)
+            ({Name, Value, Params})->
+                cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
 
     #http_resp{
@@ -79,10 +188,10 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Options})->
-                cowboy_cookies:cookie(Name, Value, Options)
+            ({Name, Value, Params})->
+                cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
-        
+
     #http_resp{
         status=Status,
         headers=[resp_format(Format)|lists:append(Cookies, Headers)],
@@ -118,7 +227,7 @@ status(use_proxy) ->            305;
 status(switch_proxy) ->         306;
 status(temporary_redirect) ->   306;
 
-status(bad_request) ->                      404;
+status(bad_request) ->                      400;
 status(unauthorized) ->                     401;
 status(payment_required) ->                 402;
 status(forbidden) ->                        403;
@@ -128,7 +237,7 @@ status(not_acceptable) ->                   406;
 status(proxy_authentication_required) ->    407;
 status(request_timeout) ->                  408;
 status(conflict) ->                         409;
-status(length_required) ->                  410;
+status(gone) ->                             410;
 status(length_required) ->                  411;
 status(precondition_failed) ->              412;
 status(request_entity_too_large) ->         413;
@@ -158,38 +267,3 @@ status(not_extended) ->                     510;
 status(network_authentication_required) ->  511;
 
 status(X) ->                                   0.
-
-
-call(Req, {Ctl,Act,Opt}) ->
-    io:format("call ::: {Ctl,Act,Opt} = ~p~n", [{Ctl,Act,Opt}]),
-    call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt});
-
-call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt} = Action) ->
-    io:format("call ::: Action = ~p~n", [Action]),
-    case call_init(Req, Action) of
-        {ok, Nreq, State} ->
-            call_emp_ctl(Nreq, Action, State);
-        {error, Error} ->
-            {error, Error}
-    end.
-
-call_init(Req, #empweb_ctl{ctl=Ctl,opt=Opt} = Action) ->
-    io:format("call_init ::: Action = ~p~n", [Action]),
-    Ctl:init(Req, Opt).
-
-call_emp_ctl(Req, #empweb_ctl{ctl=Ctl,act=Act}=Action, State) ->
-    io:format("call_emp_ctl ::: Action = ~p~n", [Action]),
-    case Ctl:Act(Req, State) of
-        {ok, Reply, Nstate} ->
-            io:format("call_emp_ctl ::: Reply, Nstate = ~p ~p ~n", [Reply, Nstate]),
-            ok = Ctl:terminate(Req, Nstate),
-            io:format("call_emp_ctl ::: Reply = ~p ~n", [Reply]),
-            {ok, Reply};
-        Error ->
-            io:format("call_emp_ctl ::: Error = ~p~n", [Error]),
-            Ctl:ternimate(Req, State),
-            {error, Error}
-    end.
-
-
-

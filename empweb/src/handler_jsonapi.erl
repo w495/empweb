@@ -5,100 +5,142 @@
 -export([init/3, handle/2, terminate/2]).
 
 
+
+
 -include("empweb.hrl").
 
 -include_lib("norm/include/norm.hrl").
 
+%%
+%% =========================================================================
+%% =========================================================================
+%%
+-compile({parse_transform, zt}).
+
+-define(FUNCTION, '__function_macro__').
+-define(ARITY, '__function_arity__').
+-define(ARGS, '__function_args__').
+
+-record(event_fun, {
+    module      =   ?MODULE,
+    function    =   ?FUNCTION,
+    arity       =   ?ARITY,
+    line        =   ?LINE
+}).
+
+-record(event_data, {
+    args    = [],
+    data    = [],
+    log     = [],
+    debug   = [],
+    error   = [],
+    info    = []
+}).
+
+
+-record(event, {
+   'fun' = #event_fun{},
+    data = #event_data{},
+    datetime = erlang:now()
+}).
+
+
+-define(event,
+    #event{
+        'fun'=#event_fun{function=?FUNCTION, arity=?ARITY, args}
+    }
+).
+
+-define(event(Data),
+    #event{
+        'fun'   = #event_fun{function=?FUNCTION, arity=?ARITY},
+         data   = Data
+    }
+).
+
+
+-define(eventd, ?event).
+
+-define(eventd(Data),
+    ?event(#event_data{Data})
+).
+
+
+-define(notify, evman:note(?eventd)).
+
+-define(notify(Data), evman:note(?eventd(Data))).
+
 
 init({tcp, http}, Req, _Opts) ->
-    io:format("init({tcp, http}, Req, _Opts) ->~n"),
+    ?debug("init({tcp, http}, Req, _Opts) ->~p~n", [{?MODULE, ?FUNCTION, ?ARITY}]),
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-    io:format("handle(Req, State) ->~n"),
+    ?notify(args=[Req, State]),
+    
     Empweb_resp  =
         case cowboy_http_req:method(Req) of
             {'POST', _} ->
-                io:format("handle(Req, State) ->~n"),
+                ?debug("handle(Req, State) ->~n"),
                 handle_post(Req, State);
             _ ->
-                #empweb_resp{
-                    status  = method_not_allowed,
-                    format = json,
-                    body = {[
-                        {<<"error">>, <<"not post">>}
-                    ]}
-                }
+                jsonapi:method_not_allowed()
         end,
-    io:format("-> 1 ~n"),
+    ?debug("-> 1 ~n"),
     Http_resp = empweb_http:resp(Empweb_resp),
-    io:format("-> Http_resp ~p ~n", [Http_resp]),
+    ?debug("-> Http_resp ~p ~n", [Http_resp]),
     X = ejson:encode(Http_resp#http_resp.body),
-    io:format("-> X ~p ~n", [X]),
+    ?debug("-> X ~p ~n", [X]),
     {ok, Reply} = cowboy_http_req:reply(
         Http_resp#http_resp.status,
         Http_resp#http_resp.headers,    
         X,
         Req
     ),
-    io:format("-> Reply ~p ~n", [Reply]),
+    ?debug("-> Reply ~p ~n", [Reply]),
     {ok,Reply,State}.
 
 handle_post(Req, State)->
-    io:format("-> handle_post ~n"),
+    ?notify(args=[Req, State]),
+
+    ?debug("-> handle_post ~n"),
     case cowboy_http_req:body_qs(Req) of
             {Post_body, _} ->
                 handle_post_body(Req, State, Post_body);
             _ ->
-                #empweb_resp{
-                    status  = not_extended,
-                    format = json,
-                    body = {[
-                        {<<"error">>, <<"no post body">>}
-                    ]}
-                }
+                jsonapi:not_extended(no_post_body)
         end.
 
 handle_post_body(Req, State, Post_body)->
     case proplists:get_value(<<"data">>, Post_body) of
         undefined ->
-            #empweb_resp{
-                status  = not_extended,
-                format = json,
-                body = {[
-                    {[{<<"error">>, <<"no data">>}]}
-                ]}
-            };
+            jsonapi:not_extended(no_data);
         Binary_object ->
             handle_data(Req, State, Binary_object)
     end.
 
-handle_data(Req, State, Binary_object)->
+handle_data(Req, _state, Binary_object)->
     try
-        io:format("Binary_object =  ~p~n", [Binary_object]),
+        ?debug("Binary_object =  ~p~n", [Binary_object]),
         Object  =  ejson:decode(Binary_object),
-        io:format("Object  =  ~p~n", [Object]),
+        ?debug("Object  =  ~p~n", [Object]),
         jsonapi_map(Req, Object)
     catch
         throw:{invalid_json, _} ->
-            #empweb_resp{
-                status  = not_extended,
-                format = json,
-                body = {[
-                    {<<"error">>, <<"invalid json">>}
+            jsonapi:not_extended(invalid_json);
+        Eclass:Ereason ->
+            ?debug("~p ~p ~n", [Eclass, Eclass]),
+            jsonapi:internal_server_error(
+                {[
+                    {unknown_error, 
+                        {[
+                            {class, jsonapi:format(Eclass)},
+                            {reason, jsonapi:format(Ereason)}
+                        ]}
+                    }
                 ]}
-            };
-        T:E ->
-            io:format("~p ~p ~n", [T, E]),
-            #empweb_resp{
-                status  = 500,
-                format = json,
-                body = {[
-                    {<<"error">>, <<"unknown error">>}
-                ]}
-            }
+            )
     end.
-
 
 terminate(_Req, _State) ->
     ok.
@@ -107,173 +149,79 @@ jsonapi_map(Req, {List}) ->
     Fname  =  proplists:get_value(<<"fname">>, List),
     Params  =  proplists:get_value(<<"params">>, List),
 
+    Is_auth=biz_session:is_auth(empweb_http:auth_cookie(Req)),
+
     Action =
         case Fname of
-            <<"register">> ->       {jsonapi_user,'register',Params};
-            <<"login">> ->          {jsonapi_user, login,    Params};
-            <<"logout">> ->         {jsonapi_user, logout,   Params};
-            <<"update_user">> ->    {jsonapi_user, update,   Params};
-            
-            <<"get_friends">> ->    {jsonapi_user, get_friends,   Params};
-            <<"add_friend">> ->     {jsonapi_user, add_friend,   Params};
-            <<"delete_friend">> ->  {jsonapi_user, delete_friend,   Params};
-            
-            <<"get_user">> ->       {jsonapi_user, 'get',    Params};
-            
-            _ -> ok
+            <<"register">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action='register',
+                    params=Params
+                };
+            <<"login">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=login,
+                    params=Params
+                };
+            <<"logout">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=logout,
+                    params=Params
+                };
+            <<"update_user">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=update_user,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            <<"get_friends">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=get_friends,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            <<"add_friend">> ->     
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=add_friend,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            <<"delete_friend">> ->  
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=delete_friend,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            <<"get_user">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=get_user,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            _ -> []
         end,
 
-    io:format("Action = (~p)", [Action]),
+    ?debug("Action = (~p)", [Action]),
     
     case empweb_http:call(Req, Action) of
         {ok, Reply} ->
             Reply;
+        {error, unknown_function} ->
+            jsonapi:not_extended(unknown_function);
         {error, Error} ->
-            #empweb_resp{
-                    status = 500,
-                    format = json,
-                    body   = {[
-                        {<<"error">>,
-                            erlang:list_to_binary(io_lib:format("~p",[Error]))
-                        }
-                    ]}
-            }
+            jsonapi:internal_server_error(
+                {[{unknown_error, jsonapi:format(Error)}]}
+            )
     end;
 
-jsonapi_map(Req, X) ->
-    #empweb_resp{
-        status  = not_extended,
-        format = json,
-        body = {[
-            {<<"error">>, <<"wrong format">>}
-        ]}
-    }.
-
-
-
-
-
-convert(Result) ->
-    Result.
-
-
-handle_params(Data, Function) ->
-    case Data#norm.errors of
-        [] ->
-            io:format("Data#norm.return  =  ~p~n", [Data#norm.return]),
-            case erlang:apply(Function, [Data]) of
-                {ok, Result} -> 
-                    {[{<<"ok">>, convert(Result)}]};
-                ok -> 
-                    {[{<<"ok">>, <<"ok">>}]};
-                {error, Err} ->
-                    X=erlang:list_to_binary(io_lib:format("~p",[Err])),
-                    io:format("X = ~p", [X]),
-                    {[{<<"error">>, X}]}
-            end;
-        Error ->
-            {[{<<"error">>, <<"wrong format">>}]}
-    end.
-%%%
-%% {
-%%  "fname":"register", 
-%%  "params": 
-%%     {
-%%      "nick":"some", 
-%%      "pass":"pass",
-%%      "description":"description",
-%%      "email":"w@w-495.ru",
-%%      "phone":"w@w-495.ru",
-%%      "fname":"fname",
-%%      "sname":"sname",
-%%      "birthday" : "sdsd",
-%%      "city":"city"
-%%     }
-%% }
-%%%
-
-
-%%%
-%%% {"fname":"login", "params": {"nick":"admin", "pass":"pass"}}
-%%%
-jsonmap(<<"login">>, Params) ->
-    io:format("Params = ~p", [Params]),
-    Data  =  norm:norm(Params, [
-        #norm_rule{
-            key = nick,
-            types = [string]
-        },
-        #norm_rule{
-            key = pass,
-            types = [string]
-        }
-    ]),
-    io:format("Data = ~p", [Data]),
-    io:format("Data#norm.return = ~p", [Data#norm.return]),
-    handle_params(Data, fun(Data)->
-        io:format("Data#norm.return = ~p", [Data#norm.return]),
-        X =biz_user:login(Data#norm.return),
-        io:format("X = ~p", [X]),
-        X
-    end);
-
-%%%
-%%% {"fname":"logout", "params": {"nick":"admin"}}
-%%%
-jsonmap(<<"logout">>, Params) ->
-    io:format("Params = ~p", [Params]),
-    Data  =  norm:norm(Params, [
-        #norm_rule{
-            key = nick,
-            types = [string]
-        }
-    ]),
-    io:format("Data = ~p", [Data]),
-    io:format("Data#norm.return = ~p", [Data#norm.return]),
-    handle_params(Data, fun(Data)->
-        biz_user:logout(Data#norm.return)
-    end);
-
-%%%
-%%% {"fname":"get_friends", "params": {"user_id":"12"}}
-%%%
-
-%%%
-%%% {"fname":"add_friend", "params": {"user_id":12, friend_id:1}}
-%%%
-
-
-%%%
-%%% {"fname":"delete_friend", "params": {"user_id":12, friend_id:1}}
-%%%
-jsonmap(<<"delete_friend">>, Params) ->
-    io:format("Params = ~p", [Params]),
-    Data  =  norm:norm(Params, [
-        #norm_rule{
-            key = user_id,
-            types = [integer]
-        },
-        #norm_rule{
-            key = friend_id,
-            types = [integer]
-        }
-    ]),
-    handle_params(Data, fun(Data)->
-        biz_user:delete_friend(Data#norm.return)
-    end);
-
-jsonmap(<<"user_create">>, []) ->
-    {[{<<"ok">>, 1}]};
-
-jsonmap(<<"user_update">>, []) ->
-    {[{<<"ok">>, 1}]};
-
-jsonmap(<<"user_get">>, []) ->
-    {[{<<"name">>, <<"fff">>}]};
-
-jsonmap(<<"user_list">>, []) ->
-    [{[{<<"name">>, <<"fff">>}]}];
-
-jsonmap(Function, Params) ->
-    {[{<<"error">>, <<"wrong format">>}]}.
+jsonapi_map(_req, _x) ->
+    jsonapi:not_extended(wrong_format).
 
