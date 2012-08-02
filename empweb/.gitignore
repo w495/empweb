@@ -14,9 +14,9 @@
 *.DAT
 *.DCD
 
-./deps/cowboy/*
-./deps/empdb/deps/psqlcp/deps/poolboy/*
-./deps/psqlcp/deps/poolboy/*
+deps/cowboy/*
+deps/empdb/deps/psqlcp/deps/poolboy/*
+deps/psqlcp/deps/poolboy/*
 
 app.config
 app_dev.config
