@@ -4,6 +4,19 @@
 
 -include_lib("norm/include/norm.hrl").
 
+%%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+%%
+%% Трансформация для получения имени функции.
+%%
+-include_lib("evman/include/evman_transform.hrl").
+
+
+
 
 -export([
     ok/0,
@@ -372,6 +385,14 @@ error(Error) ->
     ?MODULE:error(error, {error, Error}).
 
 error(Code, {error, Error}) ->
+    ?evman_note(#event{
+        mess = <<"http error">>,
+        error=[
+            {code, Code},
+            {error, Error}
+        ]
+    }),
+
     #empweb_resp{
         status  = Code,
         format = json,

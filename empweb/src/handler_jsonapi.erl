@@ -5,105 +5,67 @@
 -export([init/3, handle/2, terminate/2]).
 
 
-
-
 -include("empweb.hrl").
 
 -include_lib("norm/include/norm.hrl").
 
 %%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+%%
+%% Трансформация для получения имени функции. 
+%%
+-include_lib("evman/include/evman_transform.hrl").
+
+
+%%
 %% =========================================================================
 %% =========================================================================
 %%
--compile({parse_transform, zt}).
-
--define(FUNCTION, '__function_macro__').
--define(ARITY, '__function_arity__').
--define(ARGS, '__function_args__').
-
--record(event_fun, {
-    module      =   ?MODULE,
-    function    =   ?FUNCTION,
-    arity       =   ?ARITY,
-    line        =   ?LINE
-}).
-
--record(event_data, {
-    args    = [],
-    data    = [],
-    log     = [],
-    debug   = [],
-    error   = [],
-    info    = []
-}).
-
-
--record(event, {
-   'fun' = #event_fun{},
-    data = #event_data{},
-    datetime = erlang:now()
-}).
-
-
--define(event,
-    #event{
-        'fun'=#event_fun{function=?FUNCTION, arity=?ARITY, args}
-    }
-).
-
--define(event(Data),
-    #event{
-        'fun'   = #event_fun{function=?FUNCTION, arity=?ARITY},
-         data   = Data
-    }
-).
-
-
--define(eventd, ?event).
-
--define(eventd(Data),
-    ?event(#event_data{Data})
-).
-
-
--define(notify, evman:note(?eventd)).
-
--define(notify(Data), evman:note(?eventd(Data))).
 
 
 init({tcp, http}, Req, _Opts) ->
-    ?debug("init({tcp, http}, Req, _Opts) ->~p~n", [{?MODULE, ?FUNCTION, ?ARITY}]),
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-    ?notify(args=[Req, State]),
-    
+    ?evman_funcall([Req, State]),
+
     Empweb_resp  =
         case cowboy_http_req:method(Req) of
             {'POST', _} ->
-                ?debug("handle(Req, State) ->~n"),
                 handle_post(Req, State);
             _ ->
                 jsonapi:method_not_allowed()
         end,
-    ?debug("-> 1 ~n"),
+
+    ?debug("0~n"),
+    ?debug("Empweb_resp ~p ~n", [Empweb_resp]),
+
     Http_resp = empweb_http:resp(Empweb_resp),
-    ?debug("-> Http_resp ~p ~n", [Http_resp]),
+
+    ?debug("1~n"),
+
     X = ejson:encode(Http_resp#http_resp.body),
-    ?debug("-> X ~p ~n", [X]),
+
+    ?debug("2~n"),
+
     {ok, Reply} = cowboy_http_req:reply(
         Http_resp#http_resp.status,
         Http_resp#http_resp.headers,    
         X,
         Req
     ),
-    ?debug("-> Reply ~p ~n", [Reply]),
+    
+    ?debug("n~n"),
+
     {ok,Reply,State}.
 
 handle_post(Req, State)->
-    ?notify(args=[Req, State]),
+    ?evman_funcall([Req, State]),
 
-    ?debug("-> handle_post ~n"),
     case cowboy_http_req:body_qs(Req) of
             {Post_body, _} ->
                 handle_post_body(Req, State, Post_body);
@@ -112,6 +74,8 @@ handle_post(Req, State)->
         end.
 
 handle_post_body(Req, State, Post_body)->
+    ?evman_funcall([Req, State, Post_body]),
+
     case proplists:get_value(<<"data">>, Post_body) of
         undefined ->
             jsonapi:not_extended(no_data);
@@ -119,7 +83,8 @@ handle_post_body(Req, State, Post_body)->
             handle_data(Req, State, Binary_object)
     end.
 
-handle_data(Req, _state, Binary_object)->
+handle_data(Req, State, Binary_object)->
+    
     try
         ?debug("Binary_object =  ~p~n", [Binary_object]),
         Object  =  ejson:decode(Binary_object),
@@ -159,6 +124,8 @@ jsonapi_map(Req, {List}) ->
                     action='register',
                     params=Params
                 };
+            %% {"fname": "login", "params": {"id": 1}}
+            
             <<"login">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
@@ -185,7 +152,7 @@ jsonapi_map(Req, {List}) ->
                     params=Params,
                     is_auth=Is_auth
                 };
-            <<"add_friend">> ->     
+            <<"add_friend">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
                     action=add_friend,
@@ -208,8 +175,6 @@ jsonapi_map(Req, {List}) ->
                 };
             _ -> []
         end,
-
-    ?debug("Action = (~p)", [Action]),
     
     case empweb_http:call(Req, Action) of
         {ok, Reply} ->

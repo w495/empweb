@@ -57,11 +57,11 @@
 %% =========================================================================
 %%
 
--define(debug(S),       io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE])).
--define(debug(S, P),    io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE|P])).
+-define(debug(S),       io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE])).
+-define(debug(S, P),    io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE|P])).
 
--define(d(S),       io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE])).
--define(d(S, P),    io:format("debug ~p (~p):" ++ S ++ "~n", [calendar:local_time(), ?MODULE|P])).
+-define(d(S),       io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE])).
+-define(d(S, P),    io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE|P])).
 
 
 

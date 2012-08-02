@@ -9,6 +9,7 @@
 %%% evman_notifier API
 %%% 
 -export([
+    start/0,
     start_link/0,
     start_link/1,
     add_handler/2,
@@ -16,14 +17,20 @@
     rem_handler/2,
     rem_sup_handler/2,
     get_handlers/0,
+    format/1,
+    format/2,
+    llog/2,
+    llog/3,
     info/1,
     note/1
 ]).
 
-
 %%% -----------------------------------------------------------------------
 %%% evman_notifier API
 %%% -----------------------------------------------------------------------
+
+start() ->
+    evman_app:start().
 
 start_link() ->
     evman_notifier:start_link(?EVENTNAME).
@@ -52,3 +59,27 @@ info(Msg) ->
 
 note(Msg) ->
     evman_notifier:note(?EVENTNAME, Msg).
+
+
+
+
+format(Trem) ->
+    format("~p", [Trem]).
+
+format(Format, List) when erlang:is_list(List) ->
+    erlang:list_to_binary(io_lib:format(Format,List));
+
+format(Format, Trem) ->
+    format(Format, [Trem]).
+
+
+llog(Level, Out) ->
+    llog(Level, "~p", [Out]).
+
+llog(Level, Format, List) when erlang:is_list(List) ->
+    spawn_link(fun()->
+        lager:log(Level, self(), Format, List)
+    end);
+
+llog(Level, Format, List)  ->
+    llog(Level, Format, [List]).

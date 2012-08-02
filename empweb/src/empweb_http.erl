@@ -149,12 +149,16 @@ resp(#empweb_resp{cookies=Cookies} = Empweb_resp)
 resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_list(Icookies) ->
 
+    ?debug("0.1~n"),
+
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
             ({Name, Value, Params})->
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
+
+    ?debug("0.2~n"),
 
     #http_resp{
         status=status(redirect),
@@ -169,12 +173,18 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_atom(Status) and erlang:is_list(Icookies) ->
 
+    ?debug("0.1 = ~p ~n", [Icookies]),
+
     Cookies = lists:map(fun
             ({Name, Value})->
+                ?debug("0.1.1 = ~p ~n", [{Name, Value}]),
                 cowboy_cookies:cookie(Name, Value, []);
             ({Name, Value, Params})->
+                ?debug("0.1.2 = ~p ~n", [{Name, Value, Params}]),
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
+
+    ?debug("0.2~n"),
 
     #http_resp{
         status=status(Status),
@@ -185,12 +195,16 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_integer(Status) and erlang:is_list(Icookies) ->
 
+    ?debug("0.1~n"),
+
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
             ({Name, Value, Params})->
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
+
+    ?debug("0.2~n"),
 
     #http_resp{
         status=Status,

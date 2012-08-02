@@ -10,6 +10,20 @@
 -include("empweb.hrl").
 -include("biz_session.hrl").
 
+%%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+%%
+%% Трансформация для получения имени функции.
+%%
+-include_lib("evman/include/evman_transform.hrl").
+
+
+%%
+
 
 %% ---------------------------------------------------------------------------
 %% Экспортируемые функции
@@ -112,7 +126,8 @@ delete_friend(Params)->
     domain_user:delete_friend(Params).
 
 login(Params) ->
-    ?debug("login(Params) -> Params = ~p~n", [Params]),
+    ?evman_funcall([Params]),
+
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
     Phash = phash(Pass),
@@ -147,6 +162,13 @@ login(Params) ->
                         phash=Phash
                     }),
                     {ok, [{User}]} = domain_user:login(Params),
+                    ?evman_note(#event{
+                        type = login,
+                        info = [
+                            {user,          User},
+                            {session_id,    Session_id}
+                        ]
+                    }),
                     {ok, [{[{session_id, Session_id}|User]}]}
 
             end;

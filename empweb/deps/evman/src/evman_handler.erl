@@ -11,6 +11,9 @@
 
 -include("evman.hrl").
 
+
+-compile({parse_transform, lager_transform}).
+  
 -define(HANDLERNAME, ?MODULE).
 
 -export([
@@ -55,18 +58,26 @@ init([]) ->
 %   {ok, State};
 
 
+handle_event({_sender, #evman_note{
+    'fun'= Function,
+    event=
+        #event{
+            args=Args,
+            type=function
+        }
+    }}, State) ->
+    evman:llog(debug, "function =~n~p,~nargs =~n~p;", [Function, Args]),
+  {ok, State};
+
   
 handle_event({_sender, _event}, State) ->
-    lists:seq(1, 10000000),
-    lists:seq(1, 10000000),
-    lists:seq(1, 10000000),
-    ?debug("~p ~p has event from ~p, `~p' and state `~p' ~n",
-      [?HANDLERNAME, self(), _sender, _event, State]),
+    %?debug("~p ~p has event from ~p, `~p' and state `~p' ~n",
+    %  [?HANDLERNAME, self(), _sender, _event, State]),
   {ok, State};
 
 handle_event(_event, State) ->
-  ?debug("~p ~p has event `~p' and state `~p' ~n",
-    [?HANDLERNAME, self(), _event, State]),
+  %?debug("~p ~p has event `~p' and state `~p' ~n",
+  %  [?HANDLERNAME, self(), _event, State]),
   {ok, State}.
 
 %%%
@@ -74,8 +85,8 @@ handle_event(_event, State) ->
 %%%
 
 handle_call(_request, State) ->
-  ?debug("~p ~p has call `~p' and state `~p' ~n",
-    [?HANDLERNAME, self(), _request, State]),
+  %?debug("~p ~p has call `~p' and state `~p' ~n",
+  %  [?HANDLERNAME, self(), _request, State]),
   {ok, ok, State}.
 
 handle_info(_info, State) ->
@@ -84,22 +95,12 @@ handle_info(_info, State) ->
   {ok, State}.
 
 terminate(_reason, _state) ->
-  ?debug("~p ~p was terminate with reason `~p' and state `~p' ~n",
-    [?HANDLERNAME, self(), _reason, _state]),
+  %?debug("~p ~p was terminate with reason `~p' and state `~p' ~n",
+  %  [?HANDLERNAME, self(), _reason, _state]),
   ok.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
 
-%%%
-%%% -----------------------------------------------------------------------
-%%%
 
-customer_facade(_mod, _fun, _data) ->
-  ?debug("abstruct customer_facade ~p", [?HANDLERNAME]),
-  ok.
-
-acv_video_facade(_mod, _fun, _data) ->
-  ?debug("abstruct acv_video_facade ~p", [?HANDLERNAME]),
-  ok.

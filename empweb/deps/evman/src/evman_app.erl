@@ -5,6 +5,7 @@
 -export([start/0, start/2, stop/1]).
 
 start() ->
+    lager:start(),
     application:start(evman).
 
 start(_Type, _Args) ->

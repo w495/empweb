@@ -13,6 +13,18 @@
 -include("empweb.hrl").
 -include_lib("norm/include/norm.hrl").
 
+%%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+%%
+%% Трансформация для получения имени функции.
+%%
+-include_lib("evman/include/evman_transform.hrl").
+
+
 %% ---------------------------------------------------------------------------
 %% Экспортируемые функции
 %% ---------------------------------------------------------------------------
@@ -90,6 +102,8 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
 
 
 handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
+    ?debug("Hap = ~p ~n", [Hap]),
+    
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -103,12 +117,9 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
             }
         ]),
         fun(Data)->
-            %% Если logout выполнился успешно,
+            %% Если login выполнился успешно,
             %%  то устанавливаем клиенту cookie.
-            case biz_user:logout([
-                {session_id, empweb_http:auth_cookie(Req)}
-                | Data#norm.return
-            ]) of
+            case biz_user:login(Data#norm.return) of
                 {ok, Body} ->
                     {ok,
                         (jsonapi:resp({ok, Body}))#empweb_resp{
