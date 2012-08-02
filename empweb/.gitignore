@@ -40,7 +40,7 @@ static/data/*
 .project
 .settings
 
-./deps/cowboy
-./deps/empdb/deps/psqlcp/deps/poolboy
-./deps/psqlcp/deps/poolboy
+./deps/cowboy/
+./deps/empdb/deps/psqlcp/deps/poolboy/
+./deps/psqlcp/deps/poolboy/
 
