@@ -1,0 +1,6 @@
+
+cowboy/*
+empdb/deps/psqlcp/deps/poolboy/*
+psqlcp/deps/poolboy/*
+psqlcp/deps/poolboy/
+
