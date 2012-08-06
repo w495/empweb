@@ -39,7 +39,7 @@ start_link(Args) ->
     evman_notifier:start_link(?EVENTNAME, Args).
 
 add_handler(ModuleName, Args) ->
-    evman_notifier:add_handler(?EVENTNAME, ModuleName, []).
+    evman_notifier:add_handler(?EVENTNAME, ModuleName, Args).
 
 add_sup_handler(ModuleName, Args) ->
     evman_notifier:add_sup_handler(?EVENTNAME, ModuleName, Args).
@@ -78,7 +78,12 @@ llog(Level, Out) ->
 
 llog(Level, Format, List) when erlang:is_list(List) ->
     spawn_link(fun()->
-        lager:log(Level, self(), Format, List)
+        lager:log(
+            Level,
+            self(),
+            Format ++ "~n",
+            List
+        )
     end);
 
 llog(Level, Format, List)  ->

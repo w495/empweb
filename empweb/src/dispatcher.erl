@@ -6,8 +6,11 @@
 dispatch()->
     [
         {'_', [
-            {[<<"jsonapi">>],    handler_jsonapi,    []},
-            {[<<"static">>, '...'],    handler_static, [{path, <<"priv/static">>}]},
+            {[<<"jsonapi">>],           handler_jsonapi,    []},
+            {[<<"weblog">>],            handler_weblog, []},
+            {[<<"websocket">>],         handler_websocket, []},
+            {[<<"static">>, '...'],     handler_static, [{path, <<"priv/static">>}]},
+            {[<<"logs">>, '...'],       handler_static, [{path, <<"priv/logs">>}]},
             {'_', handler_default, []}
         ]}
     ].

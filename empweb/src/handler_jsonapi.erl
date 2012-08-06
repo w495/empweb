@@ -31,7 +31,7 @@ init({tcp, http}, Req, _Opts) ->
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-    ?evman_funcall([Req, State]),
+    ?evman_args([Req, State]),
 
     Empweb_resp  =
         case cowboy_http_req:method(Req) of
@@ -41,60 +41,59 @@ handle(Req, State) ->
                 jsonapi:method_not_allowed()
         end,
 
-    ?debug("0~n"),
-    ?debug("Empweb_resp ~p ~n", [Empweb_resp]),
+    ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
 
     Http_resp = empweb_http:resp(Empweb_resp),
 
-    ?debug("1~n"),
+    ?evman_debug({http_resp, Http_resp}, <<"http response">>),
 
-    X = ejson:encode(Http_resp#http_resp.body),
+    Http_resp_json = ejson:encode(Http_resp#http_resp.body),
 
-    ?debug("2~n"),
+    ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
 
     {ok, Reply} = cowboy_http_req:reply(
         Http_resp#http_resp.status,
         Http_resp#http_resp.headers,    
-        X,
+        Http_resp_json,
         Req
     ),
-    
-    ?debug("n~n"),
+
+    ?evman_debug({reply, Reply}, <<"server reply">>),
 
     {ok,Reply,State}.
 
 handle_post(Req, State)->
-    ?evman_funcall([Req, State]),
+    ?evman_args([Req, State]),
 
     case cowboy_http_req:body_qs(Req) of
-            {Post_body, _} ->
-                handle_post_body(Req, State, Post_body);
+            {Pbody, _} ->
+                handle_post_body(Req, State, Pbody);
             _ ->
                 jsonapi:not_extended(no_post_body)
         end.
 
-handle_post_body(Req, State, Post_body)->
-    ?evman_funcall([Req, State, Post_body]),
+handle_post_body(Req, State, Pbody)->
+    ?evman_args([Req, State, Pbody]),
 
-    case proplists:get_value(<<"data">>, Post_body) of
+    case proplists:get_value(<<"data">>, Pbody) of
         undefined ->
             jsonapi:not_extended(no_data);
-        Binary_object ->
-            handle_data(Req, State, Binary_object)
+        Bobject ->
+            handle_data(Req, State, Bobject)
     end.
 
-handle_data(Req, State, Binary_object)->
+handle_data(Req, State, Bobject)->
     
     try
-        ?debug("Binary_object =  ~p~n", [Binary_object]),
-        Object  =  ejson:decode(Binary_object),
-        ?debug("Object  =  ~p~n", [Object]),
+        ?evman_debug({bobject, Bobject}, <<"binary object">>),
+        Object  =  ejson:decode(Bobject),
+        ?evman_debug({object, Object},  <<"native object">>),
         jsonapi_map(Req, Object)
     catch
         throw:{invalid_json, _} ->
             jsonapi:not_extended(invalid_json);
         Eclass:Ereason ->
-            ?debug("~p ~p ~n", [Eclass, Eclass]),
+            ?evman_error(#event{error={Eclass,Ereason}}),
             jsonapi:internal_server_error(
                 {[
                     {unknown_error, 
@@ -111,10 +110,18 @@ terminate(_Req, _State) ->
     ok.
 
 jsonapi_map(Req, {List}) ->
+    ?evman_args([{List}]),
+
     Fname  =  proplists:get_value(<<"fname">>, List),
     Params  =  proplists:get_value(<<"params">>, List),
 
     Is_auth=biz_session:is_auth(empweb_http:auth_cookie(Req)),
+
+    ?evman_debug({jsonapi_call, [
+        {fname,     Fname},
+        {params,    Params},
+        {is_auth,   Is_auth}
+    ]}),
 
     Action =
         case Fname of
@@ -175,6 +182,8 @@ jsonapi_map(Req, {List}) ->
                 };
             _ -> []
         end,
+
+    ?evman_debug({jsonapi_action, Action}),
     
     case empweb_http:call(Req, Action) of
         {ok, Reply} ->
@@ -187,6 +196,8 @@ jsonapi_map(Req, {List}) ->
             )
     end;
 
-jsonapi_map(_req, _x) ->
+jsonapi_map(_req, List) ->
+    ?evman_args([List]),
+    
     jsonapi:not_extended(wrong_format).
 

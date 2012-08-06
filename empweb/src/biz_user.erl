@@ -55,12 +55,16 @@ is_auth({session_id, Session_id})->
     end.
 
 register(Params)->
+    ?evman_args(Params, <<"user try to register">>),
+    
     domain_user:register([
         {phash, phash(proplists:get_value(pass, Params))}
         |Params
     ]).
 
 update(Params)->
+    ?evman_args(Params, <<"user try to update himself">>),
+    
     case proplists:get_value(pass, Params) of
         undefined ->
             domain_user:update(Params);
@@ -72,6 +76,8 @@ update(Params)->
     end.
 
 logout(Params)->
+    ?evman_args(Params, <<"user try to logout">>),
+    
     case domain_user:logout(Params) of
         {ok, Res} ->
             case proplists:get_value(session_id, Params) of
@@ -85,6 +91,8 @@ logout(Params)->
 
 
 get(Params) ->
+    ?evman_args(Params, <<"get user">>),
+    
     domain_user:get(
         Params,
         [
@@ -126,7 +134,7 @@ delete_friend(Params)->
     domain_user:delete_friend(Params).
 
 login(Params) ->
-    ?evman_funcall([Params]),
+    ?evman_args(Params, <<"user try to login">>),
 
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
@@ -162,13 +170,10 @@ login(Params) ->
                         phash=Phash
                     }),
                     {ok, [{User}]} = domain_user:login(Params),
-                    ?evman_note(#event{
-                        type = login,
-                        info = [
-                            {user,          User},
-                            {session_id,    Session_id}
-                        ]
-                    }),
+                    ?evman_info({login, [
+                        {user,          User},
+                        {session_id,    Session_id}
+                    ]}),
                     {ok, [{[{session_id, Session_id}|User]}]}
 
             end;

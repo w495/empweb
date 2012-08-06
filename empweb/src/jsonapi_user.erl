@@ -44,7 +44,15 @@
 %% @doc Инициализация запроса
 %%
 init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
-    ?debug("~n init : Hap = ~p", [Hap]),
+    %%%
+    %%% Это нужно, чтобы понять, какая функция дальше выполнится
+    %%%
+    ?evman_notice({hap, [
+        {action,    Action},
+        {params,    Params},
+        {is_auth,   Is_auth}
+    ]}, <<" = Hap">>),
+
     {ok,
         Req,
         #empweb_hap{
@@ -55,6 +63,8 @@ init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
     }.
 
 handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = register">>),
+    
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -102,8 +112,7 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
 
 
 handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
-    ?debug("Hap = ~p ~n", [Hap]),
-    
+    ?evman_args(Hap, <<" = login">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -137,6 +146,7 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = logout">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -162,7 +172,8 @@ handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap) ->
-    ?debug("Params = ~p", [Params]),
+    ?evman_args(Hap, <<" = get_friends">>),
+
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -180,7 +191,8 @@ handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap)
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) ->
-    ?debug("Params = ~p", [Params]),
+    ?evman_args(Hap, <<" = add_friend">>),
+
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -202,7 +214,8 @@ handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) 
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Hap) ->
-    ?debug("Params = ~p", [Params]),
+    ?evman_args(Hap, <<" = delete_friend">>),
+    
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -224,6 +237,8 @@ handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Ha
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = get_user">>),
+
     %%
     %% Для вызова данной функции достаточно иметь
     %% хотя бы один параметр из перечисленных
@@ -261,7 +276,8 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap) ->
-    ?debug("~n update : Hap = ~p", [Hap]),
+    ?evman_args(Hap, <<" = update_user">>),
+    
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -326,12 +342,19 @@ handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap)
     );
 
 
-handle(_req, Hap) ->
+handle(_req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap) ->
+    ?evman_notice({hap, [
+        {forbidden,     true},
+        {action,        Action},
+        {params,        Params},
+        {is_auth,       Is_auth}
+    ]}, <<" = forbidden">>),
+
     {ok,jsonapi:forbidden(), Hap}.
 
 
-terminate(_req, _hap)->
-    ?debug("~n :: terminate ~p~n", [_hap]),
+terminate(_req, Hap)->
+    ?evman_args(Hap, <<" = terminate">>),
     
     ok.
 

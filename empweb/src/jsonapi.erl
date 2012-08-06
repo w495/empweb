@@ -385,14 +385,7 @@ error(Error) ->
     ?MODULE:error(error, {error, Error}).
 
 error(Code, {error, Error}) ->
-    ?evman_note(#event{
-        mess = <<"http error">>,
-        error=[
-            {code, Code},
-            {error, Error}
-        ]
-    }),
-
+    ?evman_error({http,[{code, Code},{error, Error}]}),
     #empweb_resp{
         status  = Code,
         format = json,

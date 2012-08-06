@@ -38,15 +38,15 @@ start_link(Eventname, Handler_Args) ->
     %%% Handler_Args = [{Handler, Args}, {Handler, Args}]
     Link = gen_event:start_link({local, Eventname}),
     lists:foreach(fun({Handler, Args})->
-        Eventname:add_handler(Handler, [])
+        Eventname:add_handler(Handler, Args)
     end,Handler_Args),
     Link.
 
 add_handler(Eventname, ModuleName, Args) ->
-    ok = gen_event:add_handler(Eventname, ModuleName, []).
+    ok = gen_event:add_handler(Eventname, ModuleName, Args).
 
 add_sup_handler(Eventname, ModuleName, Args) ->
-    ok = gen_event:add_sup_handler(Eventname, ModuleName, []).
+    ok = gen_event:add_sup_handler(Eventname, ModuleName, Args).
 
 rem_handler(Eventname, ModuleName, Args) ->
     ok = gen_event:delete_handler(Eventname, ModuleName, Args),
