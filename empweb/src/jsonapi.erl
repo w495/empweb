@@ -407,8 +407,11 @@ format(Format, Trem) ->
     
 %%% -------------------------------------------------------------------------
 
+resp({error, {Reason, Object}}) ->
+    not_extended({[{Reason, Object}]});
 resp({error, Error}) ->
     ?MODULE:error({error, Error});
+
 resp({ok, Body}) ->
     ok({ok, Body}).
 
@@ -436,20 +439,40 @@ handle_params(Data, Function, Pstate) ->
         [] ->
             case erlang:apply(Function, [Data]) of
                 {ok, Reply, State} ->
-                    ?evman_debug("Reply -> ~p ~n", [Reply]),
+                    ?evman_debug(
+                        Reply,
+                        <<" = reply">>
+                    ),
                     {ok, Reply, State};
+                {error, {Reason, Object}} ->
+                    ?evman_error(
+                        {error, [
+                            {reason, Reason},
+                            {object, Object}
+                        ]},
+                        <<" = error">>
+                    ),
+                    {ok, not_extended({[{Reason, Object}]}), Pstate};
                 {error, Error} ->
-                    ?evman_debug("Error = ~p", [Error]),
-                    {error, Error};
-                _ ->
-                    ?debug("handle_params(Data, Function) -> ~p ~p ~n", [Data, Function])
+                    ?evman_error(
+                        {error, Error},
+                        <<" = error">>
+                    ),
+                    {ok, ?MODULE:error(), Pstate};
+                Some ->
+                    ?evman_error(
+                        {error, Some},
+                        <<" = error">>
+                    ),
+                    {ok, ?MODULE:error(), Pstate}
             end;
         Errors ->
-            ?evman_error({wrong_format, Errors}, <<" = wrong format">>),
+            ?evman_error(
+                {wrong_format, Errors},
+                <<" = wrong format">>
+            ),
             {ok, not_extended(wrong_format), Pstate}
     end.
-
-
 
 
 is_auth(Req, Function, Args)->

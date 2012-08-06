@@ -270,7 +270,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
             try
                 {ok, RE} = re:compile("\"(.+)\""),
                 {match, [_, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
-                {error, {[{not_null, C}]}}
+                {error, {not_null, erlang:list_to_binary(C)}}
             catch
                 E:R ->
                     io:format("pgret ERROR: ~p - ~p~n", [E, R]),
@@ -280,14 +280,14 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
             try
                 {ok, RE} = re:compile("\".*_([^_]?.+)_key\""),
                 {match, [_, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
-                {error, {[{not_unique, C}]}}
+                {error, {not_unique, erlang:list_to_binary(C)}}
             catch
                 E:R ->
                     io:format("pgret ERROR: ~p - ~p~n", [E, R]),
-                    {error, {[{unknown, Msg}]}}
+                    {error, {unknown, Msg}}
             end;
         _ ->
-            {error, {unknown, binary_to_list(Msg)}}
+            {error, {unknown, Msg}}
     end;
 pgreterr(E) ->
     {error, {unexpected, E}}.

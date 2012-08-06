@@ -173,7 +173,7 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_atom(Status) and erlang:is_list(Icookies) ->
 
-    ?debug("0.1 = ~p ~n", [Icookies]),
+    ?debug("0.1 = ~p = ~p ~n", [Icookies, Status]),
 
     Cookies = lists:map(fun
             ({Name, Value})->
@@ -268,6 +268,8 @@ status(upgrade_required) ->                 426;
 status(precondition_required) ->            428;
 status(too_many_requests) ->                429;
 status(request_header_fields_too_large) ->  431;
+
+status(error) ->            500;
 
 status(internal_server_error) ->            500;
 status(not_implemented) ->                  501;
