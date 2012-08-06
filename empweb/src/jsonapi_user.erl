@@ -62,9 +62,14 @@ init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
         }
     }.
 
+
+% {"params":{"sname":"sname1","nick":"nickname","city":"Иркутск","phone":"+380633612672","email":"em@il.com","pass":"password","birthday":1900,"description":"description","fname":"fname"},"fname":"register"}
+
 handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = register">>),
-    
+
+    ?evman_debug(Params, <<" = Params">>),
+            
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -106,6 +111,9 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
             }
         ]),
         fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+
+            ?debug("biz_user:register(~p).", [Data#norm.return]),
             {ok,jsonapi:resp(biz_user:register(Data#norm.return)),Hap}
         end
     );

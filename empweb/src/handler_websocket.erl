@@ -8,6 +8,13 @@
 
 -include("empweb.hrl").
 
+%%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+
 -export([
     init/3,
     handle/2,
@@ -44,23 +51,26 @@ init([State]) ->
     {ok, State}.
 
 
-init({_Any, http}, Req, []) ->    
+init({_Any, http}, Req, Options) ->
     case cowboy_http_req:header('Upgrade', Req) of
-        {undefined, Req2} -> {ok, Req2, req};
+        {undefined, Req2} -> {ok, Req2, Options };
         {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
         {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
     end.
 
 handle(Req, State) ->
 
-%     {ok, App} = application:get_application(),
-%     {ok, Http} = application:get_env(App, http),
-%     Port =proplists:get_value(port, Http),
+    App  = proplists:get_value(app, State),
+    {ok, Http} = application:get_env(App, http),
+    {ok, Host} = application:get_env(App, host),
+
+    Port =proplists:get_value(port, Http, 8000),
+
 
     {ok, Req2} = cowboy_http_req:reply(200, [{'Content-Type', <<"text/html">>}],
 
 %% HTML code taken from misultin's example file.
-<<"<html>
+[<<"<html>
 <head>
 <script type=\"text/javascript\">
 function msg(text){
@@ -72,7 +82,7 @@ function msg(text){
 function rpl(text){
     var date = new Date();
     document.getElementById('status').innerHTML
-        =   \"<p>\" + date + \" server :<p><tt> \" + text + \"</tt></p></p>\"
+        =   \"<p>\" + date + \" server :\" + text + \"</p>\"
             + document.getElementById('status').innerHTML;
 }
 function ready(){
@@ -81,7 +91,7 @@ function ready(){
     }
     if (\"WebSocket\" in window) {
         // browser supports websockets
-        var ws = new WebSocket(\"ws://localhost:8000/websocket\");
+        var ws = new WebSocket(\"ws://">>, convert:to_list(Host), <<":">>, convert:to_list(Port), <<"/.debug/.logs/.ws\");
         ws.onopen = function() {
             // websocket is connected
             msg(\"log websocket connected!\");
@@ -106,7 +116,7 @@ function ready(){
 <body onload=\"ready();\">
 <div id=\"status\"></div>
 </body>
-</html>">>, Req),
+</html>">>], Req),
     {ok, Req2, State}.
 
 terminate(_Req, _State) ->
@@ -131,40 +141,413 @@ websocket_info(tick, Req, #state{event=undefined} = State) ->
     {ok, Req, State#state{event = []}};
 
 websocket_info(tick, Req, #state{storage=Storage, event=[]} = State) ->
-    Events = handle_ets(Storage),
-    {ok, Req, State#state{event = Events}};
+    {ok, Req, State#state{event = handle_ets(Storage)}};
 
 
 websocket_info(tick, Req, #state{storage=Storage, event=Events} = State) ->
-    Result = erlang:list_to_binary(Events),
+    Result = handle_event_list(Events),
     {reply, {text, Result}, Req, State#state{event=[]}};
 
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, #state{storage=Storage}) ->
-    ?debug("---------------------------------------------------~n"),
     ets:delete(Storage),
     ok.
 
 handle_ets(Storage)->
-    Elist =
-        case ets:first(Storage) of
-            '$end_of_table'   -> [];
-            First_key -> ets:lookup(Storage, First_key)
-        end,
-    lisrs:map(
-        fun(Event)->
-            Result = handle_event(Event),
-            ets:delete_object(Storage, Event),
-            Result
-        end,
-        Elist
-    ).
+    First = ets:first(Storage),
+    handle_ets(Storage, First, []).
 
+handle_ets(Storage, '$end_of_table', Acc)->
+    Acc;
+
+handle_ets(Storage, Key, Acc)->
+    Next = ets:next(Storage, Key),
+    Event = ets:lookup(Storage, Key),
+    Res = handle_event(Event),
+    ets:delete(Storage, Key),
+    handle_ets(Storage, Next, [Res|Acc]).
+
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            error       = Error,
+            comment     = Comment
+        }
+    }}]) when Error =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:red'>ERROR ~p:<pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event (error):~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Error
+        ]
+    ));
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            warning     = Warning,
+            comment     = Comment
+        }
+    }}]) when Warning =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:orange'>WARNING ~p:<pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event (warning):~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Warning
+        ]
+    ));
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            notice      = Notice,
+            comment     = Comment
+        }
+    }}]) when Notice =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:green'>NOTICE ~p:<pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event (notice):~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Notice
+        ]
+    ));
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            info        = Info,
+            comment     = Comment
+        }
+    }}]) when Info =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:green'>INFO ~p:<pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event (info):~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Info
+        ]
+    ));
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            debug       = Debug,
+            comment     = Comment
+        }
+    }}]) when Debug =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:gray'>DEBUG ~p:<pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event (debug):~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Debug
+        ]
+    ));
+
+
+handle_event([{_sender, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            comment     = Comment
+        }
+    }}]) when Args =/=  ?EVMAN_UNDEFINED->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div style='color:gray'>FUNCTION CALL ~p:<pre><code>"
+        "   was function call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "</code></pre></div>",
+        [   Datetime,
+            Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment     ]
+    ));
+
+
+handle_event([{_, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            debug       = Debug,
+            info        = Info,
+            notice      = Notice,
+            warning     = Warning,
+            error       = Error,
+            critical    = Critical,
+            alert       = Alert,
+            emergency   = Emergency,
+            comment     = Comment
+        }
+    } =Event}]) ->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div><pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event:~n"
+        "       debug    :~n"
+        "           ~p~n    "
+        "       info     :~n"
+        "           ~p~n    "
+        "       notice   :~n"
+        "           ~p~n    "
+        "       warning  :~n"
+        "           ~p~n    "
+        "       error    :~n"
+        "           ~p~n    "
+        "       critical :~n"
+        "           ~p~n    "
+        "       alert    :~n"
+        "           ~p~n    "
+        "       emergency:"
+        "           ~p~n    "
+        "</code></pre></div>",
+        [   Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Debug,
+            Info,
+            Notice,
+            Warning,
+            Error,
+            Critical,
+            Alert,
+            Emergency
+        ]
+    ));
+
+handle_event([{_, #evman_note{
+    event_fun=
+        #event_fun{
+            module      = Module,
+            function    = Function,
+            arity       = Arity,
+            line        = Line
+        },
+    datetime=Datetime,
+    event=
+        #event{
+            args        = Args,
+            debug       = Debug,
+            info        = Info,
+            notice      = Notice,
+            warning     = Warning,
+            error       = Error,
+            critical    = Critical,
+            alert       = Alert,
+            emergency   = Emergency,
+            comment     = Comment
+        }
+    } =Event}]) ->
+    erlang:list_to_binary(io_lib:format(
+        "<hr/><div><pre><code>"
+        "   call:~n"
+        "       line    : ~p~n"
+        "       module  : ~p~n"
+        "       function: ~p~n"
+        "       arity   : ~p~n"
+        "       args    : ~p~n"
+        "   comment: ~n"
+        "       ~p~n"
+        "   event:~n"
+        "       debug    :~n"
+        "           ~p~n    "
+        "       info     :~n"
+        "           ~p~n    "
+        "       notice   :~n"
+        "           ~p~n    "
+        "       warning  :~n"
+        "           ~p~n    "
+        "       error    :~n"
+        "           ~p~n    "
+        "       critical :~n"
+        "           ~p~n    "
+        "       alert    :~n"
+        "           ~p~n    "
+        "       emergency:"
+        "           ~p~n    "
+        "</code></pre></div>",
+        [   Line,
+            Module,
+            Function,
+            Arity,
+            Args,
+            Comment,
+            Debug,
+            Info,
+            Notice,
+            Warning,
+            Error,
+            Critical,
+            Alert,
+            Emergency
+        ]
+    ));
+  
+handle_event([{_, Event}])->
+    erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event]));
+    
 handle_event(Event)->
-    erlang:list_to_binary(io_lib:format("~p", [Event])).
-
+    erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event])).
 
 handle_event_list(Events)->
     erlang:list_to_binary(Events).

@@ -421,22 +421,32 @@ resp(Code,{ok, Body}) ->
 
 
 handle_params(Data, Function) ->
-    ?debug("handle_params(Data, Function) -> ~p ~p ~n", [Data, Function]),
+    handle_params(Data, Function, []).
+
+
+handle_params(Data, Function, Pstate) ->
+    ?evman_debug(
+        [   {data, Data},
+            {function, Function}
+        ],
+        <<" = data & function">>
+    ),
 
     case Data#norm.errors of
         [] ->
             case erlang:apply(Function, [Data]) of
                 {ok, Reply, State} ->
-                    ?debug("Reply -> ~p ~n", [Reply]),
+                    ?evman_debug("Reply -> ~p ~n", [Reply]),
                     {ok, Reply, State};
                 {error, Error} ->
-                    ?debug("Error = ~p", [Error]),
+                    ?evman_debug("Error = ~p", [Error]),
                     {error, Error};
                 _ ->
                     ?debug("handle_params(Data, Function) -> ~p ~p ~n", [Data, Function])
             end;
-        _ ->
-            not_extended(wrong_format)
+        Errors ->
+            ?evman_error({wrong_format, Errors}, <<" = wrong format">>),
+            {ok, not_extended(wrong_format), Pstate}
     end.
 
 

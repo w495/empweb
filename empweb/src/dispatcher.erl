@@ -4,11 +4,15 @@
 -export([dispatch/0]).
 
 dispatch()->
+    {ok, App} = application:get_application(),
+    Options = [{app, App}],
+
     [
         {'_', [
             {[<<"jsonapi">>],           handler_jsonapi,    []},
-            {[<<"weblog">>],            handler_weblog, []},
-            {[<<"websocket">>],         handler_websocket, []},
+
+            {[<<".debug">>, <<".logs">>, <<".ws">>],  handler_websocket, Options},
+            
             {[<<"static">>, '...'],     handler_static, [{path, <<"priv/static">>}]},
             {[<<"logs">>, '...'],       handler_static, [{path, <<"priv/logs">>}]},
             {'_', handler_default, []}
