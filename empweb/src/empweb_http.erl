@@ -35,14 +35,12 @@ make_auth_cookie(Body) ->
 %% В старом стиле для классических контроллеров
 %%
 call(Req, {Ctl,Act,Opt}) ->
-    ?debug("call ::: {Ctl,Act,Opt} = ~p~n", [{Ctl,Act,Opt}]),
     call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt});
 
 %%
 %% В новом стиле для хендлеров
 %%
 call(Req, {Handler,{Action,Params}} = Hao) ->
-    ?debug("call Hao= ~p~n", [Hao]),
     call(
         Req,
         #empweb_hap{
@@ -53,7 +51,6 @@ call(Req, {Handler,{Action,Params}} = Hao) ->
     );
 
 call(Req, {Handler,{Action,Params,Is_auth}}=Hao) ->
-    ?debug("call Hao = ~p~n", [Hao]),
     call(
         Req,
         #empweb_hap{
@@ -68,7 +65,6 @@ call(Req, {Handler,{Action,Params,Is_auth}}=Hao) ->
 %% В старом стиле для классических контроллеров
 %%
 call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt} = Action) ->
-    ?debug("call ::: Action = ~p~n", [Action]),
     case call_init(Req, Action) of
         {ok, Nreq, State} ->
             call_handle(Nreq, Action, State);
@@ -82,7 +78,6 @@ call(Req, #empweb_ctl{ctl=Ctl,act=Act,opt=Opt} = Action) ->
 call(Req, #empweb_hap{handler=Handler,action=Action,params=Params} = Hao) ->
     case call_init(Req, Hao) of
         {ok, Nreq, State} ->
-            ?debug("~ncall_init(Req, Hao)  = ~p~n", [{ok, Nreq, State}]),
             call_handle(Nreq, Hao, State);
         {error, Error} ->
             {error, Error}
@@ -96,7 +91,6 @@ call(Req, Some) ->
 %% В старом стиле для классических контроллеров
 %%
 call_init(Req, #empweb_ctl{ctl=Ctl,opt=Opt} = Action) ->
-    ?debug("call_init ::: Action = ~p~n", [Action]),
     %% Третий аргумент оставлен для совместимости с cowboy
     Ctl:init([], Req, Opt);
 
@@ -111,15 +105,11 @@ call_init(Req, #empweb_hap{handler=Handler}=Hao) ->
 %% В старом стиле для классических контроллеров
 %%
 call_handle(Req, #empweb_ctl{ctl=Ctl,act=Act}=Action, State) ->
-    ?debug("call_handle ::: Action = ~p~n", [Action]),
     case Ctl:Act(Req, State) of
         {ok, Reply, Nstate} ->
-            ?debug("call_handle ::: Reply, Nstate = ~p ~p ~n", [Reply, Nstate]),
             ok = Ctl:terminate(Req, Nstate),
-            ?debug("call_handle ::: Reply = ~p ~n", [Reply]),
             {ok, Reply};
         Error ->
-            ?debug("call_handle ::: Error = ~p~n", [Error]),
             Ctl:ternimate(Req, State),
             {error, Error}
     end;
@@ -128,15 +118,11 @@ call_handle(Req, #empweb_ctl{ctl=Ctl,act=Act}=Action, State) ->
 %% В новом стиле для хендлеров
 %%
 call_handle(Req, #empweb_hap{handler=Handler,action=Action}=Hap, State) ->
-    ?debug("call_handle ::: Action = ~p~n", [Action]),
     case Handler:handle(Req, State) of
         {ok, Reply, Nstate} ->
-            ?debug("call_handle ::: Reply, Nstate = ~p ~p ~n", [Reply, Nstate]),
             ok = Handler:terminate(Req, Nstate),
-            ?debug("call_handle ::: Reply = ~p ~n", [Reply]),
             {ok, Reply};
         Error ->
-            ?debug("call_handle ::: Error = ~p~n", [Error]),
             Handler:ternimate(Req, State),
             {error, Error}
     end.
@@ -149,7 +135,6 @@ resp(#empweb_resp{cookies=Cookies} = Empweb_resp)
 resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_list(Icookies) ->
 
-    ?debug("0.1~n"),
 
     Cookies = lists:map(fun
             ({Name, Value})->
@@ -158,7 +143,6 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
 
-    ?debug("0.2~n"),
 
     #http_resp{
         status=status(redirect),
@@ -173,18 +157,12 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_atom(Status) and erlang:is_list(Icookies) ->
 
-    ?debug("0.1 = ~p = ~p ~n", [Icookies, Status]),
-
     Cookies = lists:map(fun
             ({Name, Value})->
-                ?debug("0.1.1 = ~p ~n", [{Name, Value}]),
                 cowboy_cookies:cookie(Name, Value, []);
             ({Name, Value, Params})->
-                ?debug("0.1.2 = ~p ~n", [{Name, Value, Params}]),
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
-
-    ?debug("0.2~n"),
 
     #http_resp{
         status=status(Status),
@@ -195,8 +173,6 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_integer(Status) and erlang:is_list(Icookies) ->
 
-    ?debug("0.1~n"),
-
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
@@ -204,7 +180,6 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
                 cowboy_cookies:cookie(Name, Value, Params)
         end, Icookies),
 
-    ?debug("0.2~n"),
 
     #http_resp{
         status=Status,

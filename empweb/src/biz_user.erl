@@ -77,22 +77,63 @@ update(Params)->
 
 logout(Params)->
     ?evman_args(Params, <<"user try to logout">>),
+    Nick = proplists:get_value(nick, Params),
     
     case domain_user:logout(Params) of
-        {ok, Res} ->
+        {ok, [{Userpl}]} ->
             case proplists:get_value(session_id, Params) of
-                undefined ->    ok;
-                Session_id ->   biz_session:remove(Session_id)
-            end,
-            {ok, Res};
+                undefined ->
+                    {error,{bad_session,{[{nick, Nick}]}}};
+                Session_id ->
+                    case biz_session:get({uid, Session_id}) of
+                        [#biz_session{nick=Nick}] ->
+                            biz_session:remove(Session_id),
+                            {ok, [{[{session_id, Session_id}|Userpl]}]};
+                        _ ->
+                            {error,{bad_session,{[{nick, Nick}]}}}
+                    end
+            end;
         {error, Error} ->
-            {error, Error}
+            {error, Error};
+        _ ->
+            {error,{bad_user,{[{nick, Nick}]}}}
     end.
 
 
+get(all) ->
+    ?evman_args([all], <<"get all users">>),
+    domain_user:get(
+        all,
+        [
+            id,
+            nick,
+            name,
+            email,
+            phone,
+            fname,
+            sname,
+            'extract(epoch from birthday) as birthday',
+            male,
+            city,
+            married_status,
+            married_id,
+            description,
+            money,
+            status_id,
+            authority_id,
+            country_id,
+            emotion_id,
+            mother_id,
+            father_id,
+            community_id,
+            employment,
+            hobby,
+            allow_auction_offer
+        ]
+    );
+
 get(Params) ->
     ?evman_args(Params, <<"get user">>),
-    
     domain_user:get(
         Params,
         [
@@ -141,6 +182,8 @@ login(Params) ->
     Phash = phash(Pass),
     Max_auth_error = 10,
     EC = 0,
+    ?debug("login(Params) -> Nick   = ~p~n", [domain_user:get_opt({nick, Nick}, [id, nick, phash], [perm_names])]),
+    
     case domain_user:get_opt({nick, Nick}, [id, nick, phash], [perm_names])  of
         {ok, [{Userpl}]} ->
             Perm_names = proplists:get_value(perm_names, Userpl),
@@ -153,9 +196,26 @@ login(Params) ->
                 P =/= Phash ->
                     if
                         Max_auth_error - (EC + 1) > 0 ->
-                            throw({bad_password, integer_to_list(Max_auth_error - (EC + 1))});
+                            %throw({bad_password, integer_to_list(Max_auth_error - (EC + 1))});
+                            {error,
+                                {bad_password,
+                                    {[
+                                        {max,  Max_auth_error - (EC + 1)},
+                                        {nick, Nick},
+                                        {pass, Pass}
+                                    ]}
+                                }
+                            };
                         true ->
-                            throw({auth_count_overflow, Max_auth_error})
+                            {error,
+                                {auth_count_overflow,
+                                    {[
+                                        {max,  Max_auth_error - (EC + 1)},
+                                        {nick, Nick},
+                                        {pass, Pass}
+                                    ]}
+                                }
+                            }
                     end;
                 true  ->
                     if
@@ -178,7 +238,14 @@ login(Params) ->
 
             end;
             _ ->
-                throw(bad_user)
+                {error,
+                    {bad_user,
+                        {[
+                            {nick, Nick},
+                            {pass, Pass}
+                        ]}
+                    }
+                }
     end.
 
 %% ---------------------------------------------------------------------------

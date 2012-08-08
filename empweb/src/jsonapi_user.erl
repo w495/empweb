@@ -280,6 +280,15 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
         end
     );
 
+
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{action=get_all_users, params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = get_all_users">>),
+    
+    {ok,jsonapi:resp(biz_user:get(all)),Hap};
+
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%

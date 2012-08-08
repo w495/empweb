@@ -43,6 +43,7 @@
     #event_fun{
         function    =   ?FUNCTION,
         args        =   Args,
+        line        =   ?LINE,
         arity       =   ?ARITY
     }
 ).

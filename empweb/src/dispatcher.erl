@@ -11,10 +11,23 @@ dispatch()->
         {'_', [
             {[<<"jsonapi">>],           handler_jsonapi,    []},
 
-            {[<<".debug">>, <<".logs">>, <<".ws">>],  handler_websocket, Options},
+            %%
+            %% Контроллер отображения логов
+            %%
+            {[<<".debug">>, <<".logs">>, <<".ws">>],
+                handler_debug_logs_ws, Options},
+
+            %%
+            %% Контроллер отображения автоматических тестов
+            %%
+            {[<<".debug">>, <<".tests">>],
+                handler_debug_tests, Options},
+
+            {[<<"static">>, '...'],
+                handler_static, [{path, <<"priv/static">>}]},
             
-            {[<<"static">>, '...'],     handler_static, [{path, <<"priv/static">>}]},
-            {[<<"logs">>, '...'],       handler_static, [{path, <<"priv/logs">>}]},
+            {[<<"logs">>, '...'],
+                handler_static, [{path, <<"priv/logs">>}]},
             {'_', handler_default, []}
         ]}
     ].

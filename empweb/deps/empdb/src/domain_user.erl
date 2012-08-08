@@ -67,20 +67,20 @@ get(Params, Fileds)->
 
 get_opt(Params, Fileds, Options)->
     dao:with_connection(fun(Con)->
-        {ok, [{Userpl}]} = dao_user:get(Con, Params, Fileds),
-        get_opt(Con, Params, Options, Userpl)
+        {ok, Userpls} = dao_user:get(Con, Params, Fileds),
+        get_opt(Con, Params, Options, Userpls)
     end).
 
 get_opt(Params, Options)->
     dao:with_connection(fun(Con)->
-        {ok, [{Userpl}]} = dao_user:get(Con, Params),
-        get_opt(Con, Params, Options, Userpl)
+        {ok, Userpls} = dao_user:get(Con, Params),
+        get_opt(Con, Params, Options, Userpls)
     end).
 
-get_opt(Con, Params, [], Result)
-    -> {ok, [{Result}]};
+get_opt(Con, Params, [], Proplist)
+    -> {ok, [{Proplist}]};
 
-get_opt(Con,Params, [Option|Options], Acc)->
+get_opt(Con,Params, [Option|Options], [{Acc}])->
     case Option of
         %% ------------------------------------------------------------------
         {perm_list, Spec} when erlang:is_list(Spec) ->
@@ -110,9 +110,16 @@ get_opt(Con,Params, [Option|Options], Acc)->
             get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
         _ ->
             get_opt(Con, Params, Options, Acc)
-    end.
+    end;
 
-    
+get_opt(Con,Params, [Option|Options], Accs)->
+    {ok,
+        lists:map(fun({Obj})->
+            {ok, [{Result}]} = get_opt(Con,Params, [Option|Options], [{Obj}]),
+            {Result}
+        end, Accs
+    )}.
+
 %%%
 %%%
 %%%

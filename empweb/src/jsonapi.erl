@@ -407,6 +407,15 @@ format(Format, Trem) ->
     
 %%% -------------------------------------------------------------------------
 
+resp({error, {bad_session, Object}}) ->
+    forbidden({[{bad_session, Object}]});
+
+resp({error, {bad_user, Object}}) ->
+    forbidden({[{bad_user, Object}]});
+
+resp({error, {bad_password, Object}}) ->
+    forbidden({[{bad_password, Object}]});
+    
 resp({error, {Reason, Object}}) ->
     not_extended({[{Reason, Object}]});
 resp({error, Error}) ->

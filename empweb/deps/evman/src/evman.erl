@@ -54,7 +54,6 @@ get_handlers() ->
     evman_notifier:get_handlers(?EVENTNAME).
 
 info(Msg) ->
-    ?debug("self() = ~p~n", [self()]),
     evman_notifier:info(?EVENTNAME, Msg).
 
 note(Msg) ->

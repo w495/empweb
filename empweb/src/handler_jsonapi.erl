@@ -112,8 +112,15 @@ terminate(_Req, _State) ->
 jsonapi_map(Req, {List}) ->
     ?evman_args([{List}]),
 
-    Fname  =  proplists:get_value(<<"fname">>, List),
-    Params  =  proplists:get_value(<<"params">>, List),
+    Fname   =  proplists:get_value(<<"fname">>, List),
+    Params  =  case proplists:get_value(<<"params">>, List, []) of
+        null ->
+            [];
+        Res ->
+            Res
+    end,
+
+    ?debug("Params   = ~p~n",[Params]),
 
     Is_auth=biz_session:is_auth(empweb_http:auth_cookie(Req)),
 
@@ -177,6 +184,13 @@ jsonapi_map(Req, {List}) ->
                 #empweb_hap{
                     handler=jsonapi_user,
                     action=get_user,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+            <<"get_all_users">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=get_all_users,
                     params=Params,
                     is_auth=Is_auth
                 };
