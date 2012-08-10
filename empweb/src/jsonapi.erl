@@ -28,6 +28,7 @@
     resp/1,
     resp/2,
     handle_params/2,
+    handle_params/3,
     is_auth/3,
     is_auth/2,
     format/1,
@@ -407,6 +408,9 @@ format(Format, Trem) ->
     
 %%% -------------------------------------------------------------------------
 
+resp({error, {not_exists, Object}}) ->
+    gone({[{bad_session, Object}]});
+    
 resp({error, {bad_session, Object}}) ->
     forbidden({[{bad_session, Object}]});
 

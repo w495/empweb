@@ -278,8 +278,8 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
             end;
         <<"23505">> ->
             try
-                {ok, RE} = re:compile("\".*_([^_]?.+)_key\""),
-                {match, [_, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
+                {ok, RE} = re:compile("\"(.*?)*?_([^_].+)_key\""),
+                {match, [_, _, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
                 {error, {not_unique, erlang:list_to_binary(C)}}
             catch
                 E:R ->

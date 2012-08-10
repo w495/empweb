@@ -254,30 +254,27 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                required = false,
-                types = [integer]
-            },
-            #norm_rule{
-                key = nick,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = name,
-                required = false,
-                types = [string]
+            #norm_one{
+                rules=[
+                    #norm_rule{
+                        key = id,
+                        types = [integer]
+                    },
+                    #norm_rule{
+                        key = nick,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = name,
+                        types = [string]
+                    }
+                ]
             }
         ]),
         fun(Data)->
-            case at_list_one(Data#norm.return) of
-                {ok, Tuple} ->
-                    {ok,jsonapi:resp(biz_user:get(Tuple)),Hap};
-                _ ->
-                    {ok,jsonapi:resp({error, no_param}), Hap}
-            end
-        end
+            {ok,jsonapi:resp(biz_user:get(Data#norm.return)),Hap}
+        end,
+        Hap
     );
 
 
@@ -302,55 +299,49 @@ handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap)
                 key = id,
                 types = [integer]
             },
-            #norm_rule{
-                key = nick,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = description,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = pass,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = email,
-                required = false,
-                types = [email]
-            },
-            #norm_rule{
-                key = phone,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = hobby,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = fname,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = sname,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = birthday,
-                required = false,
-                types = [string]
-            },
-            #norm_rule{
-                key = city,
-                required = false,
-                types = [string]
+            #norm_at_least_one{
+                rules=[
+                    #norm_rule{
+                        key = nick,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = description,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = pass,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = email,
+                        types = [email]
+                    },
+                    #norm_rule{
+                        key = phone,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = hobby,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = fname,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = sname,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = birthday,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = city,
+                        types = [string]
+                    }
+                ]
             }
         ]),
         fun(Data)->

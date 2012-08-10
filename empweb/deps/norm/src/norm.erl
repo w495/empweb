@@ -18,11 +18,16 @@
 
 -export([
     norm/2,
+    norm/3,
+    norm/4,
     test/0,
     test/1
 ]).
 
 -include("norm.hrl").
+
+
+
 
 norm({Data}, Type_rules) ->
     norm(Data, Type_rules);
@@ -35,10 +40,91 @@ norm(Data, Type_rules)
 norm(_Data, [], Norm) ->
    Norm;
 
-norm(Data, [#norm_rule{key=Key, nkey=?UNIQ_UNDEFINED}=Rule|Rest], Norm) ->
-    norm(Data, [Rule#norm_rule{nkey=Key}|Rest], Norm);
+%%
+%% Описание псевдонимов для различный
+%% манипуляций с вложенными правилами
+%%
+norm(Data, [#norm_one{rules=Crules}|Restrules], Norm) ->
+    case norm(Data, set_required(Crules, false),  #norm{}) of
+        #norm{errors=[], return=[]} ->
+            norm(Data, Restrules,
+                Norm#norm{
+                    errors=[
+                        #norm_error{
+                            reason  =   param,
+                            rule    =   #norm_rule{rules=Crules}
+                        } |Norm#norm.errors
+                    ]
+                }
+            );
+        #norm{return=[One|_]} = New_norm  ->
+            norm(Data, Restrules,
+                #norm{
+                    errors=lists:append(Norm#norm.errors, New_norm#norm.errors),
+                    return=[One|Norm#norm.return]
+                }
+            );
+        New_norm ->
+            norm(Data, Restrules,
+                #norm{
+                    errors=lists:append(Norm#norm.errors, New_norm#norm.errors),
+                    return=lists:append(Norm#norm.return, New_norm#norm.return)
+                }
+            )
+    end;
 
-norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, default=Default}=Rule|Rest], Norm) ->
+norm(Data, [#norm_at_least_one{rules=Crules}|Restrules], Norm) ->
+    norm(Data,
+        [
+            #norm_rule{rules=set_required(Crules, false), required=true}
+            |Restrules
+        ],
+        Norm
+    );
+
+%%
+%% Для обработки вложенных правил
+%%
+norm(Data, [#norm_rule{rules=[], required=true, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
+    Norm;
+
+norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
+    io:format("norm(Data, Crules, Norm) ~p ~n", [norm(Data, Crules, Norm)]),
+    case norm(Data, Crules, #norm{}) of
+        #norm{errors=[], return=[]} ->
+            norm(Data, Restrules,
+                Norm#norm{
+                    errors=[
+                        #norm_error{
+                            reason  =   param,
+                            rule    =   Rule
+                        } |Norm#norm.errors
+                    ]
+                }
+            );
+        New_norm ->
+            norm(Data, Restrules,
+                #norm{
+                    errors=lists:append(Norm#norm.errors, New_norm#norm.errors),
+                    return=lists:append(Norm#norm.return, New_norm#norm.return)
+                }
+            )
+    end;
+
+norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
+    norm(Data, Restrules, norm(Data, Crules, Norm));
+    
+%%
+%% Для обработки множественных ключей
+%%
+norm(Data, [#norm_rule{keys=[Rkey|Restrkeys]=Rkeys, key=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
+    norm(Data, [Rule|Restrules], Norm, Rkeys);
+
+% 
+norm(Data, [#norm_rule{key=Key, nkey=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
+    norm(Data, [Rule#norm_rule{nkey=Key}|Restrules], Norm);
+
+norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, default=Default}=Rule|Restrules], Norm) ->
     Key = case proplists:is_defined(Rkey, Data) of
         true -> Rkey;
         _ -> norm_convert:to_binary(Rkey)
@@ -47,7 +133,7 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
         ?UNIQ_UNDEFINED ->
             case Required of
                 true ->
-                    norm(Data, Rest,
+                    norm(Data, Restrules,
                         Norm#norm{
                             errors=[
                                 #norm_error{
@@ -58,12 +144,12 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
                         }
                     );
                 _ ->
-                    norm(Data, Rest, Norm)
+                    norm(Data, Restrules, Norm)
             end;
         Raw_value ->
             case to_rule_type(Raw_value, Types) of
                 {ok, Value} ->
-                    norm(Data,Rest,
+                    norm(Data,Restrules,
                         Norm#norm{
                             return=[
                                 {norm_convert:to_atom(Nkey), Value}
@@ -72,7 +158,7 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
                         }
                     );
                 {predefined, _} ->
-                    norm(Data,Rest,
+                    norm(Data,Restrules,
                         Norm#norm{
                             return=[
                                 {norm_convert:to_atom(Nkey), Default}
@@ -81,7 +167,7 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
                         }
                     );
                 {error, Value} ->
-                    norm(Data,Rest,
+                    norm(Data,Restrules,
                         Norm#norm{errors=[
                             #norm_error{
                                 reason  =   types,
@@ -92,6 +178,41 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
                     )
             end
     end.
+
+
+norm(Data, [#norm_rule{keys=[], key=?UNIQ_UNDEFINED, required=Required}=Rule|Restrules], Norm, Errkeys) ->
+    case Required of
+        true ->
+            norm(Data, Restrules,
+                Norm#norm{
+                    errors=[
+                        #norm_error{
+                            reason  =   param,
+                            rule    =   Rule#norm_rule{keys=Errkeys}
+                        } |Norm#norm.errors
+                    ]
+                }
+            );
+        _ ->
+            norm(Data, Restrules, Norm)
+    end;
+
+norm(Data, [#norm_rule{keys=[Rkey|Restrkeys]=Rkeys, key=?UNIQ_UNDEFINED}=Rule|Restrules], Norm, Errkeys) ->
+    case {
+            proplists:is_defined(Rkey, Data),
+            proplists:is_defined(Rkeyl = norm_convert:to_binary(Rkey), Data)
+        } of
+            {true, _} ->
+                norm(Data, [Rule#norm_rule{key=Rkey}|Restrules], Norm);
+            {false, true} ->
+                norm(Data, [Rule#norm_rule{key=Rkeyl}|Restrules], Norm);
+            {_, _} ->
+                norm(Data, [Rule#norm_rule{keys=Restrkeys}|Restrules], Norm, Errkeys)
+    end.
+
+
+set_required(Rules, Required) ->
+    lists:map(fun(R)->R#norm_rule{required=Required}end,Rules).
 
 %%
 %% @doc
@@ -133,14 +254,14 @@ to_rule_type(_converter, Value, []) ->
 to_rule_type(_converter, Value, [[]|_rest]) ->
     {ok, Value};
 
-to_rule_type(Converter, Value, [Type|Rest]) ->
+to_rule_type(Converter, Value, [Type|Restrules]) ->
     try
         rule_type_done(Converter, Value, Type)
     catch
         throw : {type_error, Error} ->
             throw({type_error, Error});
         _t : _e ->
-            to_rule_type(Converter, Value, Rest)
+            to_rule_type(Converter, Value, Restrules)
     end.
 
 %%

@@ -74,21 +74,18 @@ filter_fields(List) ->
 fields(Pl) ->
     filter_fields(proplists:get_keys(Pl)).
 
+fields_create(Pl) ->
+    fields(Pl).
+    
+fields_update(Pl) ->
+    fields(Pl) -- [id].
+    
 is_field(Mbfield)->
     is_field(Mbfield, fields()).
 
 is_field(Mbfield, Fields)->
     lists:member(Mbfield, Fields).
 
-
-get(Con, {id, Id})->
-    get(Con, {id, Id}, []);
-
-get(Con, {name, Name})->
-    get(Con, {name, Name}, []);
-
-get(Con, {nick, Name})->
-    get(Con, {nick, Name}, []);
 
 get(Con, Some) ->
     get(Con, Some, []).
@@ -130,6 +127,9 @@ get(Con, {nick, Nick}, Fields)->
         )
     );
 
+get(Con, [{Key, Value}], Fields)->
+    get(Con, {Key, Value}, Fields);
+
 get(Con, _, Fields)->
     dao:pgret(
         dao:equery(Con,
@@ -143,7 +143,7 @@ get(Con, _, Fields)->
 
 create(Con, Proplist)->
     io:format("Proplist = ~p~n", [Proplist]),
-    Fields = fields(Proplist),
+    Fields = fields_create(Proplist),
     dao:pgret(
         dao:equery(Con,[
             <<"insert into user_ (">>,
@@ -155,16 +155,16 @@ create(Con, Proplist)->
     ).
 
 update(Con, Proplist)->
-    Fields = fields(Proplist),
+    Fields = fields_update(Proplist),
     case proplists:get_value(id, Proplist) of
         undefined -> 
             create(Con, Proplist);
         Id ->
             dao:pgret(
                 dao:equery(Con,[
-                    <<"update  user_ set">>,
+                    <<"update  user_ set ">>,
                         dao:fields_fieldvars(Fields),
-                    <<"where id= $id">>
+                    <<" where id= $id">>
                 ],Proplist)
             ),
             {ok, Id}
@@ -233,22 +233,32 @@ get_group(Con, {id, Id}, Fields) ->
 % 230
 %
 add_friend(Con, Proplist)->
-    dao:pgret(
-        dao:equery(Con, 
+    case dao:pgret(
+        dao:equery(Con,
             <<"insert into friend (user_id, friend_id) "
             "values ($user_id, $friend_id) returning id; ">>, 
             Proplist
         )
-    ).
+    ) of
+        {error,{not_unique,<<"user_id_friend_id_many">>}} ->
+            {error, {not_unique, [user_id, friend_id]}};
+        Res ->
+            Res
+    end.
 
 delete_friend(Con, Proplist)->
-    dao:pgret(
+    case dao:pgret(
         dao:equery(Con, 
             <<"delete from friend where "
-            " user_id=$user_id and friend_id=$friend_id">>, 
+            " user_id=$user_id and friend_id=$friend_id returning id">>, 
             Proplist
         )
-    ).
+    ) of
+        ok ->
+            {error, not_exists};
+        Res ->
+            Res
+    end.
 
 get_friends(Con, {id, User_id})->
     get_friends(Con, {user_id, User_id});
@@ -264,7 +274,7 @@ get_friends(Con, {user_id, User_id})->
 
 get_friends(Con, Proplist)->
     dao:pgret(
-        dao:equery(Con, 
+        dao:equery(Con,
             <<"select friend.friend_id from friend "
             "where friend.user_id = $user_id">>, 
             Proplist

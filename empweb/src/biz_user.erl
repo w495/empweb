@@ -75,30 +75,6 @@ update(Params)->
             ])
     end.
 
-logout(Params)->
-    ?evman_args(Params, <<"user try to logout">>),
-    Nick = proplists:get_value(nick, Params),
-    
-    case domain_user:logout(Params) of
-        {ok, [{Userpl}]} ->
-            case proplists:get_value(session_id, Params) of
-                undefined ->
-                    {error,{bad_session,{[{nick, Nick}]}}};
-                Session_id ->
-                    case biz_session:get({uid, Session_id}) of
-                        [#biz_session{nick=Nick}] ->
-                            biz_session:remove(Session_id),
-                            {ok, [{[{session_id, Session_id}|Userpl]}]};
-                        _ ->
-                            {error,{bad_session,{[{nick, Nick}]}}}
-                    end
-            end;
-        {error, Error} ->
-            {error, Error};
-        _ ->
-            {error,{bad_user,{[{nick, Nick}]}}}
-    end.
-
 
 get(all) ->
     ?evman_args([all], <<"get all users">>),
@@ -174,6 +150,10 @@ add_friend(Params)->
 delete_friend(Params)->
     domain_user:delete_friend(Params).
 
+
+%%
+%% Вход пользователя. Создание сессии.
+%%
 login(Params) ->
     ?evman_args(Params, <<"user try to login">>),
 
@@ -247,6 +227,34 @@ login(Params) ->
                     }
                 }
     end.
+
+%%
+%% Выход пользователя, Удаление сессии.
+%%
+logout(Params)->
+    ?evman_args(Params, <<"user try to logout">>),
+    Nick = proplists:get_value(nick, Params),
+    case domain_user:logout(Params) of
+        {ok, [{Userpl}]} ->
+            case proplists:get_value(session_id, Params) of
+                undefined ->
+                    {error,{bad_session,{[{nick, Nick}]}}};
+                Session_id ->
+                    case biz_session:get({uid, Session_id}) of
+                        [#biz_session{nick=Nick}] ->
+                            biz_session:remove(Session_id),
+                            {ok, [{[{session_id, Session_id}|Userpl]}]};
+                        _ ->
+                            {error,{bad_session,{[{nick, Nick}]}}}
+                    end
+            end;
+        {error, Error} ->
+            {error, Error};
+        _ ->
+            {error,{bad_user,{[{nick, Nick}]}}}
+    end.
+
+
 
 %% ---------------------------------------------------------------------------
 %% Внутрениие функции

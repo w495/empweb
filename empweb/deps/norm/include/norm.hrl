@@ -13,11 +13,27 @@
 -type norm_type()   :: atom()|fun((any()) -> any()).
 
 -record(norm_rule, {
-    key =          ?UNIQ_UNDEFINED  ::  norm_key() | [norm_key()],
-    nkey =         ?UNIQ_UNDEFINED  ::  norm_key() | [norm_key()],
-    types =        []               ::  [norm_type()] ,
-    required    = true,
-    default =      ?UNIQ_UNDEFINED  ::  any()
+        rules =        []               :: [record(norm_rule)],
+    %% Один единственный ключ
+        key =          ?UNIQ_UNDEFINED  ::  norm_key(),
+    %% Множество (список) возможных ключей
+        keys =         []               ::  [norm_key()],
+    %% Новое имя ключа
+        nkey =         ?UNIQ_UNDEFINED  ::  norm_key(),
+    %% Множество (список) типов
+        types =        []               ::  [norm_type()] ,
+    %% Можно ли этот ключ пропустить
+        required    = true,
+    %% Значение по умолчанию
+        default =      ?UNIQ_UNDEFINED  ::  any()
+}).
+
+-record(norm_at_least_one, {
+        rules =        []               :: [record(norm_rule)]
+}).
+
+-record(norm_one, {
+        rules =        []               :: [record(norm_rule)]
 }).
 
 -record(norm_error, {

@@ -147,6 +147,66 @@
                     <li class="test" name='Получить друзей'>
                         {"fname": "get_friends", "params":{"user_id":1}}
                     </li>
+                    <li class="test" name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                    <li class="test" name='Добавить друга'>
+                        {"fname": "add_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" anti="anti" name='Добавить друга второй раз не удасться'>
+                        {"fname": "add_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                    <li class="test" name='Удалить друга'>
+                        {"fname": "delete_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" anti="anti"  name='Удалить друга второй раз не удасться'>
+                        {"fname": "delete_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                </ol>
+            </section>
+            <hr/>
+            <section id="user_udpate">
+                <h2>Обновление</h2>
+                <ol class="tests">
+                    <li class="test" name="Нормальный выход">
+                        {"fname": "logout", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" anti="anti"  name="Не можем изменить данные если не залогинены">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"some a"}}
+                    </li>
+                    <li class="test" name="Логинимся для получения данных">
+                        {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" name='Получаем данные (до 1 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test"  name="Можем изменить данные о хобби">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"some ~(random(string))"}}
+                    </li>
+                    <li class="test" name='Получаем данные (после 1 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" name='Получаем данные (до 2 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test"  name="Можем изменить данные о пользователе">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                    </li>
+                    <li class="test" name='Получаем данные (после 2 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" name="Несуществующие поля игнорируются если есть нормальные">
+                        {"fname": "update_user", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                    </li>
+                    <li class="test" anti="anti" name="Несуществующие поля игнорируются если есть нормальные">
+                        {"fname": "update_user", "params":{"id":1,"hobby__2":"hobby ~(random(string))"}}
+                    </li>
                 </ol>
             </section>
         </article>
@@ -189,8 +249,9 @@ jQuery(document).ready(function($) {
         var test = this;
         $(test).html(
             "<div><span>Ввод:</span><div class=\"input\">" +
-            $(test).html() +
-            "</div></div>"
+            $(test).html()
+                .replace(/[~][(]random[(]string[)][)]/gi," " + Math.random())
+            + "</div></div>"
         );
         var name = $(test).attr("name")
         if(name)

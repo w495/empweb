@@ -52,6 +52,7 @@ init([State]) ->
 
 
 init({_Any, http}, Req, Options) ->
+    ?debug("(1)~n"),
     case cowboy_http_req:header('Upgrade', Req) of
         {undefined, Req2} -> {ok, Req2, Options };
         {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
@@ -59,12 +60,11 @@ init({_Any, http}, Req, Options) ->
     end.
 
 handle(Req, State) ->
+    ?debug("(2.0)~n"),
 
-    App  = proplists:get_value(app, State),
-    {ok, Http} = application:get_env(App, http),
-    {ok, Host} = application:get_env(App, host),
+    {Host, Req} = cowboy_http_req:raw_host(Req),
+    {Port, Req} = cowboy_http_req:port(Req),
 
-    Port =proplists:get_value(port, Http, 8000),
 
 
     {ok, Req2} = cowboy_http_req:reply(200, [{'Content-Type', <<"text/html">>}],
@@ -91,7 +91,7 @@ function ready(){
     }
     if (\"WebSocket\" in window) {
         // browser supports websockets
-        var ws = new WebSocket(\"ws://">>, convert:to_list(Host), <<":">>, convert:to_list(Port), <<"/.debug/.logs/.ws\");
+        var ws = new WebSocket(\"ws://">>, Host, <<":">>, convert:to_list(Port), <<"/.debug/.logs/.ws\");
         ws.onopen = function() {
             // websocket is connected
             msg(\"log websocket connected!\");
@@ -123,11 +123,14 @@ terminate(_Req, _State) ->
     ok.
 
 websocket_init(_Any, Req, _State) ->
+    ?debug("(3)~n"),
     timer:send_interval(1000, tick),
     Req2 = cowboy_http_req:compact(Req),
+    ?debug("(4)~n"),
     State = #state{storage=ets:new(?HANDLERNAME, [set, public, {write_concurrency,true}])},
+    ?debug("(4)~n"),
     evman:add_handler(?HANDLERNAME, [State]),
-    ?debug("1~n"),
+    ?debug("(4)~n"),
     {ok, Req2, State}.
 
 websocket_handle({text, Msg}, Req, State) ->

@@ -25,7 +25,7 @@ create table content(
     lang_id     int references lang(id)   default null,
     text        text default null,
     deleted     bool default false,
-    constraint u_constrainte unique (cid, lang_id)
+    constraint content_cid_lang_id_many_key unique (cid, lang_id)
 );
 
 create sequence seq_emotion_id;
@@ -162,7 +162,8 @@ create sequence seq_friend_id;
 create table friend(
     id          int primary key default     nextval('seq_friend_id'),
     user_id     int references user_(id)    default null,
-    friend_id   int references user_(id)    default null
+    friend_id   int references user_(id)    default null,
+    constraint friend_user_id_friend_id_many_key unique     (user_id, friend_id)
 );
 
 

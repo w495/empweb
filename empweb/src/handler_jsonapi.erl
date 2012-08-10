@@ -138,20 +138,30 @@ jsonapi_map(Req, {List}) ->
                     action='register',
                     params=Params
                 };
-            %% {"fname": "login", "params": {"id": 1}}
-            
+
+            %%
+            %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
+            %%
             <<"login">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
                     action=login,
                     params=Params
                 };
+
+            %%
+            %% {"fname": "logout", "params":{"nick":"admin"}}
+            %%
             <<"logout">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
                     action=logout,
                     params=Params
                 };
+
+            %%
+            %% {"fname": "update_user", "params":{"id":1,"hobby":"some a"}} 
+            %%
             <<"update_user">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
@@ -159,27 +169,10 @@ jsonapi_map(Req, {List}) ->
                     params=Params,
                     is_auth=Is_auth
                 };
-            <<"get_friends">> ->
-                #empweb_hap{
-                    handler=jsonapi_user,
-                    action=get_friends,
-                    params=Params,
-                    is_auth=Is_auth
-                };
-            <<"add_friend">> ->
-                #empweb_hap{
-                    handler=jsonapi_user,
-                    action=add_friend,
-                    params=Params,
-                    is_auth=Is_auth
-                };
-            <<"delete_friend">> ->  
-                #empweb_hap{
-                    handler=jsonapi_user,
-                    action=delete_friend,
-                    params=Params,
-                    is_auth=Is_auth
-                };
+
+            %%
+            %% {"fname": "get_user", "params":{"nick":"admin"}}
+            %%
             <<"get_user">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
@@ -187,6 +180,10 @@ jsonapi_map(Req, {List}) ->
                     params=Params,
                     is_auth=Is_auth
                 };
+
+            %%
+            %% {"fname": "get_all_users", "params":{}} 
+            %%
             <<"get_all_users">> ->
                 #empweb_hap{
                     handler=jsonapi_user,
@@ -194,6 +191,46 @@ jsonapi_map(Req, {List}) ->
                     params=Params,
                     is_auth=Is_auth
                 };
+
+            %%
+            %% {"fname": "get_friends", "params":{"user_id":1}} 
+            %%
+            <<"get_friends">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=get_friends,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+
+            %%
+            %%  {
+            %%      "fname": "add_friend",
+            %%      "params":{"user_id":1, "friend_id":1}
+            %%  }
+            %%
+            <<"add_friend">> ->
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=add_friend,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+
+            %%
+            %%  {
+            %%      "fname": "delete_friend",
+            %%      "params":{"user_id":1, "friend_id":1}
+            %%  } 
+            %%
+            <<"delete_friend">> ->  
+                #empweb_hap{
+                    handler=jsonapi_user,
+                    action=delete_friend,
+                    params=Params,
+                    is_auth=Is_auth
+                };
+
             _ -> []
         end,
 

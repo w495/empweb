@@ -78,6 +78,10 @@ insert into user_ (fname, sname, email, nick, phash)
     values ('fadmin', 'ladmin', 'padmin',
         'admin', '21232F297A57A5A743894A0E4A801FC3');
 
+insert into user_ (fname, sname, email, nick, phash)
+    values ('fnickname', 'lnickname', 'pnickname',
+        'nickname', '21232F297A57A5A743894A0E4A801FC3');
+
     --//
     --     admin -> 21232F297A57A5A743894A0E4A801FC3
     --// новыйпароль
@@ -94,10 +98,10 @@ insert into user_ (fname, sname, email, nick, phash)
 
 insert into user2group (user_id, group_id)
     values
-        ((select id from user_ where login='admin'),
+        ((select id from user_ where nick='admin'),
             (select id from user_group where name='admin')),
-        ((select id from user_ where login='admin'),
+        ((select id from user_ where nick='admin'),
             (select id from user_group where name='sysmsg')),
-        ((select id from user_ where login='admin'),
+        ((select id from user_ where nick='admin'),
             (select id from user_group where name='insider'));
 
