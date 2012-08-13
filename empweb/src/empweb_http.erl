@@ -3,6 +3,8 @@
 
 
 -export([
+    auth/1,
+    make_auth/1,
     auth_cookie/1,
     make_auth_cookie/1,
     call/2,
@@ -12,9 +14,15 @@
 
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
 
+auth(Req)->
+    auth_cookie(Req).
+
 auth_cookie(Req)->
     {Res, _} = cowboy_http_req:cookie(?AUTH_COOKIE_NAME, Req),
     Res.
+
+make_auth(Body)->
+    make_auth_cookie(Body).
 
 make_auth_cookie([{Body}])->
     make_auth_cookie(Body);

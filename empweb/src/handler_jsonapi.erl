@@ -122,7 +122,7 @@ jsonapi_map(Req, {List}) ->
 
     ?debug("Params   = ~p~n",[Params]),
 
-    Is_auth=biz_session:is_auth(empweb_http:auth_cookie(Req)),
+    Is_auth=biz_user:is_auth(empweb_http:auth(Req)),
 
     ?evman_debug({jsonapi_call, [
         {fname,     Fname},

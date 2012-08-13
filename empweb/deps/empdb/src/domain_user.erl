@@ -36,7 +36,6 @@ register(Params)->
     end).
 
 update(Params)->
-    io:format("domain_user:update(Params)-> "),
     dao:with_connection(fun(Con)->
         dao_user:update(Con, Params)
     end).
@@ -95,7 +94,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
         perm_names ->
             {ok, Perm_list} = dao_user:get_perm(Con, Params, [name]),
             Perm_names = lists:map(fun({Permpl})->
-                proplists:get_value(name, Permpl)
+                convert:to_atom(proplists:get_value(name, Permpl))
             end, Perm_list),
             get_opt(Con, Params, Options, [{perm_names, Perm_names}|Acc]);
         %% ------------------------------------------------------------------

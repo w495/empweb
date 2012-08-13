@@ -9,7 +9,30 @@
 
 %%%
 %%% Спецификации
-%%% 
+%%%
+
+-export([behaviour_info/1]).
+
+behaviour_info(callbacks) ->
+    [
+        {table,     0},
+            %% ::= table(name)
+        {table,     1},
+            %% {fields, insert, required}
+            %% {fields, insert}
+            %% {fields, select}
+            %% {fields, update}
+            %% {fields, all}
+            %% name
+        {create,    2},
+        {update,    2},
+        {get,       2},
+        {get,       3},
+        {is_owner,  2}
+    ];
+behaviour_info(_Other) ->
+    undefined.
+
 
 %%% -----------------------------------------------------------------------
 
@@ -92,9 +115,161 @@ fields_fieldvars(Fields, _default, Additions) ->
     end,Fields),
     [<<" ">>, [First|Res], <<" ">>].
 
+%%% -----------------------------------------------------------------------
+
+get({Parent, Fp}, {Module, Fm}, Con, {Key, Value}, Fields)->
+    Ap = Parent:table({fields, all}),
+    Sp = Parent:table({fields, select}),
+    Am = Module:table({fields, all}),
+    Sm = Module:table({fields, select}),
+    Tfields = lists:filter(fun(F)-> lists:member(F, Sp) or lists:member(F, Sm) end, Fields),
+    case lists:member(Key, lists:append(Ap, Am)) of
+        true ->
+            Ptbl = convert:to_binary(Parent:table(name)),
+            Mtbl = convert:to_binary(Module:table(name)),
+            Dfs = dao:fields(Tfields, lists:append(Sp, Sm)),
+            Ckey = convert:to_binary(Key),
+            Fmb = convert:to_binary(Fm),
+            Fpb = convert:to_binary(Fp),
+            dao:pgret(dao:equery(Con,[
+                <<" select ">>, Dfs,    <<" from ">>,   Ptbl,
+                <<" join ">>,   Mtbl,   <<" on ">>,
+                    [Mtbl,<<".">>,Fmb], <<" =  ">>,  [Ptbl,<<".">>,Fpb],
+                <<" where ">>,  Ckey,   <<" = $1 ">>
+            ], [Value]));
+        _ ->
+            {error, {wrong_field, Key}}
+    end;
+
+get(Par, Cur, Con, [{Key, Value}], Fields)->
+    get(Par, Cur, Con, {Key, Value}, Fields);
+
+get({Parent, Fp}, {Module, Fm}, Con, all, Fields)->
+    Ap = Parent:table({fields, all}),
+    Sp = Parent:table({fields, select}),
+    Am = Module:table({fields, all}),
+    Sm = Module:table({fields, select}),
+    Tfields = lists:filter(fun(F)-> lists:member(F, Sp) or lists:member(F, Sm) end, Fields),
+    Ptbl = convert:to_binary(Parent:table(name)),
+    Mtbl = convert:to_binary(Module:table(name)),
+    Dfs = dao:fields(Tfields, lists:append(Sp, Sm)),
+    Fmb = convert:to_binary(Fm),
+    Fpb = convert:to_binary(Fp),
+    dao:pgret(dao:equery(Con,[
+        <<" select ">>, Dfs,    <<" from ">>,   Ptbl,
+        <<" join ">>,   Mtbl,   <<" on ">>,
+            [Mtbl,<<".">>,Fmb], <<" =  ">>,  [Ptbl,<<".">>,Fpb]
+    ]));
+
+get(Par, Cur, Con, [], Fields)->
+    get(Par, Cur, Con, all, Fields).
 
 
+%%% -----------------------------------------------------------------------
 
+get(Module, Con, {Key, Value}, Fields)->
+    Afields = Module:table({fields, all}),
+    Sfields = Module:table({fields, select}),
+    Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
+    case lists:member(Key, Afields) of
+        true ->
+            Mtbl = convert:to_binary(Module:table(name)),
+            Dfs = dao:fields(Tfields, Sfields),
+            Ckey = convert:to_binary(Key),
+            dao:pgret(dao:equery(Con,[
+                <<"select ">>,Dfs,<<" from ">>,Mtbl,<<" where ">>,Ckey,<<" = $1">>
+            ], [Value]));
+        _ ->
+            {error, {wrong_field, Key}}
+    end;
+
+get(Module, Con, [{Key, Value}], Fields)->
+    get(Module, Con, {Key, Value}, Fields);
+
+get(Module, Con, all, Fields)->
+    Sfields = Module:table({fields, select}),
+    Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
+    Mtbl = convert:to_binary(Module:table(name)),
+    Dfs = dao:fields(Tfields, Sfields),
+    dao:pgret(dao:equery(Con,[<<"select ">>,Dfs,<<" from ">>,Mtbl]));
+
+get(Module, Con, [], Fields)->
+    get(Module, Con, all, Fields).
+
+%%% -----------------------------------------------------------------------
+
+create({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret1, Ret2)->
+    case create(Parent, Con, Proplist, Ret1) of
+        {ok, Pid} ->
+            io:format("~nFm = ~p~n", [Fm]),
+            io:format("~nPid = ~p~n", [Pid]),
+            create(Module, Con, [{Fm, Pid}|Proplist], Ret2);
+        {error, Error} ->
+            Error
+    end.
+
+create({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret2)->
+    create({Parent, Fp}, {Module, Fm}, Con, Proplist, id, Ret2).
+
+create(Module, Con, Proplist)->
+    create(Module, Con, Proplist, id).
+
+create(Module, Con, Proplist, Ret)->
+    io:format("~nProplist = ~p~n", [Proplist]),
+    Fields = lists:filter(
+        fun(F)-> lists:member(F, Module:table({fields, insert})) end,
+        proplists:get_keys(Proplist)
+    ),
+    Required = Module:table({fields, insert, required}),
+    case lists:foldl( fun(F, R)-> R and lists:member(F, Fields) end, true, Required ) of
+        true ->
+            Mtbl =  convert:to_binary(Module:table(name)),
+            Dfs =   dao:fields(Fields),
+            Dfvs  = dao:fieldvars(Fields),
+            Retb = convert:to_binary(Ret),
+            dao:pgret(dao:equery(Con,[
+                <<"insert into ">>,
+                    Mtbl,
+                <<"(">>,
+                    Dfs,
+                <<")values(">>,
+                    Dfvs,
+                <<") returning ">>,
+                    Retb
+            ], Proplist));
+        _ ->
+            {error, {required, Required}}
+    end.
+
+update({Parent, Fp}, {Module, Fm}, Con, Proplist)->
+    case update(Parent, Con, Proplist) of
+        {ok, Pid} ->
+            update(Module, Con, [{Fm, Pid}|Proplist]);
+        {error, Error} ->
+            Error
+    end.
+
+
+update(Module, Con, Proplist)->
+    Fields = lists:filter(
+        fun(F)-> lists:member(F, Module:table({fields, update})) end,
+        proplists:get_keys(Proplist)
+    ),
+    case proplists:get_value(id, Proplist) of
+        undefined ->
+            create(Module, Con, Proplist);
+        Id ->
+            Mtbl = convert:to_binary(Module:table(name)),
+            Dffvs = dao:fields_fieldvars(Fields),
+            dao:pgret(dao:equery(Con,[
+                <<" update  ">>, Mtbl, <<" set ">>, Dffvs, <<" where id = $id ">>
+            ],Proplist)),
+            {ok, Id}
+    end.
+
+
+%%% -----------------------------------------------------------------------
+%%% -----------------------------------------------------------------------
 
 
 

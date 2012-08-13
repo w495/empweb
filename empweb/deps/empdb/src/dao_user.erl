@@ -2,17 +2,19 @@
 %% Created: 25.07.2012
 %% Description: TODO: Add description to biz_user
 -module(dao_user).
+-behaviour(dao).
 
 %%
 %% Include files
 %%
 
--include("user.hrl").
 
 %%
 %% Exported Functions
 %%
 -export([
+    table/0,
+    table/1,
     create/2,
     update/2,
     get/2,
@@ -30,8 +32,34 @@
 %% API Functions
 %%
 
+%% 
+%% @doc Возвращает список обязательных полей таблицы для создания
+%%
+table({fields, insert, required})->
+    [nick, phash, email];
 
-fields()->
+%%
+%% @doc Возвращает список полей таблицы для выборки
+%%
+table({fields, select})->
+    table({fields, all});
+
+%%
+%% @doc Возвращает список полей таблицы для обновления
+%%
+table({fields, update})->
+    table({fields, all}) -- [id];
+
+%%
+%% @doc Возвращает список полей таблицы для создания
+%%
+table({fields, insert})->
+    table({fields, all}) -- [id];
+
+%%
+%% @doc Возвращает полный список полей таблицы
+%%
+table({fields, all})->
     [
         id,
         nick,
@@ -60,115 +88,42 @@ fields()->
         allow_auction_offer
         %,
         %userpic_body_id    ,
-        %userpic_head_id    
-    ].
+        %userpic_head_id
+    ];
+
+%%
+%% @doc Возвращает полный список полей таблицы
+%%
+table(fields)->
+    table({fields, all});
+
+%%
+%% @doc Возвращает имя таблицы
+%%
+table(name)->
+    user_.
 
 
-selectables() ->
-    fields().
-
-
-filter_fields(List) ->
-    lists:filter(fun is_field/1, List).
-
-fields(Pl) ->
-    filter_fields(proplists:get_keys(Pl)).
-
-fields_create(Pl) ->
-    fields(Pl).
-    
-fields_update(Pl) ->
-    fields(Pl) -- [id].
-    
-is_field(Mbfield)->
-    is_field(Mbfield, fields()).
-
-is_field(Mbfield, Fields)->
-    lists:member(Mbfield, Fields).
+table()->
+    table(name).
 
 
 get(Con, Some) ->
     get(Con, Some, []).
 
-get(Con, {id, Id}, Fields)->
-    dao:pgret(
-        dao:equery(Con,
-            [
-                <<"select ">>,
-                dao:fields(Fields, selectables()),
-                <<" from user_ where id = $1">>
-            ],
-            [Id]
-        )
-    );
-
-get(Con, {name, Name}, Fields)->
-    dao:pgret(
-        dao:equery(Con,
-            [
-                <<"select ">>,
-                dao:fields(Fields, selectables()),
-                <<" from user_ where name = $1">>
-            ],
-            [Name]
-        )
-    );
-
-
-get(Con, {nick, Nick}, Fields)->
-    dao:pgret(
-        dao:equery(Con,
-            [
-                <<"select ">>,
-                dao:fields(Fields, selectables()),
-                <<" from user_ where nick = $1">>
-            ],
-            [Nick]
-        )
-    );
-
-get(Con, [{Key, Value}], Fields)->
-    get(Con, {Key, Value}, Fields);
-
-get(Con, _, Fields)->
-    dao:pgret(
-        dao:equery(Con,
-            [
-                <<"select ">>,
-                dao:fields(Fields, selectables()),
-                <<" from user_">>
-            ]
-        )
-    ).
+get(Con, What, Fields)->
+    dao:get(?MODULE, Con, What, Fields).
 
 create(Con, Proplist)->
-    io:format("Proplist = ~p~n", [Proplist]),
-    Fields = fields_create(Proplist),
-    dao:pgret(
-        dao:equery(Con,[
-            <<"insert into user_ (">>,
-                dao:fields(Fields),
-            <<") values (">>,
-                dao:fieldvars(Fields),
-            <<") returning id; ">>
-        ],Proplist)
-    ).
+    dao:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
-    Fields = fields_update(Proplist),
-    case proplists:get_value(id, Proplist) of
-        undefined -> 
-            create(Con, Proplist);
-        Id ->
-            dao:pgret(
-                dao:equery(Con,[
-                    <<"update  user_ set ">>,
-                        dao:fields_fieldvars(Fields),
-                    <<" where id= $id">>
-                ],Proplist)
-            ),
-            {ok, Id}
-    end.
+    dao:update(?MODULE, Con, Proplist).
+
+is_owner(Con, Id, Id)->
+    true;
+is_owner(Con, _, _)->
+    false.
 
 
 get_perm(Con, Params) ->
@@ -285,3 +240,5 @@ get_friends(Con, Proplist)->
 %% Local Functions
 %%
 
+
+    

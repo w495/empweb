@@ -72,42 +72,32 @@ create table userpic_body(
 create sequence seq_user_id;
 create table user_(
     id int primary key default nextval('seq_user_id'),
-
     nick            varchar(1024) not null unique,
     name            varchar(1024),
     phash           char(32) not null,
-
     email           varchar(1024) not null unique,
     phone           varchar(1024),
     fname           varchar(1024),
     sname           varchar(1024),
-
     birthday        timestamp without time zone NOT NULL DEFAULT now(),
     male            bool default true,
     city            varchar(1024),
-
     married_status      bool default false,
     married_id          int references user_(id)   default null,
-
     description         varchar(1024),
     money               real,
     status_id           int references status(id)   default null,
-
     authority_id        int references authority(id)   default null,
     country_id          int default null,
     emotion_id          int references emotion(id)     default null,
-    
     mother_id           int references user_(id)   default null,
     father_id           int references user_(id)   default null,
-
     community_id        int default null,
     employment          varchar(1024),
     hobby               varchar(1024),
     allow_auction_offer bool default false,
-
     userpic_body_id     int references authority(id)   default null,
     userpic_head_id     int references authority(id)   default null,
-
     created timestamp without time zone NOT NULL DEFAULT now(),
     deleted             bool default false
 );  

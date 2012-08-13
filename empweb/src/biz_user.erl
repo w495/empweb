@@ -34,6 +34,9 @@
     update/1,
     login/1,
     is_auth/1,
+    perms/1,
+    has_perm/2,
+    has_perm/3,
     logout/1,
     get/1,
     get_friends/1,
@@ -50,9 +53,39 @@ is_auth({session_id, Session_id})->
     case biz_session:get(Session_id) of
         [] ->
             false;
-        [_H=#biz_session{perm_names=PList}|_T] ->
+        [_H=#biz_session{perm_names=Plist}|_] ->
             true
-    end.
+    end;
+
+is_auth(Session_id)->
+    is_auth({session_id, Session_id}).
+
+perms({session_id, Session_id})->
+    case biz_session:get(Session_id) of
+        [] ->
+            [];
+        [_H=#biz_session{perm_names=Plist}|_] ->
+            lists:map(fun convert:to_atom/1, Plist)
+    end;
+
+perms(Session_id)->
+    perms({session_id, Session_id}).
+
+
+has_perm({session_id, Session_id}, Perm, Flag) ->
+    Flag or lists:member(Perm, perms({session_id, Session_id}));
+
+has_perm(Session_id, Perm, Flag)->
+    has_perm(Session_id, Perm, Flag).
+
+has_perm({session_id, Session_id}, Perm)->
+    has_perm({session_id, Session_id}, Perm, false);
+
+has_perm(Session_id, Perm)->
+    has_perm(Session_id, Perm).
+
+
+%% ---------------------------------------------------------------------------
 
 register(Params)->
     ?evman_args(Params, <<"user try to register">>),
@@ -162,14 +195,11 @@ login(Params) ->
     Phash = phash(Pass),
     Max_auth_error = 10,
     EC = 0,
-    ?debug("login(Params) -> Nick   = ~p~n", [domain_user:get_opt({nick, Nick}, [id, nick, phash], [perm_names])]),
     
     case domain_user:get_opt({nick, Nick}, [id, nick, phash], [perm_names])  of
         {ok, [{Userpl}]} ->
             Perm_names = proplists:get_value(perm_names, Userpl),
             P = proplists:get_value(phash, Userpl),
-            ?debug("login(Params) -> P  = ~p~n", [P ]),
-            ?debug("login(Params) -> Phash  = ~p~n", [Phash]),
             if
 %                 EC >= Max_auth_error ->
 %                     throw({auth_count_overflow, Max_auth_error});
