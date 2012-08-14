@@ -105,3 +105,15 @@ insert into user2group (user_id, group_id)
         ((select id from user_ where nick='admin'),
             (select id from user_group where name='insider'));
 
+-------------------------------------------------------------------------------
+-- Документы
+-------------------------------------------------------------------------------
+
+insert into content_access_type (alias)
+    values ('private'), ('protected'), ('public');
+
+insert into content_type(alias)
+    values ('common'), ('adult_only');
+
+insert into doc_type(alias)
+    values ('blog'), ('blog_comment'), ('gallery'), ('photo'), ('photo_comment'), ('attach_description');

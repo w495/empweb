@@ -161,6 +161,7 @@ create table friend(
 -- Документы
 -------------------------------------------------------------------------------
 
+-- Тип контента (блога и галереи). Приватный, дружеский, открытый.
 create sequence seq_content_access_type_id;
 create table content_access_type(
     id          int primary key default     nextval('seq_content_access_type_id'),
@@ -168,7 +169,7 @@ create table content_access_type(
     deleted     bool default false
 );
 
-
+-- Типы контента (обычный, эротический)
 create sequence seq_content_type_id;
 create table content_type(
     id          int primary key default     nextval('seq_content_type_id'),
@@ -177,6 +178,7 @@ create table content_type(
 );
 
 
+-- Тип документа - блог, коммент к блогу, галерея, фото, коммент к фото, attach description
 create sequence seq_doc_type_id;
 create table doc_type(
     id          int primary key default     nextval('seq_doc_type_id'),

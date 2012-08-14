@@ -34,10 +34,13 @@
     update/1,
     login/1,
     is_auth/1,
-    perms/1,
+    get_perm_names/1,
+    get_user_id/1,
     has_perm/2,
     has_perm/3,
     logout/1,
+    get_user_id/1,
+    get_user_nick/1,
     get/1,
     get_friends/1,
     add_friend/1,
@@ -60,7 +63,7 @@ is_auth({session_id, Session_id})->
 is_auth(Session_id)->
     is_auth({session_id, Session_id}).
 
-perms({session_id, Session_id})->
+get_perm_names({session_id, Session_id})->
     case biz_session:get(Session_id) of
         [] ->
             [];
@@ -68,12 +71,12 @@ perms({session_id, Session_id})->
             lists:map(fun convert:to_atom/1, Plist)
     end;
 
-perms(Session_id)->
-    perms({session_id, Session_id}).
+get_perm_names(Session_id)->
+    get_perm_names({session_id, Session_id}).
 
 
 has_perm({session_id, Session_id}, Perm, Flag) ->
-    Flag or lists:member(Perm, perms({session_id, Session_id}));
+    Flag or lists:member(Perm, get_perm_names({session_id, Session_id}));
 
 has_perm(Session_id, Perm, Flag)->
     has_perm(Session_id, Perm, Flag).
@@ -85,11 +88,26 @@ has_perm(Session_id, Perm)->
     has_perm(Session_id, Perm).
 
 
+get_user_id({session_id, Session_id})->
+    case biz_session:get(Session_id) of
+        [] ->
+            undefined;
+        [_H=#biz_session{id=Id}|_] ->
+            Id
+    end.
+
+get_user_nick({session_id, Session_id})->
+    case biz_session:get(Session_id) of
+        [] ->
+            undefined;
+        [_H=#biz_session{nick=Nick}|_] ->
+            Nick
+    end.
+
 %% ---------------------------------------------------------------------------
 
 register(Params)->
     ?evman_args(Params, <<"user try to register">>),
-    
     domain_user:register([
         {phash, phash(proplists:get_value(pass, Params))}
         |Params
@@ -190,14 +208,18 @@ delete_friend(Params)->
 login(Params) ->
     ?evman_args(Params, <<"user try to login">>),
 
+    
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
     Phash = phash(Pass),
     Max_auth_error = 10,
     EC = 0,
+
+    ?debug("=> Params = ~p => ~n", [Params]),
     
-    case domain_user:get_opt({nick, Nick}, [id, nick, phash], [perm_names])  of
+    case domain_user:get_opt([{nick, Nick}], [id, nick, phash], [perm_names])  of
         {ok, [{Userpl}]} ->
+            ?debug("=> Params = ~p => ~n", [Params]),
             Perm_names = proplists:get_value(perm_names, Userpl),
             P = proplists:get_value(phash, Userpl),
             if
@@ -239,6 +261,7 @@ login(Params) ->
                         perm_names=Perm_names,
                         phash=Phash
                     }),
+                        ?debug("=> Params = ~p => ~n", [Params]),
                     {ok, [{User}]} = domain_user:login(Params),
                     ?evman_info({login, [
                         {user,          User},

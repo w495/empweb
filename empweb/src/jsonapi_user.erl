@@ -43,22 +43,32 @@
 %%
 %% @doc Инициализация запроса
 %%
-init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
+init(_, Req, #empweb_hap{
+        action          =   Action,
+        params          =   Params,
+        is_auth         =   Is_auth,
+        user_id         =   User_id,
+        user_perm_names =   User_perm_names
+    } = Hap)->
     %%%
     %%% Это нужно, чтобы понять, какая функция дальше выполнится
     %%%
     ?evman_notice({hap, [
-        {action,    Action},
-        {params,    Params},
-        {is_auth,   Is_auth}
+        {action,            Action},
+        {params,            Params},
+        {is_auth,           Is_auth},
+        {user_id,           User_id},
+        {user_perm_names,   User_perm_names}
     ]}, <<" = Hap">>),
 
     {ok,
         Req,
         #empweb_hap{
-            action=Action,
-            params=Params,
-            is_auth=Is_auth
+            action          =   Action,
+            params          =   Params,
+            is_auth         =   Is_auth,
+            user_id         =   User_id,
+            user_perm_names =   User_perm_names
         }
     }.
 

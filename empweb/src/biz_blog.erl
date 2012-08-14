@@ -20,6 +20,13 @@
 %%
 
 
+create(Params)->
+    domain_blog:create(Params).
+
 update(Params)->
     domain_blog:update(Params).
+
+
+get(Params)->
+    domain_blog:get(Params).
 

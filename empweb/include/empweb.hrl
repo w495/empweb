@@ -12,6 +12,7 @@
 }).
 
 
+
 %%
 %%
 %%
@@ -19,8 +20,12 @@
     handler,
     action,
     params = [],
-    is_auth = true
+    is_auth = true,
+    user_id,
+    user_nick,
+    user_perm_names =[]
 }).
+
 
 
 %%

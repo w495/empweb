@@ -44,35 +44,47 @@ login(Params)->
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, {nick, Nick})
+        dao_user:get(Con, [{deleted, false}, {nick, Nick}])
     end).
 
 logout(Params)->
     Nick = proplists:get_value(nick, Params),
     Pass = proplists:get_value(pass, Params),
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, {nick, Nick})
+        dao_user:get(Con, [{deleted, false}, {nick, Nick}])
     end).
+
+get({K, V})->
+    ?MODULE:get([{K, V}]);
+
+get(all)->
+    ?MODULE:get([]);
 
 get(Params)->
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, Params)
+        dao_user:get(Con, [{deleted, false}|Params])
     end).
+
+get({K, V}, Fileds)->
+    ?MODULE:get([{K, V}], Fileds);
+
+get(all, Fileds)->
+    ?MODULE:get([], Fileds);
 
 get(Params, Fileds)->
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, Params, Fileds)
+        dao_user:get(Con, [{deleted, false}|Params], Fileds)
     end).
 
 get_opt(Params, Fileds, Options)->
     dao:with_connection(fun(Con)->
-        {ok, Userpls} = dao_user:get(Con, Params, Fileds),
+        {ok, Userpls} = dao_user:get(Con, [{deleted, false}|Params], Fileds),
         get_opt(Con, Params, Options, Userpls)
     end).
 
 get_opt(Params, Options)->
     dao:with_connection(fun(Con)->
-        {ok, Userpls} = dao_user:get(Con, Params),
+        {ok, Userpls} = dao_user:get(Con, [{deleted, false}|Params]),
         get_opt(Con, Params, Options, Userpls)
     end).
 

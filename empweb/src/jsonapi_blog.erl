@@ -1,9 +1,9 @@
 %%
-%% @file    jsonapi_user.erl 
+%% @file    jsonapi_user.erl
 %%          "Контроллер" для функций работы с пользователями.
 %%
 
--module(jsonapi_user).
+-module(jsonapi_blog).
 -behavior(empweb_http_hap).
 
 %% ---------------------------------------------------------------------------
@@ -43,70 +43,50 @@
 %%
 %% @doc Инициализация запроса
 %%
-init(_, Req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap)->
+init(_, Req, #empweb_hap{
+        action          =   Action,
+        params          =   Params,
+        is_auth         =   Is_auth,
+        user_id         =   User_id,
+        user_perm_names =   User_perm_names
+    } = Hap)->
     %%%
     %%% Это нужно, чтобы понять, какая функция дальше выполнится
     %%%
     ?evman_notice({hap, [
-        {action,    Action},
-        {params,    Params},
-        {is_auth,   Is_auth}
+        {action,            Action},
+        {params,            Params},
+        {is_auth,           Is_auth},
+        {user_id,           User_id},
+        {user_perm_names,   User_perm_names}
     ]}, <<" = Hap">>),
 
     {ok,
         Req,
         #empweb_hap{
-            action=Action,
-            params=Params,
-            is_auth=Is_auth
+            action          =   Action,
+            params          =   Params,
+            is_auth         =   Is_auth,
+            user_id         =   User_id,
+            user_perm_names =   User_perm_names
         }
     }.
 
 
 % {"params":{"sname":"sname1","nick":"nickname","city":"Иркутск","phone":"+380633612672","email":"em@il.com","pass":"password","birthday":1900,"description":"description","fname":"fname"},"fname":"register"}
 
-handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
+handle(_req, #empweb_hap{action='create_blog', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = register">>),
 
-    ?evman_debug(Params, <<" = Params">>),
-            
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = nick,
+                key = title,
                 types = [string]
             },
             #norm_rule{
-                key = description,
-                types = [string]
-            },
-            #norm_rule{
-                key = pass,
-                types = [string]
-            },
-            #norm_rule{
-                key = email,
-                types = [email]
-            },
-            #norm_rule{
-                key = phone,
-                types = [string]
-            },
-            #norm_rule{
-                key = fname,
-                types = [string]
-            },
-            #norm_rule{
-                key = sname,
-                types = [string]
-            },
-            #norm_rule{
-                key = birthday,
-                types = [string]
-            },
-            #norm_rule{
-                key = city,
+                key = content,
                 types = [string]
             }
         ]),
@@ -223,7 +203,7 @@ handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) 
 %%
 handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Hap) ->
     ?evman_args(Hap, <<" = delete_friend">>),
-    
+
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -283,7 +263,7 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
 %%
 handle(_req, #empweb_hap{action=get_all_users, params=Params, is_auth=true} = Hap) ->
     ?evman_args(Hap, <<" = get_all_users">>),
-    
+
     {ok,jsonapi:resp(biz_user:get(all)),Hap};
 
 %%
@@ -291,7 +271,7 @@ handle(_req, #empweb_hap{action=get_all_users, params=Params, is_auth=true} = Ha
 %%
 handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap) ->
     ?evman_args(Hap, <<" = update_user">>),
-    
+
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -363,7 +343,7 @@ handle(_req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap) -
 
 terminate(_req, Hap)->
     ?evman_args(Hap, <<" = terminate">>),
-    
+
     ok.
 
 %% ---------------------------------------------------------------------------

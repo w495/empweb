@@ -85,7 +85,8 @@ table({fields, all})->
         community_id  ,
         employment    ,
         hobby         ,
-        allow_auction_offer
+        allow_auction_offer,
+        deleted
         %,
         %userpic_body_id    ,
         %userpic_head_id
@@ -132,6 +133,18 @@ get_perm(Con, Params) ->
 get_perm(Con, Params, []) ->
     get_perm(Con, Params, [name]);
 
+get_perm(Con, Kvalue, Fields) when erlang:is_list(Kvalue) ->
+    case {proplists:get_value(id, Kvalue), proplists:get_value(nick, Kvalue)} of
+        {undefined, undefined   } ->
+            {error, {no_data,no_data}};
+        {Id,        undefined   } ->
+            get_perm(Con, {id, Id}, Fields);
+        {undefined, Nick        } ->
+            get_perm(Con, {nick, Nick}, Fields);
+        {Id,        Nick        } ->
+            get_perm(Con, {id, Id}, Fields)
+    end;
+
 get_perm(Con, {id, Id}, Fields) ->
     dao:pgret(
         dao:equery(Con,[
@@ -164,11 +177,24 @@ get_perm(Con, {nick, Nick}, Fields) ->
         )
     ).
 
-get_group(Con, {id, Id}) ->
-    get_group(Con, {id, Id}, []).
 
-get_group(Con, {id, Id}, []) ->
-    get_group(Con, {id, Id}, [name]);
+get_group(Con, Params) ->
+    get_group(Con, Params, []).
+
+get_group(Con, Params, []) ->
+    get_group(Con, Params, [name]);
+
+get_group(Con, Kvalue, Fields) when erlang:is_list(Kvalue) ->
+    case {proplists:get_value(id, Kvalue), proplists:get_value(nick, Kvalue)} of
+        {undefined, undefined   } ->
+            {error, {no_data,no_data}};
+        {Id,        undefined   } ->
+            get_group(Con, {id, Id}, Fields);
+        {undefined, Nick        } ->
+            get_group(Con, {nick, Nick}, Fields);
+        {Id,        Nick        } ->
+            get_group(Con, {id, Id}, Fields)
+    end;
 
 get_group(Con, {id, Id}, Fields) ->
     dao:pgret(
@@ -181,8 +207,22 @@ get_group(Con, {id, Id}, Fields) ->
                     " and user2group.user_id = $1">>
             ],[Id]
         )
-    ).
+    );
 
+get_group(Con, {nick, Nick}, Fields) ->
+    dao:pgret(
+        dao:equery(Con,[
+            <<"select distinct ">>,
+                dao:table_fields(user_group, Fields),
+            <<" from user_group "
+                "join user2group on "
+                    " user2group.group_id = user_group.id "
+                "join user_ on "
+                    "user2group.user_id = user_.id "
+                    "and user_.nick = $1">>
+            ],[Nick]
+        )
+    ).
 
 %
 % 230

@@ -23,6 +23,24 @@
     get/4
 ]).
 
+
+
+-export([
+    get_content_access_type/2,
+    get_content_access_type/3,
+    create_content_access_type/2,
+    update_content_access_type/2,
+    get_doc_type/2,
+    get_doc_type/3,
+    create_doc_type/2,
+    update_doc_type/2,
+    get_content_type/2,
+    get_content_type/3,
+    create_content_type/2,
+    update_content_type/2
+]).
+
+
 %%
 %% API Functions
 %%
@@ -36,19 +54,19 @@ table({fields, insert, required})-> [];
 %% @doc Возвращает список полей таблицы для выборки
 %%
 table({fields, select})->
-    table({fields, all});
+    table({fields, all}) -- [deleted];
 
 %%
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    table({fields, all}) -- [id];
+    table({fields, all}) -- [id, deleted];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
 %%
 table({fields, insert})->
-    table({fields, all}) -- [id];
+    table({fields, all}) -- [id, deleted];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -61,7 +79,8 @@ table({fields, all})->
         doc_type_id,
         content_type_id,
         owner_id,
-        parent_id
+        parent_id,
+        deleted
     ];
 
 %%
@@ -98,7 +117,7 @@ is_owner(Con, {owner_id, Owner_id}, {id, Id})->
             true;
         _ ->
             false
-    end.
+    end;
 
 is_owner(Con, Owner_id, Id)->
     is_owner(Con, {owner_id, Owner_id}, {id, Id}).
@@ -116,7 +135,7 @@ get(Module, Con, What, Fields)->
 %%      Наследник должен быть описан в модуле Module.
 %%
 create(Module, Con, Proplist)->
-    dao:create({?MODULE, id}, {Module, doc_id}, Con, Proplist, doc_id).
+    dao:create({?MODULE, id}, {Module, doc_id}, Con, Proplist).
 
 %%
 %% @doc Изменяет экземпляр документа и экземпляр join-наследника.
@@ -127,5 +146,76 @@ update(Module, Con, Proplist)->
 
 
 
+get_content_access_type(Con, What) ->
+    get_content_access_type(Con, What, []).
+
+get_content_access_type(Con, What, Fields)->
+    dao:get(content_access_type(), Con, What, Fields).
+
+create_content_access_type(Con, Proplist)->
+    dao:get(content_access_type(), Con, Proplist).
+
+update_content_access_type(Con, Proplist)->
+    dao:get(content_access_type(), Con, Proplist).
+
+
+get_doc_type(Con, What) ->
+    get_doc_type(Con, What, []).
+
+get_doc_type(Con, What, Fields)->
+    dao:get(doc_type(), Con, What, Fields).
+
+create_doc_type(Con, Proplist)->
+    dao:get(doc_type(), Con, Proplist).
+
+update_doc_type(Con, Proplist)->
+    dao:get(doc_type(), Con, Proplist).
+
+
+get_content_type(Con, What) ->
+    get_content_type(Con, What, []).
+
+get_content_type(Con, What, Fields)->
+    dao:get(content_type(), Con, What, Fields).
+
+create_content_type(Con, Proplist)->
+    dao:get(doc_type(), Con, Proplist).
+
+update_content_type(Con, Proplist)->
+    dao:get(content_type(), Con, Proplist).
+
+
+
+
+
+content_access_type() ->
+    [
+        {{table, name},                       content_access_type},
+        {{table, fields, all},                [id, alias, deleted]},
+        {{table, fields, select},             [id, alias]},
+        {{table, fields, insert},             [alias]},
+        {{table, fields, update},             [alias]},
+        {{table, fields, insert, required},   [alias]}
+    ].
+
+doc_type() ->
+    [
+        {{table, name},                       doc_type},
+        {{table, fields, all},                [id, alias, deleted]},
+        {{table, fields, select},             [id, alias]},
+        {{table, fields, insert},             [alias]},
+        {{table, fields, update},             [alias]},
+        {{table, fields, insert, required},   [alias]}
+    ].
+
+content_type() ->
+    [
+        {{table, name},                       content_type},
+        {{table, fields, all},                [id, alias, deleted]},
+        {{table, fields, select},             [id, alias]},
+        {{table, fields, insert},             [alias]},
+        {{table, fields, update},             [alias]},
+        {{table, fields, insert, required},   [alias]}
+    ].
 
 
