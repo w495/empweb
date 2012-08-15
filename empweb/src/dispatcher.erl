@@ -20,7 +20,7 @@ dispatch()->
             %%
             %% Контроллер отображения автоматических тестов
             %%
-            {[<<".debug">>, <<".tests">>],
+            {[<<".debug">>, <<".tests">>, '...'],
                 handler_debug_tests, Options},
 
             {[<<"static">>, '...'],
