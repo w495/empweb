@@ -36,7 +36,7 @@ start(_Type, _Args) ->
         % nbacceptors
         proplists:get_value(nbacceptors,Config,?EMPWEB_NBACCEPTORS_DEF),
         % transport
-        cowboy_tcp_transport,
+        cowboy_ssl_transport,
         % transopts
         [
             {port,      proplists:get_value(port,Config)},
