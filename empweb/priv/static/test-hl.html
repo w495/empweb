@@ -1,0 +1,290 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru"><head xml:lang="ru"><meta xmlns="" http-equiv="Content-Type" content="text/html;charset=UTF-8" charset="UTF-8"/><meta xmlns="" http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><meta xmlns="" data-name="author" content="ζAVρ λαβ"/><meta xmlns="" data-name="description" content="adv com system"/><meta xmlns="" data-name="viewport" content="width=device-width, initial-scale=1.0"/><title xmlns="">Автоматические тесты</title>
+    <head>
+        <style>
+            *{
+                margin:0;
+                padding:0;
+            }
+            body{
+                padding-left: 30px;
+            }
+            .about{
+                font-size: 80%;
+                margin: 20px 20px 30px 200px;
+                padding:5px 5px 5px 5px;
+                width: 900px;
+                word-wrap: break-word;
+                border: 1px solid black;
+            }
+            .as{
+                margin: 10px 0px 0px 20px;
+                padding:5px 5px 5px 5px;
+            }
+            .asd{
+                margin: 5px 0px 5px 20px;
+            }
+            .test-set{
+                padding-left: 30px;
+            }
+            .test-set h2{
+                margin: 20px 0 20px 0;
+            }
+            .test-name{
+                margin: 20px 0 20px 0;
+            }
+            .input{
+                color:navy;
+            }
+            .input, .output{
+                max-width: 900px;
+                word-wrap: break-word;
+                margin: 10px 0 10px 20px;
+                font-family:monospace;
+            }
+            .tests{
+                padding-left: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="gh">Автоматические тесты (нагрузка)</h1>
+        <nav><a href="test-plain.html">plain</a>&nbsp;<a href="test-ajax.html">ajax</a>&nbsp;<a href="test-auto.html">auto</a>&nbsp;<a href="test-hl.html">hl</a></nav>
+        <article class="about"><h2>Описание</h2><section class="as"><h3>Что это</h3><div class="asd">Модуль автоматизированного тестирования. По сути просто одна html-страница. С помощью javascript со страницы вополняются <strong>синхронные</strong> запросы к серверу. Запросы и ответы сервера вместе с статус-кодом выводятся на страницу. Тесты двух типов прямые и обратные <em>(anti)</em>. Прямые тесты нужны, чтобы проверить выполнение корректных запросов. Обратные --- некорректных. Положительные и отрицательные ответы запросов обоих типов выделяются цветами.</div></section><section class="as"><h3>Использование</h3><div class="asd"><div class="asd-url">http://{host}/static/tests.html?url={url}</div><p><div>Например:</div><div class="asd-url">http://127.0.0.1:8000/static/tests.html?url=http://127.0.0.1:8000/jsonapi/</div></p><p>В текущей реализации тестов, если параметр <em>{url}</em> не указан,<br/>то используется <em>{host} + "/jsonapi/"</em>.</p></div></section></article>
+        <!-- ============================================================== -->
+        <article class="workspace">
+            <section id="common">
+                <h2>Общее</h2>
+                <ol class="tests">
+                    <li class="test" data-anti="anti" data-name="Неверный формат: пустой json">
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: пустой запрос">
+                        {}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: нет параметров">
+                        {"fname": "login"}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: нет функции">
+                        {"params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: параметры null">
+                        {"fname": "login", "params": null}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: параметры {}">
+                        {"fname": "login", "params": {}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: аргументы">
+                        {"fname": "login", "_params_":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: параметры не все">
+                        {"fname": "login", "params": {"nick":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: неведомая фигня">
+                        {"funcname": "_login_", "parames":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Неверный формат: нет такой функции">
+                        {"fname": "_login_", "params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                </ol>
+            </section>
+            <hr/>
+            <section id="login">
+                <h2>Вход</h2>
+                <ol class="tests">
+                    <li class="test" data-anti="anti" data-name="C не правильным пользователем">
+                        {"fname": "login", "params":{"nick":"admin2", "pass":"admin23"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="C не правильным паролем">
+                        {"fname": "login", "params":{"nick":"admin", "pass":"admin23"}}
+                    </li>
+                    <li class="test" data-name="C правильным паролем">
+                        {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                </ol>
+            </section>
+            <hr/>
+            <section id="logout">
+                <h2>Выход</h2>
+                <ol class="tests">
+                    <li class="test" data-anti="anti" data-name="По id а не по nick">
+                        {"fname": "logout", "params":{"id":1}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="C не правильным пользователем">
+                        {"fname": "logout", "params":{"nick":"admin\/"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="C не правильным пользователем">
+                        {"fname": "logout", "params":{"nick":"admin2"}}
+                    </li>
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "logout", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Повторный выход">
+                        {"fname": "logout", "params":{"nick":"admin"}}
+                    </li>
+                </ol>
+            </section>
+            <hr/>
+            <section id="user_data">
+                <h2>Данные</h2>
+                <ol class="tests">
+                    <li class="test" data-anti="anti"  data-name="Не можем получить данные если не залогинены">
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-name="Логинимся для получения данных">
+                        {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные {"nick":"admin"}'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные {"id":"1"}'>
+                        {"fname": "get_user", "params":{"id":"1"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные {"id":1}'>
+                        {"fname": "get_user", "params":{"id":1}}
+                    </li>
+                    <li class="test" data-name='Получаем данные всех пользователей'>
+                        {"fname": "get_all_users", "params":{}}
+                    </li>
+                    <li class="test" data-name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                    <li class="test" data-name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                    <li class="test" data-name='Добавить друга'>
+                        {"fname": "add_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name='Добавить друга второй раз не удасться'>
+                        {"fname": "add_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" data-name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                    <li class="test" data-name='Удалить друга'>
+                        {"fname": "delete_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" data-anti="anti"  data-name='Удалить друга второй раз не удасться'>
+                        {"fname": "delete_friend", "params":{"user_id":1, "friend_id":1}}
+                    </li>
+                    <li class="test" data-name='Получить друзей'>
+                        {"fname": "get_friends", "params":{"user_id":1}}
+                    </li>
+                </ol>
+            </section>
+            <hr/>
+            <section id="user_udpate">
+                <h2>Обновление</h2>
+                <ol class="tests">
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "logout", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti"  data-name="Не можем изменить данные если не залогинены">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"some a"}}
+                    </li>
+                    <li class="test" data-name="Логинимся для получения данных">
+                        {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные (до 1 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test"  data-name="Можем изменить данные о хобби">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"some ~(random(string))"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные (после 1 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные (до 2 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test"  data-name="Можем изменить данные о пользователе">
+                        {"fname": "update_user", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                    </li>
+                    <li class="test" data-name='Получаем данные (после 2 изменения)'>
+                        {"fname": "get_user", "params":{"nick":"admin"}}
+                    </li>
+                    <li class="test" data-name="Несуществующие поля игнорируются если есть нормальные">
+                        {"fname": "update_user", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Несуществующие поля игнорируются если есть нормальные">
+                        {"fname": "update_user", "params":{"id":1,"hobby__2":"hobby ~(random(string))"}}
+                    </li>
+                </ol>
+            </section>
+        </article>
+        <!-- ============================================================== -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+// ------------------------------------------------------------------------------------
+var default_url  =  "" + window.location.protocol + "//"+ window.location.host +"/jsonapi/";
+
+mark_err = function(test){
+    $(".output", test).css("color", "red");
+    $("h3", test)
+        .css("color", "red")
+        .html($("h3", test).html()+ " [OШИБКА]");
+}
+mark_suc = function(test){
+    $(".output", test).css("color", "green")
+}
+ups = function(){
+    var urlParams = {};
+    (function () {
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+    })();
+    return urlParams;
+};
+jQuery(document).ready(function($) {
+    jQuery.ajaxSetup({async:true});
+    var url = ups().url;
+    if(!url)
+        url = default_url;
+    $(".gh").append(" для " + url);
+    $(".test").each(function(){
+        var test = this;
+        $(test).html(
+            "<div><span>Ввод:</span><div class=\"input\">" +
+            $(test).html()
+                .replace(/[~][(]random[(]string[)][)]/gi," " + Math.random())
+            + "</div></div>"
+        );
+        var name = $(test).data("name")
+        if(name)
+            $(test).prepend("<h3 class=\"test-name\">" + name  + "</h3>");
+        $(test).append(
+            "<div>" +
+                "<div><span>Вывод: </span><b class=\"ostatus\"></b><em> (t = </em><em class=\"otime\"></em><em> мс)</em></div>" +
+                "<div class=\"output\"></div>" +
+            "</div>"
+        );
+        var input = $(".input", test).html();
+
+        test.cms = (new Date()).getTime();
+        for(var cnt = 10; cnt > -2; --cnt){
+            $.post(url, {data: input})
+                .complete(function(response) {
+                    if(response){
+                        test.rms = (new Date()).getTime();
+                        if(0 == cnt){
+                            $(".otime", test).html("" + (test.rms - test.cms));
+                            if(response.responseText){
+                                $(".output", test).html(response.responseText)
+                            }
+                            if(response.status)
+                                $(".ostatus", test).html(response.status)
+                        }
+                    }
+                });
+        }
+    });
+});
+// ------------------------------------------------------------------------------------
+        </script>
+    </body>
+</html>
