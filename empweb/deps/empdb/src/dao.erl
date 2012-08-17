@@ -198,16 +198,11 @@ get({Parent, Fp}, {Module, Fm}, Con, Kvalues, Fields)->
 
 
 get(Par, Cur, Con, {Key, Value}, Fields)->
-    get(Par, Cur, Con, [{Key, Value}], Fields);
+    get(Par, Cur, Con, [{Key, Value}], Fields).
 
-get(Par, Cur, Con, all, Fields)->
-    get(Par, Cur, Con, [], Fields).
 
 
 %%% -----------------------------------------------------------------------
-
-get(Module, Con, all, Fields)->
-    get(Module, Con, [], Fields);
 
 get(Module, Con, {Key, Value}, Fields)->
     get(Module, Con, [{Key, Value}], Fields);

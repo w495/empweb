@@ -9,8 +9,8 @@
 
 -record(biz_session, {
     uid,
-    nick,
     id,
+    login,
     perm_names=[],
     time,
     phash

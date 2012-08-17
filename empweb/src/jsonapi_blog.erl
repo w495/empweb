@@ -1,5 +1,5 @@
 %%
-%% @file    jsonapi_user.erl
+%% @file    jsonapi_pers.erl
 %%          "Контроллер" для функций работы с пользователями.
 %%
 
@@ -47,8 +47,8 @@ init(_, Req, #empweb_hap{
         action          =   Action,
         params          =   Params,
         is_auth         =   Is_auth,
-        user_id         =   User_id,
-        user_perm_names =   User_perm_names
+        pers_id         =   User_id,
+        pers_perm_names =   User_perm_names
     } = Hap)->
     %%%
     %%% Это нужно, чтобы понять, какая функция дальше выполнится
@@ -57,8 +57,8 @@ init(_, Req, #empweb_hap{
         {action,            Action},
         {params,            Params},
         {is_auth,           Is_auth},
-        {user_id,           User_id},
-        {user_perm_names,   User_perm_names}
+        {pers_id,           User_id},
+        {pers_perm_names,   User_perm_names}
     ]}, <<" = Hap">>),
 
     {ok,
@@ -67,8 +67,8 @@ init(_, Req, #empweb_hap{
             action          =   Action,
             params          =   Params,
             is_auth         =   Is_auth,
-            user_id         =   User_id,
-            user_perm_names =   User_perm_names
+            pers_id         =   User_id,
+            pers_perm_names =   User_perm_names
         }
     }.
 
@@ -93,8 +93,8 @@ handle(_req, #empweb_hap{action='create_blog', params=Params} = Hap) ->
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
 
-            ?debug("biz_user:register(~p).", [Data#norm.return]),
-            {ok,jsonapi:resp(biz_user:register(Data#norm.return)),Hap}
+            ?debug("biz_pers:register(~p).", [Data#norm.return]),
+            {ok,jsonapi:resp(biz_pers:register(Data#norm.return)),Hap}
         end
     );
 
@@ -116,7 +116,7 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
         fun(Data)->
             %% Если login выполнился успешно,
             %%  то устанавливаем клиенту cookie.
-            case biz_user:login(Data#norm.return) of
+            case biz_pers:login(Data#norm.return) of
                 {ok, Body} ->
                     {ok,
                         (jsonapi:resp({ok, Body}))#empweb_resp{
@@ -146,7 +146,7 @@ handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
         fun(Data)->
             {ok,
                 jsonapi:resp(
-                    biz_user:logout([
+                    biz_pers:logout([
                         {session_id, empweb_http:auth_cookie(Req)}
                         | Data#norm.return
                     ])
@@ -166,12 +166,12 @@ handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap)
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = user_id,
+                key = pers_id,
                 types = [integer]
             }
         ]),
         fun(Data)->
-            {ok,jsonapi:resp(biz_user:get_friends(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_pers:get_friends(Data#norm.return)),Hap}
         end
     );
 
@@ -185,7 +185,7 @@ handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) 
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = user_id,
+                key = pers_id,
                 types = [integer]
             },
             #norm_rule{
@@ -194,7 +194,7 @@ handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) 
             }
         ]),
         fun(Data)->
-            {ok,jsonapi:resp(biz_user:add_friend(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_pers:add_friend(Data#norm.return)),Hap}
         end
     );
 
@@ -208,7 +208,7 @@ handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Ha
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = user_id,
+                key = pers_id,
                 types = [integer]
             },
             #norm_rule{
@@ -217,15 +217,15 @@ handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Ha
             }
         ]),
         fun(Data)->
-            {ok,jsonapi:resp(biz_user:delete_friend(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_pers:delete_friend(Data#norm.return)),Hap}
         end
     );
 
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = get_user">>),
+handle(_req, #empweb_hap{action=get_pers, params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = get_pers">>),
 
     %%
     %% Для вызова данной функции достаточно иметь
@@ -252,7 +252,7 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
             }
         ]),
         fun(Data)->
-            {ok,jsonapi:resp(biz_user:get(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_pers:get(Data#norm.return)),Hap}
         end,
         Hap
     );
@@ -261,16 +261,16 @@ handle(_req, #empweb_hap{action=get_user, params=Params, is_auth=true} = Hap) ->
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=get_all_users, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_users">>),
+handle(_req, #empweb_hap{action=get_all_perss, params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = get_all_perss">>),
 
-    {ok,jsonapi:resp(biz_user:get(all)),Hap};
+    {ok,jsonapi:resp(biz_pers:get(all)),Hap};
 
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = update_user">>),
+handle(_req, #empweb_hap{action=update_pers, params=Params, is_auth=true} = Hap) ->
+    ?evman_args(Hap, <<" = update_pers">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -325,7 +325,7 @@ handle(_req, #empweb_hap{action=update_user, params=Params, is_auth=true} = Hap)
             }
         ]),
         fun(Data)->
-            {ok,jsonapi:resp(biz_user:update(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_pers:update(Data#norm.return)),Hap}
         end
     );
 

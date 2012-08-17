@@ -35,7 +35,7 @@ gen_uid(Login) ->
 
 new(#biz_session{uid=undefined} = Biz_session) ->
     ?MODULE:new(Biz_session#biz_session{
-        uid = gen_uid(Biz_session#biz_session.nick)
+        uid = gen_uid(Biz_session#biz_session.id)
     });
 
 new(#biz_session{uid=Uid} = Biz_session) ->
@@ -55,7 +55,7 @@ get({uid, Uid}) ->
 get(Uid) ->
     ?MODULE:read({?SESSION_TABLE_NAME, Uid}).
 
-remove({nick, Uid}) ->
+remove({login, Uid}) ->
     ?MODULE:delete({?SESSION_TABLE_NAME, Uid});
 
 remove({uid, Uid}) ->

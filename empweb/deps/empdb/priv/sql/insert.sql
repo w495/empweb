@@ -4,83 +4,120 @@
 *
 ***********************************************************************/
 
-insert into perm_type (name)
+/****************************************************************************
+    =====================================================================
+                                ЯЗЫКИ
+    =====================================================================
+****************************************************************************/
+
+
+insert into lang (alias, descr)
+    values
+        ('en', 'english language'),
+        ('ru', 'russian language');
+
+
+insert into trtype (alias, descr)
+    values
+        ('static',  'static translation'),
+        ('dynamic', 'dynamic translation');
+
+
+
+
+/****************************************************************************
+    =====================================================================
+                                ФАЙЛЫ
+    =====================================================================
+****************************************************************************/
+
+
+
+
+/****************************************************************************
+    =====================================================================
+                                ПОЛЬЗОВАТЕЛЬ
+    =====================================================================
+****************************************************************************/
+
+
+insert into permtype (alias)
     values
         ('static');
 
-insert into perm_entity_type (name)
+insert into permentitytype (alias)
     values
-        ('user');
+        ('pers');
 
-insert into perm (name, description, perm_type_id, entity_type_id)
+insert into perm (alias, descr, permtype_id, entitytype_id)
     values
-        ('system', 'права разрещенные только для самой системы',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('system', 'only allowed for the system',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('admin', 'полный доступ',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('admin', 'full access',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('undel_group', 'не удаляемые группы',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('undel_pers', 'undeletable pers',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('undel_user', 'не удаляемые пользователи',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('undel_group', 'undeletable group',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('insider', 'доступ к личному кабинету',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('sysmsg', 'the right to receive system messages',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('sysmsg', 'право получать системные сообщения',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('sysconfiger', 'the right to change system settings',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         ),
-        ('sysconfiger', 'право изменять системные настройки',
-            (select id from perm_type where name='static'),
-            (select id from perm_entity_type where name='user')
+        ('contman',     'the right to manage the content',
+            (select id from permtype where alias='static'),
+            (select id from permentitytype where alias='pers')
         );
 
-
-insert into user_group (name, description)
+insert into persgroup (alias, descr)
     values
-        ('admin', 	         'администраторы'),
-        ('sysmsg',           'получатели системных сообщений'),
-        ('insider',          'пользователи');
+        ('admin', 	         'administrators'),
+        ('sysmsg',           'recipients of internal system messages'),
+        ('sysconfiger',      'change system settings'),
+        ('contman',          'content managers');
 
 insert into perm2group (perm_id, group_id)
     values
-        ( (select id from perm where name='admin'),
-            (select id from user_group where name='admin')),
-        ( (select id from perm where name='undel_group'),
-            (select id from user_group where name='admin')),
-        ( (select id from perm where name='undel_user'),
-            (select id from user_group where name='admin')),
-        ( (select id from perm where name='sysmsg'),
-            (select id from user_group where name='admin')),
-        ( (select id from perm where name='insider'),
-            (select id from user_group where name='admin')),
-        ( (select id from perm where name='undel_group'),
-            (select id from user_group where name='sysmsg')),
-        ( (select id from perm where name='sysmsg'),
-            (select id from user_group where name='sysmsg')),
-        ( (select id from perm where name='insider'),
-            (select id from user_group where name='sysmsg')),
-        ( (select id from perm where name='undel_group'),
-            (select id from user_group where name='insider')),
-        ( (select id from perm where name='insider'),
-            (select id from user_group where name='insider'));
+        ( (select id from perm where alias='admin'),
+            (select id from persgroup where alias='admin')),
+        ( (select id from perm where alias='undel_group'),
+            (select id from persgroup where alias='admin')),
+        ( (select id from perm where alias='undel_pers'),
+            (select id from persgroup where alias='admin')),
+        ( (select id from perm where alias='sysmsg'),
+            (select id from persgroup where alias='admin')),
+        ( (select id from perm where alias='contman'),
+            (select id from persgroup where alias='admin')),
+        ( (select id from perm where alias='undel_group'),
+            (select id from persgroup where alias='sysmsg')),
+        ( (select id from perm where alias='sysmsg'),
+            (select id from persgroup where alias='sysmsg')),
+        ( (select id from perm where alias='contman'),
+            (select id from persgroup where alias='sysmsg')),
+        ( (select id from perm where alias='undel_group'),
+            (select id from persgroup where alias='contman')),
+        ( (select id from perm where alias='contman'),
+            (select id from persgroup where alias='contman'));
 
 
-insert into user_ (fname, sname, email, nick, phash)
-    values ('fadmin', 'ladmin', 'padmin',
-        'admin', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (fname, sname, email, phone, nick, login, phash)
+    values ('fadmin', 'sadmin', 'padmin@padmin.ru',
+            293203230230, 'admin', 'admin', '21232F297A57A5A743894A0E4A801FC3');
 
-insert into user_ (fname, sname, email, nick, phash)
-    values ('fnickname', 'lnickname', 'pnickname',
-        'nickname', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (fname, sname, email, phone, nick, login, phash)
+    values ('fname', 'sname', 'email@email.ru',
+            293203230230, 'nick', 'login', '21232F297A57A5A743894A0E4A801FC3');
 
     --//
     --     admin -> 21232F297A57A5A743894A0E4A801FC3
@@ -96,24 +133,25 @@ insert into user_ (fname, sname, email, nick, phash)
     --     etsuken -> C61B248A4D509E2923EBD983A8658C55
 
 
-insert into user2group (user_id, group_id)
+insert into pers2group (pers_id, group_id)
     values
-        ((select id from user_ where nick='admin'),
-            (select id from user_group where name='admin')),
-        ((select id from user_ where nick='admin'),
-            (select id from user_group where name='sysmsg')),
-        ((select id from user_ where nick='admin'),
-            (select id from user_group where name='insider'));
+        ((select id from pers_ where nick='admin'),
+            (select id from persgroup where alias='admin')),
+        ((select id from pers_ where nick='admin'),
+            (select id from persgroup where alias='sysmsg')),
+        ((select id from pers_ where nick='admin'),
+            (select id from persgroup where alias='contman'));
 
 -------------------------------------------------------------------------------
 -- Документы
 -------------------------------------------------------------------------------
 
-insert into content_access_type (alias)
+insert into acctype (alias)
     values ('private'), ('protected'), ('public');
 
-insert into content_type(alias)
+insert into contype(alias)
     values ('common'), ('adult_only');
 
-insert into doc_type(alias)
-    values ('blog'), ('blog_comment'), ('gallery'), ('photo'), ('photo_comment'), ('attach_description');
+insert into doctype(alias)
+    values ('blog'), ('blog_comment'), ('gallery'), ('photo'), ('photo_comment'), ('attach_descr');
+

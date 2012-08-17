@@ -126,12 +126,12 @@ jsonapi_map(Req, {List}) ->
     
     ?evman_debug({jsonapi_aobj, Aobj},  <<"jsonapi aobj">>),
 
-    Is_auth=            biz_user:is_auth(Aobj),
+    Is_auth=            biz_pers:is_auth(Aobj),
     
     ?evman_debug({jsonapi_aobj, Aobj},  <<"jsonapi aobj">>),
     
-    User_id=            biz_user:get_user_id(Aobj),
-    User_perm_names=    biz_user:get_perm_names(Aobj),    
+    User_id=            biz_pers:get_pers_id(Aobj),
+    User_perm_names=    biz_pers:get_perm_names(Aobj),
 
     
 
@@ -143,22 +143,73 @@ jsonapi_map(Req, {List}) ->
 
     Action =
         case Fname of
+            <<"get_all_authorities">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_all_pstatuses',
+                    params          =   Params
+                };
+            <<"get_authority">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_pstatus',
+                    params          =   Params
+                };
+
+            <<"get_all_mstatuses">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_all_pstatuses',
+                    params          =   Params
+                };
+            <<"get_mstatus">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_pstatus',
+                    params          =   Params
+                };
+
+            <<"get_all_pstatuses">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_all_pstatuses',
+                    params          =   Params
+                };
+            <<"get_pstatus">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_pstatus',
+                    params          =   Params
+                };
+
+            <<"get_emotions">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_emotions',
+                    params          =   Params
+                };
+            <<"get_emotion">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'get_emotions',
+                    params          =   Params
+                };
+
             <<"register">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   'register',
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
-
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
             %%
             <<"login">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   login,
                     params          =   Params
                 };
@@ -168,96 +219,96 @@ jsonapi_map(Req, {List}) ->
             %%
             <<"logout">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   logout,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
-            %% {"fname": "update_user", "params":{"id":1,"hobby":"some a"}} 
+            %% {"fname": "update_pers", "params":{"id":1,"hobby":"some a"}}
             %%
-            <<"update_user">> ->
+            <<"update_pers">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
-                    action          =   update_user,
+                    handler         =   jsonapi_pers,
+                    action          =   update_pers,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
-            %% {"fname": "get_user", "params":{"nick":"admin"}}
+            %% {"fname": "get_pers", "params":{"nick":"admin"}}
             %%
-            <<"get_user">> ->
+            <<"get_pers">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
-                    action          =   get_user,
+                    handler         =   jsonapi_pers,
+                    action          =   get_pers,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
-            %% {"fname": "get_all_users", "params":{}} 
+            %% {"fname": "get_all_perss", "params":{}}
             %%
-            <<"get_all_users">> ->
+            <<"get_all_perss">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
-                    action          =   get_all_users,
+                    handler         =   jsonapi_pers,
+                    action          =   get_all_perss,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
-            %% {"fname": "get_friends", "params":{"user_id":1}} 
+            %% {"fname": "get_friends", "params":{"pers_id":1}}
             %%
             <<"get_friends">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   get_friends,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
             %%  {
             %%      "fname": "add_friend",
-            %%      "params":{"user_id":1, "friend_id":1}
+            %%      "params":{"pers_id":1, "friend_id":1}
             %%  }
             %%
             <<"add_friend">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   add_friend,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             %%
             %%  {
             %%      "fname": "delete_friend",
-            %%      "params":{"user_id":1, "friend_id":1}
+            %%      "params":{"pers_id":1, "friend_id":1}
             %%  } 
             %%
             <<"delete_friend">> ->  
                 #empweb_hap{
-                    handler         =   jsonapi_user,
+                    handler         =   jsonapi_pers,
                     action          =   delete_friend,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    user_id         =   User_id,
-                    user_perm_names =   User_perm_names
+                    pers_id         =   User_id,
+                    pers_perm_names =   User_perm_names
                 };
 
             _ -> []

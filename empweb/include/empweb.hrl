@@ -21,9 +21,9 @@
     action,
     params = [],
     is_auth = true,
-    user_id,
-    user_nick,
-    user_perm_names =[]
+    pers_id,
+    pers_nick,
+    pers_perm_names =[]
 }).
 
 
