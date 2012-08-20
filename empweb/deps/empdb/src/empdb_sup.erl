@@ -26,5 +26,7 @@ init([]) ->
         supervisor,
         [psqlcp]
     },
+
+    %Psqlcp
     
-	{ok, {{one_for_one, 10, 10}, [Psqlcp ]}}.
+	{ok, {{one_for_one, 10, 10}, [Psqlcp]}}.

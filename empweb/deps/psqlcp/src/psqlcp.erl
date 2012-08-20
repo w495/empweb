@@ -30,15 +30,25 @@ start_link(Application) ->
 stop(_State) ->
     ok.
 
+init([]) ->
+    init([get_application()]);
+
 init([Application]) ->
     {ok, Pools} = application:get_env(Application, pools),
-    PoolSpecs = lists:map(fun({Pool, Pool_config}) ->
-        Args = [{name, {local, Pool}},
-                {worker_module, psqlcp_worker}]
-                ++ Pool_config,
-        poolboy:child_spec(Pool, Args)
-    end, Pools),
-    {ok, {{one_for_one, 10, 10}, PoolSpecs}}.
+    
+    io:format("Pools = ~p~n~n", [Pools]),
+    
+%     PoolSpecs = lists:map(fun({Name, SizeArgs, WorkerArgs}) ->
+%         PoolArgs = [{name, {local, Name}},
+%                     {worker_module, example_worker}] ++ SizeArgs,
+%         poolboy:child_spec(Name, PoolArgs, WorkerArgs);
+%         (X) ->
+%             io:format("X  = ~p~n~n", [X])SizeArgs
+%     end, Pools),
+
+    %io:format("PoolSpecs  = ~p~n~n", [PoolSpecs]),
+    
+    {ok, {{one_for_one, 10, 10}, []}}.
 
 %%%
 %%% -----------------------------------------------------------------------
