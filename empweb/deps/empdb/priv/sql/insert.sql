@@ -49,66 +49,66 @@ insert into permentitytype (alias)
     values
         ('pers');
 
-insert into perm (alias, descr, permtype_id, entitytype_id)
+insert into perm (alias, permtype_id, entitytype_id)
     values
-        ('system', 'only allowed for the system',
+        ('system', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('admin', 'full access',
+        ('admin', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('undel_pers', 'undeletable pers',
+        ('undel_pers', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('undel_group', 'undeletable group',
+        ('undel_group',
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('sysmsg', 'the right to receive system messages',
+        ('sysmsg', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('sysconfiger', 'the right to change system settings',
+        ('sysconfiger', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         ),
-        ('contman',     'the right to manage the content',
+        ('contman', 
             (select id from permtype where alias='static'),
             (select id from permentitytype where alias='pers')
         );
 
-insert into persgroup (alias, descr)
+insert into pgroup (alias)
     values
-        ('admin', 	         'administrators'),
-        ('sysmsg',           'recipients of internal system messages'),
-        ('sysconfiger',      'change system settings'),
-        ('contman',          'content managers');
+        ('admin'),
+        ('sysmsg'),
+        ('sysconfiger'),
+        ('contman');
 
-insert into perm2group (perm_id, group_id)
+insert into perm2pgroup (perm_id, group_id)
     values
         ( (select id from perm where alias='admin'),
-            (select id from persgroup where alias='admin')),
+            (select id from pgroup where alias='admin')),
         ( (select id from perm where alias='undel_group'),
-            (select id from persgroup where alias='admin')),
+            (select id from pgroup where alias='admin')),
         ( (select id from perm where alias='undel_pers'),
-            (select id from persgroup where alias='admin')),
+            (select id from pgroup where alias='admin')),
         ( (select id from perm where alias='sysmsg'),
-            (select id from persgroup where alias='admin')),
+            (select id from pgroup where alias='admin')),
         ( (select id from perm where alias='contman'),
-            (select id from persgroup where alias='admin')),
+            (select id from pgroup where alias='admin')),
         ( (select id from perm where alias='undel_group'),
-            (select id from persgroup where alias='sysmsg')),
+            (select id from pgroup where alias='sysmsg')),
         ( (select id from perm where alias='sysmsg'),
-            (select id from persgroup where alias='sysmsg')),
+            (select id from pgroup where alias='sysmsg')),
         ( (select id from perm where alias='contman'),
-            (select id from persgroup where alias='sysmsg')),
+            (select id from pgroup where alias='sysmsg')),
         ( (select id from perm where alias='undel_group'),
-            (select id from persgroup where alias='contman')),
+            (select id from pgroup where alias='contman')),
         ( (select id from perm where alias='contman'),
-            (select id from persgroup where alias='contman'));
+            (select id from pgroup where alias='contman'));
 
 
 insert into pers (fname, sname, email, phone, nick, login, phash)
@@ -133,14 +133,14 @@ insert into pers (fname, sname, email, phone, nick, login, phash)
     --     etsuken -> C61B248A4D509E2923EBD983A8658C55
 
 
-insert into pers2group (pers_id, group_id)
+insert into pers2pgroup (pers_id, group_id)
     values
-        ((select id from pers_ where nick='admin'),
-            (select id from persgroup where alias='admin')),
-        ((select id from pers_ where nick='admin'),
-            (select id from persgroup where alias='sysmsg')),
-        ((select id from pers_ where nick='admin'),
-            (select id from persgroup where alias='contman'));
+        ((select id from pers where nick='admin'),
+            (select id from pgroup where alias='admin')),
+        ((select id from pers where nick='admin'),
+            (select id from pgroup where alias='sysmsg')),
+        ((select id from pers where nick='admin'),
+            (select id from pgroup where alias='contman'));
 
 -------------------------------------------------------------------------------
 -- Документы
