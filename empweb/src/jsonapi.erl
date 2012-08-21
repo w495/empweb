@@ -29,8 +29,6 @@
     resp/2,
     handle_params/2,
     handle_params/3,
-    is_auth/3,
-    is_auth/2,
     format/1,
     format/2,
     bad_request/0,
@@ -487,17 +485,3 @@ handle_params(Data, Function, Pstate) ->
             {ok, not_extended(wrong_format), Pstate}
     end.
 
-
-is_auth(Req, Function, Args)->
-    ?debug("is_auth(Req, Function, Args)->~n"),
-    case biz_session:is_auth(empweb_http:auth_cookie(Req)) of
-        false ->
-            forbidden();
-        _ ->
-            X = erlang:apply(Function, Args),
-            ?debug("X  -> ~p ~n", [X]),
-            X 
-    end.
-
-is_auth(Req, Function)->
-    is_auth(Req, Function, []).

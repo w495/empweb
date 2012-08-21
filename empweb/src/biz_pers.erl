@@ -189,93 +189,31 @@ delete_friend(Params)->
 
 %%
 %% Вход пользователя. Создание сессии.
-%% Пользователь может входить по id, логину, телефону или email
 %%
-
 login(Params) ->
-    Id      = proplists:get_value(id,       Params),
-    Login   = proplists:get_value(login,    Params),
-
-    if
-        Id =/= undefined ->
-            login({id, Id}, Params);
-        Login =/= undefined ->
-            login({login, Login}, Params);
-        true ->
-            {error,{bad_pers,{Params}}}
-    end.
-
-%%
-%% Вход пользователя. Создание сессии.
-%%
-login({Uf, Uv}, Params) ->
     ?evman_args(Params, <<"pers try to login">>),
-    
-    Mbpass = proplists:get_value(pass, Params),
-    Mbphash = phash(Mbpass),
-    Max_auth_error = 10,
-    EC = 0,
 
-    ?debug("=> Params = ~p => ~n", [Params]),
-    
-    case domain_pers:get_opt([{Uf, Uv}], [id, login, phash], [perm_names])  of
+    case domain_pers:login(Params) of
         {ok, [{Userpl}]} ->
-            Perm_names = proplists:get_value(perm_names, Userpl),
-            Phash = proplists:get_value(phash, Userpl),
-            if
-%                 EC >= Max_auth_error ->
-%                     throw({auth_count_overflow, Max_auth_error});
-                Phash =/= Mbphash ->
-                    if
-                        Max_auth_error - (EC + 1) > 0 ->
-                            %throw({bad_password, integer_to_list(Max_auth_error - (EC + 1))});
-                            {error,
-                                {bad_password,
-                                    {[
-                                        {max,  Max_auth_error - (EC + 1)},
-                                        {Uf, Uv},
-                                        {pass, Mbpass}
-                                    ]}
-                                }
-                            };
-                        true ->
-                            {error,
-                                {auth_count_overflow,
-                                    {[
-                                        {max,  Max_auth_error - (EC + 1)},
-                                        {Uf, Uv},
-                                        {pass, Mbpass}
-                                    ]}
-                                }
-                            }
-                    end;
-                true  ->
-                    Id      = proplists:get_value(id,       Userpl),
-                    Login   = proplists:get_value(login,    Userpl),
-                    Session_id = biz_session:new(#biz_session{
-                        id          =   Id,
-                        login       =   Login,
-                        perm_names  =   Perm_names,
-                        phash       =   Phash
-                    }),
-                    {ok, [{User}]} = domain_pers:login(Params),
-                    ?evman_info({login, [
-                        {pers,          User},
-                        {session_id,    Session_id}
-                    ]}),
-                    {ok, [{[{session_id, Session_id}|User]}]}
-
-            end;
-        _ ->
-            {error,
-                {bad_pers,
-                    {[
-                        {Uf,    Uv},
-                        {pass,  Mbpass}
-                    ]}
-                }
-            }
+            Id          = proplists:get_value(id,           Userpl),
+            Login       = proplists:get_value(login,        Userpl),
+            Perm_names  = proplists:get_value(perm_names,   Userpl),
+            Session_id  = biz_session:new(#biz_session{
+                id          =   Id,
+                login       =   Login,
+                perm_names  =   Perm_names
+            }),
+            {ok, [{User}]} = domain_pers:get(Params),
+            ?evman_info({login, [
+                {pers,          User},
+                {session_id,    Session_id}
+            ]}),
+            {ok, [{[{session_id, Session_id}|User]}]};
+        {error, Error} ->
+            {error, Error}
     end.
+
+
 
 %%
 %% Выход пользователя, Удаление сессии.

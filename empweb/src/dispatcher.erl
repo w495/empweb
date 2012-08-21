@@ -11,6 +11,8 @@ dispatch()->
         {'_', [
             {[<<"jsonapi">>],           handler_jsonapi,    []},
 
+            {[<<"restapi">>, '...'],    handler_restapi,    []},
+
             %%
             %% Контроллер отображения логов
             %%

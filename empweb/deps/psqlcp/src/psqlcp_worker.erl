@@ -19,17 +19,14 @@
 }).
 
 start_link(Args) ->
-    io:format("Args 1  = ~p~n~n", [Args]),
     gen_server:start_link(?MODULE, Args, []).
 
 init(Args) ->
-    io:format("Args  2 = ~p~n~n", [Args]),
     Hostname = proplists:get_value(hostname, Args),
     Database = proplists:get_value(database, Args),
     Username = proplists:get_value(username, Args),
     Password = proplists:get_value(password, Args),
     State = connect(Hostname, Username, Password, Database),
-    io:format("State  = ~p~n~n", [State ]),
     {ok, State, ?RECONNECT_TIMEOUT}.
 
 connect(Hostname, Username, Password, Database)->

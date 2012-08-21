@@ -86,18 +86,71 @@ update(Params)->
         dao_pers:update(Con, Params)
     end).
 
-login(Params)->
-    Id = proplists:get_value(id, Params),
-    Pass = proplists:get_value(pass, Params),
-    dao:with_connection(fun(Con)->
-        dao_pers:get(Con, [{isdeleted, false}, {id, Id}])
-    end).
+login(Params) ->
+    Id      = proplists:get_value(id,       Params),
+    Login   = proplists:get_value(login,    Params),
+
+    if
+        Id =/= undefined ->
+            login({id, Id}, Params);
+        Login =/= undefined ->
+            login({login, Login}, Params);
+        true ->
+            {error,{bad_pers,{Params}}}
+    end.
+
+%%
+%% Вход пользователя. Создание сессии.
+%%
+login({Uf, Uv}, Params) ->
+    Mbpass = proplists:get_value(pass, Params),
+    Mbphash = phash(Mbpass),
+    Max_auth_error = 10,
+    EC = 0,
+    case domain_pers:get_opt([{Uf, Uv}], [id, login, phash], [perm_names]) of
+        {ok, [{Userpl}]} ->
+            Perm_names = proplists:get_value(perm_names, Userpl),
+            Phash = proplists:get_value(phash, Userpl),
+            case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
+                {true, true} ->
+                    {error, {auth_count_overflow,
+                        {[
+                            {max,  Max_auth_error - (EC + 1)},
+                            {Uf, Uv},
+                            {pass, Mbpass}
+                        ]}
+                    }};
+                {true, _} ->
+                    {error, {bad_password,
+                            {[
+                                {max,  Max_auth_error - (EC + 1)},
+                                {Uf, Uv},
+                                {pass, Mbpass}
+                            ]}
+                    }};
+                 _ ->
+                    {ok, [{Userpl}]}
+            end;
+        _ ->
+            {error,
+                {bad_pers,
+                    {[
+                        {Uf,    Uv},
+                        {pass,  Mbpass}
+                    ]}
+                }
+            }
+    end.
+
+
+
+
+
+
 
 logout(Params)->
-    Id = proplists:get_value(id, Params),
-    Pass = proplists:get_value(pass, Params),
     dao:with_connection(fun(Con)->
-        dao_pers:get(Con, [{isdeleted, false}, {id, Id}])
+        dao_pers:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params)->
@@ -140,7 +193,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
         perm_names ->
             {ok, Perm_list} = dao_pers:get_perm(Con, Params, [alias]),
             Perm_names = lists:map(fun({Permpl})->
-                convert:to_atom(proplists:get_value(name, Permpl))
+                convert:to_atom(proplists:get_value(alias, Permpl))
             end, Perm_list),
             get_opt(Con, Params, Options, [{perm_names, Perm_names}|Acc]);
         %% ------------------------------------------------------------------
@@ -266,4 +319,17 @@ update_emotion(Params)->
 %%
 %% Local Functions
 %%
+
+
+phash(Mbpass) ->
+    hexstring(erlang:md5(Mbpass)).
+
+hexstring(<<X:128/big-unsigned-integer>>) ->
+    erlang:list_to_binary(io_lib:format("~32.16.0B", [X]));
+hexstring(<<X:160/big-unsigned-integer>>) ->
+    erlang:list_to_binary(io_lib:format("~40.16.0B", [X]));
+hexstring(<<X:256/big-unsigned-integer>>) ->
+    erlang:list_to_binary(io_lib:format("~64.16.0B", [X]));
+hexstring(<<X:512/big-unsigned-integer>>) ->
+    erlang:list_to_binary(io_lib:format("~128.16.0B", [X])).
 

@@ -139,11 +139,11 @@ table({fields, all})->
 
         %% Информация о персоонаже
         money,
-        ppstatus_id,
+        pstatus_id,
         authority_id,
-        emotimstatuson_id,
+        emotion_id,
 
-        mpstatus_id,
+        mstatus_id,
         married_id,
         mother_id,
         father_id,
@@ -233,9 +233,9 @@ get_perm(Con, {login, Login}, Fields) ->
                     " perm2pgroup.perm_id = perm.id "
                 "join pers2pgroup on "
                     " pers2pgroup.group_id = perm2pgroup.group_id "
-                "join pers_ on "
-                    "pers2pgroup.pers_id = pers_.id "
-                    "and pers_.login = $1">>
+                "join pers on "
+                    "pers2pgroup.pers_id = pers.id "
+                    "and pers.login = $1">>
             ],[Login]
         )
     ).
@@ -280,9 +280,9 @@ get_group(Con, {login, Login}, Fields) ->
             <<" from pgroup "
                 "join pers2pgroup on "
                     " pers2pgroup.group_id = pers_group.id "
-                "join pers_ on "
-                    "pers2pgroup.pers_id = pers_.id "
-                    "and pers_.login = $1">>
+                "join pers on "
+                    "pers2pgroup.pers_id = pers.id "
+                    "and pers.login = $1">>
             ],[Login]
         )
     ).
@@ -347,10 +347,13 @@ get_pgroup(Con, What, Fields)->
     dao:get(pgroup(), Con, What, Fields).
 
 create_pgroup(Con, Proplist)->
-    dao:get(pgroup(), Con, Proplist).
+    dao:create(pgroup(), Con, Proplist).
 
 update_pgroup(Con, Proplist)->
-    dao:get(pgroup(), Con, Proplist).
+    dao:update(pgroup(), Con, Proplist).
+
+
+
 
 get_pstatus(Con, What) ->
     get_pstatus(Con, What, []).
@@ -359,10 +362,12 @@ get_pstatus(Con, What, Fields)->
     dao:get(pstatus(), Con, What, Fields).
 
 create_pstatus(Con, Proplist)->
-    dao:get(pstatus(), Con, Proplist).
+    dao:create(pstatus(), Con, Proplist).
 
 update_pstatus(Con, Proplist)->
-    dao:get(pstatus(), Con, Proplist).
+    dao:update(pstatus(), Con, Proplist).
+
+
 
 get_mstatus(Con, What) ->
     get_mstatus(Con, What, []).
@@ -371,36 +376,40 @@ get_mstatus(Con, What, Fields)->
     dao:get(mstatus(), Con, What, Fields).
 
 create_mstatus(Con, Proplist)->
-    dao:get(mstatus(), Con, Proplist).
+    dao:create(mstatus(), Con, Proplist).
 
 update_mstatus(Con, Proplist)->
-    dao:get(mstatus(), Con, Proplist).
+    dao:update(mstatus(), Con, Proplist).
+
+
 
 
 get_authority(Con, What) ->
-    get_mstatus(Con, What, []).
+    get_authority(Con, What, []).
 
 get_authority(Con, What, Fields)->
     dao:get(authority(), Con, What, Fields).
 
 create_authority(Con, Proplist)->
-    dao:get(authority(), Con, Proplist).
+    dao:create(authority(), Con, Proplist).
 
 update_authority(Con, Proplist)->
-    dao:get(authority(), Con, Proplist).
+    dao:update(authority(), Con, Proplist).
+
+
 
 
 get_emotion(Con, What) ->
-    get_mstatus(Con, What, []).
+    get_emotion(Con, What, []).
 
 get_emotion(Con, What, Fields)->
     dao:get(emotion(), Con, What, Fields).
 
 create_emotion(Con, Proplist)->
-    dao:get(emotion(), Con, Proplist).
+    dao:create(emotion(), Con, Proplist).
 
 update_emotion(Con, Proplist)->
-    dao:get(emotion(), Con, Proplist).
+    dao:update(emotion(), Con, Proplist).
 
 
 %%
@@ -414,7 +423,7 @@ pgroup() ->
         {{table, fields, select},             [id, alias, name_ti]},
         {{table, fields, insert},             [alias, name_ti]},
         {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias, name_ti]}
+        {{table, fields, insert, required},   [alias]}
     ].
 
 pstatus() ->
@@ -424,7 +433,7 @@ pstatus() ->
         {{table, fields, select},             [id, alias, name_ti]},
         {{table, fields, insert},             [alias, name_ti]},
         {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias, name_ti]}
+        {{table, fields, insert, required},   [alias]}
     ].
 
 mstatus() ->
@@ -434,7 +443,7 @@ mstatus() ->
         {{table, fields, select},             [id, alias, name_ti]},
         {{table, fields, insert},             [alias, name_ti]},
         {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias, name_ti]}
+        {{table, fields, insert, required},   [alias]}
     ].
 
 authority() ->
@@ -444,7 +453,7 @@ authority() ->
         {{table, fields, select},             [id, alias, level, name_ti]},
         {{table, fields, insert},             [alias, level, name_ti]},
         {{table, fields, update},             [id, alias, level, name_ti]},
-        {{table, fields, insert, required},   [alias, level, name_ti]}
+        {{table, fields, insert, required},   [alias, level]}
     ].
 
 emotion() ->
@@ -454,5 +463,6 @@ emotion() ->
         {{table, fields, select},             [id, alias, name_ti]},
         {{table, fields, insert},             [alias, name_ti]},
         {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias, name_ti]}
+        {{table, fields, insert, required},   [alias]}
     ].
+

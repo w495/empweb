@@ -146,34 +146,31 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_authorities">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_pstatuses',
-                    params          =   Params
+                    action          =   'get_all_authorities'
                 };
             <<"get_authority">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_pstatus',
+                    action          =   'get_authority',
                     params          =   Params
                 };
 
             <<"get_all_mstatuses">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_pstatuses',
-                    params          =   Params
+                    action          =   'get_all_mstatuses'
                 };
             <<"get_mstatus">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_pstatus',
+                    action          =   'get_mstatus',
                     params          =   Params
                 };
 
             <<"get_all_pstatuses">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_pstatuses',
-                    params          =   Params
+                    action          =   'get_all_pstatuses'
                 };
             <<"get_pstatus">> ->
                 #empweb_hap{
@@ -182,16 +179,15 @@ jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
 
-            <<"get_emotions">> ->
+            <<"get_all_emotions">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_emotions',
-                    params          =   Params
+                    action          =   'get_all_emotions'
                 };
             <<"get_emotion">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_emotions',
+                    action          =   'get_emotion',
                     params          =   Params
                 };
 
