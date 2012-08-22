@@ -56,8 +56,8 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
-        default_content_access_type_id,
-        default_content_comment_type_id
+        read_acctype_id,
+        comm_acctype_id
     ];
 
 %%
@@ -89,6 +89,7 @@ update(Con, Proplist)->
 
 is_owner(Con, Owner_id, Obj_id) ->
     dao_doc:is_owner(Con, Owner_id, Obj_id).
+
 
 
 %%

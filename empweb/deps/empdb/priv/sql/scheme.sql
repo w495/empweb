@@ -16,7 +16,7 @@
 **/
 create sequence seq_lang_id;
 create table lang(
-    id              int primary key default nextval('seq_lang_id'),
+    id              decimal primary key default nextval('seq_lang_id'),
     alias           varchar(1024) unique,
     descr           varchar(1024),
     created         timestamp without time zone NOT NULL DEFAULT now(),
@@ -31,7 +31,7 @@ create table lang(
 **/
 create sequence seq_trtype_id;
 create table trtype(
-    id              int primary key default nextval('seq_trtype_id'),
+    id              decimal primary key default nextval('seq_trtype_id'),
     alias           varchar(1024) unique,
     descr           varchar(1024),
     created         timestamp without time zone not null default now(),
@@ -51,30 +51,41 @@ create sequence seq_any_ti;
 **/
 create sequence seq_tr_id;
 create table tr(
-    id          int primary key default nextval('seq_tr_id'),
+    id          decimal primary key default nextval('seq_tr_id'),
     /**
         Имя таблицы с которой связан перевод сущности
     **/
     tt          varchar(1024)   default null,
     /**
+        Имя поля с которым связан перевод сущности
+    **/
+    tf          varchar(1024)   default null,
+    /**
         Номер языковой сущности, он не уникален в этой таблице.
         Если не указан, то используется новое значение.
     **/
-    ti          int default nextval('seq_any_ti'),
+    ti          decimal default nextval('seq_any_ti'),
     /**
         Краткое описание, оно не уникален в этой таблице.
     **/
     ta          varchar(1024)   default null,
-    lang_id     int references lang(id)   default null,
+    lang_id     decimal references lang(id)   default null,
     /**
         Типы многоязыкового содержимого можно сделать булевским полем.
         Но возможно, будет много типов.
     **/
-    type_id     int references trtype(id)   default null,
+    type_id     decimal references trtype(id)   default null,
     text        text default null,
     isdeleted   bool default false,
     constraint  tr_ti_lang_id_many_key unique (ti,lang_id)
 );
+
+
+alter table lang add column name_ti
+    decimal unique default nextval('seq_any_ti');
+
+alter table trtype add column name_ti
+    decimal unique default nextval('seq_any_ti');
 
 /****************************************************************************
     =====================================================================
@@ -87,8 +98,8 @@ create table tr(
 **/
 create sequence seq_filetype_id;
 create table filetype(
-    id          int primary key default nextval('seq_filetype_id'),
-    name_ti     int unique      default nextval('seq_any_ti'),
+    id          decimal primary key default nextval('seq_filetype_id'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     mime        varchar(1024)   default null,
     ext         varchar(1024)   default null,
@@ -102,12 +113,12 @@ create table filetype(
 **/
 create sequence seq_fileinfo_id;
 create table fileinfo(
-    id         int primary key default nextval('seq_fileinfo_id'),
+    id         decimal primary key default nextval('seq_fileinfo_id'),
     size       numeric                          default null,
     path       varchar(1024)                    default null,
     name       varchar(1024)                    default null,
     dir        varchar(1024)                    default null,
-    type_id    int references filetype(id)      default null,
+    type_id    decimal references filetype(id)      default null,
     created    timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted  bool default false
 );
@@ -117,19 +128,19 @@ create table fileinfo(
 **/
 create sequence seq_file_id;
 create table file(
-    id          int primary key default nextval('seq_file_id'),
+    id          decimal primary key default nextval('seq_file_id'),
     /**
         Информация о загрузке
     **/
-    ulfileinfo    int references fileinfo(id)    default null,
+    ulfileinfo    decimal references fileinfo(id)    default null,
     /**
         Информация о скачивании
     **/
-    dlfileinfo    int references fileinfo(id)    default null,
+    dlfileinfo    decimal references fileinfo(id)    default null,
     /**
         Информация о файле на файловой системе
     **/
-    fileinfo      int references fileinfo(id)    default null,
+    fileinfo      decimal references fileinfo(id)    default null,
     issystem      bool default false,
     created       timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted     bool default false
@@ -148,11 +159,11 @@ create table file(
 **/
 create sequence seq_emotion_id;
 create table emotion(
-    id          int primary key default nextval('seq_emotion_id'),
+    id          decimal primary key default nextval('seq_emotion_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false
@@ -163,13 +174,13 @@ create table emotion(
 **/
 create sequence seq_authority_id;
 create table authority(
-    id          int primary key default nextval('seq_authority_id'),
+    id          decimal primary key default nextval('seq_authority_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    level       int default 0,
+    level       decimal default 0,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false
 );
@@ -179,11 +190,11 @@ create table authority(
 **/
 create sequence seq_pstatus_id;
 create table pstatus(
-    id          int primary key default nextval('seq_pstatus_id'),
+    id          decimal primary key default nextval('seq_pstatus_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
+    name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false
@@ -195,11 +206,11 @@ create table pstatus(
 **/
 create sequence seq_mstatus_id;
 create table mstatus(
-    id          int primary key default nextval('seq_mstatus_id'),
+    id          decimal primary key default nextval('seq_mstatus_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
+    name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default now(),
     isdeleted   bool default false
@@ -216,11 +227,11 @@ create table mstatus(
 -- **/
 -- create sequence seq_gender_id;
 -- create table gender(
---     id          int primary key default nextval('seq_gender_id'),
+--     id          decimal primary key default nextval('seq_gender_id'),
 --     /**
 --         Номер языковой сущности
 --     **/
---     name_ti     int unique default nextval('seq_any_ti'),
+--     name_ti     decimal unique default nextval('seq_any_ti'),
 --     alias       varchar(1024) unique,
 --     isdeleted     bool default false
 -- );
@@ -230,24 +241,24 @@ create table mstatus(
 
 create sequence seq_perspichead_id;
 create table perspichead(
-    id          int primary key default nextval('seq_perspichead_id'),
+    id          decimal primary key default nextval('seq_perspichead_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
-    file_id     int references file(id) default null,
+    name_ti     decimal unique default nextval('seq_any_ti'),
+    file_id     decimal references file(id) default null,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false
 );
 
 create sequence seq_perspicbody_id;
 create table perspicbody(
-    id          int primary key default nextval('seq_perspicbody_id'),
+    id          decimal primary key default nextval('seq_perspicbody_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
-    file_id     int references file(id) default null,
+    name_ti     decimal unique default nextval('seq_any_ti'),
+    file_id     decimal references file(id) default null,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false
 );
@@ -258,13 +269,13 @@ create table perspicbody(
 
 create sequence seq_pregion_id;
 create table pregion(
-    id          int primary key default nextval('seq_perspicbody_id'),
+    id          decimal primary key default nextval('seq_perspicbody_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
+    name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024),
-    pregion_id  int references pregion(id)     default null,
+    pregion_id  decimal references pregion(id)     default null,
     created     timestamp without time zone NOT NULL DEFAULT now(),
     isdeleted   bool default false,
     constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
@@ -282,7 +293,7 @@ create table pers(
             Идентификация
         ------------------------------------------------------------
     **/
-    id int primary key default nextval('seq_pers_id'),
+    id decimal primary key default nextval('seq_pers_id'),
     login               varchar(1024) default '_'
                         || CAST (nextval('seq_pers_fakelogin')
                             as varchar(1024))
@@ -303,10 +314,10 @@ create table pers(
     empl        varchar(1024)   default null,
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
-    pregion_id  int references  pregion(id)     default null,
+    pregion_id  decimal references  pregion(id)     default null,
     birthday    timestamp       without time zone NOT NULL DEFAULT now(),
-    -- gender_id           int references gender(id)      default null,
-    lang_id     int     references lang(id) default null,
+    -- gender_id           decimal references gender(id)      default null,
+    lang_id     decimal     references lang(id) default null,
     ismale      bool    default false,
     /**
         ------------------------------------------------------------
@@ -314,23 +325,23 @@ create table pers(
         ------------------------------------------------------------
     **/
     money               real,
-    pstatus_id          int references pstatus(id)     default null,
-    authority_id        int references authority(id)   default null,
-    emotion_id          int references emotion(id)     default null,
+    pstatus_id          decimal references pstatus(id)     default null,
+    authority_id        decimal references authority(id)   default null,
+    emotion_id          decimal references emotion(id)     default null,
 
-    mstatus_id          int references mstatus(id)     default null,
-    married_id          int references pers(id)        default null,
-    mother_id           int references pers(id)        default null,
-    father_id           int references pers(id)        default null,
+    mstatus_id          decimal references mstatus(id)     default null,
+    married_id          decimal references pers(id)        default null,
+    mother_id           decimal references pers(id)        default null,
+    father_id           decimal references pers(id)        default null,
     /** Общество в котором он состоит
-        [см далее]: community_id int references community(id) default null,
+        [см далее]: community_id decimal references community(id) default null,
     **/
     /** Страна \ рай \ aд
-        [см далее]: room_id int references room(id) default null,
+        [см далее]: room_id decimal references room(id) default null,
     **/
     allowauctionoffer   bool default false,
-    perspicbody_id      int references perspicbody(id)   default null,
-    perspichead_id      int references perspichead(id)   default null,
+    perspicbody_id      decimal references perspicbody(id)   default null,
+    perspichead_id      decimal references perspichead(id)   default null,
     /**
         ------------------------------------------------------------
             Внутрениие поля
@@ -341,18 +352,18 @@ create table pers(
 );
 
 alter table file add column owner_id
-    int references pers(id) default null;
+    decimal references pers(id) default null;
 
 /**
  *  Группа пользователей
 **/
 create sequence seq_group_id;
 create table pgroup (
-    id int primary key default nextval('seq_group_id'),
+    id decimal primary key default nextval('seq_group_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     issystem        bool    default false,
     isdeleted       bool    default false
@@ -363,11 +374,11 @@ create table pgroup (
 **/
 create sequence seq_permtype_id;
 create table permtype (
-    id          int primary key default nextval('seq_permtype_id'),
+    id          decimal primary key default nextval('seq_permtype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
+    name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique
 );
 
@@ -376,11 +387,11 @@ create table permtype (
 **/
 create sequence seq_permentitytype_id;
 create table permentitytype (
-    id          int primary key default nextval('seq_permentitytype_id'),
+    id          decimal primary key default nextval('seq_permentitytype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
+    name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique
 );
 
@@ -390,14 +401,14 @@ create table permentitytype (
 **/
 create sequence seq_perm_id;
 create table perm (
-    id              int primary key default nextval('seq_perm_id'),
+    id              decimal primary key default nextval('seq_perm_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024) unique,
-    permtype_id     int references permtype(id),
-    entitytype_id   int references permentitytype(id),
+    permtype_id     decimal references permtype(id),
+    entitytype_id   decimal references permentitytype(id),
     entity_id       int,
     type            int
 );
@@ -407,13 +418,13 @@ create table perm (
 **/
 create sequence seq_friend_id;
 create table friend(
-    id          int primary key default     nextval('seq_friend_id'),
+    id          decimal primary key default     nextval('seq_friend_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique default nextval('seq_any_ti'),
-    pers_id     int references pers(id)    default null,
-    friend_id   int references pers(id)    default null,
+    /*name_ti     decimal unique default nextval('seq_any_ti'),*/
+    pers_id     decimal references pers(id)    default null,
+    friend_id   decimal references pers(id)    default null,
     constraint  friend_pers_id_friend_id_many_key unique (pers_id, friend_id)
 );
 
@@ -430,11 +441,11 @@ create table friend(
 **/
 create sequence seq_acctype_id;
 create table acctype(
-    id              int primary key default     nextval('seq_acctype_id'),
+    id              decimal primary key default     nextval('seq_acctype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     isdeleted       bool default false
 );
@@ -445,11 +456,11 @@ create table acctype(
 **/
 create sequence seq_contype_id;
 create table contype(
-    id              int primary key default     nextval('seq_contype_id'),
+    id              decimal primary key default     nextval('seq_contype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     isdeleted       bool default false
 );
@@ -461,11 +472,11 @@ create table contype(
 **/
 create sequence seq_doctype_id;
 create table doctype(
-    id              int primary key default     nextval('seq_doctype_id'),
+    id              decimal primary key default     nextval('seq_doctype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     isdeleted       bool default false
 );
@@ -476,23 +487,23 @@ create table doctype(
 **/
 create sequence seq_doc_id;
 create table doc(
-    id                  int primary key default     nextval('seq_doc_id'),
+    id                  decimal primary key default     nextval('seq_doc_id'),
     head                text,
-    text                text default null,
+    body                text default null,
     --
-    doctype_id          int references doctype(id)      default null,
-    contype_id          int references contype(id)      default null,
+    doctype_id          decimal references doctype(id)      default null,
+    contype_id          decimal references contype(id)      default null,
     --     /**
     --         Разрешение на чтение
     --     **/
-    --     read_acctype_id     int references acctype(id)      default null,
+    --     read_acctype_id     decimal references acctype(id)      default null,
     --     /**
     --         Разрешение комментов
     --     **/
-    --     comm_acctype_id     int references acctype(id)      default null,
+    --     comm_acctype_id     decimal references acctype(id)      default null,
     --
-    owner_id            int references pers(id)         default null,
-    parent_id           int references doc(id)          default null,
+    owner_id            decimal references pers(id)         default null,
+    parent_id           decimal references doc(id)          default null,
     view_counter        numeric default null,
     position            numeric default null,
     created             timestamp without time zone NOT NULL DEFAULT now(),
@@ -506,19 +517,19 @@ create table doc(
 
 create sequence seq_atttype_id;
 create table atttype(
-    id              int primary key default     nextval('seq_atttype_id'),
+    id              decimal primary key default     nextval('seq_atttype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         int unique default nextval('seq_any_ti'),
+    name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     isdeleted         bool default false
 );
 
 create table att(
-    doc_id      int unique references doc(id)       default null,
-    type_id     int references atttype(id)          default null,
-    file_id     int references file(id)    default null
+    doc_id      decimal unique references doc(id)       default null,
+    type_id     decimal references atttype(id)          default null,
+    file_id     decimal references file(id)    default null
 );
 
 ------------------------------------------------------------------------------
@@ -535,30 +546,30 @@ create table att(
  *  Используется таблица repost.
 **/
 create table blog(
-    doc_id              int unique references doc(id),
+    doc_id              decimal unique references doc(id),
     /**
         Разрешение на чтение
     **/
-    read_acctype_id     int references acctype(id)     default null,
+    read_acctype_id     decimal references acctype(id)     default null,
     /**
         Разрешение комментов
     **/
-    comm_acctype_id     int references acctype(id)     default null
+    comm_acctype_id     decimal references acctype(id)     default null
 );
 
 /**
  *  Запись блога \ комментарий
 **/
 create table post(
-    doc_id              int unique references doc(id),
+    doc_id              decimal unique references doc(id),
     /**
         Разрешение на чтение
     **/
-    read_acctype_id     int references acctype(id)     default null,
+    read_acctype_id     decimal references acctype(id)     default null,
     /**
         Разрешение комментов
     **/
-    comm_acctype_id     int references acctype(id)     default null,
+    comm_acctype_id     decimal references acctype(id)     default null,
     /**
         Оповещение комментов
     **/
@@ -569,7 +580,7 @@ create table post(
 --  *  Опрос
 -- **/
 -- create table pool(
---     doc_id              int unique references doc(id),
+--     doc_id              decimal unique references doc(id),
 --     /**
 --         Разрешение на чтение
 --     **/
@@ -586,15 +597,15 @@ create table post(
  *  Галерея
 **/
 create table gallery(
-    doc_id              int unique references doc(id),
+    doc_id              decimal unique references doc(id),
     /**
         Разрешение на чтение
     **/
-    read_acctype_id     int references acctype(id)     default null,
+    read_acctype_id     decimal references acctype(id)     default null,
     /**
         Разрешение комментов
     **/
-    comm_acctype_id     int references acctype(id)     default null,
+    comm_acctype_id     decimal references acctype(id)     default null,
     /**
         Разрешение на перепост
     **/
@@ -605,7 +616,7 @@ create table gallery(
  *  Картинка галереи
 **/
 create table gpic(
-    att_id              int unique references att(doc_id)
+    att_id              decimal unique references att(doc_id)
 );
 
 -- ...
@@ -620,11 +631,11 @@ create table gpic(
 **/
 create sequence seq_roomtype_id;
 create table roomtype(
-    id          int primary key default nextval('seq_roomtype_id'),
+    id          decimal primary key default nextval('seq_roomtype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     isdeleted     bool default false
 );
@@ -634,12 +645,12 @@ create table roomtype(
 **/
 create sequence seq_chatlang_id;
 create table chatlang(
-    id          int primary key default nextval('seq_chatlang_id'),
+    id          decimal primary key default nextval('seq_chatlang_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
-    -- alias       varchar(1024)   unique,
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
     isdeleted     bool default false
 );
 
@@ -649,30 +660,30 @@ create table chatlang(
 **/
 create sequence seq_topic_id;
 create table topic(
-    id          int primary key default nextval('seq_topic_id'),
+    id          decimal primary key default nextval('seq_topic_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     /**
         Номер языковой сущности
     **/
-    descr_ti    int unique      default nextval('seq_any_ti'),
+    descr_ti    decimal unique      default nextval('seq_any_ti'),
     -- alias       varchar(1024)   unique,
-    topic_id    int references topic(id) default null,
+    topic_id    decimal references topic(id) default null,
     isdeleted   bool default false
 );
 
 
 create table room(
-    doc_id              int unique references doc(id),
-    type_id             int references roomtype(id) default null,
-    user_limit          int default null,
-    chatlang_id         int references chatlang(id) default null,
-    topic_id            int references topic(id) default null,
+    doc_id              decimal unique references doc(id),
+    type_id             decimal references roomtype(id) default null,
+    ulimit              decimal default null,
+    chatlang_id         decimal references chatlang(id) default null,
+    topic_id            decimal references topic(id) default null,
     slogan              text default null,
     weather             text default null,
-    treasury            int default null
+    treasury            decimal default null
 --     bearing - герб
 --     flag - ссылка на картинку флага
 --     wallpaper - ссылка на картинку фона ?????? не закончено
@@ -680,7 +691,7 @@ create table room(
 
 
 alter table pers add  column room_id
-    int references room(doc_id) default null;
+    decimal references room(doc_id) default null;
 
 ------------------------------------------------------------------------------
 -- Сообщество
@@ -689,19 +700,19 @@ alter table pers add  column room_id
 
 create sequence seq_communitytype_id;
 create table communitytype(
-    id          int primary key default nextval('seq_communitytype_id'),
+    id          decimal primary key default nextval('seq_communitytype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     int unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     isdeleted   bool default false
 );
 
 
 create table community(
-    doc_id              int unique references doc(id),
-    type_id             int references communitytype(id) default null,
+    doc_id              decimal unique references doc(id),
+    type_id             decimal references communitytype(id) default null,
     /**
         approve_status
         (nullable bool:
@@ -711,12 +722,12 @@ create table community(
     **/
     approvestatus       bool default null,
     slogan              text default null,
-    treasury            int default null
+    treasury            decimal default null
 
 );
 
 alter table pers add column community_id
-    int references community(doc_id) default null;
+    decimal references community(doc_id) default null;
 
 -------------------------------------------------------------------------------
 -- СВЯЗКИ МНОГИЕ КО МНОГИМ
@@ -726,15 +737,15 @@ alter table pers add column community_id
  *  Многие ко многим для прав и групп
 **/
 create table perm2pgroup (
-    perm_id int references perm(id) not null,
-    group_id int references pgroup(id) not null
+    perm_id decimal references perm(id) not null,
+    group_id decimal references pgroup(id) not null
 );
 
 /**
  *  Многие ко многим для пользователей и групп
 **/
 create table pers2pgroup (
-    pers_id int references pers(id) not null,
-    group_id int references pgroup(id) not null
+    pers_id decimal references pers(id) not null,
+    group_id decimal references pgroup(id) not null
 );
 

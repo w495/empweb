@@ -26,18 +26,18 @@
 
 
 -export([
-    get_content_access_type/2,
-    get_content_access_type/3,
-    create_content_access_type/2,
-    update_content_access_type/2,
-    get_doc_type/2,
-    get_doc_type/3,
-    create_doc_type/2,
-    update_doc_type/2,
-    get_content_type/2,
-    get_content_type/3,
-    create_content_type/2,
-    update_content_type/2
+    get_acctype/2,
+    get_acctype/3,
+    create_acctype/2,
+    update_acctype/2,
+    get_doctype/2,
+    get_doctype/3,
+    create_doctype/2,
+    update_doctype/2,
+    get_contype/2,
+    get_contype/3,
+    create_contype/2,
+    update_contype/2
 ]).
 
 
@@ -54,19 +54,19 @@ table({fields, insert, required})-> [];
 %% @doc Возвращает список полей таблицы для выборки
 %%
 table({fields, select})->
-    table({fields, all}) -- [deleted];
+    table({fields, all}) -- [isdeleted];
 
 %%
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    table({fields, all}) -- [id, deleted];
+    table({fields, all}) -- [id, isdeleted];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
 %%
 table({fields, insert})->
-    table({fields, all}) -- [id, deleted];
+    table({fields, all}) -- [id, isdeleted];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -74,13 +74,13 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        title,
-        content,
-        doc_type_id,
-        content_type_id,
+        head,
+        body,
+        doctype_id,
+        contype_id,
         owner_id,
         parent_id,
-        deleted
+        isdeleted
     ];
 
 %%
@@ -146,75 +146,73 @@ update(Module, Con, Proplist)->
 
 
 
-get_content_access_type(Con, What) ->
-    get_content_access_type(Con, What, []).
+get_acctype(Con, What) ->
+    get_acctype(Con, What, []).
 
-get_content_access_type(Con, What, Fields)->
-    dao:get(content_access_type(), Con, What, Fields).
+get_acctype(Con, What, Fields)->
+    dao:get(acctype(), Con, What, Fields).
 
-create_content_access_type(Con, Proplist)->
-    dao:get(content_access_type(), Con, Proplist).
+create_acctype(Con, Proplist)->
+    dao:get(acctype(), Con, Proplist).
 
-update_content_access_type(Con, Proplist)->
-    dao:get(content_access_type(), Con, Proplist).
-
-
-get_doc_type(Con, What) ->
-    get_doc_type(Con, What, []).
-
-get_doc_type(Con, What, Fields)->
-    dao:get(doc_type(), Con, What, Fields).
-
-create_doc_type(Con, Proplist)->
-    dao:get(doc_type(), Con, Proplist).
-
-update_doc_type(Con, Proplist)->
-    dao:get(doc_type(), Con, Proplist).
+update_acctype(Con, Proplist)->
+    dao:get(acctype(), Con, Proplist).
 
 
-get_content_type(Con, What) ->
-    get_content_type(Con, What, []).
+get_doctype(Con, What) ->
+    get_doctype(Con, What, []).
 
-get_content_type(Con, What, Fields)->
-    dao:get(content_type(), Con, What, Fields).
+get_doctype(Con, What, Fields)->
+    dao:get(doctype(), Con, What, Fields).
 
-create_content_type(Con, Proplist)->
-    dao:get(doc_type(), Con, Proplist).
+create_doctype(Con, Proplist)->
+    dao:get(doctype(), Con, Proplist).
 
-update_content_type(Con, Proplist)->
-    dao:get(content_type(), Con, Proplist).
+update_doctype(Con, Proplist)->
+    dao:get(doctype(), Con, Proplist).
 
 
+get_contype(Con, What) ->
+    get_contype(Con, What, []).
+
+get_contype(Con, What, Fields)->
+    dao:get(contype(), Con, What, Fields).
+
+create_contype(Con, Proplist)->
+    dao:get(contype(), Con, Proplist).
+
+update_contype(Con, Proplist)->
+    dao:get(contype(), Con, Proplist).
 
 
 
-content_access_type() ->
+acctype() ->
     [
-        {{table, name},                       content_access_type},
-        {{table, fields, all},                [id, alias, deleted]},
-        {{table, fields, select},             [id, alias]},
-        {{table, fields, insert},             [alias]},
-        {{table, fields, update},             [alias]},
+        {{table, name},                       acctype},
+        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        {{table, fields, select},             [id, name_ti, alias]},
+        {{table, fields, insert},             [name_ti, alias]},
+        {{table, fields, update},             [name_ti, alias]},
         {{table, fields, insert, required},   [alias]}
     ].
 
-doc_type() ->
+doctype() ->
     [
-        {{table, name},                       doc_type},
-        {{table, fields, all},                [id, alias, deleted]},
-        {{table, fields, select},             [id, alias]},
-        {{table, fields, insert},             [alias]},
-        {{table, fields, update},             [alias]},
+        {{table, name},                       doctype},
+        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        {{table, fields, select},             [name_ti, id, alias]},
+        {{table, fields, insert},             [name_ti, alias]},
+        {{table, fields, update},             [name_ti, alias]},
         {{table, fields, insert, required},   [alias]}
     ].
 
-content_type() ->
+contype() ->
     [
-        {{table, name},                       content_type},
-        {{table, fields, all},                [id, alias, deleted]},
-        {{table, fields, select},             [id, alias]},
-        {{table, fields, insert},             [alias]},
-        {{table, fields, update},             [alias]},
+        {{table, name},                       contype},
+        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        {{table, fields, select},             [id, name_ti, alias]},
+        {{table, fields, insert},             [name_ti, alias]},
+        {{table, fields, update},             [name_ti, alias]},
         {{table, fields, insert, required},   [alias]}
     ].
 

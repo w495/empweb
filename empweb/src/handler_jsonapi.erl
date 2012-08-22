@@ -130,10 +130,8 @@ jsonapi_map(Req, {List}) ->
     
     ?evman_debug({jsonapi_aobj, Aobj},  <<"jsonapi aobj">>),
     
-    User_id=            biz_pers:get_pers_id(Aobj),
-    User_perm_names=    biz_pers:get_perm_names(Aobj),
-
-    
+    Pid         =   biz_pers:get_pers_id(Aobj),
+    Pperm_names =   biz_pers:get_perm_names(Aobj),
 
     ?evman_debug({jsonapi_call, [
         {fname,     Fname},
@@ -143,6 +141,189 @@ jsonapi_map(Req, {List}) ->
 
     Action =
         case Fname of
+
+            <<"get_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_langs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_all_langs,
+                    pers_id         =   Pid
+                };
+            <<"create_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   create_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   update_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   delete_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+
+            <<"get_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_trs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_all_trs,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   create_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   update_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   delete_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+
+
+                
+            <<"get_blog">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_blogs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_blogs,
+                    pers_id         =   Pid
+                };
+            <<"create_blog">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_blog">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_blog">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"get_post">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_post,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_posts">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_posts,
+                    pers_id         =   Pid
+                };
+            <<"create_post">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_post,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_post">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_post,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_post">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_post,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+
+            <<"get_room">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_rooms">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_blogs,
+                    pers_id         =   Pid
+                };
+            <<"create_room">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_room,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_room">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_room,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_room">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_room,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+
             <<"get_all_authorities">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
@@ -197,9 +378,20 @@ jsonapi_map(Req, {List}) ->
                     action          =   'register',
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
+
+            <<"register">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   'register',
+                    params          =   Params,
+                    is_auth         =   Is_auth,
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
+                };
+
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
             %%
@@ -219,8 +411,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   logout,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -232,8 +424,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   update_pers,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -245,8 +437,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   get_pers,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -258,8 +450,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   get_all_perss,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -271,8 +463,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   get_friends,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -287,8 +479,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   add_friend,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%
@@ -303,8 +495,8 @@ jsonapi_map(Req, {List}) ->
                     action          =   delete_friend,
                     params          =   Params,
                     is_auth         =   Is_auth,
-                    pers_id         =   User_id,
-                    pers_perm_names =   User_perm_names
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             _ -> []

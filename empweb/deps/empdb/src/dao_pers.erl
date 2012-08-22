@@ -415,7 +415,7 @@ update_emotion(Con, Proplist)->
 %%
 %% Local Functions
 %%
-    
+
 pgroup() ->
     [
         {{table, name},                       pgroup},

@@ -88,6 +88,81 @@
                 </ol>
             </section>
             <hr/>
+
+            <section id="lang">
+                <h2>Подгружаемые настройки: языки</h2>
+                <ol class="tests">
+                    <li class="test" data-name="Полный список языков">
+                        {"fname": "get_all_langs", "params": {}}
+                    </li>
+                    <li class="test" data-name="Язык">
+                        {"fname": "get_lang", "params": {"id": 1}}
+                    </li>
+                    <li class="test" data-name="Язык">
+                        {"fname": "get_lang", "params": {"alias": "ru"}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов">
+                        {"fname": "get_all_trs", "params": {}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов данного языка 1">
+                        {"fname": "get_all_trs", "params": {"lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов данного языка 2">
+                        {"fname": "get_all_trs", "params": {"lang_id": 2}}
+                    </li>
+                    <li class="test" data-name="Перевод 1 1">
+                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Перевод 1 2">
+                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 2}}
+                    </li>
+                    <li class="test" data-name="Перевод 2 1">
+                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Перевод 2 2">
+                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 2}}
+                    </li>
+                </ol>
+            </section>
+
+            <section id="lang">
+                <h2>Подгружаемые настройки: языки</h2>
+                <ol class="tests">
+                    <li class="test" data-name="Полный список языков">
+                        {"fname": "get_all_langs", "params": {}}
+                    </li>
+                    <li class="test" data-name="Язык">
+                        {"fname": "get_lang", "params": {"id": 1}}
+                    </li>
+                    <li class="test" data-name="Язык">
+                        {"fname": "get_lang", "params": {"alias": "ru"}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов">
+                        {"fname": "get_all_trs", "params": {}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов данного языка 1">
+                        {"fname": "get_all_trs", "params": {"lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Полный список переводов данного языка 2">
+                        {"fname": "get_all_trs", "params": {"lang_id": 2}}
+                    </li>
+                    <li class="test" data-name="Перевод 1 1">
+                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Перевод 1 2">
+                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 2}}
+                    </li>
+                    <li class="test" data-name="Перевод 2 1">
+                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 1}}
+                    </li>
+                    <li class="test" data-name="Перевод 2 2">
+                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 2}}
+                    </li>
+                </ol>
+            </section>
+
+
+            <hr/>
             <section id="register">
                 <h2>Регистрация</h2>
                 <ol class="tests">
@@ -226,24 +301,19 @@
                     </li>
                 </ol>
             </section>
-            <hr/>
             <section id="pers_udpate">
-                <h2>Обновление</h2>
+                <h2>Блоги</h2>
                 <ol class="tests">
-                    <li class="test" data-name="Все авторитеты">
-                        {"fname": "get_all_authorities", "params":{}}
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "create_blog", "params":{"head":"head ~(random(string))", "body":"body ~(random(string))"}}
                     </li>
-                    <li class="test" data-name="Все семейные положения">
-                        {"fname": "get_all_mstatuses", "params":{}}
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "create_room", "params":{"head":"head ~(random(string))", "body":"body ~(random(string))"}}
                     </li>
-                    <li class="test" data-name="Все статусы пользователей">
-                        {"fname": "get_all_pstatuses", "params":{}}
-                    </li>
-                    <li class="test" data-name="Все эмоции">
-                        {"fname": "get_all_emotions", "params":{}}
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "create_post", "params":{"parent_id": 1, "head":"head ~(random(string))", "body":"body ~(random(string))"}}
                     </li>
                 </ol>
-
             </section>
         </article>
         <!-- ============================================================== -->

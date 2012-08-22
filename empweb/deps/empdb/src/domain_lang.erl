@@ -12,92 +12,86 @@
 %%
 %% Exported Functions
 %%
+
+%%
+%% Exported Functions
+%%
 -export([
-    update/1,
-    get/1,
-    get/2,
-    get_opt/2,
-    get_opt/3
+    update_tr/1,
+    create_tr/1,
+    get_tr/1,
+    get_tr/2
 ]).
+
+%%
+%% Exported Functions
+%%
+-export([
+    update_lang/1,
+    create_lang/1,
+    get_lang/1,
+    get_lang/2
+]).
+
 
 %%
 %% API Functions
 %%
 
 
-update(Params)->
+create_tr(Params)->
     dao:with_connection(fun(Con)->
-        dao_user:update(Con, Params)
+        dao_tr:create(Con, Params)
     end).
 
-get(Params)->
+update_tr(Params)->
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, Params)
+        dao_tr:update(Con, Params)
     end).
 
-get(Params, Fileds)->
+get_tr(Params)->
     dao:with_connection(fun(Con)->
-        dao_user:get(Con, Params, Fileds)
+        dao_tr:get(Con, [{isdeleted, false}|Params])
     end).
 
-get_opt(Params, Fileds, Options)->
+get_tr(Params, Fileds)->
     dao:with_connection(fun(Con)->
-        {ok, Userpls} = dao_user:get(Con, Params, Fileds),
-        get_opt(Con, Params, Options, Userpls)
+        dao_tr:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-get_opt(Params, Options)->
+is_tr_owner(Uid, Oid)->
     dao:with_connection(fun(Con)->
-        {ok, Userpls} = dao_user:get(Con, Params),
-        get_opt(Con, Params, Options, Userpls)
+        dao_tr:is_owner(Con, Uid, Oid)
     end).
 
-get_opt(Con, Params, [], Proplist) ->
-    {ok, [{Proplist}]};
 
-get_opt(Con,Params, [Option|Options], [{Acc}])->
-    case Option of
-        %% ------------------------------------------------------------------
-        {perm_list, Spec} when erlang:is_list(Spec) ->
-            {ok, Perm_list} = dao_user:get_perm(Con, Params, Spec),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        {perm_list, Spec} when erlang:is_atom(Spec) ->
-            {ok, Perm_list} = dao_user:get_perm(Con, Params, [Spec]),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        perm_list ->
-            {ok, Perm_list} = dao_user:get_perm(Con, Params, [name]),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        perm_names ->
-            {ok, Perm_list} = dao_user:get_perm(Con, Params, [name]),
-            Perm_names = lists:map(fun({Permpl})->
-                convert:to_atom(proplists:get_value(name, Permpl))
-            end, Perm_list),
-            get_opt(Con, Params, Options, [{perm_names, Perm_names}|Acc]);
-        %% ------------------------------------------------------------------
-        {group_list, Spec} when erlang:is_list(Spec) ->
-            {ok, Perm_list} = dao_user:get_group(Con, Params, Spec),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        {group_list, Spec} when erlang:is_atom(Spec) ->
-            {ok, Perm_list} = dao_user:get_group(Con, Params, [Spec]),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        group_list ->
-            {ok, Perm_list} = dao_user:get_group(Con, Params, [name]),
-            get_opt(Con, Params, Options, [{perm_list, Perm_list}|Acc]);
-        _ ->
-            get_opt(Con, Params, Options, Acc)
-    end;
 
-get_opt(Con,Params, [Option|Options], Accs)->
-    {ok,
-        lists:map(fun({Obj})->
-            {ok, [{Result}]} = get_opt(Con,Params, [Option|Options], [{Obj}]),
-            {Result}
-        end, Accs
-    )}.
 
-%%%
-%%%
-%%%
+create_lang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_lang:create(Con, Params)
+    end).
+
+update_lang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_lang:update(Con, Params)
+    end).
+
+get_lang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_lang:get(Con, [{isdeleted, false}|Params])
+    end).
+
+get_lang(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_lang:get(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+is_lang_owner(Uid, Oid)->
+    dao:with_connection(fun(Con)->
+        dao_lang:is_owner(Con, Uid, Oid)
+    end).
+
 
 %%
 %% Local Functions
