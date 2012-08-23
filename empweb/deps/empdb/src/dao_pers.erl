@@ -99,7 +99,7 @@ table({fields, insert, required})->
 table({fields, select})->
     [   'extract(epoch from birthday) as birthday'
         |table({fields, all})
-    ] -- [birthday];
+    ] -- [birthday, isdeleted];
 
 %%
 %% @doc Возвращает список полей таблицы для обновления

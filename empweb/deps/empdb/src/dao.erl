@@ -313,7 +313,9 @@ create(Module, Con, Proplist, Ret)->
 update({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret1, Ret2)->
     case update(Parent, Con, Proplist,Ret1) of
         {ok, Pid} ->
-            update(Module, Con, [{Fm, Pid}|Proplist], Ret2);
+            X = update(Module, Con, Proplist, Ret2),
+            io:format("X  = ~p ~n", [X]),
+            X;
         {error, Error} ->
             Error
     end.
@@ -328,20 +330,43 @@ update({Parent, Fp}, {Module, Fm}, Con, Proplist) ->
     update({Parent, Fp}, {Module, Fm}, Con, Proplist, Fp, Fm);
     
 update(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
+    Kname = id,
     Fields = lists:filter(
         fun(F)-> lists:member(F, proplists:get_value({table, fields, update}, Options)) end,
         proplists:get_keys(Proplist)
     ),
-    case proplists:get_value(id, Proplist) of
+    case proplists:get_value(Kname, Proplist) of
         undefined ->
             create(Options, Con, Proplist, Ret);
-        Id ->
-            Mtbl = convert:to_binary(proplists:get_value({table, name}, Options)),
-            Dffvs = dao:fields_fieldvars(Fields),
-            dao:pgret(dao:equery(Con,[
-                <<" update  ">>, Mtbl, <<" set ">>, Dffvs, <<" where id = $id ">>
-            ],Proplist)),
-            {ok, Id}
+        Kval ->
+            case lists:filter(
+                    fun({F, V})->lists:member(
+                            F,
+                            proplists:get_value(
+                                {table, fields, update},
+                                Options
+                    )) end, Proplist
+            ) of
+                [] ->
+                    {ok, Kval};
+                Pls ->
+                    Mtbl = convert:to_binary(proplists:get_value({table, name}, Options)),
+                    Dffvs = dao:fields_fieldvars(Fields),
+                    case dao:pgret(dao:equery(Con,[
+                        <<" update  ">>,
+                        Mtbl,
+                        <<" set ">>,
+                        Dffvs,
+                        <<" where ">>,
+                        [   convert:to_binary(Ret),
+                            <<" = $">>,
+                            convert:to_binary(Kname)
+                        ]
+                    ],[{Kname, Kval}|Pls])) of
+                        ok -> {ok, Kval};
+                        {error, Error} -> {error, Error}
+                    end
+            end
     end;
 
 update(Module, Con, Proplist, Ret)->
@@ -739,11 +764,14 @@ equery(Con, Qfunction, Params) when erlang:is_function(Qfunction) ->
 equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
     case is_proplist(Params) of
         true ->
+            io:format("FQ = ~p~n", [convert:to_binary(Query)]),
             {NewQuery, Values} = equery_pl(Query, Params),
-            io:format("NewQuery = ~p~n", [NewQuery]),
+            io:format("PQ = ~p~n", [convert:to_binary(NewQuery)]),
+            io:format("PP = ~p~n", [Params]),
             psqlcp:equery(Con, NewQuery, Values);
         _ ->
-            io:format("Query = ~p~n", [list_to_binary(Query)]),
+            io:format("PQ = ~p~n", [convert:to_binary(Query)]),
+            io:format("PP = ~p~n", [Params]),
             psqlcp:equery(Con, Query, Params)
     end.
 

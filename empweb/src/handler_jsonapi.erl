@@ -142,6 +142,181 @@ jsonapi_map(Req, {List}) ->
     Action =
         case Fname of
 
+            <<"get_doctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_doctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_doctypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_doctypes,
+                    pers_id         =   Pid
+                };
+            <<"create_doctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_doctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_doctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_doctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_doctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_doctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"get_contype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_contype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_contypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_contypes,
+                    pers_id         =   Pid
+                };
+            <<"create_contype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_contype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_contype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_contype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_contype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_contype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"get_acctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_acctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_acctypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_acctypes,
+                    pers_id         =   Pid
+                };
+            <<"create_acctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_acctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_acctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_acctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_acctype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_acctype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"get_roomtype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_roomtype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_roomtypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_roomtypes,
+                    pers_id         =   Pid
+                };
+            <<"create_roomtype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_roomtype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_roomtype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_roomtype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_roomtype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_roomtype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"get_chatlang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_chatlang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_chatlangs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_chatlangs,
+                    pers_id         =   Pid
+                };
+            <<"create_chatlang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_chatlang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_chatlang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_chatlang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_chatlang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_chatlang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
             <<"get_lang">> ->
                 #empweb_hap{
                     handler         =   jsonapi_conf,
@@ -176,7 +351,6 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
 
             <<"get_tr">> ->
                 #empweb_hap{
@@ -214,9 +388,6 @@ jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
 
-
-
-                
             <<"get_blog">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -291,14 +462,14 @@ jsonapi_map(Req, {List}) ->
             <<"get_room">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_blog,
+                    action          =   get_room,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_rooms">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_blogs,
+                    action          =   get_all_rooms,
                     pers_id         =   Pid
                 };
             <<"create_room">> ->
@@ -382,15 +553,6 @@ jsonapi_map(Req, {List}) ->
                     pers_perm_names =   Pperm_names
                 };
 
-            <<"register">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_pers,
-                    action          =   'register',
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
-                };
 
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 

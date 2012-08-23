@@ -88,7 +88,6 @@
                 </ol>
             </section>
             <hr/>
-
             <section id="lang">
                 <h2>Подгружаемые настройки: языки</h2>
                 <ol class="tests">
@@ -99,7 +98,7 @@
                         {"fname": "get_lang", "params": {"id": 1}}
                     </li>
                     <li class="test" data-name="Язык">
-                        {"fname": "get_lang", "params": {"alias": "ru"}}
+                        {"fname": "get_lang", "params": {"alias": "ru_ru"}}
                     </li>
                     <li class="test" data-name="Полный список переводов">
                         {"fname": "get_all_trs", "params": {}}
@@ -124,44 +123,72 @@
                     </li>
                 </ol>
             </section>
-
-            <section id="lang">
-                <h2>Подгружаемые настройки: языки</h2>
+            <hr/>
+            <section id="emotions">
+                <h2>Подгружаемые настройки: эмоции \ статусы \ авторитеты </h2>
                 <ol class="tests">
-                    <li class="test" data-name="Полный список языков">
-                        {"fname": "get_all_langs", "params": {}}
+                    <li class="test" data-name="Список эмоций">
+                        {"fname": "get_all_emotions", "params": {}}
                     </li>
-                    <li class="test" data-name="Язык">
-                        {"fname": "get_lang", "params": {"id": 1}}
+                    <li class="test" data-name="Получение эмоции">
+                        {"fname": "get_emotion", "params": {"id" : 1}}
                     </li>
-                    <li class="test" data-name="Язык">
-                        {"fname": "get_lang", "params": {"alias": "ru"}}
+                    <li class="test" data-name="Список семейного положения">
+                        {"fname": "get_all_mstatuses", "params": {}}
                     </li>
-                    <li class="test" data-name="Полный список переводов">
-                        {"fname": "get_all_trs", "params": {}}
+                    <li class="test" data-name="Получение семейного положения">
+                        {"fname": "get_mstatus", "params": {"id" : 1}}
                     </li>
-                    <li class="test" data-name="Полный список переводов данного языка 1">
-                        {"fname": "get_all_trs", "params": {"lang_id": 1}}
+                    <li class="test" data-name="Список статусов">
+                        {"fname": "get_all_pstatuses", "params": {}}
                     </li>
-                    <li class="test" data-name="Полный список переводов данного языка 2">
-                        {"fname": "get_all_trs", "params": {"lang_id": 2}}
+                    <li class="test" data-name="Получение статусa">
+                        {"fname": "get_pstatus", "params": {"id" : 1}}
                     </li>
-                    <li class="test" data-name="Перевод 1 1">
-                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 1}}
+                    <li class="test" data-name="Список авторитетов">
+                        {"fname": "get_all_authorities", "params": {}}
                     </li>
-                    <li class="test" data-name="Перевод 1 2">
-                        {"fname": "get_tr", "params": {"ti": -1, "lang_id": 2}}
-                    </li>
-                    <li class="test" data-name="Перевод 2 1">
-                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 1}}
-                    </li>
-                    <li class="test" data-name="Перевод 2 2">
-                        {"fname": "get_tr", "params": {"ti": -2, "lang_id": 2}}
+                    <li class="test" data-name="Получение авторитета">
+                        {"fname": "get_authority", "params": {"id" : 1}}
                     </li>
                 </ol>
             </section>
-
-
+            <hr/>
+            <section id="lang">
+                <h2>Подгружаемые настройки: типы комнат </h2>
+                <ol class="tests">
+                    <li class="test" data-name="Список типов документов">
+                        {"fname": "get_all_doctypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение типа документов">
+                        {"fname": "get_doctype", "params": {"id" : 1}}
+                    </li>
+                    <li class="test" data-name="Список типа контента">
+                        {"fname": "get_all_contypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение типа контента">
+                        {"fname": "get_contype", "params": {"id" : 1}}
+                    </li>
+                    <li class="test" data-name="Список типа доступа контента">
+                        {"fname": "get_all_acctypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение типа доступа контента">
+                        {"fname": "get_acctype", "params": {"id" : 1}}
+                    </li>
+                    <li class="test" data-name="Список типа комнат">
+                        {"fname": "get_all_roomtypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение типа комнат">
+                        {"fname": "get_roomtype", "params": {"id" : 1}}
+                    </li>
+                    <li class="test" data-name="Список языков чата">
+                        {"fname": "get_all_chatlangs", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение языка чата">
+                        {"fname": "get_chatlang", "params": {"id" : 1}}
+                    </li>
+                </ol>
+            </section>
             <hr/>
             <section id="register">
                 <h2>Регистрация</h2>
@@ -288,30 +315,73 @@
                         {"fname": "get_pers", "params":{"id":1}}
                     </li>
                     <li class="test"  data-name="Можем изменить данные о пользователе">
-                        {"fname": "update_pers", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":~(random(phone)), "email":"email@email ~(random(string))"}}
                     </li>
                     <li class="test" data-name='Получаем данные (после 2 изменения)'>
                         {"fname": "get_pers", "params":{"id":1}}
                     </li>
                     <li class="test" data-name="Несуществующие поля игнорируются если есть нормальные">
-                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":"phone ~(random(string))", "email":"email@email ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":~(random(phone)), "email":"email@email ~(random(string))"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Несуществующие поля игнорируются если есть нормальные">
                         {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))"}}
                     </li>
                 </ol>
             </section>
-            <section id="pers_udpate">
-                <h2>Блоги</h2>
+            <hr/>
+            <section id="docs">
+                <h2>Документы</h2>
                 <ol class="tests">
-                    <li class="test" data-name="Нормальный выход">
-                        {"fname": "create_blog", "params":{"head":"head ~(random(string))", "body":"body ~(random(string))"}}
+                    <li class="test" data-name="Создать блог">
+                        {"fname": "create_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(string))"}}
                     </li>
-                    <li class="test" data-name="Нормальный выход">
-                        {"fname": "create_room", "params":{"head":"head ~(random(string))", "body":"body ~(random(string))"}}
+                    <li class="test" data-name="Обновить блог">
+                        {"fname": "update_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(string))", "id": 1}}
                     </li>
-                    <li class="test" data-name="Нормальный выход">
-                        {"fname": "create_post", "params":{"parent_id": 1, "head":"head ~(random(string))", "body":"body ~(random(string))"}}
+                    <li class="test" data-name="Создать комнату (абстрактную страну)">
+                        {"fname": "create_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(string))"}}
+                    </li>
+                    <li class="test" data-name="Обновить комнату (абстрактную страну)">
+                        {"fname": "update_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(string))", "id": 2, "ulimit":100, "type_id":1}}
+                    </li>
+                    <li class="test" data-name="Создать пост ">
+                        {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(string))", "parent_id": 1}}
+                    </li>
+                    <li class="test" data-name="Создать коммент">
+                        {"fname": "create_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(string))", "parent_id": 3}}
+                    </li>
+                    <li class="test" data-name="Обновить пост ">
+                        {"fname": "update_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(string))", "id": 3}}
+                    </li>
+                    <li class="test" data-name="Обновить коммент">
+                        {"fname": "update_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(string))", "id": 4}}
+                    </li>
+                    <li class="test" data-name="Получить все блоги">
+                        {"fname": "get_all_blogs", "params":{}}
+                    </li>
+                    <li class="test" data-name="Получить коменты \ посты">
+                        {"fname": "get_all_posts", "params":{}}
+                    </li>
+                    <li class="test" data-name="Получить посты первого блога">
+                        {"fname": "get_all_posts", "params":{"parent_id": 1}}
+                    </li>
+                    <li class="test" data-name="Получить комменты первого поста первого блога">
+                        {"fname": "get_all_posts", "params":{"parent_id": 3}}
+                    </li>
+                    <li class="test" data-name="Получить все комнаты">
+                        {"fname": "get_all_rooms", "params":{}}
+                    </li>
+                    <li class="test" data-name="Получить блог">
+                        {"fname": "get_blog", "params":{"id": 1}}
+                    </li>
+                    <li class="test" data-name="Получить комнату">
+                        {"fname": "get_room", "params":{"id": 2}}
+                    </li>
+                    <li class="test" data-name="Получить пост">
+                        {"fname": "get_post", "params":{"id": 3}}
+                    </li>
+                    <li class="test" data-name="Получить комент">
+                        {"fname": "get_post", "params":{"id": 4}}
                     </li>
                 </ol>
             </section>
@@ -345,6 +415,20 @@ ups = function(){
     })();
     return urlParams;
 };
+
+random_string = function(n){
+    var a = "あアいイうウえエおオかカきキくクけケこコさサしシすスせセそソたタちチつツてテとトなナにニぬヌねネのノはハひヒふフへヘほホまマみミむムめメもモやヤゆユよヨらラりリるルれレろロわワをヲんン"
+    if(n)
+        n = 10;
+    var r = "";
+    for(var i=0; i != n; ++i){
+        var rand = Math.random() * (a.length-1);;
+        var char = a[Math.ceil(rand)];
+        r += char;
+    }
+    return r;
+}
+
 jQuery(document).ready(function($) {
     jQuery.ajaxSetup({async:false});
     var url = ups().url;
@@ -356,7 +440,9 @@ jQuery(document).ready(function($) {
         $(test).html(
             "<div><span>Ввод:</span><div class=\"input\">" +
             $(test).html()
-                .replace(/[~][(]random[(]string[)][)]/gi," " + Math.random())
+                .replace(/[~][(]random[(]string[)][)]/gi," " + random_string())
+                .replace(/[~][(]random[(]integer[)][)]/gi," " + Math.ceil(Math.random() * 10000000000000000))
+                .replace(/[~][(]random[(]phone[)][)]/gi," " + Math.ceil(Math.random() * 9153660541))
             + "</div></div>"
         );
         var name = $(test).data("name")

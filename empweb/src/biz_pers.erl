@@ -170,11 +170,17 @@ update(Params)->
 
 get([]) ->
     ?evman_args([[]], <<"get all perss">>),
-    domain_pers:get([],[]);
+    domain_pers:get(
+        [],
+        dao_pers:table({fields, select}) -- [phash]
+    );
 
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),
-    domain_pers:get(Params, []).
+    domain_pers:get(
+        Params,
+        dao_pers:table({fields, select}) -- [phash]
+    ).
 
 
 get_friends(Params)->
