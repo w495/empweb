@@ -594,6 +594,70 @@ insert into tr (text, tt, tf, ta, ti,  lang_id, type_id)
             (select id from trtype where alias='dynamic')
         );
 
+/****************************************************************************
+    =====================================================================
+                                НАСТРОЙКИ
+    =====================================================================
+****************************************************************************/
+
+insert into sysvartype (alias)
+    values  ('text'), ('int'), ('bool'), ('real'), ('void');
+
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'text',         'sysvartype',   'name_ti','text',
+            (select name_ti from acctype  where alias='text'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'integer',      'sysvartype',   'name_ti','int',
+            (select name_ti from acctype  where alias='int'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'boolean',      'sysvartype',   'name_ti','bool',
+            (select name_ti from acctype  where alias='bool'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'real',         'sysvartype',   'name_ti','real',
+            (select name_ti from acctype  where alias='real'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'void',         'sysvartype',   'name_ti','void',
+            (select name_ti from acctype  where alias='void'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'текст',        'sysvartype',   'name_ti','text',
+            (select name_ti from acctype  where alias='text'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'целое',        'sysvartype',   'name_ti','int',
+            (select name_ti from acctype  where alias='int'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'логическое',   'sysvartype',   'name_ti','bool',
+            (select name_ti from acctype  where alias='bool'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'вещественное', 'sysvartype',   'name_ti','real',
+            (select name_ti from acctype  where alias='real'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'пустое',       'sysvartype',   'name_ti','void',
+            (select name_ti from acctype  where alias='void'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        );
+
+
 -------------------------------------------------------------------------------
 -- Документы
 -------------------------------------------------------------------------------

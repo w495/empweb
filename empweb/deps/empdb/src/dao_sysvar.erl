@@ -6,17 +6,6 @@
 -module(dao_sysvar).
 
 -export([
-    partners/0,
-    partners/1,
-    acv_video_loadnext/0,
-    acv_video_loadnext/1,
-    videonow/0,
-    videonow/1,
-    vitpc/0,
-    vitpc/1
-]).
-
--export([
     get_sysvars/1,
     get_sysvars/2,
     get/2,
@@ -29,55 +18,6 @@
     test/0,
     test/1
 ]).
-
--include("common.hrl").
-
-%%% -------------------------------------------------------------------------
-%%% ФУНКЦИИ ВОЗВРАТА КОНКРЕТНЫХ ПЕРЕМЕННЫХ,
-%%%
-%%%     Возможно надо вынести в biz
-%%% -------------------------------------------------------------------------
-
-acv_video_loadnext() ->
-    dao_sysvar:get(acv_video_loadnext, ?DEFAULT_ACV_VIDEO_LOADNEXT).
-
-acv_video_loadnext(Con) ->
-    dao_sysvar:get(Con, acv_video_loadnext, ?DEFAULT_ACV_VIDEO_LOADNEXT).
-    
-videonow() ->
-    dao_sysvar:get(videonow, false).
-
-videonow(Con) ->
-    dao_sysvar:get(Con, videonow, false).
-
-vitpc() ->
-    dao_sysvar:get(vitpc, false).
-
-vitpc(Con) ->
-    dao_sysvar:get(Con, vitpc, false).
-
-
-partners()->
-    fpartners([
-        videonow,
-        vitpc
-    ]).
-
-partners(Con)->
-    fpartners(Con, [
-        videonow,
-        vitpc
-    ]).
-
-fpartners(Partners)->
-    lists:filter(fun(Partner)->
-        dao_sysvar:get(Partner, false)
-    end, Partners).
-
-fpartners(Con, Partners)->
-    lists:filter(fun(Partner)->
-        dao_sysvar:get(Con, Partner, false)
-    end, Partners).
 
 
 %%% -------------------------------------------------------------------------
