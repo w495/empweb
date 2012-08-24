@@ -12,14 +12,23 @@
 ****************************************************************************/
 
 /**
+ *  Нумерация сущностей для которых требуется перевод
+ *  Нужно для обеспечения уникальность ti,
+ *  для каждой конкретной сущности, которую будем переводить
+**/
+create sequence seq_any_ti;
+
+
+/**
  *  Язык
 **/
 create sequence seq_lang_id;
 create table lang(
     id              decimal primary key default nextval('seq_lang_id'),
     alias           varchar(1024) unique,
+    name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
-    created         timestamp without time zone NOT NULL DEFAULT now(),
+    created         timestamp without time zone not null default now(),
     isdeleted       bool default false
 );
 
@@ -33,17 +42,11 @@ create sequence seq_trtype_id;
 create table trtype(
     id              decimal primary key default nextval('seq_trtype_id'),
     alias           varchar(1024) unique,
+    name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
     created         timestamp without time zone not null default now(),
     isdeleted       bool default false
 );
-
-/**
- *  Нумерация сущностей для которых требуется перевод
- *  Нужно для обеспечения уникальность ti,
- *  для каждой конкретной сущности, которую будем переводить
-**/
-create sequence seq_any_ti;
 
 
 /**
@@ -81,12 +84,6 @@ create table tr(
 );
 
 
-alter table lang add column name_ti
-    decimal unique default nextval('seq_any_ti');
-
-alter table trtype add column name_ti
-    decimal unique default nextval('seq_any_ti');
-
 /****************************************************************************
     =====================================================================
                                 ФАЙЛЫ
@@ -119,7 +116,7 @@ create table fileinfo(
     name       varchar(1024)                    default null,
     dir        varchar(1024)                    default null,
     type_id    decimal references filetype(id)      default null,
-    created    timestamp without time zone NOT NULL DEFAULT now(),
+    created    timestamp without time zone not null default now(),
     isdeleted  bool default false
 );
 
@@ -142,7 +139,7 @@ create table file(
     **/
     fileinfo      decimal references fileinfo(id)    default null,
     issystem      bool default false,
-    created       timestamp without time zone NOT NULL DEFAULT now(),
+    created       timestamp without time zone not null default now(),
     isdeleted     bool default false
 );
 
@@ -165,7 +162,7 @@ create table emotion(
     **/
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false
 );
 
@@ -181,7 +178,7 @@ create table authority(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     level       decimal default 0,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false
 );
 
@@ -196,7 +193,7 @@ create table pstatus(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false
 );
 
@@ -247,7 +244,7 @@ create table perspichead(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false
 );
 
@@ -259,7 +256,7 @@ create table perspicbody(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false
 );
 
@@ -276,7 +273,7 @@ create table pregion(
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024),
     pregion_id  decimal references pregion(id)     default null,
-    created     timestamp without time zone NOT NULL DEFAULT now(),
+    created     timestamp without time zone not null default now(),
     isdeleted   bool default false,
     constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
 );
@@ -315,7 +312,7 @@ create table pers(
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
     pregion_id  decimal references  pregion(id)     default null,
-    birthday    timestamp       without time zone NOT NULL DEFAULT now(),
+    birthday    timestamp       without time zone not null default now(),
     -- gender_id           decimal references gender(id)      default null,
     lang_id     decimal     references lang(id) default null,
     ismale      bool    default false,
@@ -347,7 +344,7 @@ create table pers(
             Внутрениие поля
         ------------------------------------------------------------
     **/
-    created             timestamp without time zone NOT NULL DEFAULT now(),
+    created             timestamp without time zone not null default now(),
     isdeleted           bool default false
 );
 
@@ -431,9 +428,45 @@ create table friend(
 
 /****************************************************************************
     =====================================================================
+                                НАСТРОЙКИ
+    =====================================================================
+****************************************************************************/
+
+/**
+ * Типы системных переменных
+**/
+create sequence seq_sysvartype_id;
+create table sysvartype(
+    id              decimal primary key default nextval('seq_sysvartype_id'),
+    alias           varchar(1024) not null unique,
+    name_ti         decimal unique default nextval('seq_any_ti'),
+    created         timestamp without time zone not null default now(),
+    isdeleted       bool default false
+);
+
+/**
+ * Cистемные переменные
+**/
+create sequence seq_sysvar_id;
+create table sysvar(
+    id              decimal primary key default nextval('seq_sysvar_id'),
+    perm_id         decimal references permission(id) default null,
+    type_id         decimal references sysvartype(id) default null,
+    alias           varchar(1024) not null unique,
+    val             varchar(1024) not null,
+    sysvar_id       decimal references sysvar(id),
+    name_ti         decimal unique default nextval('seq_any_ti'),
+    created         timestamp without time zone not null default now(),
+    isdeleted       bool default false
+);
+
+
+/****************************************************************************
+    =====================================================================
                                 ДОКУМЕНТЫ
     =====================================================================
 ****************************************************************************/
+
 
 /**
  *  Тип доступа к контенту контента (блога и галереи):
@@ -506,7 +539,7 @@ create table doc(
     parent_id           decimal references doc(id)          default null,
     view_counter        numeric default null,
     position            numeric default null,
-    created             timestamp without time zone NOT NULL DEFAULT now(),
+    created             timestamp without time zone not null default now(),
     isdeleted           bool default false
 );
 
