@@ -1,0 +1,46 @@
+{
+    type : "table",
+    toolbar : [
+        {type : "button",
+            name : "Обновить",
+            action : "/get-all-acv-video-stats",
+            //icon : "icon/32/actions/edit-redo.png",
+            icon : "icon/32/actions/view-refresh.png",
+            specParam: "tab-change-state-action"},
+            
+        {type : "button", name : "Создать",
+            action : "resource/zqr/descr/adv-com-vid-form.json",
+            icon : "icon/32/actions/document-new.png"},
+
+        {type : "button", name : "Редактировать",
+            action : "resource/zqr/descr/adv-com-vid-form.json",
+            icon : "icon/32/actions/zoom-in.png",
+            specParam: "tab-row"},
+
+        {type : "button",
+            name : "Удалить",
+            action : "/delete-adv-com-vid",
+            icon : "icon/32/actions/edit-delete.png",
+            specParam: "tab-row-action",
+            confirmMsg : "Уверены ли вы в том что хотите удалить рекламную компанию?"}
+            
+
+            
+    ],
+    columns : [
+        {name : "id", alias : "#", type : "float", sortable : true, width:"5%"},
+        {name : "name", alias : "Название", type : "string", sortable : true},
+        {name : "datestart", alias : "Дата начала", type : "erl_datetime", sortable : true},
+        {name : "datestop", alias : "Дата конца", type : "erl_datetime", sortable : true}
+    ],
+
+    filter : {
+        submit_url : "/get-acv-banners"
+    },
+
+    // sort : "datatime",
+    sort : "id",
+    ascending : false,
+
+    dblclick_action : "resource/zqr/descr/adv-com-vid-form.json"
+}

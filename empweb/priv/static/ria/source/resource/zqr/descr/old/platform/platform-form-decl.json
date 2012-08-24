@@ -1,0 +1,52 @@
+{
+    "type" : "form",
+    "toolbar" : [
+        {"type" : "back"}
+    ],
+    "fields" : [
+        {   "name" : "id",
+            "alias" : "#",
+            "input" : {
+                "type" : "hidden"
+            }
+        },
+        {   "name" : "name",
+            "alias" : "Имя",
+            "validation" : {
+                "required" : true
+            },
+            "input" : {
+                "type" : "text-field"
+            }
+        },
+        {   "name" : "code",
+            "alias" : "Код",
+            "validation" : {
+                "required" : true
+            },
+            "input" : {
+                "type" : "text-field"
+            }
+        },
+        {   "name" : "description",
+            "alias" : "Описание",
+            "validation" : {
+                "required" : true
+            },
+            "input" : {
+                "type" : "text-area"
+            }
+        }
+    ],
+
+    "submit_btn_label"  : "Отправить!",
+    "cancel_btn_label"  : "Отмена!",
+    "render"            : "single",
+    "index_name"        : "id",
+        // имя поля по которому запрашивается рекрдсет для редактирования
+    "formdata_url"      : "/get-platform-info",
+        // заглушка для получения данных в форму редактирования
+    "submit_url"        : "/update-platform",
+        // заглушка для ответа на сабмит
+    "req_type"          : "POST"
+}

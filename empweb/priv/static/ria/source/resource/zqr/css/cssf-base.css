@@ -1,0 +1,181 @@
+/*	CSS-Framework
+
+	Version		: 0.3
+	Author		: Aleksej Romanovskij (http://css-framework.ru)
+	License		: Creative Commons Attribution 3.0 Unported License (http://creativecommons.org/licenses/by/3.0/)
+
+------------------------------ */
+		
+/* Utilites
+------------------------------ */
+
+* { margin: 0; padding: 0; }
+
+*:focus { outline: none; }
+.hidden { display: none; }
+.show { display: block!important; }
+.no-margin { margin: 0!important; }
+.no-padding { padding: 0!important; }
+.no-bg { background: none!important; }
+.no-border, a img { border: none!important; }
+.container:after, .columns:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.img-repl { text-indent: -9999px; overflow: hidden; display: block; }
+.cc { clear: both; }
+
+/* Main styles
+------------------------------ */
+
+html { height: 100%; background: #f4f4f4; font: .75em/1.5 Verdana, Arial, Helvetica, sans-serif; }
+body { height: auto !important; height: 100%; min-height: 100%; position: relative; } /* body height 100% */
+
+a { color: #0066cc; }
+a:visited {  }
+a:hover {  }
+a:active {  }
+			
+/* Layout Boxs
+------------------------------ */
+
+.page-layout { margin-right: -5px; }
+.layout-box { float: left; margin: 0 5px 5px 0; }
+
+.lb-1 { width: 779px; } /* 100% */
+.lb-2 { width: 583px; } /* 75% */
+.lb-3 { width: 387px; } /* 50% */
+.lb-4 { width: 191px; } /* 25% */
+/* Demo Template
+------------------------------ */
+
+#page { width: 779px; margin: 0 auto; background: #fff; padding: 10px; }
+#header { padding-bottom: 1em; border-bottom: 2px solid #ccc; margin-bottom: 1em; }
+#col-left { float: left; width: 25%; }
+#content { width: 73%; float: right; }
+#footer { clear: both; padding-top: 1em; border-top: 2px solid #ccc; }
+
+/* Horizontal Menu
+------------------------------ */
+
+.menu-h { overflow: hidden; border-left: 1px solid #ccc; }
+.menu-h li { float: left; list-style: none; padding: 0 .8em; border-right: 1px solid #ccc; }
+.menu-h a { text-decoration: none; display: block; }
+.menu-h a:hover { text-decoration: underline; }
+			
+/* Content elements
+------------------------------ */
+
+.content h1, .content h2, .content h3, .content h4 { font: 1.7em Verdana, Arial, Helvetica, sans-serif; margin-bottom: .5em; }
+.content h2 { font-size: 1.5em; }
+.content h3 { font-size: 1.3em; font-weight: bold; }
+.content h4 { font-size: 1.1em; font-weight: bold; }
+
+blockquote { margin-left: 10em; padding-left: 1em; border-left: 2px solid #ccc; }
+code, pre { font: 1.2em/1 "Courier New", Courier, monospace; padding: 1px 2px; background: #eee; }
+pre { border: 1px dashed #aaa; line-height: 1.7em; padding: 5px; font-size: .9em; background: #eee; margin: 0; }
+strong {  }
+em {  }
+sup, sub { vertical-align: baseline; position: relative; }
+sup { top: -0.4em; }
+sub { bottom: -0.3em; }
+
+hr { color: #ccc; background-color: #ccc; height: 1px; border-width: 0px; }
+
+.em { font-style: italic; }
+.strong { font-weight: bold; }
+
+.content ul, .content ol { margin-left: 3em; line-height: 1.3em; }
+.content ul li, .content ol li { margin-bottom: .2em; }
+
+.content dl {  }
+.content dl dt { margin-bottom: .2em; font-weight: bold; }
+.content dl dd { padding-left: 5em; margin-bottom: .4em; }
+
+.icons a, .icon { padding: 1px 0 1px 20px; background-repeat: no-repeat; background-position: left center; }
+
+.content p, .content ul, .content ol, .content dl, .content table, blockquote, pre, .columns, .content img, hr { margin-bottom: 11px; }
+
+.box { margin: 11px; }
+
+/* Text align, float
+------------------------------ */
+
+.a-left { text-align: left; }
+.a-center { text-align: center; }
+.a-right { text-align: right; }
+
+.f-left { float: left; }
+.f-right { float: right; }
+
+/*	Tables
+------------------------------ */
+
+table { border-collapse: collapse; width: 100%; }
+table th, table td { border: 1px solid #ccc; padding: 2px 3px; vertical-align: top; }
+table th { background: #f4f4f4; }
+table td {  }
+
+/*	Columns
+------------------------------ */
+
+.columns {  }
+.w-5, .w-10, .w-15, .w-20, .w-25, .w-30, .w-35, .w-40, .w-45, .w-50, .w-55, .w-60, .w-65, .w-70, .w-75, .w-80, .w-85, .w-90, .w-95, .w-100, .w-33, .w-66, .w-38, .w-62 { float: left;  }
+
+.col-content { padding-right: 6px; }
+.col-first { padding-left: 0!important; }
+.col-last { padding-right: 0!important; }
+
+.w-5 { width: 5%; }
+.w-10 { width: 10%; }
+.w-15 { width: 15%; }
+.w-20 { width: 20%; }
+.w-25 { width: 25%; }
+.w-30 { width: 30%; }
+.w-35 { width: 35%; }
+.w-40 { width: 40%; }
+.w-45 { width: 45%; }
+.w-50 { width: 50%; }
+.w-55 { width: 55%; }
+.w-60 { width: 60%; }
+.w-65 { width: 65%; }
+.w-70 { width: 70%; }
+.w-75 { width: 75%; }
+.w-80 { width: 80%; }
+.w-85 { width: 85%; }
+.w-90 { width: 90%; }
+.w-95 { width: 95%; }
+.w-100 { width: 100%; }
+
+.w-33 { width: 33%; }
+.w-66 { width: 66%; }
+
+.w-38 { width: 38%; }
+.w-62 { width: 62%; }
+
+/* Images
+------------------------------ */
+
+.content img { padding: 5px; border: 1px solid #ccc!important; margin-top: .4em; }
+.content img.null-image { padding: 0!important; border: none!important; margin: 0!important; }
+img.f-left { margin-right: 1em; }
+img.f-right { margin-left: 1em; }
+
+/* Content Form
+------------------------------ */
+
+.content form { padding: .5em 0; }
+.content fieldset { margin-bottom: 1em; border: none; }
+.content legend { margin-top: -1px; padding-bottom: 1em; font-size: 1.1em; font-weight: bold; }
+
+.content .f-row { overflow: hidden; margin-bottom: .5em; }
+.content label { float: left; text-align: right; width: 25.99%; padding: 0 2%; }
+.content .f-inputs { padding-left: 30%; }
+
+.f-actions { padding-top: 1em; border-top: 1px solid #ccc; }
+
+/* Inputs
+------------------------------ */
+
+input { vertical-align: middle }
+.i-checkbox { margin-top: 3px; }
+.i-text { width: 200px; padding: 1px; font: 1em sans-serif; }
+.button { padding: 0 .25em; width: auto; overflow: visible; cursor: pointer; }
+			

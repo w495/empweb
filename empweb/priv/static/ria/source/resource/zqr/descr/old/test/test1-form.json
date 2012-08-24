@@ -1,0 +1,41 @@
+{
+    type : "form",
+    toolbar : [
+        {type : "back"}
+    ],
+    fields : [
+        {name : "field1",   alias : "поле 1", input : {type : "check-box"}},
+        {name : "field2",   alias : "поле 2", input : {type : "date-field"}},
+        {name : "field3",   alias : "поле 3", validation : {type : "string-length", min : 5, max : 10, required : true}, input : {type : "password"}},
+        {name : "field4",   alias : "поле 4", input : {type : "spinner", min : -1000, max : 1000}},
+        {name : "field5",   alias : "поле 5", validation : {required : true}, input : {type : "text-field"}},
+        {name : "field6",   alias : "поле 6", input : {type : "select-box", select_id : "id", select_display_name : "alias", values : [
+            {id:"select1", alias:"селект 1"},
+            {id:"select2", alias:"селект 2"},
+            {id:"select3", alias:"селект 3"},
+            {id:"select4", alias:"селект 4"},
+            {id:"select5", alias:"селект 5"},
+            {id:"select6", alias:"селект 6"},
+            {id:"select7", alias:"селект 7"},
+            {id:"select8", alias:"селект 8"}
+        ]}},
+
+        {name : "field7",   alias : "поле 7", input : {type : "text-area"}}
+/*        ,{name : "field8",   alias : "поле 8", input : {type : "radio-group", align : "vertical", values :[
+            {id:"select1", alias:"селект 1"},
+            {id:"select2", alias:"селект 2"},
+            {id:"select3", alias:"селект 3"},
+            {id:"select4", alias:"селект 4"}
+        ]}}*/
+    ],
+
+    submit_btn_label : "Отправить!",
+    cancel_btn_label : "Отмена!",
+
+    render : "double", // single - в одну колонку, double - две колонки (default), horisontal - в одну строку
+
+    index_name : "id", // имя поля по которому запрашивается рекрдсет для редактирования
+    formdata_url : "resource/bsk/descr/test1-form-data.json",  // заглушка для получения данных в форму редактирования
+    submit_url : "resource/bsk/descr/test1-form-submit-response1-data.json", // заглушка для ответа на сабмит
+    req_type : "POST"
+}

@@ -1,0 +1,48 @@
+// Подсети
+{
+    "type" : "table",
+    "toolbar" : [
+        {"type" : "button",
+            "name" : "Обновить",
+            "action" : "/get-all-acv-video-stats",
+            "icon" : "icon/32/actions/view-refresh.png",
+            "specParam": "tab-change-state-action"},
+
+
+        {"type" : "button",
+            "name" : "Удалить",
+            "action" : "/delete-snet-region",
+            "icon" : "icon/32/actions/edit-delete.png",
+            "specParam": "tab-row-action",
+            "confirmMsg":
+                "Уверены ли вы в том что хотите удалить рекламную компанию?"
+        }
+    ],
+    "columns" : [
+        {"name" : "id",
+            "alias" : "#",
+            "type" : "float",
+            "sortable" : true,
+            "width":    "5%"},
+        {"name" : "name",
+            "alias" :   "Название",
+            "type" :    "string",
+            "sortable" : true},
+        {"name" : "ip",
+            "alias" :   "Маска",
+            "type" :    "string",
+            "sortable" : true,
+            "width":    "10%"},
+        {"name" : "description",
+            "alias" :   "Описание",
+            "type" :    "string",
+            "sortable" : true}
+    ],
+    "filter" : {
+        "submit_url" : "/get-snet-regions"
+    },
+
+    "sort" : "id",
+    "ascending" : false,
+    "dblclick_action" : "resource/zqr/descr/snet/tab.json"
+}

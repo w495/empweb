@@ -1,0 +1,8 @@
+// Регионы подсетей
+{
+    "type" : "form",
+    "controller" : "snetRegionForm",
+    "toolbar" : [
+        {"type" : "back"}
+    ]
+}

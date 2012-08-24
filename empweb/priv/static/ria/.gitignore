@@ -1,0 +1,12 @@
+*~
+*~
+*.beam
+*.bup
+*.log
+*.dump
+*.pyc
+*.swp
+*.so
+*.config
+cache/*
+build/*

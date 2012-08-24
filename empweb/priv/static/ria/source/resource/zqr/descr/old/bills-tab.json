@@ -1,0 +1,118 @@
+{
+    "type" : "table",
+
+    "warns":  {
+        "delete system user or self" : "Нельзя удалять себя или системного пользователя!",
+    },
+
+    "toolbar" : [
+        {"type" : "button",
+            "name" : "Обновить",
+            "action" : "/get-bills",
+            "icon" : "icon/32/actions/view-refresh.png",
+            "specParam": "tab-change-state-action"},
+
+        {"type" : "button",
+            "name" : "Состояние",
+            "action" : "resource/zqr/descr/bill-view-form.json",
+            "icon" : "icon/32/apps/utilities-archiver.png",
+            "specParam": "tab-change-state-action"
+        },
+
+        {"type" : "button", "name" : "Пополнить",
+            "action" : "resource/zqr/descr/bill-make-form.json",
+            "icon" : "icon/32/actions/document-new.png"
+        },
+
+        {"type" : "button", "name" : "Просмотреть",
+            "action" : "resource/zqr/descr/bill-view-form.json",
+            "icon" : "icon/32/actions/zoom-in.png",
+            "specParam": "tab-row"
+        },
+
+        {"type"                   : "button",
+            "name"                : "Оплатить",
+            "action"              : "resource/zqr/descr/bill-pay-form.json",
+            "icon"                : "icon/32/actions/media-record.png",
+            "specParam"           : "tab-row"
+        }
+
+        /*
+        {"type"                   : "button",
+            "name"                : "Оплатить",
+            "action"              : "/pay",
+            "icon"                : "icon/32/actions/media-record.png",
+            "specParam"           : {
+                "name"        : "tab-row-link",
+                "fields"      : ["id", "uid"],
+                "type"        : "_blank"
+            }
+        }
+
+        {"type" : "button",
+            "name" : "Удалить",
+            "action" : "/delete-customer",
+            "icon" : "icon/32/actions/edit-delete.png",
+            "specParam": "tab-row-action",
+            "confirmMsg" : "Уверены ли вы в том что хотите удалить cчет-?"
+        }
+        */
+
+    ],
+    "columns" : [
+
+/*
+        {"name" : "id",
+            "alias" : "#",
+            "type" : "float",
+            "sortable" : true,
+            "width" :"5%"
+        },
+*/
+
+        {"name" : "uid",
+            "alias" : "Номер",
+            "type" : "float",
+            "sortable" : true
+        },
+        {"name" : "sum",
+            "alias" : "Сумма",
+            "type" : "float",
+            "sortable" : true
+        },
+/*
+        {"name" : "product_id",
+            "alias" : "Продукт",
+            "type" : "float",
+            "sortable" : true
+        },
+*/
+        {"name" : "billdate",
+            "alias" : "Дата создания",
+            "type" : "erl_datetime_nullable",
+            "sortable" : true
+        },
+        {"name" : "paydate",
+            "alias" : "Дата оплаты",
+            "type" : "erl_datetime_nullable",
+            "sortable" : true
+        },
+
+        {"name" : "product_type_name",
+            "alias" : "Тип",
+            "type" : "enum",
+            "dict"  : {
+                "acv_video":    "Видео кампания",
+                "donation":     "Пожертвование",
+                "":             "Пополнение",
+                "default":      "Неопределено"},
+            "sortable" : true
+        }
+    ],
+    "filter" : {
+        "submit_url" : "/get-bills"
+    },
+    "sort" : "id",
+    "ascending" : false,
+    "dblclick_action" : "resource/zqr/descr/bill-view-form.json"
+}

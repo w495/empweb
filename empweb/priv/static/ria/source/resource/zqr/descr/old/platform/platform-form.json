@@ -1,0 +1,8 @@
+// Регионы подсетей
+{
+    "type" : "form",
+    "controller" : "platformForm",
+    "toolbar" : [
+        {"type" : "back"}
+    ]
+}

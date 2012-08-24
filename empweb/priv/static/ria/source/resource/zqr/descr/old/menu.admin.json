@@ -1,0 +1,102 @@
+[
+    {
+        "name" : "Администрирование",
+        "opened" : true,
+        "subitems": [
+            {
+                "name" : "пользователи",
+                "model" : "resource/zqr/descr/customers-tab.json"
+            },
+            {
+                "name" : "группы пользователей",
+                "model" : "resource/zqr/descr/customer-groups-tab.json"
+            },
+            {   "name" : "права",
+                "model" : "resource/zqr/descr/permissions-tab.json"
+            },
+
+            {   "name" : "подсети",
+                "model" : "resource/zqr/descr/snet/region-tab.json"
+            },
+
+            {   "name" : "платформы",
+                "model" : "resource/zqr/descr/platform/platform-tab.json"
+            },
+
+            {   "name" : "площадки",
+                "model" : "resource/zqr/descr/pageurl/pageurl-tab.json"
+            },
+
+            {   "name" : "настройки",
+                "model" : "resource/zqr/descr/sysvar/sysvar-tab.json"
+            }
+        ]
+    },
+
+    {   "name" : "Рекламные кампании",
+        "opened" : true,
+        "subitems": [
+
+            {
+                "name" : "Видео",
+                "model" : "resource/zqr/descr/acv-videos-tab.json"
+            },
+            {
+                "name" : "Статистика",
+                "model" : "resource/zqr/descr/acv-video-stats-tab.json"
+            }
+        ]
+    },
+
+    {   "name" : "Все рекламные кампании",
+        "opened" : true,
+        "subitems": [
+
+            {
+                "name" : "Все видео",
+                "model" : "resource/zqr/descr/all-acv-videos-tab.json"
+            },
+            {
+                "name" : "Вся статистика",
+                "model" : "resource/zqr/descr/all-acv-video-stats-tab.json"
+            }
+        ]
+    },
+
+    {   "name" : "Аккаунт",
+        "opened" : true,
+        "subitems": [
+
+            {
+                "name" : "Профиль",
+                "model" : "resource/zqr/descr/customer-profile.json"
+            },
+
+
+            {
+                "name"      : "Выход",
+                "model"     : "/do_logout",
+                "unclose"   : true
+            }
+        ]
+    },
+
+
+    {
+        "name"                : "Помощь",
+        "icon"                : "icon/22/actions/help-contents.png",
+        "model"               : "/docs/howto",
+        "external"            : true,
+        "afterSpacer"         : true,
+        "externalType"        : "_blank"
+    },
+    {
+        "name"                : "Расценки",
+        "icon"                : "icon/22/mimetypes/office-spreadsheet.png",
+        "model"               : "/docs/offer",
+        "external"            : true,
+        "afterSpacer"         : true,
+        "externalType"        : "_blank"
+    }
+]
+

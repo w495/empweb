@@ -1,0 +1,34 @@
+{
+  "info" : 
+  {
+    "name" : "zqr",
+    "summary" : "Zavr Qooxdoo Custom Ria",
+    "description" : "This is a skeleton for a custom application with qooxdoo.",
+    "homepage" : "https://github.com/zavr/zqr",
+    "license" : "SomeLicense",
+    "authors" : 
+    [
+      {
+        "name" : "Ilya w-495 Nikitin",
+        "email" : "w@w-495.ru"
+      },
+      {
+        "name" : "Serge сff Kozhevnikov",
+        "email" : ""
+      }
+    ],
+    "version" : "trunk",
+    "qooxdoo-versions": ["1.6"]
+  },
+  
+  "provides" : 
+  {
+    "namespace"   : "zqr",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation",
+    "type"        : "application"
+  }
+}
+

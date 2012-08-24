@@ -1,0 +1,47 @@
+{
+    type : "table",
+
+    toolbar : [
+        {type : "button", name : "Создать хню", action : "resource/bsk/descr/test1-form.json", icon : "icon/32/actions/list-add.png"}
+    ],
+
+    columns : [
+        {name : "field1", alias : "поле 1", type : "bool", sortable : false, width : 40},
+        {name : "field2", alias : "поле 2", type : "date", sortable : true, width : "30%"},
+        {name : "field3", alias : "поле 3", type : "date-time", sortable : true},
+        {name : "field4", alias : "поле 4", type : "float", maximumFractionDigit : 3, sortable : true},
+        {name : "field5", alias : "поле 5", type : "html", sortable : true},
+        {name : "field6", alias : "поле 6", sortable : true},
+        {name : "field7", alias : "поле 7", sortable : true},
+        {name : "field8", alias : "поле 8", sortable : true}
+    ],
+
+    //url : "resource/bsk/descr/test1-tab-data.json", // адрес для получения данных заполнения формы,
+
+
+    filter : {
+        fields : [
+            {name : "field1",   alias : "фильтр 1", input : {type : "check-box"}},
+            {name : "field2",   alias : "фильтр 2", input : {type : "date-field"}},
+            {name : "field4",   alias : "фильтр 4", input : {type : "spinner", min : -1000, max : 1000}},
+            {name : "field5",   alias : "фильтр 5", input : {type : "text-field"}},
+            {name : "field6",   alias : "фильтр 6", input : {
+                type : "select-box", 
+                select_id : "jopa", 
+                select_display_name : "alias",
+                values_url : "resource/bsk/descr/test1-tab-field6-select-data.json"
+            }}
+        ],
+        submit_btn_label : "Отфильтровать",
+        cancel_btn_label : "Сбросить фильтр",
+        render : "horisontal", // single - в одну колонку, double - две колонки (default), horisontal - в одну строку
+        submit_url : "resource/bsk/descr/test1-tab-data.json" // адрес для получения данных заполнения формы
+    },
+
+    sort : "field4",   // default sort column
+    ascending : false,
+
+    pager : {pageSize : 50},
+
+    dblclick_action : "resource/bsk/descr/test1-form.json"
+}

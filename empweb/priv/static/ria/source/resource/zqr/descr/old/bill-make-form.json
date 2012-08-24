@@ -1,0 +1,8 @@
+{
+    "type" : "form",
+    "controller" : "billMakeForm",
+    "toolbar" :
+        [
+            {"type" : "back"}
+        ]
+}

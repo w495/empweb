@@ -1,0 +1,55 @@
+// Платформы
+{
+    "type" : "table",
+    "toolbar" : [
+        {"type" : "button",
+            "name" : "Обновить",
+            "action" : "/get-platforms",
+            "icon" : "icon/32/actions/view-refresh.png",
+            "specParam": "tab-change-state-action"},
+
+        {"type" : "button", "name" : "Создать",
+            "action" : "resource/zqr/descr/platform/platform-form.json",
+            "icon" : "icon/32/actions/document-new.png"},
+
+        {"type" : "button", "name" : "Редактировать",
+            "action" : "resource/zqr/descr/platform/platform-form.json",
+            "icon" : "icon/32/actions/zoom-in.png",
+            "specParam": "tab-row"},
+
+        {"type" : "button",
+            "name" : "Удалить",
+            "action" : "/delete-platform",
+            "icon" : "icon/32/actions/edit-delete.png",
+            "specParam": "tab-row-action",
+            "confirmMsg":
+                "Уверены ли вы в том что хотите удалить рекламную компанию?"
+        }
+    ],
+    "columns" : [
+        {"name" : "id",
+            "alias" : "#",
+            "type" : "float",
+            "sortable" : true,
+            "width":    "5%"},
+        {"name" : "name",
+            "alias" :   "Название",
+            "type" :    "string",
+            "sortable" : true},
+        {"name" : "code",
+            "alias" :   "Код",
+            "type" :    "string",
+            "sortable" : true},
+        {"name" : "description",
+            "alias" :   "Описание",
+            "type" :    "string",
+            "sortable" : true}
+    ],
+    "filter" : {
+        "submit_url" : "/get-platforms"
+    },
+    "index_name" : ["id"],
+    "sort" : "id",
+    "ascending" : false,
+    "dblclick_action" : "resource/zqr/descr/platform/platform-form.json"
+}

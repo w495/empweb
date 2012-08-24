@@ -1,0 +1,69 @@
+[
+    {
+        name : "Администрирование",
+        icon : "icon/16/apps/utilities-dictionary.png",
+        opened : true,
+        subitems: [
+            {
+                name : "пользователи",
+                icon : "icon/16/places/network-workgroup.png",
+                model : "resource/zqr/descr/customers-tab.json"
+            },
+            {
+                name : "группы пользователей",
+                icon : "icon/16/apps/preferences-theme.png",
+                model : "resource/zqr/descr/customer-groups-tab.json"
+            },
+            {   name : "права",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/permissions-tab.json"
+            },
+
+            {   name : "настройки",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/config-form.json"
+            }
+        ]
+    },
+
+    {   name : "Рекламные кампании",
+        opened : true,
+        subitems: [
+
+            {
+                name : "Видео",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/acv-videos-tab.json"
+            },
+            {
+                name : "Статистика",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/acv-video-stats-tab.json"
+            }
+        ]
+    },
+
+    {   name : "Все рекламные кампании",
+        opened : true,
+        model : "resource/zqr/descr/all-acv-video-stats-tab.json",
+        subitems: [
+
+            {
+                name : "Все видео",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/all-acv-videos-tab.json"
+            },
+            {
+                name : "Вся статистика",
+                icon : "icon/16/apps/utilities-keyring.png",
+                model : "resource/zqr/descr/all-acv-video-stats-tab.json"
+            }
+        ]
+    },
+
+    {   name : "Все рекламные кампании 2",
+        opened : false
+    }
+
+]
+
