@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE xsl:stylesheet [ <!ENTITY nbsp "&#160;"> ]>
+
+<patterns>
+    <!-- BBCODE -->
+        
+    <!-- <a> </a> -->         
+    <triple>
+       <left pattern="[a "><![CDATA[<a class="c" href="]]></left>
+       <middle pattern="]"><![CDATA[">]]></middle>
+       <right pattern="[/a]"><![CDATA[</a>]]></right>
+    </triple>
+    <triple>
+       <left pattern="[url "><![CDATA[<a class="c" href="]]></left>
+       <middle pattern="]"><![CDATA[">]]></middle>
+       <right pattern="[/url]"><![CDATA[</a>]]></right>
+    </triple>
+    <triple>
+       <left pattern="[ссылка "><![CDATA[<a class="c" href="]]></left>
+       <middle pattern="]"><![CDATA[">]]></middle>
+       <right pattern="[/ссылка]"><![CDATA[</a>]]></right>
+    </triple>
+    
+    <!-- <img> </img> -->
+    <triple>
+       <left pattern="[img "><![CDATA[<img class="c" src="]]></left>
+       <middle pattern="]"><![CDATA[" alt="]]></middle>
+       <right pattern="[/img]"><![CDATA[" />]]></right>
+    </triple>
+    <triple>
+       <left pattern="[pic "><![CDATA[<img class="c" src="]]></left>
+       <middle pattern="]"><![CDATA[" alt="]]></middle>
+       <right pattern="[/pic]"><![CDATA[" />]]></right>
+    </triple>
+    
+    
+    <!-- <video> </video> -->
+    <triple>
+       <left pattern="[video "><![CDATA[<video class="c" src="]]></left>
+       <middle pattern="]"><![CDATA[">]]></middle>
+       <right pattern="[/video]"><![CDATA[</video>]]></right>
+    </triple>
+    
+    <!-- [h1] [h2] -->
+    
+    <pair>
+       <left pattern="[h1]"><![CDATA[<h3 class="c">]]></left>
+       <right pattern="[/h1]"><![CDATA[</h3>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[h2]"><![CDATA[<h4 class="c">]]></left>
+       <right pattern="[/h2]"><![CDATA[</h4>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[h3]"><![CDATA[<h5 class="c">]]></left>
+       <right pattern="[/h3]"><![CDATA[</h5>]]></right>
+    </pair>
+    
+    <!-- [left] [left] -->
+
+
+    <pair>
+       <left pattern="[left]"><![CDATA[<left class="c">]]></left>
+       <right pattern="[/left]"><![CDATA[</left>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[right]"><![CDATA[<right class="c">]]></left>
+       <right pattern="[/right]"><![CDATA[</right>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[center]"><![CDATA[<center class="c">]]></left>
+       <right pattern="[/center]"><![CDATA[</center>]]></right>
+    </pair>
+    
+    <!-- <p> </p> -->    
+    <pair>
+       <left pattern=""><![CDATA[<p class="c br">]]></left>
+       <right pattern="&#xa;&#xa;"><![CDATA[</p>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[p]"><![CDATA[<p class="c">]]></left>
+       <right pattern="[/p]"><![CDATA[</p>]]></right>
+    </pair>
+    
+    <!-- <b> </b> -->
+    <pair>
+       <left pattern="[b]"><![CDATA[<b class="c">]]></left>
+       <right pattern="[/b]"><![CDATA[</b>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[strong]"><![CDATA[<b class="c">]]></left>
+       <right pattern="[/strong]"><![CDATA[</b>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[ж]"><![CDATA[<b class="c">]]></left>
+       <right pattern="[/ж]"><![CDATA[</b>]]></right>
+    </pair>
+    
+    <!-- <i> </i> -->
+    <pair>
+       <left pattern="[em]"><![CDATA[<em class="c">]]></left>
+       <right pattern="[/em]"><![CDATA[</em>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[i]"><![CDATA[<i class="c">]]></left>
+       <right pattern="[/i]"><![CDATA[</i>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[н]"><![CDATA[<i class="c">]]></left>
+       <right pattern="[/н]"><![CDATA[</i>]]></right>
+    </pair>
+    
+    <!-- <ul> </ul> -->
+    <pair>
+       <left pattern="[ul]"><![CDATA[<ul class="c">]]></left>
+       <right pattern="[/ul]"><![CDATA[</ul>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[list]"><![CDATA[<ul class="c">]]></left>
+       <right pattern="[list/]"><![CDATA[</ul>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[список]"><![CDATA[<ul class="c">]]></left>
+       <right pattern="[/список]"><![CDATA[</ul>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[ol]"><![CDATA[<ol class="c">]]></left>
+       <right pattern="[/ol]"><![CDATA[</ol>]]></right>
+    </pair>
+    
+    <!-- <li> </li> -->
+    <pair>
+       <left pattern="[li]"><![CDATA[<li class="c">]]></left>
+       <right pattern="[/li]"><![CDATA[</li>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[item]"><![CDATA[<li class="c">]]></left>
+       <right pattern="[/item]"><![CDATA[</li>]]></right>
+    </pair>
+    <pair>
+       <left pattern="[эл]"><![CDATA[<li class="c">]]></left>
+       <right pattern="[/эл]"><![CDATA[</li>]]></right>
+    </pair>
+    
+    <pair>
+       <left pattern="[mono]"><![CDATA[<span class="c monospace"]]></left>
+       <right pattern="[/mono]"><![CDATA[</span>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[tt]"><![CDATA[<tt class="c">]]></left>
+       <right pattern="[/tt]"><![CDATA[</tt>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[pre]"><![CDATA[<pre class="c">]]></left>
+       <right pattern="[/pre]"><![CDATA[</pre>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[plain]"><![CDATA[<pre class="c monospace">]]></left>
+       <right pattern="[/plain]"><![CDATA[</pre>]]></right>
+    </pair>
+
+    <pair>
+       <left pattern="[code]"><![CDATA[<code class="c">]]></left>
+       <right pattern="[/code]"><![CDATA[</code>]]></right>
+    </pair>
+    
+    <pair>
+       <left pattern="`[^"><![CDATA[<]]></left>
+       <right pattern="$]`"><![CDATA[>]]></right>
+    </pair>
+    
+    <!-- перевод строк -->
+    <item pattern="\n"><![CDATA[<br class="c" />]]></item>
+    <item pattern="\\"><![CDATA[<br class="c" />]]></item>
+    
+    <!--
+    <item pattern="&#xa;"><![CDATA[<br class="c" />]]></item>
+    -->
+    
+    </patterns>

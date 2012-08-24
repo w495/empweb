@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE xsl:stylesheet [ <!ENTITY nbsp "&#160;"> ]>
+
+<patterns>
+<!-- ТИПОГРАФИКА -->
+    <!-- ЗНАКИ -->        
+    
+    <!--
+    <pair>
+       <left pattern='"'>&#171;</left>
+       <right pattern='"'>&#187;</right>
+    </pair>
+    -->
+    
+    <pair>
+       <left pattern='&lt;&lt;'>&#171;</left>
+       <right pattern='&gt;&gt;'>&#187;</right>
+    </pair>
+    
+    <pair>
+       <left pattern='”'>&#171;</left>
+       <right pattern='”'>&#187;</right>
+    </pair>
+
+    <!-- ТИРЕ -->
+    <item pattern=" --- ">&#32;&#8212;&#160;</item>
+    <item pattern=" - ">&#32;&#8212;&#160;</item>
+    <item pattern=" -- ">&#32;&#8211;&#160;</item>
+
+    <!-- КАВЫЧКИ -->
+    <!--
+        <item pattern='&#160;&#187;'> &#171;</item>
+        <item pattern=' &#187;'> &#171;</item>
+        <item pattern='(&#187;'>(&#171;</item>
+        <item pattern='&#171; '>&#187; </item>
+        <item pattern='&#171;)'>&#187;)</item>
+        <item pattern='&#171;.'>&#187;.</item>
+        <item pattern='&#171;,'>&#187;,</item>
+        <item pattern=' "'>&#32;&#171;</item>
+        <item pattern='&#160;"'>&#160;&#171;</item>
+        <item pattern=' "'> &#171;</item>
+        <item pattern='("'>(&#171;</item>
+        <item pattern=')"'>)&#171;</item>
+        <item pattern='["'>[&#171;</item>
+        <item pattern=']"'>]&#171;</item>
+        <item pattern='{"'>{&#171;</item>
+        <item pattern='}"'>}&#171;</item>
+        <item pattern='&gt;"'>&gt;&#171;</item>
+        <item pattern='&lt;"'>&lt;&#171;</item>
+        <item pattern='/"'>/&#171;</item>
+        <item pattern='\"'>\&#171;</item>
+        <item pattern='" '>&#187; </item>
+        <item pattern='")'>&#187;)</item>
+        <item pattern='"('>&#187;(</item>
+        <item pattern='"]'>&#187;]</item>
+        <item pattern='"['>&#187;[</item>
+        <item pattern='"}'>&#187;}</item>
+        <item pattern='"{'>&#187;{</item>
+        <item pattern='"&gt;'>&#187;&gt;</item>
+        <item pattern='"&lt;'>&#187;&lt;</item>
+        <item pattern='",'>&#187;,</item>
+        <item pattern='".'>&#187;.</item>
+        <item pattern='"?'>&#187;?</item>
+        <item pattern='"!'>&#187;~</item>
+        <item pattern='":'>&#187;:</item>
+        <item pattern='";'>&#187;;</item>
+        <item pattern='"\'>&#187;\</item>
+        <item pattern='"/'>&#187;/</item>
+        <item pattern='  '>&#32;</item>
+        <item pattern=' &#160;'>&#160;</item>
+        <item pattern='&#160; '>&#160;</item>
+        <item pattern='&lt;&lt;'>&#171;</item>
+        <item pattern='&gt;&gt;'>&#187;</item>
+    -->            
+    <!-- ПРЕДЛОГИ -->                  
+</patterns>
