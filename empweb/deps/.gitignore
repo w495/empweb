@@ -1,6 +1,1 @@
-cowboy*
-ejson*
-mochiweb*
-poolboy*
-empdb/deps/psqlcp/deps/poolboy*
-psqlcp/deps/poolboy*
+*.git/*
