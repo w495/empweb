@@ -23,15 +23,29 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, start_link/1]).
 
 %% Callbacks
 -export([init/1]).
 
-start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
-init([]) ->
+
+start_link() ->
+    Node = erlang:atom_to_list(node()),
+    {Date, Time} = lager_util:format_time(),
+    start_link([
+        {'node', Node},
+        {'date', Date},
+        {'time', Time}
+    ]).
+
+start_link(Opt) ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, Opt).
+
+init(Opt) ->
+    Node = proplists:get_value('node', Opt),
+    Date = proplists:get_value('date', Opt),
+    Time = proplists:get_value('time', Opt),
     Children = [
         {lager, {gen_event, start_link, [{local, lager_event}]},
             permanent, 5000, worker, [dynamic]},
@@ -42,7 +56,20 @@ init([]) ->
     Crash = case application:get_env(lager, crash_log) of
         {ok, undefined} ->
             [];
-        {ok, File} ->
+        {ok, Raw_file} ->
+            File = re:replace(re:replace(re:replace(
+                Raw_file,
+                "~[{]node[(][)][}]",
+                Node,
+                [{return, list}]),
+                "~[{]date[(][)][}]",
+                Date,
+                [{return, list}]),
+                "~[{]time[(][)][}]",
+                Time,
+                [{return, list}]
+            ),
+
             MaxBytes = case application:get_env(lager, crash_log_msg_size) of
                 {ok, Val} when is_integer(Val) andalso Val > 0 -> Val;
                 _ -> 65536

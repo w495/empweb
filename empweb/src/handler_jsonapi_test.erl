@@ -1,5 +1,3 @@
-%% Feel free to use, reuse and abuse the code in this file.
-
 -module(handler_jsonapi_test).
 -behaviour(cowboy_http_handler).
 -export([init/3, handle/2, terminate/2]).
@@ -36,13 +34,6 @@ handle_post(Req, State)->
     {Pbody, Req1} = X,
     io:format("handle_post ~p ~n", [?LINE]),
     handle_post_body(Req1, State, Pbody).
-    
-%     case cowboy_http_req:body_qs(Req) of
-%         {Pbody, Req1} ->
-%             handle_post_body(Req, State, Pbody);
-%         _ ->
-%             {510, <<"{\"error\": \"no_post_body\"}">>, Req}
-%     end.
 
 handle_post_body(Req, State, Pbody)->
     io:format("handle_post_body ~p ~n", [?LINE]),
@@ -53,16 +44,13 @@ handle_post_body(Req, State, Pbody)->
             handle_data(Req, State, Data)
     end.
 
-
 handle_data(Req, State, Data)->
     io:format("handle_data ~p ~n", [?LINE]),
     {_aobj, Req1} = auth(Req),
     {200, Data, Req1}.
 
-
 terminate(_Req, _State) ->
     ok.
-
 
 auth(Req)->
     auth_cookie(Req).

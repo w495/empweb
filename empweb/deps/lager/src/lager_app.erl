@@ -33,15 +33,19 @@ start() ->
 start(_StartType, _StartArgs) ->
     %% until lager is completely started, allow all messages to go through
     lager_mochiglobal:put(loglevel, {?DEBUG, []}),
-    {ok, Pid} = lager_sup:start_link(),
+    Node = erlang:atom_to_list(node()),
+    {Date, Time} = lager_util:format_time(),
+    {ok, Pid} = lager_sup:start_link([
+        {'node', Node},
+        {'date', Date},
+        {'time', Time}
+    ]),
     Handlers = case application:get_env(lager, handlers) of
         undefined ->
             [{lager_console_backend, info},
                 {lager_file_backend, [{"log/error.log", error, 10485760, "", 5},
                         {"log/console.log", info, 10485760, "", 5}]}];
         {ok, Val} ->
-            {Date, Time} = lager_util:format_time(),
-            Node = erlang:atom_to_list(node()),
             Raw_file_backends = proplists:get_value(lager_file_backend, Val),
             Rest_backends = proplists:delete(lager_file_backend, Val),
             File_backends = lists:map(
