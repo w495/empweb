@@ -194,13 +194,13 @@
                 <h2>Регистрация</h2>
                 <ol class="tests">
                     <li class="test" data-name="Обычная регистация c email">
-                        {"fname": "register", "params":{"nick":"somenick", "pass":"admin23", "email": "www@www.ru", "phone": 1001}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23", "email": "~(random(email))", "phone": ~(random(phone))}}
                     </li>
                     <li class="test" data-name="Обычная регистация c email">
-                        {"fname": "register", "params":{"nick":"somenick", "pass":"admin23", "email": "www@www.ru"}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23", "email": "~(random(email))"}}
                     </li>
                     <li class="test" data-name="Обычная регистация">
-                        {"fname": "register", "params":{"nick":"somenick", "pass":"admin23"}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23"}}
                     </li>
                 </ol>
             </section>
@@ -315,13 +315,13 @@
                         {"fname": "get_pers", "params":{"id":1}}
                     </li>
                     <li class="test"  data-name="Можем изменить данные о пользователе">
-                        {"fname": "update_pers", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":~(random(phone)), "email":"email@email ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
                     </li>
                     <li class="test" data-name='Получаем данные (после 2 изменения)'>
                         {"fname": "get_pers", "params":{"id":1}}
                     </li>
                     <li class="test" data-name="Несуществующие поля игнорируются если есть нормальные">
-                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":~(random(phone)), "email":"email@email ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Несуществующие поля игнорируются если есть нормальные">
                         {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))"}}
@@ -333,28 +333,28 @@
                 <h2>Документы</h2>
                 <ol class="tests">
                     <li class="test" data-name="Создать блог">
-                        {"fname": "create_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(string))"}}
+                        {"fname": "create_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(long_string))"}}
                     </li>
                     <li class="test" data-name="Обновить блог">
-                        {"fname": "update_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(string))", "id": 1}}
+                        {"fname": "update_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(long_string))", "id": 1}}
                     </li>
                     <li class="test" data-name="Создать комнату (абстрактную страну)">
-                        {"fname": "create_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(string))"}}
+                        {"fname": "create_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(long_string))"}}
                     </li>
                     <li class="test" data-name="Обновить комнату (абстрактную страну)">
-                        {"fname": "update_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(string))", "id": 2, "ulimit":100, "type_id":1}}
+                        {"fname": "update_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(long_string))", "id": 2, "ulimit":100, "type_id":1}}
                     </li>
                     <li class="test" data-name="Создать пост ">
-                        {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(string))", "parent_id": 1}}
+                        {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "parent_id": 1}}
                     </li>
                     <li class="test" data-name="Создать коммент">
-                        {"fname": "create_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(string))", "parent_id": 3}}
+                        {"fname": "create_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(long_string))", "parent_id": 3}}
                     </li>
                     <li class="test" data-name="Обновить пост ">
-                        {"fname": "update_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(string))", "id": 3}}
+                        {"fname": "update_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "id": 3}}
                     </li>
                     <li class="test" data-name="Обновить коммент">
-                        {"fname": "update_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(string))", "id": 4}}
+                        {"fname": "update_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(long_string))", "id": 4}}
                     </li>
                     <li class="test" data-name="Получить все блоги">
                         {"fname": "get_all_blogs", "params":{}}
@@ -417,17 +417,55 @@ ups = function(){
 };
 
 random_string = function(n){
-    var a = "あアいイうウえエおオかカきキくクけケこコさサしシすスせセそソたタちチつツてテとトなナにニぬヌねネのノはハひヒふフへヘほホまマみミむムめメもモやヤゆユよヨらラりリるルれレろロわワをヲんン"
-    if(n)
+    var a = "ΑΙΥΒΓΚΞΧΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαιυβγκξχδεζηθικλμνξοπρστυφχψωანიბანიგანიდონიენივინიზენიეჲთანიინიკანილასიმანინარიჲეონიპარიჟანირაესანტარვიეუნფარქანღანყარშინჩინცანძილწილჭარხანჴარჯანჰაეჰოეあアいイうウえエおオかカきキくクけケこコさサしシすスせセそソたタちチつツてテとトなナにニぬヌねネのノはハひヒふフへヘほホまマみミむムめメもモやヤゆユよヨらラりリるルれレろロわワをヲんン"
+    if(!n)
         n = 10;
     var r = "";
     for(var i=0; i != n; ++i){
-        var rand = Math.random() * (a.length-1);;
-        var char = a[Math.ceil(rand)];
-        r += char;
+        r += a[Math.ceil(Math.random() * (a.length-1))];
     }
     return r;
 }
+
+random_abc = function(n){
+    var a = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvXxYyZz"
+    if(!n)
+        n = 10;
+    var r = "";
+    for(var i=0; i != n; ++i){
+        r += a[Math.ceil(Math.random() * (a.length-1))];
+    }
+    return r;
+}
+
+random_ascii = function(n){
+    var a = " !\"#$%&'()*+,—./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+    if(!n)
+        n = 10;
+    var r = "";
+    for(var i=0; i != n; ++i){
+        r += a[Math.ceil(Math.random() * (a.length-1))];
+    }
+    return r;
+}
+
+
+
+random_wrds = function(n){
+    var a = " abcdefghijklmnopqrstuvwxyz.,"
+    if(!n)
+        n = 10;
+    var r = "";
+    for(var i=0; i != n; ++i){
+        r += a[Math.ceil(Math.random() * (a.length-1))];
+    }
+    return r;
+}
+
+random_email = function(){
+    return "" + random_abc(5) + "@" + random_abc(5) + "." + random_abc(2) + ""
+}
+
 
 jQuery(document).ready(function($) {
     jQuery.ajaxSetup({async:false});
@@ -440,9 +478,18 @@ jQuery(document).ready(function($) {
         $(test).html(
             "<div><span>Ввод:</span><div class=\"input\">" +
             $(test).html()
-                .replace(/[~][(]random[(]string[)][)]/gi," " + random_string())
-                .replace(/[~][(]random[(]integer[)][)]/gi," " + Math.ceil(Math.random() * 10000000000000000))
-                .replace(/[~][(]random[(]phone[)][)]/gi," " + Math.ceil(Math.random() * 9153660541))
+                .replace(/[~][(]random[(]string[)][)]/gi,
+                    "" + random_string(10))
+                .replace(/[~][(]random[(]long_string[)][)]/gi,
+                    "" + random_string(1000))
+                .replace(/[~][(]random[(]abc[)][)]/gi,
+                    "" + random_abc(10))
+                .replace(/[~][(]random[(]email[)][)]/gi,
+                    "" + random_email())
+                .replace(/[~][(]random[(]integer[)][)]/gi,
+                    "" + Math.ceil(Math.random() * 10000000000000000))
+                .replace(/[~][(]random[(]phone[)][)]/gi,
+                    "" + Math.ceil(Math.random() * 9153660541))
             + "</div></div>"
         );
         var name = $(test).data("name")

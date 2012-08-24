@@ -225,6 +225,8 @@ login(Params) ->
 %% Выход пользователя, Удаление сессии.
 %%
 logout(Params)->
+    io:format("Params = ~p~n ", [Params]),
+    
     ?evman_args(Params, <<"pers try to logout">>),
     Id = proplists:get_value(id, Params),
     case domain_pers:logout(Params) of

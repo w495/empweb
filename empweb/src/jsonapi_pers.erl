@@ -46,6 +46,7 @@
 init(_, Req, #empweb_hap{
         action          =   Action,
         params          =   Params,
+        auth            =   Auth,
         is_auth         =   Is_auth,
         pers_id         =   User_id,
         pers_perm_names =   User_perm_names
@@ -64,6 +65,7 @@ init(_, Req, #empweb_hap{
     {ok,
         Req,
         #empweb_hap{
+            auth            =   Auth,
             action          =   Action,
             params          =   Params,
             is_auth         =   Is_auth,
@@ -234,7 +236,7 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
+handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true, auth=Auth} = Hap) ->
     ?evman_args(Hap, <<" = logout">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -244,13 +246,10 @@ handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true} = Hap) ->
                 types = [integer]
             }
         ]),
-        fun(Data)->
+        fun(Data)->        
             {ok,
                 jsonapi:resp(
-                    biz_pers:logout([
-                        {session_id, empweb_http:auth_cookie(Req)}
-                        | Data#norm.return
-                    ])
+                    biz_pers:logout([Auth | Data#norm.return])
                 ),
                 Hap
             }

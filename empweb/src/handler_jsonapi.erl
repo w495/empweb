@@ -28,34 +28,29 @@
 
 
 init(_, Req, _Opts) ->
+    ?evman_warning({erlang:time(), Req}),
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
     ?evman_args([Req, State]),
-
-    Empweb_resp  =
+    {Empweb_resp, Reqres}  =
         case cowboy_http_req:method(Req) of
-            {'POST', _} ->
-                handle_post(Req, State);
-            _ ->
-                jsonapi:method_not_allowed()
+            {'POST', Req1} ->
+                handle_post(Req1, State);
+            {_, Req1} ->
+                {jsonapi:method_not_allowed(), Req1}
         end,
-
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
-
     Http_resp = empweb_http:resp(Empweb_resp),
-
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
-
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
-
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
-
     {ok, Reply} = cowboy_http_req:reply(
         Http_resp#http_resp.status,
-        Http_resp#http_resp.headers,    
+        Http_resp#http_resp.headers,
+        %[{<<"Connection">>,<<"close">>}|Http_resp#http_resp.headers],
         Http_resp_json,
-        Req
+        Reqres
     ),
 
     ?evman_debug({reply, Reply}, <<"server reply">>),
@@ -64,39 +59,39 @@ handle(Req, State) ->
 
 handle_post(Req, State)->
     ?evman_args([Req, State]),
-
     case cowboy_http_req:body_qs(Req) of
-            {Pbody, _} ->
-                handle_post_body(Req, State, Pbody);
-            _ ->
-                jsonapi:not_extended(no_post_body)
-        end.
+        {Pbody, Req1} ->
+            handle_post_body(Req1, State, Pbody);
+        _ ->
+            {jsonapi:not_extended(no_post_body), Req}
+    end.
 
 handle_post_body(Req, State, Pbody)->
     ?evman_args([Req, State, Pbody]),
 
     case proplists:get_value(<<"data">>, Pbody) of
         undefined ->
-            jsonapi:not_extended(no_data);
+            {jsonapi:not_extended(no_data), Req};
         Bobject ->
             handle_data(Req, State, Bobject)
     end.
 
 handle_data(Req, State, Bobject)->
+    ?evman_args([Req, State, Bobject]),
     
     try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
         ?evman_debug({object, Object},          <<"native object">>),
-        Res = jsonapi_map(Req, Object),
-        ?evman_debug({jsonapi_result, Object},  <<"jsonapi result">>),
-        Res 
+        {Res, Reqres}  =  jsonapi_map(Req, Object),
+        ?evman_debug({jsonapi_result, Res},  <<"jsonapi result">>),
+        {Res, Reqres}
     catch
         throw:{invalid_json, _} ->
-            jsonapi:not_extended(invalid_json);
+            {jsonapi:not_extended(invalid_json), Req};
         Eclass:Ereason ->
             ?evman_error(#event{error={Eclass,Ereason}}),
-            jsonapi:internal_server_error(
+            {jsonapi:internal_server_error(
                 {[
                     {unknown_error, 
                         {[
@@ -105,14 +100,16 @@ handle_data(Req, State, Bobject)->
                         ]}
                     }
                 ]}
-            )
+            ), Req}
     end.
 
-terminate(_Req, _State) ->
+terminate(Req, State) ->
+    ?evman_args([Req, State]),
+    ?evman_warning(Req),
     ok.
 
 jsonapi_map(Req, {List}) ->
-    ?evman_args([{List}]),
+    ?evman_args([Req, List]),
 
     Fname   =  proplists:get_value(<<"fname">>, List),
     Params  =  case proplists:get_value(<<"params">>, List, []) of
@@ -122,16 +119,16 @@ jsonapi_map(Req, {List}) ->
             Res
     end,
     ?evman_debug({jsonapi_params, Params},  <<"jsonapi params">>),
-    Aobj = empweb_http:auth(Req),
-    
-    ?evman_debug({jsonapi_aobj, Aobj},  <<"jsonapi aobj">>),
+    {Auth, Req1} = empweb_http:auth(Req),
 
-    Is_auth=            biz_pers:is_auth(Aobj),
+    ?evman_debug({jsonapi_aobj, Auth},  <<"jsonapi aobj">>),
+
+    Is_auth=            biz_pers:is_auth(Auth),
     
-    ?evman_debug({jsonapi_aobj, Aobj},  <<"jsonapi aobj">>),
+    ?evman_debug({jsonapi_aobj, Auth},  <<"jsonapi aobj">>),
     
-    Pid         =   biz_pers:get_pers_id(Aobj),
-    Pperm_names =   biz_pers:get_perm_names(Aobj),
+    Pid         =   biz_pers:get_pers_id(Auth),
+    Pperm_names =   biz_pers:get_perm_names(Auth),
 
     ?evman_debug({jsonapi_call, [
         {fname,     Fname},
@@ -572,6 +569,7 @@ jsonapi_map(Req, {List}) ->
                     handler         =   jsonapi_pers,
                     action          =   logout,
                     params          =   Params,
+                    auth            =   Auth,
                     is_auth         =   Is_auth,
                     pers_id         =   Pid,
                     pers_perm_names =   Pperm_names
@@ -666,19 +664,18 @@ jsonapi_map(Req, {List}) ->
 
     ?evman_debug({jsonapi_action, Action}),
     
-    case empweb_http:call(Req, Action) of
+    case empweb_http:call(Req1, Action) of
         {ok, Reply} ->
-            Reply;
+            {Reply, Req1};
         {error, unknown_function} ->
-            jsonapi:not_extended(unknown_function);
+            {jsonapi:not_extended(unknown_function), Req1};
         {error, Error} ->
-            jsonapi:internal_server_error(
-                {[{unknown_error, jsonapi:format(Error)}]}
-            )
+            {jsonapi:internal_server_error(
+                {[{unknown_error1, jsonapi:format(Error)}]}
+            ), Req1}
     end;
 
-jsonapi_map(_req, List) ->
+jsonapi_map(Req, List) ->
     ?evman_args([List]),
-    
-    jsonapi:not_extended(wrong_format).
+    {jsonapi:not_extended(wrong_format), Req}.
 

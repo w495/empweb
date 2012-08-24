@@ -15,11 +15,12 @@
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
 
 auth(Req)->
-    {session_id, auth_cookie(Req)}.
+    {Res, Req1} = auth_cookie(Req),
+    {{session_id, Res}, Req1}.
 
 auth_cookie(Req)->
-    {Res, _} = cowboy_http_req:cookie(?AUTH_COOKIE_NAME, Req),
-    Res.
+    {Res, Req1} = cowboy_http_req:cookie(?AUTH_COOKIE_NAME, Req),
+    {Res, Req1}.
 
 make_auth(Body)->
     make_auth_cookie(Body).
