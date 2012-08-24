@@ -10,3 +10,4 @@
 *.config
 cache/*
 build/*
+source/script/*
