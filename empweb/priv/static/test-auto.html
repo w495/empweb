@@ -155,14 +155,21 @@
             </section>
             <hr/>
             <section id="lang">
-                <h2>Подгружаемые настройки: типы комнат </h2>
+                <h2>Подгружаемые настройки: типы комнат и пр </h2>
                 <ol class="tests">
+                    <li class="test" data-name="Список статусов докуметов">
+                        {"fname": "get_all_oktypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение статусов докуметов">
+                        {"fname": "get_oktype", "params": {"id" : 1}}
+                    </li>
                     <li class="test" data-name="Список типов документов">
                         {"fname": "get_all_doctypes", "params": {}}
                     </li>
                     <li class="test" data-name="Получение типа документов">
                         {"fname": "get_doctype", "params": {"id" : 1}}
                     </li>
+
                     <li class="test" data-name="Список типа контента">
                         {"fname": "get_all_contypes", "params": {}}
                     </li>
@@ -186,6 +193,12 @@
                     </li>
                     <li class="test" data-name="Получение языка чата">
                         {"fname": "get_chatlang", "params": {"id" : 1}}
+                    </li>
+                    <li class="test" data-name="Список статусов докуметов">
+                        {"fname": "get_all_communitytypes", "params": {}}
+                    </li>
+                    <li class="test" data-name="Получение статусов докуметов">
+                        {"fname": "get_communitytype", "params": {"id" : 1}}
                     </li>
                 </ol>
             </section>
@@ -329,9 +342,67 @@
                 </ol>
             </section>
             <hr/>
+            <section id="pass">
+                <h2>Получение пароля</h2>
+                <ol class="tests">
+                    <li class="test" data-name="Логинимся для получения данных">
+                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Не можем запросить изменение пароля другому пользователю">
+                        {"fname": "pass", "params":{"id":2}}
+                    </li>
+                    <li class="test" data-name="Логинимся под другим пользователем">
+                        {"fname": "login", "params":{"id":2, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
+                        {"fname": "pass", "params":{"id":2}}
+                    </li>
+                    <li class="test" data-name="Нормальный выход">
+                        {"fname": "logout", "params":{"id":2}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Пароль был изменен">
+                        {"fname": "login", "params":{"id":2, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
+                        {"fname": "pass", "params":{"id":3}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Пароль был изменен">
+                        {"fname": "login", "params":{"id":3, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Запрашиваем пароль, но такого пользователя нет">
+                        {"fname": "pass", "params":{"id":10000000000000000}}
+                    </li>
+                    <li class="test" data-name="Логинимся под другим пользователем">
+                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Cтавим пустой email">
+                        {"fname": "update_pers", "params":{"id":4, "email":null}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Запрашиваем пароль: нехватает данных">
+                        {"fname": "pass", "params":{"id":4}}
+                    </li>
+                    <li class="test" data-name="Пароль не был изменен">
+                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Cтавим пустой email и phone">
+                        {"fname": "update_pers", "params":{"id":4, "email":null, "phone": null}}
+                    </li>
+                    <li class="test" data-anti="anti" data-name="Запрашиваем пароль: нехватает данных">
+                        {"fname": "pass", "params":{"id":4}}
+                    </li>
+                    <li class="test" data-name="Пароль не был изменен">
+                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                    </li>
+                    <p><b>TODO:</b><em>Для анонимного запроса пароля, нужно будет использовать капчу.</em></p>
+                </ol>
+            </section>
+            <hr/>
             <section id="docs">
                 <h2>Документы</h2>
                 <ol class="tests">
+                    <li class="test" data-name="Логинимся для получения данных">
+                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                    </li>
                     <li class="test" data-name="Создать блог">
                         {"fname": "create_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(long_string))"}}
                     </li>
@@ -348,13 +419,19 @@
                         {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "parent_id": 1}}
                     </li>
                     <li class="test" data-name="Создать коммент">
-                        {"fname": "create_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(long_string))", "parent_id": 3}}
+                        {"fname": "create_post", "params":{"head":"comment head ~(random(string))", "body":"comment body ~(random(long_string))", "parent_id": 3}}
                     </li>
                     <li class="test" data-name="Обновить пост ">
                         {"fname": "update_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "id": 3}}
                     </li>
                     <li class="test" data-name="Обновить коммент">
-                        {"fname": "update_post", "params":{"head":"comm head ~(random(string))", "body":"comm body ~(random(long_string))", "id": 4}}
+                        {"fname": "update_post", "params":{"head":"comment head ~(random(string))", "body":"comment body ~(random(long_string))", "id": 4}}
+                    </li>
+                    <li class="test" data-name="Создать сообщество">
+                        {"fname": "create_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))"}}
+                    </li>
+                    <li class="test" data-name="Обновить сообщество">
+                        {"fname": "update_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))", "oktype_id": 2, "id": 5, "slogan":"community slogan ~(random(string))", "type_id":1}}
                     </li>
                     <li class="test" data-name="Получить все блоги">
                         {"fname": "get_all_blogs", "params":{}}
@@ -367,6 +444,9 @@
                     </li>
                     <li class="test" data-name="Получить комменты первого поста первого блога">
                         {"fname": "get_all_posts", "params":{"parent_id": 3}}
+                    </li>
+                    <li class="test" data-name="Получить все сообщества">
+                        {"fname": "get_all_communities", "params":{}}
                     </li>
                     <li class="test" data-name="Получить все комнаты">
                         {"fname": "get_all_rooms", "params":{}}
@@ -382,6 +462,9 @@
                     </li>
                     <li class="test" data-name="Получить комент">
                         {"fname": "get_post", "params":{"id": 4}}
+                    </li>
+                    <li class="test" data-name="Получить сообществo">
+                        {"fname": "get_community", "params":{"id": 4}}
                     </li>
                 </ol>
             </section>

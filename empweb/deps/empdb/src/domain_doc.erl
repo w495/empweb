@@ -47,7 +47,6 @@
     get_blog/2
 ]).
 
-
 %%
 %% Exported Functions
 %%
@@ -57,7 +56,6 @@
     get_post/1,
     get_post/2
 ]).
-
 
 %%
 %% Exported Functions
@@ -70,6 +68,16 @@
 ]).
 
 
+%%
+%% Exported Functions
+%%
+-export([
+    update_community/1,
+    create_community/1,
+    get_community/1,
+    get_community/2
+]).
+
 
 %%
 %% Exported Functions
@@ -81,9 +89,6 @@
     get_chatlang/2
 ]).
 
-
-
-
 %%
 %% Exported Functions
 %%
@@ -92,6 +97,28 @@
     create_roomtype/1,
     get_roomtype/1,
     get_roomtype/2
+]).
+
+
+%%
+%% Exported Functions
+%%
+-export([
+    update_communitytype/1,
+    create_communitytype/1,
+    get_communitytype/1,
+    get_communitytype/2
+]).
+
+
+%%
+%% Exported Functions
+%%
+-export([
+    get_oktype/1,
+    get_oktype/2,
+    create_oktype/1,
+    update_oktype/1
 ]).
 
 
@@ -250,6 +277,32 @@ is_room_owner(Uid, Oid)->
 
 
 
+create_community(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:create(Con, Params)
+    end).
+
+update_community(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:update(Con, Params)
+    end).
+
+get_community(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:get(Con, [{isdeleted, false}|Params])
+    end).
+
+get_community(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_community:get(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+is_community_owner(Uid, Oid)->
+    dao:with_connection(fun(Con)->
+        dao_community:is_owner(Con, Uid, Oid)
+    end).
+
+
 create_roomtype(Params)->
     dao:with_connection(fun(Con)->
         dao_room:create_roomtype(Con, Params)
@@ -271,6 +324,28 @@ get_roomtype(Params, Fileds)->
     end).
 
 
+create_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:create_communitytype(Con, Params)
+    end).
+
+update_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:update_communitytype(Con, Params)
+    end).
+
+get_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:get_communitytype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_communitytype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_community:get_communitytype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+
+
 create_chatlang(Params)->
     dao:with_connection(fun(Con)->
         dao_room:create_chatlang(Con, Params)
@@ -290,6 +365,29 @@ get_chatlang(Params, Fileds)->
     dao:with_connection(fun(Con)->
         dao_room:get_chatlang(Con, [{isdeleted, false}|Params], Fileds)
     end).
+
+
+
+create_oktype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:create_oktype(Con, Params)
+    end).
+
+update_oktype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:update_oktype(Con, Params)
+    end).
+
+get_oktype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:get_oktype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_oktype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_doc:get_oktype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
 
 
 %%

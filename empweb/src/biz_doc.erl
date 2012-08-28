@@ -88,10 +88,44 @@
 %% Exported Functions
 %%
 -export([
+    get_community/1,
+    get_community/2,
+    create_community/1,
+    update_community/1
+]).
+
+
+
+%%
+%% Exported Functions
+%%
+-export([
+    get_communitytype/1,
+    get_communitytype/2,
+    create_communitytype/1,
+    update_communitytype/1
+]).
+
+
+
+%%
+%% Exported Functions
+%%
+-export([
     get_chatlang/1,
     get_chatlang/2,
     create_chatlang/1,
     update_chatlang/1
+]).
+
+%%
+%% Exported Functions
+%%
+-export([
+    get_oktype/1,
+    get_oktype/2,
+    create_oktype/1,
+    update_oktype/1
 ]).
 
 
@@ -186,7 +220,6 @@ get_room(Params, Fields)->
     domain_doc:get_room(Params, Fields).
 
 
-
 create_roomtype(Params)->
     domain_doc:create_roomtype(Params).
 
@@ -198,6 +231,33 @@ get_roomtype(Params)->
 
 get_roomtype(Params, Fields)->
     domain_doc:get_roomtype(Params, Fields).
+
+
+
+create_community(Params)->
+    domain_doc:create_community(Params).
+
+update_community(Params)->
+    domain_doc:update_community(Params).
+
+get_community(Params)->
+    domain_doc:get_community(Params).
+
+get_community(Params, Fields)->
+    domain_doc:get_community(Params, Fields).
+
+
+create_communitytype(Params)->
+    domain_doc:create_communitytype(Params).
+
+update_communitytype(Params)->
+    domain_doc:update_communitytype(Params).
+
+get_communitytype(Params)->
+    domain_doc:get_communitytype(Params).
+
+get_communitytype(Params, Fields)->
+    domain_doc:get_communitytype(Params, Fields).
 
 
 
@@ -214,3 +274,15 @@ get_chatlang(Params, Fields)->
     domain_doc:get_chatlang(Params, Fields).
 
 
+
+create_oktype(Params)->
+    domain_doc:create_oktype(Params).
+
+update_oktype(Params)->
+    domain_doc:update_oktype(Params).
+
+get_oktype(Params)->
+    domain_doc:get_oktype(Params).
+
+get_oktype(Params, Fields)->
+    domain_doc:get_oktype(Params, Fields).

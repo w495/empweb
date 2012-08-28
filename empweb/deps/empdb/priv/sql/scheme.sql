@@ -450,7 +450,7 @@ create table sysvartype(
 create sequence seq_sysvar_id;
 create table sysvar(
     id              decimal primary key default nextval('seq_sysvar_id'),
-    perm_id         decimal references permission(id) default null,
+    perm_id         decimal references perm(id) default null,
     type_id         decimal references sysvartype(id) default null,
     alias           varchar(1024) not null unique,
     val             varchar(1024) not null,
@@ -468,8 +468,25 @@ create table sysvar(
 ****************************************************************************/
 
 
+
 /**
- *  Тип доступа к контенту контента (блога и галереи):
+ *  Тип разрешения: не рассмотрен, запрещена, разрешена
+**/
+create sequence seq_oktype_id;
+create table oktype(
+    id          decimal primary key default nextval('seq_oktype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+
+
+/**
+ *  Тип доступа к контенту контента (блога и галереиc):
  *      Приватный, дружеский, открытый.
 **/
 create sequence seq_acctype_id;
@@ -523,8 +540,21 @@ create table doc(
     id                  decimal primary key default     nextval('seq_doc_id'),
     head                text,
     body                text default null,
-    --
+
+    /**
+        Непросмотрен, разрешен, запрещен, там где это нужно,
+    **/
+    oktype_id    decimal references oktype(id) default null,
+
+    /**
+        Тип документа: блог, коммент к блогу, галерея,
+            фото, коммент к фото, attach descr.
+    **/
     doctype_id          decimal references doctype(id)      default null,
+
+    /**
+        Типы контента: Обычный, эротический
+    **/
     contype_id          decimal references contype(id)      default null,
     --     /**
     --         Разрешение на чтение
@@ -537,7 +567,16 @@ create table doc(
     --
     owner_id            decimal references pers(id)         default null,
     parent_id           decimal references doc(id)          default null,
-    view_counter        numeric default null,
+
+
+    /**
+        количество просмотров документа
+    **/
+    view_counter        decimal default null,
+
+    /**
+        позиция в списке
+    **/
     position            numeric default null,
     created             timestamp without time zone not null default now(),
     isdeleted           bool default false
@@ -730,7 +769,9 @@ alter table pers add  column room_id
 -- Сообщество
 ------------------------------------------------------------------------------
 
-
+/**
+ *  Типы сообществ (обычные, тайные)
+**/
 create sequence seq_communitytype_id;
 create table communitytype(
     id          decimal primary key default nextval('seq_communitytype_id'),
@@ -743,20 +784,12 @@ create table communitytype(
 );
 
 
+
 create table community(
     doc_id              decimal unique references doc(id),
     type_id             decimal references communitytype(id) default null,
-    /**
-        approve_status
-        (nullable bool:
-            null - не рассмотрен,
-            false - запрещена,
-            true - разрешена)
-    **/
-    approvestatus       bool default null,
     slogan              text default null,
     treasury            decimal default null
-
 );
 
 alter table pers add column community_id

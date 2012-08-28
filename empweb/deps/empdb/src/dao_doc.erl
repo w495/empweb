@@ -41,6 +41,15 @@
 ]).
 
 
+
+-export([
+    get_oktype/2,
+    get_oktype/3,
+    create_oktype/2,
+    update_oktype/2
+]).
+
+
 %%
 %% API Functions
 %%
@@ -76,6 +85,7 @@ table({fields, all})->
         id,
         head,
         body,
+        oktype_id,
         doctype_id,
         contype_id,
         owner_id,
@@ -185,6 +195,28 @@ update_contype(Con, Proplist)->
     dao:get(contype(), Con, Proplist).
 
 
+get_oktype(Con, What) ->
+    get_oktype(Con, What, []).
+
+get_oktype(Con, What, Fields)->
+    dao:get(oktype(), Con, What, Fields).
+
+create_oktype(Con, Proplist)->
+    dao:get(oktype(), Con, Proplist).
+
+update_oktype(Con, Proplist)->
+    dao:get(oktype(), Con, Proplist).
+
+
+oktype() ->
+    [
+        {{table, name},                       oktype},
+        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        {{table, fields, select},             [id, name_ti, alias]},
+        {{table, fields, insert},             [name_ti, alias]},
+        {{table, fields, update},             [name_ti, alias]},
+        {{table, fields, insert, required},   [alias]}
+    ].
 
 acctype() ->
     [

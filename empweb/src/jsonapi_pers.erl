@@ -74,6 +74,7 @@ init(_, Req, #empweb_hap{
         }
     }.
 
+
 handle(_req, #empweb_hap{action='get_all_authorities'} = Hap) ->
     ?evman_args(Hap, <<" = get_all_authorities">>),
 
@@ -198,6 +199,39 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
 
             ?debug("biz_pers:register(~p).", [Data#norm.return]),
             {ok,jsonapi:resp(biz_pers:register(Data#norm.return)),Hap}
+        end
+    );
+
+
+handle(Req, #empweb_hap{
+        action  =   pass,
+        params  =   Params,
+        is_auth =   Is_auth,
+        pers_id =   Pers_id,
+        auth    =   Auth,
+        pers_perm_names=Pperm_names
+    }=Hap) ->
+    ?evman_args(Hap, <<" = pass">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [integer]
+            }
+        ]),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_pers:pass([
+                        Auth,
+                        {pers_id, Pers_id},
+                        {is_auth, Is_auth}
+                        | Data#norm.return
+                    ])
+                ),
+                Hap
+            }
         end
     );
 
@@ -379,31 +413,31 @@ handle(_req, #empweb_hap{action=update_pers, params=Params, is_auth=true} = Hap)
                     },
                     #norm_rule{
                         key = email,
-                        types = [email]
+                        types = [nullable, email]
                     },
                     #norm_rule{
                         key = phone,
-                        types = [string]
+                        types = [nullable, integer]
                     },
                     #norm_rule{
                         key = hobby,
-                        types = [string]
+                        types = [nullable, string]
                     },
                     #norm_rule{
                         key = fname,
-                        types = [string]
+                        types = [nullable, string]
                     },
                     #norm_rule{
                         key = sname,
-                        types = [string]
+                        types = [nullable, string]
                     },
                     #norm_rule{
                         key = birthday,
-                        types = [string]
+                        types = [nullable, integer]
                     },
                     #norm_rule{
                         key = city,
-                        types = [string]
+                        types = [nullable, string]
                     }
                 ]
             }

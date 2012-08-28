@@ -23,6 +23,14 @@
     test/1
 ]).
 
+nullable("nil") ->
+    null;
+nullable(nil) ->
+    null;
+nullable("null") ->
+    null;
+nullable(null) ->
+    null;
 nullable(<<"">>) ->
     null;
 nullable(<<"nil">>) ->

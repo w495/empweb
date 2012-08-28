@@ -47,13 +47,9 @@
 ]).
 
 
-
-
 %%
 %% API Functions
 %%
-
-
 
 %%
 %% @doc Возвращает список обязательных полей таблицы для создания
@@ -123,8 +119,6 @@ update(Con, Proplist)->
 is_owner(Con, Owner_id, Obj_id) ->
     dao_doc:is_owner(Con, Owner_id, Obj_id).
 
-
-
 get_roomtype(Con, What) ->
     get_roomtype(Con, What, []).
 
@@ -150,12 +144,9 @@ create_chatlang(Con, Proplist)->
 update_chatlang(Con, Proplist)->
     dao:get(chatlang(), Con, Proplist).
 
-
-
 %%
 %% Local Functions
 %%
-
 
 roomtype() ->
     [

@@ -75,6 +75,55 @@ init(_, Req, #empweb_hap{
 
 
 
+handle(_req, #empweb_hap{action='get_all_oktypes'} = Hap) ->
+    ?evman_args(Hap, <<" = get_oktypes">>),
+
+    {ok,jsonapi:resp(biz_doc:get_oktype([])),Hap};
+
+
+handle(_req, #empweb_hap{action='get_oktype', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get_oktype">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_one{
+                rules=[
+                    #norm_rule{
+                        key = alias,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = id,
+                        types = [integer]
+                    }
+                ]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_doc:get_oktype(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
+    ?evman_args(Hap, <<" = get_all_mstatuses">>),
+    {ok,jsonapi:resp(biz_doc:get_mstatus([])),Hap};
+
+handle(_req, #empweb_hap{action='get_mstatus', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get_mstatus">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [integer]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_doc:get_mstatus(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
 
 
 
@@ -521,6 +570,84 @@ handle(_req, #empweb_hap{action=update_roomtype, params=Params, pers_id=Owner_id
 
 
 
+handle(_req, #empweb_hap{action=get_all_communitytypes, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = get_all_communitytypes">>),
+
+    {ok,jsonapi:resp(biz_doc:get_communitytype([])),Hap};
+
+handle(_req, #empweb_hap{action='get_communitytype', params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = get_communitytype">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_at_least_one{
+                rules=[
+                    #norm_rule{
+                        key = id,
+                        types = [integer]
+                    },
+                    #norm_rule{
+                        key = alias,
+                        types = [string]
+                    }
+                ]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_doc:get_communitytype(Data#norm.return)),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{action=create_communitytype, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = create_communitytype">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = alias,
+                types       = [string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_doc:create_communitytype(Data#norm.return)),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{action=update_communitytype, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = update_communitytype">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = alias,
+                types       = [string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_doc:update_communitytype(Data#norm.return)),Hap}
+        end
+    );
+
+
+
+
+
+
 
 
 
@@ -832,6 +959,118 @@ handle(_req, #empweb_hap{action=update_room, params=Params, pers_id=Owner_id} = 
         end
     );
 
+
+
+
+handle(_req, #empweb_hap{action=get_all_communities, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = get_all_communities">>),
+
+    {ok,jsonapi:resp(biz_doc:get_community([{owner_id, Owner_id}])),Hap};
+
+handle(_req, #empweb_hap{action='get_community', params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = get_community">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_doc:get_community([{owner_id, Owner_id}|Data#norm.return])),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{action=create_community, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = create_community">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = head,
+                types = [string]
+            },
+            #norm_rule{
+                key = body,
+                types = [string]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = treasury,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = slogan,
+                required    = false,
+                types       = [string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_doc:create_community([{owner_id, Owner_id}|Data#norm.return])),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{action=update_community, params=Params, pers_id=Owner_id} = Hap) ->
+    ?evman_args([Hap], <<" = update_community">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key = head,
+                types = [string]
+            },
+            #norm_rule{
+                key = body,
+                types = [string]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = treasury,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = slogan,
+                required    = false,
+                types       = [string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            ?debug(" ---> biz_doc:update_community(~p) ~n", [[{owner_id, Owner_id}|Data#norm.return]]),
+
+            {ok,jsonapi:resp(biz_doc:update_community([{owner_id, Owner_id}|Data#norm.return])),Hap}
+        end
+    );
 
 
 

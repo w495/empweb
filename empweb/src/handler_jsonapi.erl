@@ -138,7 +138,52 @@ jsonapi_map(Req, {List}) ->
 
     Action =
         case Fname of
+            %%
+            %% Тип разрешения: не рассмотрен, запрещена, разрешена
+            %%
+            <<"get_oktype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_oktype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_oktypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_oktypes,
+                    pers_id         =   Pid
+                };
+            <<"create_oktype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_oktype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_oktype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_oktype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_oktype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_oktype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
 
+        %% ----------------------------------------------------------------
+        %% Функции документов
+        %% ----------------------------------------------------------------
+
+            %%
+            %% Тип документа: Блог, коммент к блогу, галерея,
+            %%      фото, коммент к фото, attach descr.
+            %%
             <<"get_doctype">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -173,7 +218,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Типы контента: обычный, эротический
+            %%
             <<"get_contype">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -208,7 +255,10 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Тип доступа к контенту контента (блога и галереи):
+            %%  приватный, дружеский, открытый.
+            %%
             <<"get_acctype">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -243,7 +293,46 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Типы сообществ (обычные, тайные)
+            %%
+            <<"get_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_communitytypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_communitytypes,
+                    pers_id         =   Pid
+                };
+            <<"create_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            %%
+            %% Типы чат-комнат. (страна, тюрьма, ад, рай)
+            %%
             <<"get_roomtype">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -278,7 +367,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Список языков чата.
+            %%
             <<"get_chatlang">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -313,7 +404,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Список языков системы.
+            %%
             <<"get_lang">> ->
                 #empweb_hap{
                     handler         =   jsonapi_conf,
@@ -348,7 +441,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Список переводов системы.
+            %%
             <<"get_tr">> ->
                 #empweb_hap{
                     handler         =   jsonapi_conf,
@@ -384,7 +479,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Блоги
+            %%
             <<"get_blog">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -419,7 +516,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
+            %%
+            %% Посты \ коменты
+            %%
             <<"get_post">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -454,8 +553,9 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-
-
+            %%
+            %% Чат-комнаты (страны)
+            %%
             <<"get_room">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -490,7 +590,47 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            %%
+            %% Сообщества
+            %%
+            <<"get_community">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_community,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_communities">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_communities,
+                    pers_id         =   Pid
+                };
+            <<"create_community">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_community,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_community">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_community,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_community">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_community,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
 
+        %% ----------------------------------------------------------------
+        %% Функции пользователей
+        %% ----------------------------------------------------------------
 
             <<"get_all_authorities">> ->
                 #empweb_hap{
@@ -549,8 +689,6 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     pers_perm_names =   Pperm_names
                 };
-
-
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
             %%
@@ -559,6 +697,19 @@ jsonapi_map(Req, {List}) ->
                     handler         =   jsonapi_pers,
                     action          =   login,
                     params          =   Params
+                };
+            %%
+            %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
+            %%
+            <<"pass">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_pers,
+                    action          =   pass,
+                    params          =   Params,
+                    auth            =   Auth,
+                    is_auth         =   Is_auth,
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
                 };
 
             %%

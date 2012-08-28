@@ -41,6 +41,7 @@
     get_pers_id/1,
     get_pers_nick/1,
     get/1,
+    pass/1,
     get_friends/1,
     add_friend/1,
     delete_friend/1
@@ -150,22 +151,11 @@ get_pers_nick({session_id, Session_id})->
 
 register(Params)->
     ?evman_args(Params, <<"pers try to register">>),
-    domain_pers:register([
-        {phash, phash(proplists:get_value(pass, Params))}
-        |Params
-    ]).
+    domain_pers:register(Params).
 
 update(Params)->
     ?evman_args(Params, <<"pers try to update himself">>),
-    case proplists:get_value(pass, Params) of
-        undefined ->
-            domain_pers:update(Params);
-        Mbpass ->
-            domain_pers:update([
-                {phash, phash(Mbpass)}
-                |Params
-            ])
-    end.
+    domain_pers:update(Params).
 
 
 get([]) ->
@@ -219,14 +209,119 @@ login(Params) ->
             {error, Error}
     end.
 
+%%
+%% Восстановление пароля, проверки применимости.
+%%
+pass(Params) ->
+    ?evman_args(Params, <<"pers try to remind password">>),
+    Id = proplists:get_value(id,Params),
+    Pers_id = proplists:get_value(pers_id,Params),
+    %%
+    %% Востанавливать пароль можно только, если пользователь не залогинен
+    %% в системе, или если залогинен, но восстанавливает пароль для себя.
+    %%
+    case {proplists:get_value(is_auth,Params), Id == Pers_id} of
+        {true, true}->
+            restore_pass([{id, Id}]);
+        {false, _}->
+            restore_pass([{id, Id}]);
+        {undefined, _}->
+            restore_pass([{id, Id}]);
+        _ ->
+            {error,{bad_pers,{[{id, Id}]}}}
+    end.
 
+%%
+%% Структура данных для отправки сообщений.
+%%
+-record(send, {
+    type            :: phone|email,
+        %% Тип сообщения.
+    destination     :: integer()|binary(),
+        %% Адрес\номер телефона
+        %%      integer  для phone
+        %%      binary   для mail
+    message         :: any()
+        %% Некоторая структура, которую хотим передать.
+        %% Внешний вид сообщения, определяет передающий элемент.
+}).
+
+%%
+%%  Восстановление пароля (непосредственно).
+%%  Сначала посылаем сообщение о новом пароле,
+%%  потом сбрасываем старый пароль.
+%%
+restore_pass(Params) ->
+    Id = proplists:get_value(id,Params),
+    case domain_pers:get(Params, [email, phone]) of
+        {ok,[]} ->
+            {error,{bad_pers,{[{id, Id}]}}};
+        {ok,[{Perspl}]} ->
+            {ok, Pass} = lgps:new(),
+            {Status, Reasons} = lists:foldl(fun(Type, {Status, Reasons})->
+                case restore_pass_send_guarded(#send{
+                    type        =   Type,
+                    message     =   {pass,  Pass},
+                    destination =   proplists:get_value(Type, Perspl)
+                }) of
+                    {ok,    was_sent} ->
+                        {true or Status, Reasons};
+                    {error, Reason} ->
+                        {false or Status, [{Type, Reason}|Reasons]}
+                end
+            end, {false, []}, [email, phone]),
+            case Status of
+                true ->
+                    {ok, [{[
+                        domain_pers:update([{id, Id}, {pass, Pass}]),
+                        {errors, [{Reasons}]}
+                    ]}]};
+                false ->
+                    {error,{no_enough_info,{[{id, Id}]}}}
+            end;
+        {error, Error} ->
+            {error, Error}
+    end.
+
+restore_pass_send_guarded(Send) ->
+    %%
+    %% TODO: сделать проверку через капчу
+    %%
+    restore_pass_send(Send).
+
+%%
+%% Непосредственная посылка сообщения о новом пароле
+%%
+restore_pass_send(#send{destination=null}) ->
+    {error, no_information};
+
+restore_pass_send(#send{destination=undefined}) ->
+    {error, no_information};
+
+restore_pass_send(#send{type=phone, destination=Phone}) ->
+    {error, not_implemented};
+
+restore_pass_send(#send{type=email, destination=Email, message={pass,  Pass}}) ->
+    %%
+    %% TODO: сделать нормальную посылку почты
+    %%
+    case mail_utils:mail(
+        Email,
+        [<<"Empire user: ">>, Email],
+        <<"Empire notification">>,
+        [<<"Your new password is: ">>, Pass]
+    ) of
+        {ok, _} ->
+            {ok,was_sent};
+        {error, Error}->
+            {error, Error}
+    end.
 
 %%
 %% Выход пользователя, Удаление сессии.
 %%
 logout(Params)->
     io:format("Params = ~p~n ", [Params]),
-    
     ?evman_args(Params, <<"pers try to logout">>),
     Id = proplists:get_value(id, Params),
     case domain_pers:logout(Params) of
@@ -246,7 +341,7 @@ logout(Params)->
         {error, Error} ->
             {error, Error};
         _ ->
-            {error,{bad_pers,{[{login, Id}]}}}
+            {error,{bad_pers,{[{id, Id}]}}}
     end.
 
 

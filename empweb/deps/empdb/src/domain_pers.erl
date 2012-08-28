@@ -78,13 +78,28 @@
 
 register(Params)->
     dao:with_connection(fun(Con)->
-        dao_pers:create(Con, Params)
+        dao_pers:create(Con, [
+            {phash, phash(proplists:get_value(pass, Params))}
+            |Params
+        ])
     end).
 
+
 update(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:update(Con, Params)
-    end).
+    case proplists:get_value(pass, Params) of
+        undefined ->
+            dao:with_connection(fun(Con)->
+                dao_pers:update(Con, Params)
+            end);
+        Mbpass ->
+            dao:with_connection(fun(Con)->
+                dao_pers:update(Con, [
+                    {phash, phash(Mbpass)}
+                    |Params
+                ])
+            end)
+    end.
+
 
 login(Params) ->
     Id      = proplists:get_value(id,       Params),
@@ -112,7 +127,7 @@ login({Uf, Uv}, Params) ->
             Perm_names = proplists:get_value(perm_names, Userpl),
             Phash = proplists:get_value(phash, Userpl),
             case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
-                {true, true} ->
+                {true, false} ->
                     {error, {auth_count_overflow,
                         {[
                             {max,  Max_auth_error - (EC + 1)},
