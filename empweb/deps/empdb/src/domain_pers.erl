@@ -108,16 +108,25 @@ register(Params)->
 update(Params)->
     case proplists:get_value(pass, Params) of
         undefined ->
-            dao:with_connection(emp, fun(Con)->
-                dao_pers:update(Con, Params)
-            end);
+            dao_pers:update(emp, Params)
         Mbpass ->
-            dao:with_connection(emp, fun(Con)->
-                dao_pers:update(Con, [
-                    {phash, phash(Mbpass)}
-                    |Params
-                ])
-            end)
+            case dao_pers:update(emp, [
+                {phash, phash(Mbpass)}
+                |Params
+            ])  of
+                {ok, Id} ->
+                    case dao_pers:update_ejabberd(ejabberd, [
+                        {username, convert:to_list(Id)},
+                        {password, Pass}
+                    ]) of
+                        {ok, _}->
+                            {ok, Id};
+                        {error, Error} ->
+                            {error, Error}
+                    end;
+                {error, Error} ->
+                    {error, Error}
+            end
     end.
 
 
