@@ -1,13 +1,33 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add description to biz_pers
+%%
+%% @file    biz_pers.erl
+%%          Бизнес логика по работе с документами,
+%%          и связанными с ними объектами.
+%%
+%%          Зависит от модулей:
+%%              * domain_pers;
+%%              * biz_session.
+%%          Все внешние функуции принимают
+%%              proplist()
+%%          и возвращают:
+%%              {ok, [Obj::{proplist()}]}
+%%              |   {error, Reason::atom()}
+%%              |   {error, {Reason::atom(), Info::atom()}}
+%%              |   {error, {Reason::atom(), Info::[Obj::{proplist()}]}}
+%%
 -module(biz_pers).
 
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 %% Заголовочные файлы
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 
+%%
+%% Определения общие для всего приложения
+%%
 -include("empweb.hrl").
+
+%%
+%% Описание сессии пользователя
+%%
 -include("biz_session.hrl").
 
 %%
@@ -15,20 +35,18 @@
 %%
 -include_lib("evman/include/events.hrl").
 
-
 %%
 %% Трансформация для получения имени функции.
 %%
 -include_lib("evman/include/evman_transform.hrl").
 
+%% ===========================================================================
+%% Экспортируемые функции
+%% ===========================================================================
 
 %%
-
-
-%% ---------------------------------------------------------------------------
-%% Экспортируемые функции
-%% ---------------------------------------------------------------------------
-
+%% Сам пользователь
+%%
 -export([
     register/1,
     update/1,
@@ -41,59 +59,88 @@
     get_pers_id/1,
     get_pers_nick/1,
     get/1,
-    pass/1,
+    pass/1
+]).
+
+%%
+%% Группа пользователя
+%%
+-export([
+    get_pgroup/1,
+    create_pgroup/1,
+    update_pgroup/1,
+    delete_pgroup/1
+]).
+
+%%
+%% Друзья пользователя
+%%
+-export([
     get_friends/1,
     add_friend/1,
     delete_friend/1
 ]).
 
-
 %%
-%% Exported Functions
-%%
--export([
-    get_pgroup/1,
-    update_pgroup/1
-]).
-
-%%
-%% Exported Functions
+%% Статус пользователя
 %%
 -export([
     get_pstatus/1,
-    update_pstatus/1
+    create_pstatus/1,
+    update_pstatus/1,
+    delete_pstatus/1
 ]).
 
 %%
-%% Exported Functions
+%% Семейное положение пользователя
 %%
 -export([
     get_mstatus/1,
-    update_mstatus/1
+    create_mstatus/1,
+    update_mstatus/1,
+    delete_mstatus/1
 ]).
 
 %%
-%% Exported Functions
+%% Авторитет пользователя
 %%
 -export([
     get_authority/1,
-    update_authority/1
+    create_authority/1,
+    update_authority/1,
+    delete_authority/1
 ]).
 
 
 %%
-%% Exported Functions
+%% Эмоции пользователя
 %%
 -export([
     get_emotion/1,
-    update_emotion/1
+    create_emotion/1,
+    update_emotion/1,
+    delete_emotion/1
 ]).
 
+%%
+%% Структура данных для отправки сообщений.
+%%
+-record(send, {
+    type            :: phone|email,
+        %% Тип сообщения.
+    destination     :: integer()|binary(),
+        %% Адрес\номер телефона
+        %%      integer  для phone
+        %%      binary   для mail
+    message         :: any()
+        %% Некоторая структура, которую хотим передать.
+        %% Внешний вид сообщения, определяет передающий элемент.
+}).
 
-%% ---------------------------------------------------------------------------
+
+%% ===========================================================================
 %% Внешние функции
-%% ---------------------------------------------------------------------------
-
+%% ===========================================================================
 
 is_auth({session_id, Session_id})->
     case biz_session:get(Session_id) of
@@ -154,10 +201,13 @@ register(Params)->
     domain_pers:register(Params).
 
 update(Params)->
-    ?evman_args(Params, <<"pers try to update himself">>),
+    ?evman_args(Params, <<"pers try to update him self">>),
     domain_pers:update(Params).
 
 
+%%
+%% Получить всех пользователей
+%%
 get([]) ->
     ?evman_args([[]], <<"get all perss">>),
     domain_pers:get(
@@ -171,17 +221,6 @@ get(Params) ->
         Params,
         dao_pers:table({fields, select}) -- [phash]
     ).
-
-
-get_friends(Params)->
-    domain_pers:get_friends(Params).
-
-add_friend(Params)->
-    domain_pers:add_friend(Params).
-
-delete_friend(Params)->
-    domain_pers:delete_friend(Params).
-
 
 %%
 %% Вход пользователя. Создание сессии.
@@ -230,21 +269,6 @@ pass(Params) ->
         _ ->
             {error,{bad_pers,{[{id, Id}]}}}
     end.
-
-%%
-%% Структура данных для отправки сообщений.
-%%
--record(send, {
-    type            :: phone|email,
-        %% Тип сообщения.
-    destination     :: integer()|binary(),
-        %% Адрес\номер телефона
-        %%      integer  для phone
-        %%      binary   для mail
-    message         :: any()
-        %% Некоторая структура, которую хотим передать.
-        %% Внешний вид сообщения, определяет передающий элемент.
-}).
 
 %%
 %%  Восстановление пароля (непосредственно).
@@ -344,65 +368,120 @@ logout(Params)->
             {error,{bad_pers,{[{id, Id}]}}}
     end.
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Друзья пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+get_friends(Params)->
+    domain_pers:get_friends(Params).
+
+add_friend(Params)->
+    domain_pers:add_friend(Params).
+
+delete_friend(Params)->
+    domain_pers:delete_friend(Params).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Эмоции пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_emotion(Params) ->
     ?evman_args(Params, <<"get emotion">>),
     domain_pers:get_emotion(Params).
 
+create_emotion(Params) ->
+    ?evman_args(Params, <<"get create emotion">>),
+    domain_pers:create_emotion(Params).
+
 update_emotion(Params) ->
-    ?evman_args(Params, <<"get update_emotion">>),
+    ?evman_args(Params, <<"get update emotion">>),
     domain_pers:update_emotion(Params).
+
+delete_emotion(Params) ->
+    ?evman_args(Params, <<"get delete emotion">>),
+    domain_pers:delete_emotion(Params).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Группа пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_pgroup(Params) ->
     ?evman_args(Params, <<"get pgroup">>),
     domain_pers:get_pgroup(Params).
 
+create_pgroup(Params) ->
+    ?evman_args(Params, <<"create pgroup">>),
+    domain_pers:create_pgroup(Params).
+
 update_pgroup(Params) ->
     ?evman_args(Params, <<"update pgroup">>),
     domain_pers:update_pgroup(Params).
 
+delete_pgroup(Params) ->
+    ?evman_args(Params, <<"update pgroup">>),
+    domain_pers:delete_pgroup(Params).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Семейное положение пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_mstatus(Params) ->
     ?evman_args(Params, <<"get mstatus">>),
     domain_pers:get_mstatus(Params).
 
+create_mstatus(Params) ->
+    ?evman_args(Params, <<"create mstatus">>),
+    domain_pers:create_mstatus(Params).
+    
 update_mstatus(Params) ->
     ?evman_args(Params, <<"update mstatus">>),
     domain_pers:update_mstatus(Params).
 
+delete_mstatus(Params) ->
+    ?evman_args(Params, <<"delete mstatus">>),
+    domain_pers:delete_mstatus(Params).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Статус пользователя пользователя: в сети \ не в сети.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_pstatus(Params) ->
     ?evman_args(Params, <<"get pstatus">>),
     domain_pers:get_pstatus(Params).
 
+create_pstatus(Params) ->
+    ?evman_args(Params, <<"create pstatus">>),
+    domain_pers:create_pstatus(Params).
+
 update_pstatus(Params) ->
     ?evman_args(Params, <<"update pstatus">>),
     domain_pers:update_pstatus(Params).
 
+delete_pstatus(Params) ->
+    ?evman_args(Params, <<"delete pstatus">>),
+    domain_pers:delete_pstatus(Params).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Авторитет пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_authority(Params) ->
     ?evman_args(Params, <<"get authority">>),
     domain_pers:get_authority(Params).
 
+create_authority(Params) ->
+    ?evman_args(Params, <<"create authority">>),
+    domain_pers:create_authority(Params).
+
 update_authority(Params) ->
     ?evman_args(Params, <<"update authority">>),
     domain_pers:update_authority(Params).
+
+delete_authority(Params) ->
+    ?evman_args(Params, <<"delete authority">>),
+    domain_pers:delete_authority(Params).
 
 
 %% ---------------------------------------------------------------------------
 %% Внутрениие функции
 %% ---------------------------------------------------------------------------
-
-phash(Mbpass) ->
-    hexstring(erlang:md5(Mbpass)).
-
-hexstring(<<X:128/big-unsigned-integer>>) ->
-    erlang:list_to_binary(io_lib:format("~32.16.0B", [X]));
-hexstring(<<X:160/big-unsigned-integer>>) ->
-    erlang:list_to_binary(io_lib:format("~40.16.0B", [X]));
-hexstring(<<X:256/big-unsigned-integer>>) ->
-    erlang:list_to_binary(io_lib:format("~64.16.0B", [X]));
-hexstring(<<X:512/big-unsigned-integer>>) ->
-    erlang:list_to_binary(io_lib:format("~128.16.0B", [X])).
-

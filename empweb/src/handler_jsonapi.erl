@@ -4,10 +4,10 @@
 -behaviour(cowboy_http_handler).
 -export([init/3, handle/2, terminate/2]).
 
-
+%%
+%% Определения общие для всего приложения
+%%
 -include("empweb.hrl").
-
--include_lib("norm/include/norm.hrl").
 
 %%
 %% Описание записей событий и макросов
@@ -405,77 +405,39 @@ jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
             %%
-            %% Список языков системы.
+            %% Список режимов страны
             %%
-            <<"get_lang">> ->
+            <<"get_regimen">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   get_lang,
+                    handler         =   jsonapi_doc,
+                    action          =   get_regimen,
                     pers_id         =   Pid,
                     params          =   Params
                 };
-            <<"get_all_langs">> ->
+            <<"get_all_regimens">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   get_all_langs,
+                    handler         =   jsonapi_doc,
+                    action          =   get_all_regimens,
                     pers_id         =   Pid
                 };
-            <<"create_lang">> ->
+            <<"create_regimen">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   create_lang,
+                    handler         =   jsonapi_doc,
+                    action          =   create_regimen,
                     pers_id         =   Pid,
                     params          =   Params
                 };
-            <<"update_lang">> ->
+            <<"update_regimen">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   update_lang,
+                    handler         =   jsonapi_doc,
+                    action          =   update_regimen,
                     pers_id         =   Pid,
                     params          =   Params
                 };
-            <<"delete_lang">> ->
+            <<"delete_regimen">> ->
                 #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   delete_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            %%
-            %% Список переводов системы.
-            %%
-            <<"get_tr">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   get_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"get_all_trs">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   get_all_trs,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"create_tr">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   create_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"update_tr">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   update_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"delete_tr">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_conf,
-                    action          =   delete_tr,
+                    handler         =   jsonapi_doc,
+                    action          =   delete_regimen,
                     pers_id         =   Pid,
                     params          =   Params
                 };
@@ -624,6 +586,86 @@ jsonapi_map(Req, {List}) ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
                     action          =   delete_community,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+        %% ----------------------------------------------------------------
+        %% Функции системы
+        %% ----------------------------------------------------------------
+
+            %%
+            %% Список языков системы.
+            %%
+            <<"get_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_langs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_all_langs,
+                    pers_id         =   Pid
+                };
+            <<"create_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   create_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   update_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_lang">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   delete_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            %%
+            %% Список переводов системы.
+            %%
+            <<"get_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_trs">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   get_all_trs,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   create_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   update_tr,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_tr">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_conf,
+                    action          =   delete_tr,
                     pers_id         =   Pid,
                     params          =   Params
                 };

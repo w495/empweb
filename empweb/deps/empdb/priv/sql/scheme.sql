@@ -747,12 +747,27 @@ create table topic(
 );
 
 
+create sequence seq_regimen_id;
+create table regimen(
+    id          decimal primary key default nextval('seq_regimen_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    descr_ti    decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+
+
 create table room(
     doc_id              decimal unique references doc(id),
     type_id             decimal references roomtype(id) default null,
     ulimit              decimal default null,
     chatlang_id         decimal references chatlang(id) default null,
     topic_id            decimal references topic(id) default null,
+    regimen_id          decimal references regimen(id) default null,
     slogan              text default null,
     weather             text default null,
     treasury            decimal default null
@@ -794,6 +809,54 @@ create table community(
 
 alter table pers add column community_id
     decimal references community(doc_id) default null;
+
+
+------------------------------------------------------------------------------
+-- События
+------------------------------------------------------------------------------
+
+create sequence seq_eventtype_id;
+create table eventtype(
+    id          decimal primary key default nextval('seq_eventtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+
+create table event(
+    doc_id              decimal unique references doc(id),
+    type_id             decimal references eventtype(id) default null,
+    pers_id              decimal references pers(id) default null
+);
+
+
+------------------------------------------------------------------------------
+-- Сообщения
+------------------------------------------------------------------------------
+
+create sequence seq_messagetype_id;
+create table messagetype(
+    id          decimal primary key default nextval('seq_messagetype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+
+create table message(
+    doc_id              decimal unique references doc(id),
+    type_id             decimal references messagetype(id) default null,
+    persfrom_id         decimal references pers(id) default null,
+    persto_id           decimal references pers(id) default null
+);
+
 
 -------------------------------------------------------------------------------
 -- СВЯЗКИ МНОГИЕ КО МНОГИМ

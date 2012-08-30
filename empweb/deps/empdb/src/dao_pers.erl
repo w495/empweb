@@ -9,13 +9,16 @@
 -module(dao_pers).
 -behaviour(dao).
 
-%%
-%% Include files
-%%
+%% ===========================================================================
+%% Заголовочные файлы
+%% ===========================================================================
 
+%% ===========================================================================
+%% Экспортируемые функции
+%% ===========================================================================
 
 %%
-%% Exported Functions
+%% Группа пользователя
 %%
 -export([
     table/0,
@@ -27,14 +30,11 @@
     get_perm/2,
     get_perm/3,
     get_group/2,
-    get_group/3,
-    get_friends/2,
-    add_friend/2,
-    delete_friend/2
+    get_group/3
 ]).
 
 %%
-%% Exported Functions
+%% Группа пользователя
 %%
 -export([
     get_pgroup/2,
@@ -44,7 +44,16 @@
 ]).
 
 %%
-%% Exported Functions
+%% Группа пользователя
+%%
+-export([
+    get_friends/2,
+    add_friend/2,
+    delete_friend/2
+]).
+
+%%
+%% Статус пользователя
 %%
 -export([
     get_pstatus/2,
@@ -54,7 +63,7 @@
 ]).
 
 %%
-%% Exported Functions
+%% Семейное положение пользователя
 %%
 -export([
     get_mstatus/2,
@@ -64,7 +73,7 @@
 ]).
 
 %%
-%% Exported Functions
+%% Авторитет пользователя
 %%
 -export([
     get_authority/2,
@@ -73,7 +82,9 @@
     update_authority/2
 ]).
 
-
+%%
+%% Эмоции пользователя
+%%
 -export([
     get_emotion/2,
     get_emotion/3,
@@ -81,11 +92,19 @@
     update_emotion/2
 ]).
 
-
-
 %%
-%% API Functions
+%% Ejabberd-aккаунт пользователя
 %%
+-export([
+    get_ejabberd/2,
+    get_ejabberd/3,
+    create_ejabberd/2,
+    update_ejabberd/2
+]).
+
+%% ===========================================================================
+%% Внешние функции
+%% ===========================================================================
 
 %% 
 %% @doc Возвращает список обязательных полей таблицы для создания
@@ -189,6 +208,9 @@ is_owner(Con, Id, Id)->
 is_owner(Con, _, _)->
     false.
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Системные права пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_perm(Con, Params) ->
     get_perm(Con, Params, []).
@@ -197,7 +219,10 @@ get_perm(Con, Params, []) ->
     get_perm(Con, Params, [alias]);
 
 get_perm(Con, Kvalue, Fields) when erlang:is_list(Kvalue) ->
-    case {proplists:get_value(id, Kvalue), proplists:get_value(login, Kvalue)} of
+    case {
+        proplists:get_value(id, Kvalue),
+        proplists:get_value(login, Kvalue)
+    } of
         {undefined, undefined   } ->
             {error, {no_data,no_data}};
         {Id,        undefined   } ->
@@ -240,6 +265,13 @@ get_perm(Con, {login, Login}, Fields) ->
         )
     ).
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Группы пользователя (доступ конкретно по id пользователя)
+%% 
+%% WARNING: По написаниею оно похоже на на опирации с группами непосредственно.
+%%          Возможно, надо перекидать сущности по модулям.
+%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_group(Con, Params) ->
     get_group(Con, Params, []).
@@ -248,7 +280,10 @@ get_group(Con, Params, []) ->
     get_group(Con, Params, [alias]);
 
 get_group(Con, Kvalue, Fields) when erlang:is_list(Kvalue) ->
-    case {proplists:get_value(id, Kvalue), proplists:get_value(login, Kvalue)} of
+    case {
+        proplists:get_value(id, Kvalue),
+        proplists:get_value(login, Kvalue)
+    } of
         {undefined, undefined   } ->
             {error, {no_data,no_data}};
         {Id,        undefined   } ->
@@ -287,9 +322,27 @@ get_group(Con, {login, Login}, Fields) ->
         )
     ).
 
-%
-% 230
-%
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Группы пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_pgroup(Con, What) ->
+    get_pgroup(Con, What, []).
+
+get_pgroup(Con, What, Fields)->
+    dao:get(pgroup(), Con, What, Fields).
+
+create_pgroup(Con, Proplist)->
+    dao:create(pgroup(), Con, Proplist).
+
+update_pgroup(Con, Proplist)->
+    dao:update(pgroup(), Con, Proplist).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Друзья пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 add_friend(Con, Proplist)->
     case dao:pgret(
         dao:equery(Con,
@@ -306,7 +359,7 @@ add_friend(Con, Proplist)->
 
 delete_friend(Con, Proplist)->
     case dao:pgret(
-        dao:equery(Con, 
+        dao:equery(Con,
             <<"delete from friend where "
             " pers_id=$pers_id and friend_id=$friend_id returning id">>,
             Proplist
@@ -323,7 +376,7 @@ get_friends(Con, {id, User_id})->
 
 get_friends(Con, {pers_id, User_id})->
     dao:pgret(
-        dao:equery(Con, 
+        dao:equery(Con,
             <<"select friend.friend_id from friend "
             "where friend.pers_id = $pers_id">>,
             [User_id]
@@ -339,21 +392,9 @@ get_friends(Con, Proplist)->
         )
     ).
 
-
-get_pgroup(Con, What) ->
-    get_pgroup(Con, What, []).
-
-get_pgroup(Con, What, Fields)->
-    dao:get(pgroup(), Con, What, Fields).
-
-create_pgroup(Con, Proplist)->
-    dao:create(pgroup(), Con, Proplist).
-
-update_pgroup(Con, Proplist)->
-    dao:update(pgroup(), Con, Proplist).
-
-
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Статус пользователя пользователя: в сети \ не в сети.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_pstatus(Con, What) ->
     get_pstatus(Con, What, []).
@@ -367,7 +408,9 @@ create_pstatus(Con, Proplist)->
 update_pstatus(Con, Proplist)->
     dao:update(pstatus(), Con, Proplist).
 
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Семейное положение пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_mstatus(Con, What) ->
     get_mstatus(Con, What, []).
@@ -381,8 +424,9 @@ create_mstatus(Con, Proplist)->
 update_mstatus(Con, Proplist)->
     dao:update(mstatus(), Con, Proplist).
 
-
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Авторитет пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_authority(Con, What) ->
     get_authority(Con, What, []).
@@ -396,8 +440,9 @@ create_authority(Con, Proplist)->
 update_authority(Con, Proplist)->
     dao:update(authority(), Con, Proplist).
 
-
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Эмоции пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_emotion(Con, What) ->
     get_emotion(Con, What, []).
@@ -411,58 +456,195 @@ create_emotion(Con, Proplist)->
 update_emotion(Con, Proplist)->
     dao:update(emotion(), Con, Proplist).
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Ejabberd-aккаунт пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%
-%% Local Functions
-%%
+get_ejabberd(Con, What) ->
+    get_ejabberd(Con, What, []).
 
+get_ejabberd(Con, What, Fields)->
+    dao:get(ejabberd(), Con, What, Fields).
+
+create_ejabberd(Con, Proplist)->
+    dao:create(ejabberd(), Con, Proplist, username).
+
+update_ejabberd(Con, Proplist)->
+    dao:update(ejabberd(), Con, Proplist, username).
+
+%% ===========================================================================
+%% Внутренние функции
+%% ===========================================================================
+
+%% 
+%% @doc Описывает группу пользователя
+%%
 pgroup() ->
     [
+        %% Имя таблицы.
         {{table, name},                       pgroup},
-        {{table, fields, all},                [id, alias, name_ti, issystem, isdeleted]},
-        {{table, fields, select},             [id, alias, name_ti]},
-        {{table, fields, insert},             [alias, name_ti]},
-        {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias]}
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, issystem, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            alias
+        ]}
     ].
 
+%%
+%% @doc Описывает статус пользователя
+%%
 pstatus() ->
     [
+        %% Имя таблицы.
         {{table, name},                       pstatus},
-        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
-        {{table, fields, select},             [id, alias, name_ti]},
-        {{table, fields, insert},             [alias, name_ti]},
-        {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias]}
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            alias
+        ]}
     ].
 
+%%
+%% @doc Описывает семейное положение пользователя
+%%
 mstatus() ->
     [
+        %% Имя таблицы.
         {{table, name},                       mstatus},
-        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
-        {{table, fields, select},             [id, alias, name_ti]},
-        {{table, fields, insert},             [alias, name_ti]},
-        {{table, fields, update},             [id, alias, name_ti]},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [alias]}
     ].
 
+%%
+%% @doc Описывает семейное положение пользователя
+%%
 authority() ->
     [
+        %% Имя таблицы.
         {{table, name},                       authority},
-        {{table, fields, all},                [id, alias, name_ti, level, isdeleted]},
-        {{table, fields, select},             [id, alias, level, name_ti]},
-        {{table, fields, insert},             [alias, level, name_ti]},
-        {{table, fields, update},             [id, alias, level, name_ti]},
-        {{table, fields, insert, required},   [alias, level]}
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, level, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, level, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, level, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, level, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            alias, level
+        ]}
     ].
 
+%%
+%% @doc Описывает эмоции пользователя
+%%
 emotion() ->
     [
+        %% Имя таблицы.
         {{table, name},                       emotion},
-        {{table, fields, all},                [id, alias, name_ti, isdeleted]},
-        {{table, fields, select},             [id, alias, name_ti]},
-        {{table, fields, insert},             [alias, name_ti]},
-        {{table, fields, update},             [id, alias, name_ti]},
-        {{table, fields, insert, required},   [alias]}
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            alias
+        ]}
+    ].
+
+%%
+%% @doc Описывает ejabberd-aккаунт пользователя
+%%
+ejabberd() ->
+    [
+        %% Имя таблицы.
+        {{table, name},                       users},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            username, password
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            username, password
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            username, password
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            username, password
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            username, password
+        ]}
     ].
 

@@ -89,6 +89,18 @@
     get_chatlang/2
 ]).
 
+
+%%
+%% Exported Functions
+%%
+-export([
+    update_regimen/1,
+    create_regimen/1,
+    get_regimen/1,
+    get_regimen/2
+]).
+
+
 %%
 %% Exported Functions
 %%
@@ -127,29 +139,40 @@
 %% API Functions
 %%
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%                          УТИЛИТАРНЫЕ ОБЪЕКТЫ
+%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-create_contype(Params)->
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Тип разрешения: не рассмотрен, запрещена, разрешена
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_oktype(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:create_contype(Con, Params)
+        dao_doc:create_oktype(Con, Params)
     end).
 
-update_contype(Params)->
+update_oktype(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:update_contype(Con, Params)
+        dao_doc:update_oktype(Con, Params)
     end).
 
-get_contype(Params)->
+get_oktype(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:get_contype(Con, [{isdeleted, false}|Params])
+        dao_doc:get_oktype(Con, [{isdeleted, false}|Params])
     end).
 
-get_contype(Params, Fileds)->
+get_oktype(Params, Fileds)->
     dao:with_connection(fun(Con)->
-        dao_doc:get_contype(Con, [{isdeleted, false}|Params], Fileds)
+        dao_doc:get_oktype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Тип документа: Блог, коммент к блогу, галерея,
+%%      фото, коммент к фото, attach descr.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_doctype(Params)->
     dao:with_connection(fun(Con)->
@@ -172,7 +195,34 @@ get_doctype(Params, Fileds)->
     end).
 
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Типы контента: обычный, эротический
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+create_contype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:create_contype(Con, Params)
+    end).
+
+update_contype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:update_contype(Con, Params)
+    end).
+
+get_contype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_doc:get_contype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_contype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_doc:get_contype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Тип доступа к контенту контента (блога и галереи):
+%%  приватный, дружеский, открытый.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_acctype(Params)->
     dao:with_connection(fun(Con)->
@@ -368,25 +418,31 @@ get_chatlang(Params, Fileds)->
 
 
 
-create_oktype(Params)->
+
+create_regimen(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:create_oktype(Con, Params)
+        dao_room:create_regimen(Con, Params)
     end).
 
-update_oktype(Params)->
+update_regimen(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:update_oktype(Con, Params)
+        dao_room:update_regimen(Con, Params)
     end).
 
-get_oktype(Params)->
+get_regimen(Params)->
     dao:with_connection(fun(Con)->
-        dao_doc:get_oktype(Con, [{isdeleted, false}|Params])
+        dao_room:get_regimen(Con, [{isdeleted, false}|Params])
     end).
 
-get_oktype(Params, Fileds)->
+get_regimen(Params, Fileds)->
     dao:with_connection(fun(Con)->
-        dao_doc:get_oktype(Con, [{isdeleted, false}|Params], Fileds)
+        dao_room:get_regimen(Con, [{isdeleted, false}|Params], Fileds)
     end).
+
+
+
+
+
 
 
 

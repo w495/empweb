@@ -342,8 +342,8 @@ handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Ha
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = pers_id,
-                types = [integer]
+                key     = pers_id,
+                types   = [integer]
             },
             #norm_rule{
                 key = friend_id,
@@ -364,9 +364,21 @@ handle(_req, #empweb_hap{action=get_pers, params=Params, is_auth=true} = Hap) ->
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
+            #norm_at_least_one{
+                rules=[
+                    #norm_rule{
+                        key     = id,
+                        types   = [integer]
+                    },
+                    #norm_rule{
+                        key     = room_id,
+                        types   = [integer]
+                    },
+                    #norm_rule{
+                        key     = community_id,
+                        types   = [integer]
+                    }
+                ]
             }
         ]),
         fun(Data)->
@@ -417,6 +429,14 @@ handle(_req, #empweb_hap{action=update_pers, params=Params, is_auth=true} = Hap)
                     },
                     #norm_rule{
                         key = phone,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = room_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = community_id,
                         types = [nullable, integer]
                     },
                     #norm_rule{

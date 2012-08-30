@@ -1,16 +1,24 @@
 %%
 %% @file    jsonapi_pers.erl
-%%          "Контроллер" для функций работы с пользователями.
+%%          "Контроллер" для функций работы с системными настройками,
+%%          языками, и связанными с ними объектами.
 %%
 
 -module(jsonapi_conf).
 -behavior(empweb_http_hap).
 
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 %% Заголовочные файлы
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 
+%%
+%% Определения общие для всего приложения
+%%
 -include("empweb.hrl").
+
+%%
+%% Описание структур нормировки полей
+%%
 -include_lib("norm/include/norm.hrl").
 
 %%
@@ -25,20 +33,19 @@
 -include_lib("evman/include/evman_transform.hrl").
 
 
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 %% Экспортируемые функции
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 
 -export([
     init/3,
     handle/2,
-    at_list_one/1,
     terminate/2
 ]).
 
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 %% Внешние функции
-%% ---------------------------------------------------------------------------
+%% ===========================================================================
 
 %%
 %% @doc Инициализация запроса
@@ -72,14 +79,20 @@ init(_, Req, #empweb_hap{
         }
     }.
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Языки
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action=get_all_langs, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = get_all_langs">>),
-
+handle(_req, #empweb_hap{
+        action=get_all_langs, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get all langs">>),
     {ok,jsonapi:resp(biz_conf:get_lang([])),Hap};
 
-handle(_req, #empweb_hap{action='get_lang', params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = get_lang">>),
+handle(_req, #empweb_hap{
+        action='get_lang', params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get lang">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -103,8 +116,10 @@ handle(_req, #empweb_hap{action='get_lang', params=Params, pers_id=Owner_id} = H
         end
     );
 
-handle(_req, #empweb_hap{action=create_lang, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = create_lang">>),
+handle(_req, #empweb_hap{
+        action=create_lang, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create lang">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -128,8 +143,10 @@ handle(_req, #empweb_hap{action=create_lang, params=Params, pers_id=Owner_id} = 
         end
     );
 
-handle(_req, #empweb_hap{action=update_lang, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = update_lang">>),
+handle(_req, #empweb_hap{
+        action=update_lang, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update lang">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -154,9 +171,14 @@ handle(_req, #empweb_hap{action=update_lang, params=Params, pers_id=Owner_id} = 
         end
     );
 
-handle(_req, #empweb_hap{action=get_all_trs, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = get_all_trs">>),
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Переводы
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+handle(_req, #empweb_hap{
+        action=get_all_trs, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get all trs">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -172,9 +194,10 @@ handle(_req, #empweb_hap{action=get_all_trs, params=Params, pers_id=Owner_id} = 
         end
     );
 
-handle(_req, #empweb_hap{action='get_tr', params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = get_tr">>),
-
+handle(_req, #empweb_hap{
+        action='get_tr', params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get tr">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -193,8 +216,10 @@ handle(_req, #empweb_hap{action='get_tr', params=Params, pers_id=Owner_id} = Hap
         end
     );
 
-handle(_req, #empweb_hap{action=create_tr, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = create_tr">>),
+handle(_req, #empweb_hap{
+        action=create_tr, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create tr">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -218,8 +243,10 @@ handle(_req, #empweb_hap{action=create_tr, params=Params, pers_id=Owner_id} = Ha
         end
     );
 
-handle(_req, #empweb_hap{action=update_tr, params=Params, pers_id=Owner_id} = Hap) ->
-    ?evman_args([Hap], <<" = update_tr">>),
+handle(_req, #empweb_hap{
+        action=update_tr, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update tr">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -248,7 +275,9 @@ handle(_req, #empweb_hap{action=update_tr, params=Params, pers_id=Owner_id} = Ha
 
 
 
-handle(_req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id} = Hap) ->
+handle(_req, #empweb_hap{
+        action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
+    } = Hap) ->
     ?evman_notice({hap, [
         {forbidden,     true},
         {action,        Action},
@@ -256,21 +285,9 @@ handle(_req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth, pers_id=
         {pers_id,       Pers_id},
         {is_auth,       Is_auth}
     ]}, <<" = forbidden">>),
-
     {ok,jsonapi:forbidden(), Hap}.
 
 
 terminate(_req, Hap)->
     ?evman_args([Hap], <<" = terminate">>),
-
     ok.
-
-%% ---------------------------------------------------------------------------
-%% Внутрениие функции
-%% ---------------------------------------------------------------------------
-
-at_list_one([]) ->
-    {error, no_param};
-at_list_one([Return|_]) ->
-    {ok, Return}.
-

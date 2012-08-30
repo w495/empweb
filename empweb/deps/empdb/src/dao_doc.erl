@@ -202,50 +202,73 @@ get_oktype(Con, What, Fields)->
     dao:get(oktype(), Con, What, Fields).
 
 create_oktype(Con, Proplist)->
-    dao:get(oktype(), Con, Proplist).
+    dao:create(oktype(), Con, Proplist).
 
 update_oktype(Con, Proplist)->
-    dao:get(oktype(), Con, Proplist).
+    dao:update(oktype(), Con, Proplist).
 
 
 oktype() ->
     [
+        %% Имя таблицы.
         {{table, name},                       oktype},
+        %% Список всех полей.
         {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [id, name_ti, alias]},
+        %% Список полей таблицы для создания.
         {{table, fields, insert},             [name_ti, alias]},
+        %% Список полей таблицы для обновления.
         {{table, fields, update},             [name_ti, alias]},
+        %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [alias]}
     ].
 
 acctype() ->
     [
+        %% Имя таблицы.
         {{table, name},                       acctype},
+        %% Список всех полей.
         {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [id, name_ti, alias]},
+        %% Список полей таблицы для создания.
         {{table, fields, insert},             [name_ti, alias]},
+        %% Список полей таблицы для обновления.
         {{table, fields, update},             [name_ti, alias]},
+        %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [alias]}
     ].
 
 doctype() ->
     [
+        %% Имя таблицы.
         {{table, name},                       doctype},
+        %% Список всех полей.
         {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [name_ti, id, alias]},
+        %% Список полей таблицы для создания.
         {{table, fields, insert},             [name_ti, alias]},
+        %% Список полей таблицы для обновления.
         {{table, fields, update},             [name_ti, alias]},
+        %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [alias]}
     ].
 
 contype() ->
     [
+        %% Имя таблицы.
         {{table, name},                       contype},
+        %% Список всех полей.
         {{table, fields, all},                [id, alias, name_ti, isdeleted]},
+        %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [id, name_ti, alias]},
+        %% Список полей таблицы для создания.
         {{table, fields, insert},             [name_ti, alias]},
+        %% Список полей таблицы для обновления.
         {{table, fields, update},             [name_ti, alias]},
+        %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [alias]}
     ].
-
 

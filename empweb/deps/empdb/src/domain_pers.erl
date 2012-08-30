@@ -3,13 +3,16 @@
 %% Description: TODO: Add description to biz_pers
 -module(domain_pers).
 
-%%
-%% Include files
-%%
+%% ===========================================================================
+%% Заголовочные файлы
+%% ===========================================================================
 
+%% ===========================================================================
+%% Экспортируемые функции
+%% ===========================================================================
 
 %%
-%% Exported Functions
+%% Сам пользователь
 %%
 -export([
     register/1,
@@ -19,14 +22,20 @@
     get/1,
     get/2,
     get_opt/2,
-    get_opt/3,
+    get_opt/3
+]).
+
+%%
+%% Друзья пользователя
+%%
+-export([
     get_friends/1,
     add_friend/1,
     delete_friend/1
 ]).
 
 %%
-%% Exported Functions
+%% Группа пользователя
 %%
 -export([
     get_pgroup/1,
@@ -35,7 +44,7 @@
 ]).
 
 %%
-%% Exported Functions
+%% Статус пользователя
 %%
 -export([
     get_pstatus/1,
@@ -44,7 +53,7 @@
 ]).
 
 %%
-%% Exported Functions
+%% Семейное положение пользователя
 %%
 -export([
     get_mstatus/1,
@@ -53,7 +62,7 @@
 ]).
 
 %%
-%% Exported Functions
+%% Авторитет пользователя
 %%
 -export([
     get_authority/1,
@@ -61,9 +70,8 @@
     update_authority/1
 ]).
 
-
 %%
-%% Exported Functions
+%% Эмоции пользователя
 %%
 -export([
     get_emotion/1,
@@ -71,28 +79,40 @@
     update_emotion/1
 ]).
 
+%% ===========================================================================
+%% Внешние функции
+%% ===========================================================================
 
 %%
-%% API Functions
+%% @doc Cоздает нового пользователя в базе данных сервера приложений,
+%% и нового пользователя сервера jabberd.
 %%
-
 register(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:create(Con, [
-            {phash, phash(proplists:get_value(pass, Params))}
-            |Params
-        ])
-    end).
+    Pass = proplists:get_value(pass, Params),
+    case dao_pers:create(emp, [{phash, phash(Pass)}|Params]) of
+        {ok, Id} ->
+            case dao_pers:create_ejabberd(ejabberd, [
+                {username, convert:to_list(Id)},
+                {password, Pass}
+            ]) of
+                {ok, _}->
+                    {ok, Id};
+                {error, Error} ->
+                    {error, Error}
+            end;
+        {error, Error} ->
+            {error, Error}
+    end.
 
 
 update(Params)->
     case proplists:get_value(pass, Params) of
         undefined ->
-            dao:with_connection(fun(Con)->
+            dao:with_connection(emp, fun(Con)->
                 dao_pers:update(Con, Params)
             end);
         Mbpass ->
-            dao:with_connection(fun(Con)->
+            dao:with_connection(emp, fun(Con)->
                 dao_pers:update(Con, [
                     {phash, phash(Mbpass)}
                     |Params
@@ -157,35 +177,29 @@ login({Uf, Uv}, Params) ->
             }
     end.
 
-
-
-
-
-
-
 logout(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 get_opt(Params, Fileds, Options)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         {ok, Userpls} = dao_pers:get(Con, [{isdeleted, false}|Params], Fileds),
         get_opt(Con, Params, Options, Userpls)
     end).
 
 get_opt(Params, Options)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         {ok, Userpls} = dao_pers:get(Con, [{isdeleted, false}|Params]),
         get_opt(Con, Params, Options, Userpls)
     end).
@@ -233,108 +247,123 @@ get_opt(Con,Params, [Option|Options], Accs)->
         end, Accs
     )}.
 
-%%%
-%%%
-%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Друзья пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 add_friend(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:add_friend(Con, Params)
     end).
 
 delete_friend(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:delete_friend(Con, Params)
     end).
 
 get_friends(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get_friends(Con, Params)
     end).
 
-
-get_pgroup(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_pgroup(Con, [{isdeleted, false}|Params])
-    end).
-
-get_pgroup(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_pgroup(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-update_pgroup(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:update_pgroup(Con, Params)
-    end).
-
-
-get_authority(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_authority(Con, [{isdeleted, false}|Params])
-    end).
-
-get_authority(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_authority(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-update_authority(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:update_authority(Con, Params)
-    end).
-
-
-get_pstatus(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_pstatus(Con, [{isdeleted, false}|Params])
-    end).
-
-get_pstatus(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_pstatus(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-update_pstatus(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:update_pstatus(Con, Params)
-    end).
-
-
-get_mstatus(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_mstatus(Con, [{isdeleted, false}|Params])
-    end).
-
-get_mstatus(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_pers:get_mstatus(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-update_mstatus(Params)->
-    dao:with_connection(fun(Con)->
-        dao_pers:update_mstatus(Con, Params)
-    end).
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Эмоции пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_emotion(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get_emotion(Con, [{isdeleted, false}|Params])
     end).
 
 get_emotion(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:get_emotion(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 update_emotion(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_connection(emp, fun(Con)->
         dao_pers:update_emotion(Con, Params)
     end).
 
-%%
-%% Local Functions
-%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Группа пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+get_pgroup(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_pgroup(Con, [{isdeleted, false}|Params])
+    end).
+
+get_pgroup(Params, Fileds)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_pgroup(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+update_pgroup(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:update_pgroup(Con, Params)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Семейное положение пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_mstatus(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_mstatus(Con, [{isdeleted, false}|Params])
+    end).
+
+get_mstatus(Params, Fileds)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_mstatus(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+update_mstatus(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:update_mstatus(Con, Params)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Статус пользователя пользователя: в сети \ не в сети.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_pstatus(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_pstatus(Con, [{isdeleted, false}|Params])
+    end).
+
+get_pstatus(Params, Fileds)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_pstatus(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+update_pstatus(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:update_pstatus(Con, Params)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Авторитет пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_authority(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_authority(Con, [{isdeleted, false}|Params])
+    end).
+
+get_authority(Params, Fileds)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:get_authority(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+update_authority(Params)->
+    dao:with_connection(emp, fun(Con)->
+        dao_pers:update_authority(Con, Params)
+    end).
+
+%% ===========================================================================
+%% Внутренние функции
+%% ===========================================================================
 
 phash(Mbpass) ->
     hexstring(erlang:md5(Mbpass)).

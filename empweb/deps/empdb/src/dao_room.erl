@@ -21,8 +21,6 @@
     get/3
 ]).
 
-
-
 %%
 %% Exported Functions
 %%
@@ -33,8 +31,15 @@
     get_chatlang/3
 ]).
 
-
-
+%%
+%% Exported Functions
+%%
+-export([
+    update_regimen/2,
+    create_regimen/2,
+    get_regimen/2,
+    get_regimen/3
+]).
 
 %%
 %% Exported Functions
@@ -83,6 +88,7 @@ table({fields, all})->
         type_id,
         ulimit,
         chatlang_id,
+        regimen_id,
         topic_id,
         slogan,
         weather,
@@ -144,6 +150,22 @@ create_chatlang(Con, Proplist)->
 update_chatlang(Con, Proplist)->
     dao:get(chatlang(), Con, Proplist).
 
+
+
+get_regimen(Con, What) ->
+    get_regimen(Con, What, []).
+
+get_regimen(Con, What, Fields)->
+    dao:get(regimen(), Con, What, Fields).
+
+create_regimen(Con, Proplist)->
+    dao:get(regimen(), Con, Proplist).
+
+update_regimen(Con, Proplist)->
+    dao:get(regimen(), Con, Proplist).
+
+
+
 %%
 %% Local Functions
 %%
@@ -162,6 +184,17 @@ roomtype() ->
 chatlang() ->
     [
         {{table, name},                       chatlang},
+        {{table, fields, all},                [id, name_ti, alias, isdeleted]},
+        {{table, fields, select},             [id, name_ti, alias]},
+        {{table, fields, insert},             [name_ti, alias]},
+        {{table, fields, update},             [name_ti, alias]},
+        {{table, fields, insert, required},   [alias]}
+    ].
+
+
+regimen() ->
+    [
+        {{table, name},                       regimen},
         {{table, fields, all},                [id, name_ti, alias, isdeleted]},
         {{table, fields, select},             [id, name_ti, alias]},
         {{table, fields, insert},             [name_ti, alias]},

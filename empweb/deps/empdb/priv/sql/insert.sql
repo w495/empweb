@@ -362,25 +362,87 @@ insert into pers (id, fname, sname, email, phone, nick, login, phash)
 
 select 'test users' as log;
 
-insert into pers (fname, sname, email, phone, nick, login, phash)
-    values ('fname1', 'sname1', 'email1@email.ru',
-            293203230231, 'nick1', 'login1', '21232F297A57A5A743894A0E4A801FC3');
+-- insert into pers (id, fname, sname, email, phone, nick, login, phash)
+--     values (1, 'fname-1', 'sname-1', 'email-1@email.ru',
+--             293203230231, 'nick-1', 'login-1', '21232F297A57A5A743894A0E4A801FC3');
+-- 
 
-insert into pers (fname, sname, email, phone, nick, login, phash)
-    values ('fname2', 'sname2', 'emai2l@email.ru',
-            293203230232, 'nick2', 'login2', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-1001, 'test_1_fname-1', 'test_1_sname-1', 'test_1_email-1@email.ru',
+            293203230231, 'test_1_nick-1', 'test_1_login-1', '21232F297A57A5A743894A0E4A801FC3');
 
-insert into pers (fname, sname, email, phone, nick, login, phash)
-    values ('fname3', 'sname3', 'email3@email.ru',
-            293203230233, 'nick3', 'login3', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-2001, 'test_1_fname-2', 'test_1_sname-2', 'test_1_email-2@email.ru',
+            293203230231, 'test_1_nick-2', 'test_1_login-2', '21232F297A57A5A743894A0E4A801FC3');
 
-insert into pers (fname, sname, email, phone, nick, login, phash)
-    values ('fname4', 'sname4', 'email4@email.ru',
-            293203230234, 'nick4', 'login4', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-3001, 'test_1_fname-3', 'test_1_sname-3', 'test_1_email-3@email.ru',
+            293203230231, 'test_1_nick-3', 'test_1_login-3', '21232F297A57A5A743894A0E4A801FC3');
 
-insert into pers (fname, sname, email, phone, nick, login, phash)
-    values ('fadmin', 'sadmin', 'padmin@padmin.ru',
-            093203230235, 'nick5', 'login5', '21232F297A57A5A743894A0E4A801FC3');
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-4001, 'test_1_fname-4', 'test_1_sname-4', 'test_1_email-4@email.ru',
+            293203230231, 'test_1_nick-4', 'test_1_login-4', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-5001, 'test_1_fname-5', 'test_1_sname-5', 'test_1_email-5@email.ru',
+            293203230231, 'test_1_nick-5', 'test_1_login-5', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-6001, 'test_1_fname-6', 'test_1_sname-6', 'test_1_email-6@email.ru',
+            293203230231, 'test_1_nick-6', 'test_1_login-6', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-7001, 'test_1_fname-7', 'test_1_sname-7', 'test_1_email-7@email.ru',
+            293203230231, 'test_1_nick-7', 'test_1_login-7', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-8001, 'test_1_fname-8', 'test_1_sname-8', 'test_1_email-8@email.ru',
+            293203230231, 'test_1_nick-8', 'test_1_login-8', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-10001, 'test_1_fname-10', 'test_1_sname-10', 'test_1_email-10@email.ru',
+            293203230231, 'test_1_nick-10', 'test_1_login-10', '21232F297A57A5A743894A0E4A801FC3');
+
+
+
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-1002, 'test_2_fname-1', 'test_2_sname-1', 'test_2_email-1@email.ru',
+            293203230231, 'test_2_nick-1', 'test_2_login-1', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-2002, 'test_2_fname-2', 'test_2_sname-2', 'test_2_email-2@email.ru',
+            293203230231, 'test_2_nick-2', 'test_2_login-2', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-3002, 'test_2_fname-3', 'test_2_sname-3', 'test_2_email-3@email.ru',
+            293203230231, 'test_2_nick-3', 'test_2_login-3', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-4002, 'test_2_fname-4', 'test_2_sname-4', 'test_2_email-4@email.ru',
+            293203230231, 'test_2_nick-4', 'test_2_login-4', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-5002, 'test_2_fname-5', 'test_2_sname-5', 'test_2_email-5@email.ru',
+            293203230231, 'test_2_nick-5', 'test_2_login-5', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-6002, 'test_2_fname-6', 'test_2_sname-6', 'test_2_email-6@email.ru',
+            293203230231, 'test_2_nick-6', 'test_2_login-6', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-7002, 'test_2_fname-7', 'test_2_sname-7', 'test_2_email-7@email.ru',
+            293203230231, 'test_2_nick-7', 'test_2_login-7', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-8002, 'test_2_fname-8', 'test_2_sname-8', 'test_2_email-8@email.ru',
+            293203230231, 'test_2_nick-8', 'test_2_login-8', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-10002, 'test_2_fname-10', 'test_2_sname-10', 'test_2_email-10@email.ru',
+            293203230231, 'test_2_nick-10', 'test_2_login-10', '21232F297A57A5A743894A0E4A801FC3');
+
+
 
 
     --//
@@ -675,7 +737,7 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
         ),
-        (   'пустое',       'sysvartype',   '   name_ti','void',
+        (   'пустое',       'sysvartype',      'name_ti','void',
             (select name_ti from sysvartype  where alias='void'),
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
@@ -852,17 +914,17 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
 select 'log:roomtype' as log;
 
 insert into roomtype(alias)
-    values ('lang'), ('prison'), ('hell'), ('heaven');
+    values ('land'), ('prison'), ('hell'), ('heaven');
 
 insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
     values
-        (   'land',         'roomtype',     'name_ti','lang',
-            (select name_ti from roomtype where alias='lang'),
+        (   'land',         'roomtype',     'name_ti','land',
+            (select name_ti from roomtype where alias='land'),
             (select id from lang where alias='en_gb'),
             (select id from trtype where alias='dynamic')
         ),
-        (   'страна',       'roomtype',     'name_ti','lang',
-            (select name_ti from roomtype where alias='lang'),
+        (   'страна',       'roomtype',     'name_ti','land',
+            (select name_ti from roomtype where alias='land'),
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
         ),
@@ -971,6 +1033,268 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
         );
+
+
+
+select 'log:regimen' as log;
+
+insert into regimen(alias)
+    values
+        ('despotism'), 
+        ('monarchy'), 
+        ('sultanate'),
+        ('republic'), 
+        ('anarchy'), 
+        ('kingdom'),
+        ('shogunate'),
+        ('principality'),
+        ('feudal'),
+        ('tribe');
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'despotism',
+            'regimen', 'name_ti', 'despotism',
+            (select name_ti from regimen where alias='despotism'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'The founder of the country is a life of its owner, on the one hand, it is tempting to create this type of country, on the other hand — in a country, other users will be severely limited in their rights compared to a dictator, so is unlikely to be many who want to visit a country.',
+            'regimen', 'descr_ti', 'despotism',
+            (select descr_ti from regimen where alias='despotism'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'monarchy',
+            'regimen', 'name_ti', 'monarchy',
+            (select name_ti from regimen where alias='monarchy'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ), (
+            'Founder of the country became its first monarch, over time, may be a change of government (coup) — Crown can go to another, but only to someone who has become quite influential in the country, ie the country has some real merit.',
+            'regimen', 'descr_ti', 'monarchy',
+            (select descr_ti from regimen where alias='monarchy'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'sultanate',
+            'regimen', 'name_ti', 'sultanate',
+            (select name_ti from regimen where alias='sultanate'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ), (
+            'Eastern monarchy. Founder of the country is a life of its owner, on the one hand, it is tempting to create this type of country, on the other hand — in a country, other users will be severely limited in their rights compared to a dictator, so is unlikely to be many who want to visit a country .',
+            'regimen', 'descr_ti', 'sultanate',
+            (select descr_ti from regimen where alias='sultanate'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'republic',
+            'regimen', 'name_ti', 'republic',
+            (select name_ti from regimen where alias='republic'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Elected president. President is open to anyone, regardless of the authority (even a novice) and real merit, most importantly — popularity, chosen by voting for a certain period.',
+            'regimen', 'descr_ti', 'republic',
+            (select descr_ti from regimen where alias='republic'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'anarchy',
+            'regimen', 'name_ti', 'anarchy',
+            (select name_ti from regimen where alias='anarchy'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'The founder of the country (the owner) is no different from other people, except for the right to sell the country, bought her just will not have any privileges, except the right to resell the country. Accordingly, the people of the country no matter who the owner at the moment.',
+            'regimen', 'descr_ti', 'anarchy',
+            (select descr_ti from regimen where alias='anarchy'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'kingdom',
+            'regimen', 'name_ti', 'kingdom',
+            (select name_ti from regimen where alias='kingdom'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'The founder of the country is the king of life, no he will not get any coups. The king can only relinquished his title — selling country; buyer along with the country and takes the title of King (absolute monarch).',
+            'regimen', 'descr_ti', 'kingdom',
+            (select descr_ti from regimen where alias='kingdom'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'shogunate',
+            'regimen', 'name_ti', 'shogunate',
+            (select name_ti from regimen where alias='shogunate'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Real power in the country belongs not to the king, and the samurai code of honor that Real Samurai.',
+            'regimen', 'descr_ti', 'shogunate',
+            (select descr_ti from regimen where alias='shogunate'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'principality',
+            'regimen', 'name_ti', 'principality',
+            (select name_ti from regimen where alias='principality'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'The owner of the country — prince or princess — enjoy great respect, but almost did not intervene in the affairs of people.',
+            'regimen', 'descr_ti', 'principality',
+            (select descr_ti from regimen where alias='principality'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'feudal system',
+            'regimen', 'name_ti', 'feudal',
+            (select name_ti from regimen where alias='feudal'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Real power in the country belongs not to the king, and the Knights, the most romantic structure — here is thriving cult of beautiful ladies (ladies heart).',
+            'regimen', 'descr_ti', 'feudal',
+            (select descr_ti from regimen where alias='feudal'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'tribe',
+            'regimen', 'name_ti', 'tribe',
+            (select name_ti from regimen where alias='tribe'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Tribe ruled by a leader.',
+            'regimen', 'descr_ti', 'tribe',
+            (select descr_ti from regimen where alias='tribe'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'деспостизм',
+            'regimen', 'name_ti', 'despotism',
+            (select name_ti from regimen where alias='despotism'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Основатель страны является пожизненным ее хозяином; с одной стороны, это заманчиво создать такой тип страны, с другой стороны — в такой стране все остальные пользователи будут сильно ограничены в своих правах по сравнению с диктатором, поэтому вряд ли будет много желающих такую страну посетить.',
+            'regimen', 'descr_ti','despotism',
+            (select descr_ti from regimen where alias='despotism'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'монархия',
+            'regimen', 'name_ti', 'monarchy',
+            (select name_ti from regimen where alias='monarchy'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ), (
+            'Oснователь страны становится ее первым монархом; со временем может произойти смена власти (переворот) — корона может перейти к другому, но только к тому, кто стал достаточно авторитетным в этой стране, т.е. имеет перед страной какие-то реальные заслуги.',
+            'regimen', 'descr_ti', 'monarchy',
+            (select descr_ti from regimen where alias='monarchy'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'султанат',
+            'regimen', 'name_ti', 'sultanate',
+            (select name_ti from regimen where alias='sultanate'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ), (
+            'Восточная монархия. Oснователь страны является пожизненным ее хозяином; с одной стороны, это заманчиво создать такой тип страны, с другой стороны — в такой стране все остальные пользователи будут сильно ограничены в своих правах по сравнению с диктатором, поэтому вряд ли будет много желающих такую страну посетить.',
+            'regimen', 'descr_ti', 'sultanate',
+            (select descr_ti from regimen where alias='sultanate'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'республика',
+            'regimen', 'name_ti', 'republic',
+            (select name_ti from regimen where alias='republic'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Избираемый президент. Президентом страны может стать каждый, не зависимо от авторитета (даже новичок) и реальных заслуг, главное — популярность, выбирается на определенный срок голосованием.',
+            'regimen', 'descr_ti', 'republic',
+            (select descr_ti from regimen where alias='republic'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'анархия',
+            'regimen', 'name_ti', 'anarchy',
+            (select name_ti from regimen where alias='anarchy'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Основатель страны (владелец) ничем не отличается от других жителей, кроме права продать страну; купивший ее так же не будет иметь никаких привилегий, кроме права перепродать страну. Соответственно и жителям страны без разницы, кто ее владелец в настоящий момент.',
+            'regimen', 'descr_ti', 'anarchy',
+            (select descr_ti from regimen where alias='anarchy'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'королевство',
+            'regimen', 'name_ti', 'kingdom',
+            (select name_ti from regimen where alias='kingdom'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Основатель страны является пожизненным королем, никакие перевороты ему не грозят. Король может только сам отказаться от своего титула — продав страну; покупатель вместе со страной приобретает и титул короля (абсолютного монарха).',
+            'regimen', 'descr_ti', 'kingdom',
+            (select descr_ti from regimen where alias='kingdom'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'сегунат',
+            'regimen', 'name_ti', 'shogunate',
+            (select name_ti from regimen where alias='shogunate'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Фактическая власть в стране принадлежит не королю, а самураям, которые чтят Кодекс Настоящего Самурая.',
+            'regimen', 'descr_ti', 'shogunate',
+            (select descr_ti from regimen where alias='shogunate'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'графство',
+            'regimen', 'name_ti', 'principality',
+            (select name_ti from regimen where alias='principality'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Владелец страны — граф или графиня — пользуются огромным уважением, но практически не вмешиваются в дела жителей.',
+            'regimen', 'descr_ti', 'principality',
+            (select descr_ti from regimen where alias='principality'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'феодальный строй',
+            'regimen', 'name_ti', 'feudal',
+            (select name_ti from regimen where alias='feudal'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Фактическая власть в стране принадлежит не королю, а Рыцарскому Ордену; самый романтический строй — здесь процветает культ прекрасных дам (дам сердца).',
+            'regimen', 'descr_ti', 'feudal',
+            (select descr_ti from regimen where alias='feudal'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'племя',
+            'regimen', 'name_ti', 'tribe',
+            (select name_ti from regimen where alias='tribe'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),(
+            'Племенем правит вождь.',
+            'regimen', 'descr_ti', 'tribe',
+            (select descr_ti from regimen where alias='tribe'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        );
+
+
 
 select 'log:communitytype' as log;
 

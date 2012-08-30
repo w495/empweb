@@ -65,7 +65,7 @@
                         {"fname": "login"}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: нет функции">
-                        {"params":{"id":1, "pass":"admin"}}
+                        {"params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: параметры null">
                         {"fname": "login", "params": null}
@@ -74,16 +74,16 @@
                         {"fname": "login", "params": {}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: аргументы">
-                        {"fname": "login", "_params_":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "_params_":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: параметры не все">
-                        {"fname": "login", "params": {"id":1}}
+                        {"fname": "login", "params": {"id":-1001}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: неведомая фигня">
-                        {"funcname": "_login_", "parames":{"id":1, "pass":"admin"}}
+                        {"funcname": "_login_", "parames":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Неверный формат: нет такой функции">
-                        {"fname": "_login_", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "_login_", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                 </ol>
             </section>
@@ -207,13 +207,13 @@
                 <h2>Регистрация</h2>
                 <ol class="tests">
                     <li class="test" data-name="Обычная регистация c email">
-                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23", "email": "~(random(email))", "phone": ~(random(phone))}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"gwerty12", "email": "~(random(email))", "phone": ~(random(phone))}}
                     </li>
                     <li class="test" data-name="Обычная регистация c email">
-                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23", "email": "~(random(email))"}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"gwerty12", "email": "~(random(email))"}}
                     </li>
                     <li class="test" data-name="Обычная регистация">
-                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"admin23"}}
+                        {"fname": "register", "params":{"nick":"nick ~(random(string))", "pass":"gwerty12"}}
                     </li>
                 </ol>
             </section>
@@ -221,21 +221,23 @@
             <hr/>
             <section id="login">
                 <h2>Вход</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-anti="anti" data-name="C не правильным пользователем">
-                        {"fname": "login", "params":{"id":1, "pass":"admin23"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin23"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="C не правильным паролем">
-                        {"fname": "login", "params":{"id":1, "pass":"admin23"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin23"}}
                     </li>
                     <li class="test" data-name="C правильным паролем">
-                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                 </ol>
             </section>
             <hr/>
             <section id="logout">
                 <h2>Выход</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-anti="anti" data-name="По id а не по nick">
                         {"fname": "logout", "params":{"nick":"admin"}}
@@ -247,151 +249,151 @@
                         {"fname": "logout", "params":{"id":"admin2"}}
                     </li>
                     <li class="test" data-name="Нормальный выход">
-                        {"fname": "logout", "params":{"id":1}}
+                        {"fname": "logout", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Повторный выход">
-                        {"fname": "logout", "params":{"id":1}}
+                        {"fname": "logout", "params":{"id":-1001}}
                     </li>
                 </ol>
             </section>
             <hr/>
             <section id="pers_data">
                 <h2>Данные</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-anti="anti"  data-name="Не можем получить данные если не залогинены">
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name="Логинимся для получения данных">
-                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name='Получаем данные {"id":1}'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name='Получаем данные {"id":"1"}'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name='Получаем данные {"id":1}'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name='Получаем данные всех пользователей'>
                         {"fname": "get_all_perss", "params":{}}
                     </li>
                     <li class="test" data-name='Получить друзей'>
-                        {"fname": "get_friends", "params":{"pers_id":1}}
-                    </li>
-                    <li class="test" data-name='Получить друзей'>
-                        {"fname": "get_friends", "params":{"pers_id":1}}
+                        {"fname": "get_friends", "params":{"pers_id":-1001}}
                     </li>
                     <li class="test" data-name='Добавить друга'>
-                        {"fname": "add_friend", "params":{"pers_id":1, "friend_id":1}}
+                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
                     </li>
                     <li class="test" data-anti="anti" data-name='Добавить друга второй раз не удасться'>
-                        {"fname": "add_friend", "params":{"pers_id":1, "friend_id":1}}
+                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
                     </li>
                     <li class="test" data-name='Получить друзей'>
-                        {"fname": "get_friends", "params":{"pers_id":1}}
+                        {"fname": "get_friends", "params":{"pers_id":-1001}}
                     </li>
                     <li class="test" data-name='Удалить друга'>
-                        {"fname": "delete_friend", "params":{"pers_id":1, "friend_id":1}}
+                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
                     </li>
                     <li class="test" data-anti="anti"  data-name='Удалить друга второй раз не удасться'>
-                        {"fname": "delete_friend", "params":{"pers_id":1, "friend_id":1}}
+                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
                     </li>
                     <li class="test" data-name='Получить друзей'>
-                        {"fname": "get_friends", "params":{"pers_id":1}}
+                        {"fname": "get_friends", "params":{"pers_id":-1001}}
                     </li>
                 </ol>
             </section>
             <hr/>
             <section id="pers_udpate">
                 <h2>Обновление</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-name="Нормальный выход">
-                        {"fname": "logout", "params":{"id":1}}
+                        {"fname": "logout", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-anti="anti"  data-name="Не можем изменить данные если не залогинены">
-                        {"fname": "update_pers", "params":{"id":1,"hobby":"some a"}}
+                        {"fname": "update_pers", "params":{"id":-1001,"hobby":"some a"}}
                     </li>
                     <li class="test" data-name="Логинимся для получения данных">
-                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name='Получаем данные (до 1 изменения)'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test"  data-name="Можем изменить данные о хобби">
-                        {"fname": "update_pers", "params":{"id":1,"hobby":"some ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":-1001,"hobby":"some ~(random(string))"}}
                     </li>
                     <li class="test" data-name='Получаем данные (после 1 изменения)'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name='Получаем данные (до 2 изменения)'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test"  data-name="Можем изменить данные о пользователе">
-                        {"fname": "update_pers", "params":{"id":1,"hobby":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
+                        {"fname": "update_pers", "params":{"id":-1001,"hobby":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
                     </li>
                     <li class="test" data-name='Получаем данные (после 2 изменения)'>
-                        {"fname": "get_pers", "params":{"id":1}}
+                        {"fname": "get_pers", "params":{"id":-1001}}
                     </li>
                     <li class="test" data-name="Несуществующие поля игнорируются если есть нормальные">
-                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
+                        {"fname": "update_pers", "params":{"id":-1001,"hobby__2":"hobby ~(random(string))", "phone":~(random(phone)), "email":"~(random(email))"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Несуществующие поля игнорируются если есть нормальные">
-                        {"fname": "update_pers", "params":{"id":1,"hobby__2":"hobby ~(random(string))"}}
+                        {"fname": "update_pers", "params":{"id":-1001,"hobby__2":"hobby ~(random(string))"}}
                     </li>
                 </ol>
             </section>
             <hr/>
             <section id="pass">
                 <h2>Получение пароля</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-name="Логинимся для получения данных">
-                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Не можем запросить изменение пароля другому пользователю">
-                        {"fname": "pass", "params":{"id":2}}
+                        {"fname": "pass", "params":{"id":-1002}}
                     </li>
                     <li class="test" data-name="Логинимся под другим пользователем">
-                        {"fname": "login", "params":{"id":2, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1002, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
-                        {"fname": "pass", "params":{"id":2}}
+                        {"fname": "pass", "params":{"id":-1002}}
                     </li>
                     <li class="test" data-name="Нормальный выход">
-                        {"fname": "logout", "params":{"id":2}}
+                        {"fname": "logout", "params":{"id":-1002}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Пароль был изменен">
-                        {"fname": "login", "params":{"id":2, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1002, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
-                        {"fname": "pass", "params":{"id":3}}
+                        {"fname": "pass", "params":{"id":-3001}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Пароль был изменен">
-                        {"fname": "login", "params":{"id":3, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-3001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Запрашиваем пароль, но такого пользователя нет">
                         {"fname": "pass", "params":{"id":10000000000000000}}
                     </li>
                     <li class="test" data-name="Логинимся под другим пользователем">
-                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-4001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Cтавим пустой email">
-                        {"fname": "update_pers", "params":{"id":4, "email":null}}
+                        {"fname": "update_pers", "params":{"id":-4001, "email":null}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Запрашиваем пароль: нехватает данных">
-                        {"fname": "pass", "params":{"id":4}}
+                        {"fname": "pass", "params":{"id":-4001}}
                     </li>
                     <li class="test" data-name="Пароль не был изменен">
-                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-4001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Cтавим пустой email и phone">
-                        {"fname": "update_pers", "params":{"id":4, "email":null, "phone": null}}
+                        {"fname": "update_pers", "params":{"id":-4001, "email":null, "phone": null}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Запрашиваем пароль: нехватает данных">
-                        {"fname": "pass", "params":{"id":4}}
+                        {"fname": "pass", "params":{"id":-4001}}
                     </li>
                     <li class="test" data-name="Пароль не был изменен">
-                        {"fname": "login", "params":{"id":4, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-4001, "pass":"admin"}}
                     </li>
                     <p><b>TODO:</b><em>Для анонимного запроса пароля, нужно будет использовать капчу.</em></p>
                 </ol>
@@ -399,9 +401,10 @@
             <hr/>
             <section id="docs">
                 <h2>Документы</h2>
+                <p>Для тестовых пользователей используются отрицательный id</p>
                 <ol class="tests">
                     <li class="test" data-name="Логинимся для получения данных">
-                        {"fname": "login", "params":{"id":1, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Создать блог">
                         {"fname": "create_blog", "params":{"head":"blog head ~(random(string))", "body":"blog body ~(random(long_string))"}}
@@ -464,7 +467,19 @@
                         {"fname": "get_post", "params":{"id": 4}}
                     </li>
                     <li class="test" data-name="Получить сообществo">
-                        {"fname": "get_community", "params":{"id": 4}}
+                        {"fname": "get_community", "params":{"id": 5}}
+                    </li>
+                    <li class="test" data-name="Пользователь -1001 переместился в страну 2">
+                        {"fname": "update_pers", "params":{"id":-1001, "room_id":2}}
+                    </li>
+                    <li class="test" data-name="Список пользователей в стане 2">
+                        {"fname": "get_pers", "params":{"room_id":2}}
+                    </li>
+                    <li class="test" data-name="Пользователь -1001 состоит в сообществе">
+                        {"fname": "update_pers", "params":{"id":-1001, "community_id": 5}}
+                    </li>
+                    <li class="test" data-name="Список пользователей в сообществе 5">
+                        {"fname": "get_pers", "params":{"community_id":5}}
                     </li>
                 </ol>
             </section>

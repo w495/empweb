@@ -407,7 +407,7 @@ format(Format, Trem) ->
 %%% -------------------------------------------------------------------------
 
 resp({error, {not_exists, Object}}) ->
-    gone({[{bad_session, Object}]});
+    gone({[{not_exists, Object}]});
     
 resp({error, {bad_session, Object}}) ->
     forbidden({[{bad_session, Object}]});

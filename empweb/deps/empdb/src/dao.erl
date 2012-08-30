@@ -414,7 +414,7 @@ collect_where_params(Where, Params, [{Key, Val}|T]) ->
 collect_where_params(Where, Params, [{Key, Action, Val}|T]) ->
     collect_where_params([lists:append([Key, " ", Action, " $", convert:to_list(length(Params) + 1)])|Where], [Val | Params], T);
 collect_where_params(Where, Params, []) when length(Where) > 0->
-    {" WHERE", [string:join(lists:reverse(Where), " and ")], lists:reverse(Params)};
+    {" WHERe", [string:join(lists:reverse(Where), " and ")], lists:reverse(Params)};
 collect_where_params(_, _, []) ->
     {";", []}.
 
@@ -511,16 +511,15 @@ pgret({ok, _Count}) ->
 %%%
 %%% insert sq & eq
 %%%
-pgret({ok, 1, _, [{Value}]}) ->
-
-    {ok, Value};
+pgret({ok, 1, Columns, Vals}) ->
+    [{[{_,Res}]}] = make_proplist(Columns, Vals, []),
+    {ok, Res};
 
 %%%
 %%% insert sq & eq
 %%%
-pgret({ok, _Count, _Columns, _Rows}) ->
-
-    ok;
+pgret({ok, _Count, Columns, Vals}) ->
+    {ok, make_proplist(Columns, Vals, [])};
 
 %%% 
 %%% @doc    Ошибка сиквела - неожиданный возврат в функции
@@ -553,9 +552,19 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
     case Error_code_bin of
         <<"23502">> ->
             try
-                {ok, RE} = re:compile("\"(.+)\""),
-                {match, [_, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
+                {ok, Re} = re:compile("\"(.+)\""),
+                {match, [_, C | _]} = re:run(Msg, Re, [{capture, all, list}]),
                 {error, {not_null, erlang:list_to_binary(C)}}
+            catch
+                E:R ->
+                    io:format("pgret ERROR: ~p - ~p~n", [E, R]),
+                    {error, {unknown, Msg}}
+            end;
+        <<"23503">> ->
+            try
+                {ok, Re} = re:compile("\"(.*?)*?_([^_].+)_fkey\""),
+                {match, [_, _, C | _]} = re:run(Msg, Re, [{capture, all, list}]),
+                {error, {not_exists, erlang:list_to_binary(C)}}
             catch
                 E:R ->
                     io:format("pgret ERROR: ~p - ~p~n", [E, R]),
@@ -563,15 +572,16 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
             end;
         <<"23505">> ->
             try
-                {ok, RE} = re:compile("\"(.*?)*?_([^_].+)_key\""),
-                {match, [_, _, C | _]} = re:run(Msg, RE, [{capture, all, list}]),
+                {ok, Re} = re:compile("\"(.*?)*?_([^_].+)_key\""),
+                {match, [_, _, C | _]} = re:run(Msg, Re, [{capture, all, list}]),
                 {error, {not_unique, erlang:list_to_binary(C)}}
             catch
                 E:R ->
                     io:format("pgret ERROR: ~p - ~p~n", [E, R]),
                     {error, {unknown, Msg}}
             end;
-        _ ->
+        Code ->
+            io:format("Code ~p ~n", [Code]),
             {error, {unknown, Msg}}
     end;
 pgreterr(E) ->
