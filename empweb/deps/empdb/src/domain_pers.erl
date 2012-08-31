@@ -83,6 +83,10 @@
 %% Внешние функции
 %% ===========================================================================
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Сам пользователь
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%
 %% @doc Cоздает нового пользователя в базе данных сервера приложений,
 %% и нового пользователя сервера jabberd.
@@ -91,6 +95,7 @@ register(Params)->
     Pass = proplists:get_value(pass, Params),
     case dao_pers:create(emp, [{phash, phash(Pass)}|Params]) of
         {ok, Id} ->
+            %% создаем запись в базе jabberd
             case dao_pers:create_ejabberd(ejabberd, [
                 {username, convert:to_list(Id)},
                 {password, Pass}
@@ -104,20 +109,27 @@ register(Params)->
             {error, Error}
     end.
 
-
+%%
+%% @doc Обновляет пользователя. Если у пользователя указан пароль,
+%% то обновляется хешь пароля в базе данных сервера приложений,
+%% и обновляется запись пользователя сервера jabberd.
+%%
 update(Params)->
     case proplists:get_value(pass, Params) of
         undefined ->
-            dao_pers:update(emp, Params)
+            %% не пытаемся поменять пароль
+            dao_pers:update(emp, Params);
         Mbpass ->
+            %% пытаемся поменять пароль
             case dao_pers:update(emp, [
                 {phash, phash(Mbpass)}
                 |Params
             ])  of
                 {ok, Id} ->
+                    %% изменяем запись в базе jabberd
                     case dao_pers:update_ejabberd(ejabberd, [
                         {username, convert:to_list(Id)},
-                        {password, Pass}
+                        {password, Mbpass}
                     ]) of
                         {ok, _}->
                             {ok, Id};
@@ -129,11 +141,14 @@ update(Params)->
             end
     end.
 
-
+%%
+%% @doc Вход пользователя. Создание сессии.
+%% Сначала определяет, какой из параметров был передан, 
+%% и логинит пользователя по этому параметру.
+%%
 login(Params) ->
     Id      = proplists:get_value(id,       Params),
     Login   = proplists:get_value(login,    Params),
-
     if
         Id =/= undefined ->
             login({id, Id}, Params);
@@ -144,11 +159,15 @@ login(Params) ->
     end.
 
 %%
-%% Вход пользователя. Создание сессии.
+%% @doc Проверяет, соответвует ли id или логин пользователя его паролю.
+%% Выдает ошибку, если такого пользователя нет или если пароль не соответвует
 %%
 login({Uf, Uv}, Params) ->
     Mbpass = proplists:get_value(pass, Params),
     Mbphash = phash(Mbpass),
+    %% Фиктиные переменные, в логике реально не участвуют.
+    %% Нужны для быстрого построения проверки, 
+    %% на количество ошибочных логинов.
     Max_auth_error = 10,
     EC = 0,
     case domain_pers:get_opt([{Uf, Uv}], [id, login, phash], [perm_names]) of
@@ -157,6 +176,9 @@ login({Uf, Uv}, Params) ->
             Phash = proplists:get_value(phash, Userpl),
             case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
                 {true, false} ->
+                    %% Фиктиная ветка, в реалности не выполняется.
+                    %% Нужны для быстрого построения проверки,
+                    %% на количество ошибочных логинов.
                     {error, {auth_count_overflow,
                         {[
                             {max,  Max_auth_error - (EC + 1)},
@@ -165,6 +187,7 @@ login({Uf, Uv}, Params) ->
                         ]}
                     }};
                 {true, _} ->
+                    %% Есть такой пользователь, но нет такого пароля.
                     {error, {bad_password,
                             {[
                                 {max,  Max_auth_error - (EC + 1)},
@@ -176,6 +199,7 @@ login({Uf, Uv}, Params) ->
                     {ok, [{Userpl}]}
             end;
         _ ->
+            %% Нет такого пользователя
             {error,
                 {bad_pers,
                     {[

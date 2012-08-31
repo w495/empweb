@@ -11,6 +11,7 @@
 %% ---------------------------------------------------------------------------
 
 -include("empweb.hrl").
+
 -include_lib("norm/include/norm.hrl").
 
 %%
@@ -74,100 +75,9 @@ init(_, Req, #empweb_hap{
         }
     }.
 
-
-handle(_req, #empweb_hap{action='get_all_authorities'} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_authorities">>),
-
-    {ok,jsonapi:resp(biz_pers:get_authority([])),Hap};
-
-
-handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
-    ?evman_args(Hap, <<" = get_authority">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_one{
-                rules=[
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    },
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    }
-                ]
-            }
-        ]),
-        fun(Data)->
-            {ok,jsonapi:resp(biz_pers:get_authority(Data#norm.return)),Hap}
-        end,
-        Hap
-    );
-
-handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_mstatuses">>),
-    {ok,jsonapi:resp(biz_pers:get_mstatus([])),Hap};
-
-handle(_req, #empweb_hap{action='get_mstatus', params=Params} = Hap) ->
-    ?evman_args(Hap, <<" = get_mstatus">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
-        fun(Data)->
-            {ok,jsonapi:resp(biz_pers:get_mstatus(Data#norm.return)),Hap}
-        end,
-        Hap
-    );
-
-
-handle(_req, #empweb_hap{action='get_all_pstatuses'} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_pstatuses">>),
-    {ok,jsonapi:resp(biz_pers:get_pstatus([])),Hap};
-
-handle(_req, #empweb_hap{action='get_pstatus', params=Params} = Hap) ->
-    ?evman_args(Hap, <<" = get_pstatus">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
-        fun(Data)->
-            {ok,jsonapi:resp(biz_pers:get_pstatus(Data#norm.return)),Hap}
-        end,
-        Hap
-    );
-
-handle(_req, #empweb_hap{action='get_all_emotions'} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_emotions">>),
-    {ok,jsonapi:resp(biz_pers:get_emotion([])),Hap};
-
-handle(_req, #empweb_hap{action='get_emotion', params=Params} = Hap) ->
-    ?evman_args(Hap, <<" = get_emotion">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
-        fun(Data)->
-            {ok,jsonapi:resp(biz_pers:get_emotion(Data#norm.return)),Hap}
-        end,
-        Hap
-    );
-
-
-% {"params":{"sname":"sname1","nick":"nickname","city":"Иркутск","phone":"+380633612672","email":"em@il.com","pass":"password","birthday":1900,"description":"description","fname":"fname"},"fname":"register"}
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Сам пользователь непосредственно
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = register">>),
@@ -196,8 +106,6 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-
-            ?debug("biz_pers:register(~p).", [Data#norm.return]),
             {ok,jsonapi:resp(biz_pers:register(Data#norm.return)),Hap}
         end
     );
@@ -270,7 +178,9 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true, auth=Auth} = Hap) ->
+handle(Req, #empweb_hap{
+        action=logout,  params=Params, is_auth=true, auth=Auth
+    } = Hap) ->
     ?evman_args(Hap, <<" = logout">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -290,11 +200,17 @@ handle(Req, #empweb_hap{action=logout,  params=Params, is_auth=true, auth=Auth} 
         end
     );
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Друзья пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = get_friends">>),
+handle(_req, #empweb_hap{
+        action=get_friends, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = get friends">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -312,9 +228,10 @@ handle(_req, #empweb_hap{action=get_friends, params=Params, is_auth=true} = Hap)
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = add_friend">>),
-
+handle(_req, #empweb_hap{
+        action=add_friend, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = add friend">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -335,9 +252,10 @@ handle(_req, #empweb_hap{action=add_friend, params=Params, is_auth=true} = Hap) 
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = delete_friend">>),
-    
+handle(_req, #empweb_hap{
+        action=delete_friend, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = delete friend">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -358,9 +276,10 @@ handle(_req, #empweb_hap{action=delete_friend, params=Params, is_auth=true} = Ha
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=get_pers, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = get_pers">>),
-
+handle(_req, #empweb_hap{
+        action=get_pers, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = get pers">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -391,17 +310,19 @@ handle(_req, #empweb_hap{action=get_pers, params=Params, is_auth=true} = Hap) ->
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
-handle(_req, #empweb_hap{action=get_all_perss, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = get_all_perss">>),
-    
+handle(_req, #empweb_hap{
+        action=get_all_perss, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = get all perss">>),
     {ok,jsonapi:resp(biz_pers:get([])),Hap};
 
 %%
-%% Функция отрабатывает только если пользователь идентифицирован
+%% Функция отрабатывает только если пользователь идентиф ицирован
 %%
-handle(_req, #empweb_hap{action=update_pers, params=Params, is_auth=true} = Hap) ->
-    ?evman_args(Hap, <<" = update_pers">>),
-    
+handle(_req, #empweb_hap{
+        action=update_pers, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = update pers">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -467,15 +388,120 @@ handle(_req, #empweb_hap{action=update_pers, params=Params, is_auth=true} = Hap)
         end
     );
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Авторитет пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action=Action, params=Params, is_auth=Is_auth} = Hap) ->
+handle(_req, #empweb_hap{action='get_all_authorities'} = Hap) ->
+    ?evman_args(Hap, <<" = get all authorities">>),
+    {ok,jsonapi:resp(biz_pers:get_authority([])),Hap};
+
+
+handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get authority">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_one{
+                rules=[
+                    #norm_rule{
+                        key = alias,
+                        types = [string]
+                    },
+                    #norm_rule{
+                        key = id,
+                        types = [integer]
+                    }
+                ]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_pers:get_authority(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Семейное положение пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
+    ?evman_args(Hap, <<" = get all mstatuses">>),
+    {ok,jsonapi:resp(biz_pers:get_mstatus([])),Hap};
+
+handle(_req, #empweb_hap{action='get_mstatus', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get mstatus">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [integer]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_pers:get_mstatus(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Статус пользователя пользователя: в сети \ не в сети.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{action='get_all_pstatuses'} = Hap) ->
+    ?evman_args(Hap, <<" = get all pstatuses">>),
+    {ok,jsonapi:resp(biz_pers:get_pstatus([])),Hap};
+
+handle(_req, #empweb_hap{action='get_pstatus', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get pstatus">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [integer]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_pers:get_pstatus(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Эмоции пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{action='get_all_emotions'} = Hap) ->
+    ?evman_args(Hap, <<" = get all emotions">>),
+    {ok,jsonapi:resp(biz_pers:get_emotion([])),Hap};
+
+handle(_req, #empweb_hap{action='get_emotion', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get emotion">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key = id,
+                types = [integer]
+            }
+        ]),
+        fun(Data)->
+            {ok,jsonapi:resp(biz_pers:get_emotion(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+handle(_req, #empweb_hap{
+        action=Action, params=Params, is_auth=Is_auth
+    } = Hap) ->
     ?evman_notice({hap, [
         {forbidden,     true},
         {action,        Action},
         {params,        Params},
         {is_auth,       Is_auth}
     ]}, <<" = forbidden">>),
-
     {ok,jsonapi:forbidden(), Hap}.
 
 
