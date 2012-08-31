@@ -313,7 +313,7 @@ create(Module, Con, Proplist, Ret)->
 update({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret1, Ret2)->
     case update(Parent, Con, Proplist,Ret1) of
         {ok, Pid} ->
-            X = update(Module, Con, Proplist, Ret2),
+            X = update(Module, Con, [{Ret2, Pid}|Proplist], Ret2),
             io:format("X  = ~p ~n", [X]),
             X;
         {error, Error} ->
@@ -335,6 +335,7 @@ update(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
         fun(F)-> lists:member(F, proplists:get_value({table, fields, update}, Options)) end,
         proplists:get_keys(Proplist)
     ),
+    io:format("Kname, Proplist = ~p", [[Kname, Proplist]]),
     case proplists:get_value(Kname, Proplist) of
         undefined ->
             create(Options, Con, Proplist, Ret);
