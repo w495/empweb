@@ -96,7 +96,8 @@ register(Params)->
     case dao_pers:create(emp, [{phash, phash(Pass)}|Params]) of
         {ok, Id} ->
             %% создаем запись в базе jabberd
-            case dao_pers:create_ejabberd(ejabberd, [
+            %case dao_pers:create_ejabberd(ejabberd, [
+            case dao_pers:update_ejabberd(ejabberd, [
                 {username, convert:to_list(Id)},
                 {password, Pass}
             ]) of

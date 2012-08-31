@@ -330,7 +330,7 @@ update({Parent, Fp}, {Module, Fm}, Con, Proplist) ->
     update({Parent, Fp}, {Module, Fm}, Con, Proplist, Fp, Fm);
     
 update(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
-    Kname = id,
+    Kname = Ret,
     Fields = lists:filter(
         fun(F)-> lists:member(F, proplists:get_value({table, fields, update}, Options)) end,
         proplists:get_keys(Proplist)
