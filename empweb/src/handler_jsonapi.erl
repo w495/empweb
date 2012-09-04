@@ -858,24 +858,40 @@ jsonapi_map(Req, {List}) ->
 
     ?evman_debug({jsonapi_action, Action}),
 
-    ?debug("01-=-----------------------------------------------~n"),
-    case empweb_http:call(Req1, Action) of
-        {ok, Reply} ->
-            ?debug("00-=-----------------------------------------------~n"),
-            {Reply, Req1};
-        {error, unknown_function} ->
-            ?debug("000-=-----------------------------------------------~n"),
-            {jsonapi:not_extended(unknown_function), Req1};
-        {error, Error} ->
-            ?debug("0000-=-----------------------------------------------~n"),
-            {jsonapi:internal_server_error(
-                {[{unknown_error1, jsonapi:format(Error)}]}
-            ), Req1};
-        X ->
-            ?debug("0000000-=-----------------------------------------------~n")
-    end;
+%     ?debug("01-=-----------------------------------------------~n"),
+%     case empweb_http:call(Req1, Action) of
+%         {ok, Reply} ->
+%             ?debug("00-=-----------------------------------------------~n"),
+%             {Reply, Req1};
+%         {error, unknown_function} ->
+%             ?debug("000-=-----------------------------------------------~n"),
+%             {jsonapi:not_extended(unknown_function), Req1};
+%         {error, Error} ->
+%             ?debug("0000-=-----------------------------------------------~n"),
+%             {jsonapi:internal_server_error(
+%                 {[{unknown_error1, jsonapi:format(Error)}]}
+%             ), Req1};
+%         X ->
+%             ?debug("0000000-=-----------------------------------------------~n")
+%     end;
+
+    jsonapi_call(Req1, Action, Fname);
 
 jsonapi_map(Req, List) ->
     ?evman_args([List]),
     {jsonapi:not_extended(wrong_format), Req}.
 
+jsonapi_call(Req1, Action, Fname) ->
+    {Res, Req} = case empweb_http:call(Req1, Action) of
+        {ok, Reply} ->
+            {Reply, Req1};
+        {error, unknown_function} ->
+            {jsonapi:not_extended(unknown_function), Req1};
+        {error, Error} ->
+            {jsonapi:internal_server_error(
+                {[{unknown_error1, jsonapi:format(Error)}]}
+            ), Req1}
+    end,
+    {Rpl} = Res#empweb_resp.body,
+    %{Res#empweb_resp{body = {[{fname, Action#empweb_hap.action}|Rpl]}}, Req}.
+    {Res#empweb_resp{body = {[{fname, Fname}|Rpl]}}, Req}.
