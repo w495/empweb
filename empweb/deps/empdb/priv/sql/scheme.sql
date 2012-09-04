@@ -853,9 +853,9 @@ create table messagetype(
 create table message(
     doc_id              decimal unique references doc(id),
     type_id             decimal references messagetype(id) default null,
-    persfrom_id         decimal references pers(id) default null,
-    persto_id           decimal references pers(id) default null
+    reader_id           decimal references pers(id) default null
 );
+
 
 
 -------------------------------------------------------------------------------

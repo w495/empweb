@@ -157,7 +157,7 @@ get({Parent, Fp}, {Options, Fm}, Con, Kvalues, Fields)
     Sfields = lists:append(Sp, Sm),
     Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
     Keys = proplists:get_keys(Kvalues),
-    case lists:filter(fun(F)-> lists:member(F, Afields) end, Keys) of
+    case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
         [] ->
             {error, {wrong_field, Keys}};
         Ffields ->
@@ -176,11 +176,19 @@ get({Parent, Fp}, {Options, Fm}, Con, Kvalues, Fields)
                             convert:to_binary(Ff),
                             <<" = $">>,
                             convert:to_binary(Ff)
-                        ] ||  Ff <- Ffields
+                        ] ||  {Ff, _} <- Ffields
                     ],
                     [<<" and ">>]
-                )
-            ], Kvalues))
+                ),
+                case proplists:get_value('sql:limit', Kvalues) of
+                    undefined -> [];
+                    Limit -> [<<" limit ">>, convert:to_list(Limit), <<" ">> ]
+                end,
+                case proplists:get_value('sql:offset', Kvalues) of
+                    undefined -> [];
+                    Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
+                end
+            ], Ffields))
     end;
 
 get({Parent, Fp}, {Module, Fm}, Con, Kvalues, Fields)->
@@ -219,7 +227,7 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
     Sfields = proplists:get_value({table, fields, select},  Options),
     Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
     Keys = proplists:get_keys(Kvalues),
-    case lists:filter(fun(F)-> lists:member(F, Afields) end, Keys) of
+    case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
         [] ->
             {error, {wrong_field, Kvalues}};
         Ffields ->
@@ -232,11 +240,19 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
                             convert:to_binary(Ff),
                             <<" = $">>,
                             convert:to_binary(Ff)
-                        ] ||  Ff <- Ffields
+                        ] ||  {Ff, _} <- Ffields
                     ],
                     [<<" and ">>]
-                )
-            ], Kvalues))
+                ),
+                case proplists:get_value(limit, Kvalues) of
+                    undefined -> [];
+                    Limit -> [<<" limit ">>, convert:to_list(Limit), <<" ">> ]
+                end,
+                case proplists:get_value(offset, Kvalues) of
+                    undefined -> [];
+                    Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
+                end
+            ], Ffields))
     end;
 
 

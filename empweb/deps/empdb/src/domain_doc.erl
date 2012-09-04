@@ -3,12 +3,27 @@
 %% Description: TODO: Add description to biz_user
 -module(domain_doc).
 
-%%
-%% Include files
-%%
+%% ==========================================================================
+%% Экспортируемые функции
+%% ==========================================================================
+
+%% --------------------------------------------------------------------------
+%% УТИЛИТАРНЫЕ ОБЪЕКТЫ
+%% --------------------------------------------------------------------------
 
 %%
-%% Exported Functions
+%% Тип разрешения: не рассмотрен, запрещена, разрешена
+%%
+-export([
+    get_oktype/1,
+    get_oktype/2,
+    create_oktype/1,
+    update_oktype/1
+]).
+
+%%
+%% Тип документа: Блог, коммент к блогу, галерея,
+%%      фото, коммент к фото, attach descr.
 %%
 -export([
     update_doctype/1,
@@ -18,7 +33,19 @@
 ]).
 
 %%
-%% Exported Functions
+%% Типы контента: обычный, эротический
+%%
+-export([
+    update_contype/1,
+    create_contype/1,
+    get_contype/1,
+    get_contype/2
+]).
+
+
+%%
+%% Тип доступа к контенту контента (блога и галереи):
+%%  приватный, дружеский, открытый.
 %%
 -export([
     update_acctype/1,
@@ -28,111 +55,109 @@
 ]).
 
 %%
-%% Exported Functions
+%% Типы чат-комнат. (страна, тюрьма, ад, рай)
 %%
 -export([
-    update_contype/1,
-    create_contype/1,
-    get_contype/1,
-    get_contype/2
-]).
-
-%%
-%% Exported Functions
-%%
--export([
-    update_blog/1,
-    create_blog/1,
-    get_blog/1,
-    get_blog/2
-]).
-
-%%
-%% Exported Functions
-%%
--export([
-    update_post/1,
-    create_post/1,
-    get_post/1,
-    get_post/2
-]).
-
-%%
-%% Exported Functions
-%%
--export([
-    update_room/1,
-    create_room/1,
-    get_room/1,
-    get_room/2
-]).
-
-
-%%
-%% Exported Functions
-%%
--export([
-    update_community/1,
-    create_community/1,
-    get_community/1,
-    get_community/2
-]).
-
-
-%%
-%% Exported Functions
-%%
--export([
-    update_chatlang/1,
-    create_chatlang/1,
-    get_chatlang/1,
-    get_chatlang/2
-]).
-
-
-%%
-%% Exported Functions
-%%
--export([
-    update_regimen/1,
-    create_regimen/1,
-    get_regimen/1,
-    get_regimen/2
-]).
-
-
-%%
-%% Exported Functions
-%%
--export([
-    update_roomtype/1,
-    create_roomtype/1,
     get_roomtype/1,
-    get_roomtype/2
+    get_roomtype/2,
+    create_roomtype/1,
+    update_roomtype/1
 ]).
 
-
 %%
-%% Exported Functions
+%% Список языков чата.
 %%
 -export([
-    update_communitytype/1,
-    create_communitytype/1,
+    get_chatlang/1,
+    get_chatlang/2,
+    create_chatlang/1,
+    update_chatlang/1
+]).
+
+%%
+%% Список режимов страны
+%%
+-export([
+    get_regimen/1,
+    get_regimen/2,
+    create_regimen/1,
+    update_regimen/1
+]).
+
+%%
+%% Типы сообществ (обычные, тайные)
+%%
+-export([
     get_communitytype/1,
-    get_communitytype/2
+    get_communitytype/2,
+    create_communitytype/1,
+    update_communitytype/1
 ]).
 
-
 %%
-%% Exported Functions
+%% Типы сообщений
 %%
 -export([
-    get_oktype/1,
-    get_oktype/2,
-    create_oktype/1,
-    update_oktype/1
+    get_messagetype/1,
+    get_messagetype/2,
+    create_messagetype/1,
+    update_messagetype/1
 ]).
 
+
+%% --------------------------------------------------------------------------
+%% ЗНАЧИМЫЕ ОБЪЕКТЫ
+%% --------------------------------------------------------------------------
+
+%%
+%% Блоги
+%%
+-export([
+    get_blog/1,
+    get_blog/2,
+    create_blog/1,
+    update_blog/1
+]).
+
+%%
+%% Посты \ коменты
+%%
+-export([
+    get_post/1,
+    get_post/2,
+    create_post/1,
+    update_post/1
+]).
+
+%%
+%% Чат-комнаты (страны)
+%%
+-export([
+    get_room/1,
+    get_room/2,
+    create_room/1,
+    update_room/1
+]).
+
+%%
+%% Сообщества
+%%
+-export([
+    get_community/1,
+    get_community/2,
+    create_community/1,
+    update_community/1
+]).
+
+%%
+%% Сообщения
+%%
+-export([
+    get_message/1,
+    get_message/2,
+    create_message/1,
+    update_message/1
+]).
 
 
 %%
@@ -194,7 +219,6 @@ get_doctype(Params, Fileds)->
         dao_doc:get_doctype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы контента: обычный, эротический
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,7 +268,136 @@ get_acctype(Params, Fileds)->
         dao_doc:get_acctype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Типы чат-комнат. (страна, тюрьма, ад, рай)
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+create_roomtype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:create_roomtype(Con, Params)
+    end).
+
+update_roomtype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:update_roomtype(Con, Params)
+    end).
+
+get_roomtype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_roomtype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_roomtype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_roomtype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Список языков чата.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_chatlang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:create_chatlang(Con, Params)
+    end).
+
+update_chatlang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:update_chatlang(Con, Params)
+    end).
+
+get_chatlang(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_chatlang(Con, [{isdeleted, false}|Params])
+    end).
+
+get_chatlang(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_chatlang(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Список режимов страны
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_regimen(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:create_regimen(Con, Params)
+    end).
+
+update_regimen(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:update_regimen(Con, Params)
+    end).
+
+get_regimen(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_regimen(Con, [{isdeleted, false}|Params])
+    end).
+
+get_regimen(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_regimen(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Типы сообществ (обычные, тайные)
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:create_communitytype(Con, Params)
+    end).
+
+update_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:update_communitytype(Con, Params)
+    end).
+
+get_communitytype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:get_communitytype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_communitytype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_community:get_communitytype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Типы сообщений
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_messagetype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_message:create_messagetype(Con, Params)
+    end).
+
+update_messagetype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_message:update_messagetype(Con, Params)
+    end).
+
+get_messagetype(Params)->
+    dao:with_connection(fun(Con)->
+        dao_message:get_messagetype(Con, [{isdeleted, false}|Params])
+    end).
+
+get_messagetype(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_message:get_messagetype(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%                          ЗНАЧИМЫЕ ОБЪЕКТЫ
+%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Блоги
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_blog(Params)->
     dao:with_connection(fun(Con)->
@@ -271,7 +424,9 @@ is_blog_owner(Uid, Oid)->
         dao_blog:is_owner(Con, Uid, Oid)
     end).
 
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Посты \ коменты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_post(Params)->
     dao:with_connection(fun(Con)->
@@ -298,7 +453,9 @@ is_post_owner(Uid, Oid)->
         dao_post:is_owner(Con, Uid, Oid)
     end).
 
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Чат-комнаты (страны)
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_room(Params)->
     dao:with_connection(fun(Con)->
@@ -325,7 +482,9 @@ is_room_owner(Uid, Oid)->
         dao_room:is_owner(Con, Uid, Oid)
     end).
 
-
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Сообщества
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_community(Params)->
     dao:with_connection(fun(Con)->
@@ -353,98 +512,34 @@ is_community_owner(Uid, Oid)->
     end).
 
 
-create_roomtype(Params)->
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Сообщения
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_message(Params)->
     dao:with_connection(fun(Con)->
-        dao_room:create_roomtype(Con, Params)
+        dao_message:create(Con, Params)
     end).
 
-update_roomtype(Params)->
+update_message(Params)->
     dao:with_connection(fun(Con)->
-        dao_room:update_roomtype(Con, Params)
+        dao_message:update(Con, Params)
     end).
 
-get_roomtype(Params)->
+get_message(Params)->
     dao:with_connection(fun(Con)->
-        dao_room:get_roomtype(Con, [{isdeleted, false}|Params])
+        dao_message:get(Con, [{isdeleted, false}|Params])
     end).
 
-get_roomtype(Params, Fileds)->
+get_message(Params, Fileds)->
     dao:with_connection(fun(Con)->
-        dao_room:get_roomtype(Con, [{isdeleted, false}|Params], Fileds)
+        dao_message:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-
-create_communitytype(Params)->
+is_message_owner(Uid, Oid)->
     dao:with_connection(fun(Con)->
-        dao_community:create_communitytype(Con, Params)
+        dao_message:is_owner(Con, Uid, Oid)
     end).
-
-update_communitytype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_community:update_communitytype(Con, Params)
-    end).
-
-get_communitytype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_community:get_communitytype(Con, [{isdeleted, false}|Params])
-    end).
-
-get_communitytype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_community:get_communitytype(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-
-
-create_chatlang(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:create_chatlang(Con, Params)
-    end).
-
-update_chatlang(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:update_chatlang(Con, Params)
-    end).
-
-get_chatlang(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_chatlang(Con, [{isdeleted, false}|Params])
-    end).
-
-get_chatlang(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_chatlang(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-
-
-
-create_regimen(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:create_regimen(Con, Params)
-    end).
-
-update_regimen(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:update_regimen(Con, Params)
-    end).
-
-get_regimen(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_regimen(Con, [{isdeleted, false}|Params])
-    end).
-
-get_regimen(Params, Fileds)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_regimen(Con, [{isdeleted, false}|Params], Fileds)
-    end).
-
-
-
-
-
-
-
 
 %%
 %% Local Functions

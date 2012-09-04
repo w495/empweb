@@ -104,6 +104,16 @@
     update_communitytype/1
 ]).
 
+%%
+%% Типы сообщений
+%%
+-export([
+    get_messagetype/1,
+    get_messagetype/2,
+    create_messagetype/1,
+    update_messagetype/1
+]).
+
 %% --------------------------------------------------------------------------
 %% ЗНАЧИМЫЕ ОБЪЕКТЫ
 %% --------------------------------------------------------------------------
@@ -148,9 +158,22 @@
     update_community/1
 ]).
 
+
+%%
+%% Сообщения
+%%
+-export([
+    get_message/1,
+    get_message/2,
+    create_message/1,
+    update_message/1
+]).
+
+
 %% ==========================================================================
 %% Внешние функции
 %% ==========================================================================
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -169,7 +192,7 @@ update_oktype(Params)->
     domain_doc:update_oktype(Params).
 
 get_oktype(Params)->
-    domain_doc:get_oktype(Params).
+    get_oktype(Params, []).
 
 get_oktype(Params, Fields)->
     domain_doc:get_oktype(Params, Fields).
@@ -186,7 +209,7 @@ update_doctype(Params)->
     domain_doc:update_doctype(Params).
 
 get_doctype(Params)->
-    domain_doc:get_doctype(Params).
+    get_doctype(Params, []).
 
 get_doctype(Params, Fields)->
     domain_doc:get_doctype(Params, Fields).
@@ -289,6 +312,22 @@ get_communitytype(Params, Fields)->
     domain_doc:get_communitytype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Типы сообщений
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_messagetype(Params)->
+    domain_doc:create_messagetype(Params).
+
+update_messagetype(Params)->
+    domain_doc:update_messagetype(Params).
+
+get_messagetype(Params)->
+    domain_doc:get_messagetype(Params).
+
+get_messagetype(Params, Fields)->
+    domain_doc:get_messagetype(Params, Fields).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %%                          ЗНАЧИМЫЕ ОБЪЕКТЫ
 %%
@@ -358,4 +397,18 @@ get_community(Params)->
 get_community(Params, Fields)->
     domain_doc:get_community(Params, Fields).
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Сообщения
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+create_message(Params)->
+    domain_doc:create_message(Params).
+
+update_message(Params)->
+    domain_doc:update_message(Params).
+
+get_message(Params)->
+    domain_doc:get_message(Params).
+
+get_message(Params, Fields)->
+    domain_doc:get_message(Params, Fields).

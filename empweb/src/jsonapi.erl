@@ -19,6 +19,7 @@
 
 
 -export([
+    norm/1,
     ok/0,
     ok/1,
     ok/2,
@@ -485,3 +486,39 @@ handle_params(Data, Function, Pstate) ->
             {ok, not_extended(wrong_format), Pstate}
     end.
 
+%%
+%%
+%%
+norm('get') ->
+    [
+        #norm_rule{
+            key = limit,
+            nkey = 'limit',
+            required = false,
+            types = [nullable, integer]
+        },
+        #norm_rule{
+            key = offset,
+            nkey = 'offset',
+            required = false,
+            types = [nullable, integer]
+        },
+        #norm_rule{
+            key = fields,
+            nkey = 'fields',
+            required = false,
+            types = [
+                fun
+                    (null)->
+                        [];
+                    (List)->
+                        lists:map(
+                            fun(Item)->
+                                erlang:binary_to_atom(Item, utf8)
+                            end,
+                            List
+                        )
+                end
+            ]
+        }
+    ].

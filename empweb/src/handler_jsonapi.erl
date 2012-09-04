@@ -454,8 +454,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_blogs">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_blogs,
-                    pers_id         =   Pid
+                    action          =   get_blog,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_blog">> ->
                 #empweb_hap{
@@ -856,16 +857,22 @@ jsonapi_map(Req, {List}) ->
         end,
 
     ?evman_debug({jsonapi_action, Action}),
-    
+
+    ?debug("01-=-----------------------------------------------~n"),
     case empweb_http:call(Req1, Action) of
         {ok, Reply} ->
+            ?debug("00-=-----------------------------------------------~n"),
             {Reply, Req1};
         {error, unknown_function} ->
+            ?debug("000-=-----------------------------------------------~n"),
             {jsonapi:not_extended(unknown_function), Req1};
         {error, Error} ->
+            ?debug("0000-=-----------------------------------------------~n"),
             {jsonapi:internal_server_error(
                 {[{unknown_error1, jsonapi:format(Error)}]}
-            ), Req1}
+            ), Req1};
+        X ->
+            ?debug("0000000-=-----------------------------------------------~n")
     end;
 
 jsonapi_map(Req, List) ->

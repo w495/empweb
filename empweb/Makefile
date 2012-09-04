@@ -1,24 +1,19 @@
-# Feel free to use, reuse and abuse the code in this file.
+REBAR=which rebar || ./rebar
 
 all: app ria
-
 app: get-deps
-	@./rebar compile
-
+	@$(REBAR) compile
+test:
+	@$(REBAR) skip_deps=true eunit
 ria: ria-build ria-source
-
 ria-build:
 	cd ./priv/static/ria/ && python generate.py build || exit 1;
-
 ria-source:
 	cd ./priv/static/ria/ && python generate.py source || exit 1;
-
 get-deps:
-	@./rebar get-deps
-
+	@$(REBAR) get-deps
 clean:
-	@./rebar clean
+	@$(REBAR) clean
 	rm -f erl_crash.dump
-
 dist-clean: clean
 
