@@ -985,7 +985,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:get_post([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1012,7 +1012,6 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [string]
             }
-            | jsonapi:norm()
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1077,7 +1076,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:create_post([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1132,7 +1131,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:update_post([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1258,7 +1257,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:create_room([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1354,7 +1353,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:update_room([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1441,7 +1440,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:create_community([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1497,7 +1496,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:update_community([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1600,7 +1599,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:create_message([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
@@ -1656,7 +1655,7 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:update_message([
-                        {pers_id, Pers_id}
+                        {owner_id, Pers_id}
                         |Data#norm.return
                     ])
                 ),
