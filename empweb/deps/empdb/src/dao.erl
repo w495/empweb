@@ -239,10 +239,12 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
     Sfields = proplists:get_value({table, fields, select},  Options),
     Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
     Keys = proplists:get_keys(Kvalues),
+    io:format(" --- Kvalues --- ~n~p~n", [Kvalues]),
     case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
         [] ->
             {error, {wrong_field, Kvalues}};
         Ffields ->
+            io:format(" --- Ffields --- ~n~p~n", [Ffields]),
             Mtbl = convert:to_binary(proplists:get_value({table, name},  Options)),
             Dfs = dao:fields(Tfields, Sfields),
             dao:pgret(dao:equery(Con,[
@@ -273,7 +275,8 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
                     undefined -> [];
                     Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
                 end
-            ], lists:filter(fun({_, null})-> false; ({_, V})-> true end, Fields)))
+            %], lists:filter(fun({_, null})-> false; ({_, V})-> true end, Ffields)))
+            ], Ffields))
     end;
 
 

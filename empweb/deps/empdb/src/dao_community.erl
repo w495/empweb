@@ -72,7 +72,6 @@ table({fields, all})->
     [
         doc_id,
         type_id,
-        oktype_id,
         slogan,
         treasury
     ];

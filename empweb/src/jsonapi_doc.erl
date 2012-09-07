@@ -629,10 +629,7 @@ handle(_req, #empweb_hap{
     jsonapi:handle_params(
         norm:norm(Params, doc_norm('create')),
         fun(Data)->
-            ?evman_debug(Data,
-                <<" = create post data">>),
-            ?evman_debug(Data#norm.return,
-                <<" = create post data#norm.return">>),
+            ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
                     biz_doc:create_post([
