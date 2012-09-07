@@ -283,19 +283,19 @@
                         {"fname": "get_friends", "params":{"pers_id":-1001}}
                     </li>
                     <li class="test" data-name='Добавить друга'>
-                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
+                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-2001}}
                     </li>
                     <li class="test" data-anti="anti" data-name='Добавить друга второй раз не удасться'>
-                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
+                        {"fname": "add_friend", "params":{"pers_id":-1001, "friend_id":-2001}}
                     </li>
                     <li class="test" data-name='Получить друзей'>
                         {"fname": "get_friends", "params":{"pers_id":-1001}}
                     </li>
                     <li class="test" data-name='Удалить друга'>
-                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
+                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-2001}}
                     </li>
                     <li class="test" data-anti="anti"  data-name='Удалить друга второй раз не удасться'>
-                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-1002}}
+                        {"fname": "delete_friend", "params":{"pers_id":-1001, "friend_id":-2001}}
                     </li>
                     <li class="test" data-name='Получить друзей'>
                         {"fname": "get_friends", "params":{"pers_id":-1001}}
@@ -351,19 +351,19 @@
                         {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Не можем запросить изменение пароля другому пользователю">
-                        {"fname": "pass", "params":{"id":-1002}}
+                        {"fname": "pass", "params":{"id":-2001}}
                     </li>
                     <li class="test" data-name="Логинимся под другим пользователем">
-                        {"fname": "login", "params":{"id":-1002, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-2001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
-                        {"fname": "pass", "params":{"id":-1002}}
+                        {"fname": "pass", "params":{"id":-2001}}
                     </li>
                     <li class="test" data-name="Нормальный выход">
-                        {"fname": "logout", "params":{"id":-1002}}
+                        {"fname": "logout", "params":{"id":-2001}}
                     </li>
                     <li class="test" data-anti="anti" data-name="Пароль был изменен">
-                        {"fname": "login", "params":{"id":-1002, "pass":"admin"}}
+                        {"fname": "login", "params":{"id":-2001, "pass":"admin"}}
                     </li>
                     <li class="test" data-name="Запрашиваем пароль. пароль был отправлен на почту">
                         {"fname": "pass", "params":{"id":-3001}}
@@ -436,26 +436,35 @@
                     <li class="test" data-name="Обновить сообщество">
                         {"fname": "update_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))", "oktype_id": 2, "id": 5, "slogan":"community slogan ~(random(string))", "type_id":1}}
                     </li>
-                    <li class="test" data-name="Получить все блоги">
-                        {"fname": "get_all_blogs", "params":{}}
+                    <li class="test" data-name="Получить 3 блога текущего пользователя">
+                        {"fname": "get_blog", "params":{"limit":3}}
                     </li>
-                    <li class="test" data-name="Получить коменты \ посты">
-                        {"fname": "get_all_posts", "params":{}}
+                    <li class="test" data-name="Получить другие 3 блога текущего пользователя (паджинация)">
+                        {"fname": "get_blog", "params":{"limit":3, "offset": 3}}
+                    </li>
+                    <li class="test" data-name="Получить 3 блога пользователя 3">
+                        {"fname": "get_blog", "params":{"limit":3, "owner_id": 3. "fields":["head", "id"]}}
+                    </li>
+                    <li class="test" data-name="Получить заголовки и id всех блогов текущего пользователя">
+                        {"fname": "get_blog", "params":{"fields":["head", "id"]}}
+                    </li>
+                    <li class="test" data-name="Получить id 3 коментов \ постов текущего пользователя">
+                        {"fname": "get_post", "params":{"limit":3, "fields":["id"]}}
                     </li>
                     <li class="test" data-name="Получить посты первого блога">
-                        {"fname": "get_all_posts", "params":{"parent_id": 1}}
+                        {"fname": "get_post", "params":{"parent_id": 1, "limit":3}}
                     </li>
                     <li class="test" data-name="Получить комменты первого поста первого блога">
-                        {"fname": "get_all_posts", "params":{"parent_id": 3}}
+                        {"fname": "get_post", "params":{"parent_id": 3, "limit":3}}
                     </li>
-                    <li class="test" data-name="Получить все сообщества">
-                        {"fname": "get_all_communities", "params":{}}
+                    <li class="test" data-name="Получить 3 сообщества текущего пользователя">
+                        {"fname": "get_community", "params":{"limit":3, "fields":["head", "id"]}}
                     </li>
-                    <li class="test" data-name="Получить все комнаты">
-                        {"fname": "get_all_rooms", "params":{}}
+                    <li class="test" data-name="Получить 3 комнаты текущего пользователя">
+                        {"fname": "get_room", "params":{"limit":3}}
                     </li>
-                    <li class="test" data-name="Получить блог">
-                        {"fname": "get_blog", "params":{"id": 1}}
+                    <li class="test" data-name="Получить блог поля (head, body)">
+                        {"fname": "get_blog", "params":{"id": 1, "fields":["head", "body"]}}
                     </li>
                     <li class="test" data-name="Получить комнату">
                         {"fname": "get_room", "params":{"id": 2}}
@@ -480,6 +489,25 @@
                     </li>
                     <li class="test" data-name="Список пользователей в сообществе 5">
                         {"fname": "get_pers", "params":{"community_id":5}}
+                    </li>
+                    <hr/>
+                    <li class="test" data-name="Логинимся как -1001">
+                        {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Пользователь -1001 отправил сообщение пользователю -1002">
+                        {"fname": "create_message", "params":{"head":"hello", "body":"hello -1002", "reader_id":-1002}}
+                    </li>
+                    <li class="test" data-name="Логинимся как -1002">
+                        {"fname": "login", "params":{"id":-1002, "pass":"admin"}}
+                    </li>
+                    <li class="test" data-name="Получить все сообщения -1002">
+                        {"fname": "get_message", "params":{"reader_id":-1002, "fields":["id", "owner_id", "oktype_id"]}}
+                    </li>
+                    <li class="test" data-name="Получить все сообщения -1002">
+                        {"fname": "get_message", "params":{"reader_id":-1002, "oktype_id": null, "fields":["id", "owner_id"]}}
+                    </li>
+                    <li class="test" data-name="Получить все сообщения -1002">
+                        {"fname": "get_message", "params":{"reader_id":-1002}}
                     </li>
                 </ol>
             </section>

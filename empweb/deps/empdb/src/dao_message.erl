@@ -94,6 +94,7 @@ get(Con, Some) ->
     get(Con, Some, []).
 
 get(Con, What, Fields)->
+    io:format(" --- What --- ~n~p~n", [What]),
     dao_doc:get(?MODULE, Con, What, Fields).
 
 create(Con, Proplist)->

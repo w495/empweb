@@ -157,10 +157,12 @@ get({Parent, Fp}, {Options, Fm}, Con, Kvalues, Fields)
     Sfields = lists:append(Sp, Sm),
     Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
     Keys = proplists:get_keys(Kvalues),
+    io:format(" --- Kvalues --- ~n~p~n", [Kvalues]),
     case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
         [] ->
             {error, {wrong_field, Keys}};
         Ffields ->
+            io:format(" --- Ffields --- ~n~p~n", [Ffields]),
             Ptbl = convert:to_binary(proplists:get_value({table, name},Parent)),
             Mtbl = convert:to_binary(proplists:get_value({table, name},Options)),
             Dfs = dao:fields(Tfields, lists:append(Sp, Sm)),
@@ -172,19 +174,29 @@ get({Parent, Fp}, {Options, Fm}, Con, Kvalues, Fields)
                     [Mtbl,<<".">>,Fmb], <<" =  ">>,  [Ptbl,<<".">>,Fpb],
                 <<" where ">>,
                 string:join(
-                    [   [
-                            convert:to_binary(Ff),
-                            <<" = $">>,
-                            convert:to_binary(Ff)
-                        ] ||  {Ff, _} <- Ffields
+                    [   case Val of
+                            null ->
+                                io:format(" --- ~p --- ~n~p~n", [Ff, Ffields]),
+                                [
+                                    convert:to_binary(Ff),
+                                    <<" is null ">>
+                                ];
+                            _ ->
+                                [
+                                    convert:to_binary(Ff),
+                                    <<" = $">>,
+                                    convert:to_binary(Ff)
+                                ]
+                        end
+                        ||  {Ff, Val} <- Ffields
                     ],
                     [<<" and ">>]
                 ),
-                case proplists:get_value('sql:limit', Kvalues) of
+                case proplists:get_value('limit', Kvalues) of
                     undefined -> [];
                     Limit -> [<<" limit ">>, convert:to_list(Limit), <<" ">> ]
                 end,
-                case proplists:get_value('sql:offset', Kvalues) of
+                case proplists:get_value('offset', Kvalues) of
                     undefined -> [];
                     Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
                 end
@@ -236,11 +248,20 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
             dao:pgret(dao:equery(Con,[
                 <<"select ">>,Dfs,<<" from ">>,Mtbl,<<" where ">>,
                 string:join(
-                    [   [
-                            convert:to_binary(Ff),
-                            <<" = $">>,
-                            convert:to_binary(Ff)
-                        ] ||  {Ff, _} <- Ffields
+                    [   case Val of
+                            null ->
+                                [
+                                    convert:to_binary(Ff),
+                                    <<" is null">>
+                                ];
+                            _ ->
+                                [
+                                    convert:to_binary(Ff),
+                                    <<" = $">>,
+                                    convert:to_binary(Ff)
+                                ]
+                        end
+                        ||  {Ff, Val} <- Ffields
                     ],
                     [<<" and ">>]
                 ),
@@ -252,7 +273,7 @@ get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(
                     undefined -> [];
                     Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
                 end
-            ], Ffields))
+            ], lists:filter(fun({_, null})-> false; ({_, V})-> true end, Fields)))
     end;
 
 
@@ -288,10 +309,11 @@ create({Parent, Fp}, {Module, Fm}, Con, Proplist) ->
     create({Parent, Fp}, {Module, Fm}, Con, Proplist, Fp, Fm);
 
 create(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
-    Fields = lists:filter(
-        fun(F)-> lists:member(F, proplists:get_value({table, fields, insert}, Options)) end,
-        proplists:get_keys(Proplist)
+    Kvalues = lists:filter(
+        fun({F, _})-> lists:member(F, proplists:get_value({table, fields, insert}, Options)) end,
+        Proplist
     ),
+    Fields = proplists:get_keys(Kvalues),
     Required = proplists:get_value({table, fields, insert, required}, Options),
     case lists:foldl( fun(F, R)-> R and lists:member(F, Fields) end, true, Required ) of
         true ->
@@ -312,7 +334,7 @@ create(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
                     _ ->
                     [<<"returning ">>, Retb]
                 end
-            ], Proplist));
+            ], Kvalues));
         _ ->
             {error, {required, Required}}
     end;
@@ -438,6 +460,15 @@ collect_where_params(_, _, []) ->
 
 to_type(null, _Type) ->
     null;
+
+
+to_type(V,  timestamp) ->
+    Bas = calendar:datetime_to_gregorian_seconds({{1970,1,1},{0,0,0}}),
+    {X, {H, M, S}} = V,
+    Ts = trunc(S),
+    Cur = calendar:datetime_to_gregorian_seconds({X, {H, M, Ts}}),
+    trunc((Cur - Bas + S - Ts) * 1000000);
+
 to_type(V, int4) ->
     convert:to_integer(V);
 
@@ -454,6 +485,7 @@ to_type(V, varchar) ->
 to_type(V, text) ->
     V;
 to_type(V, Type) ->
+    io:format("Type= ~p~n", [Type]),
     V.
 
 

@@ -9,6 +9,7 @@
 -export([
     any/1,
     nullable/1,
+    allable/1,
     boolean/1,
     atom/1,
     string/1,
@@ -22,6 +23,19 @@
     test/0,
     test/1
 ]).
+
+allable('*') ->
+    all;
+allable(all) ->
+    all;
+allable("*") ->
+    all;
+allable("all") ->
+    all;
+allable(<<"*">>) ->
+    all;
+allable(<<"all">>) ->
+    all.
 
 nullable("nil") ->
     null;

@@ -38,6 +38,9 @@
 -export([
     init/3,
     handle/2,
+    doc_norm/1,
+    opt_norm/1,
+    filter_owner/1,
     terminate/2
 ]).
 
@@ -89,34 +92,20 @@ init(_, Req, #empweb_hap{
 %%          TODO: добавить обработчиком
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action='get_all_oktypes'} = Hap) ->
-    ?evman_args(Hap, <<" = get oktypes">>),
-    {ok,
-        jsonapi:resp(biz_doc:get_oktype([])),
-        Hap
-    };
 
 handle(_req, #empweb_hap{action='get_oktype', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = get oktype">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_one{
-                rules=[
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    },
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             {ok,
-                jsonapi:resp(biz_doc:get_oktype(Data#norm.return)),
+                jsonapi:resp(
+                    biz_doc:get_oktype(
+                        Data#norm.return,
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
                 Hap
             }
         end,
@@ -129,31 +118,12 @@ handle(_req, #empweb_hap{action='get_oktype', params=Params} = Hap) ->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_doctypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all doc types">>),
-    {ok,jsonapi:resp(biz_doc:get_doctype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_doctype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get doc type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -168,22 +138,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create doc type">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -198,22 +153,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update doc type">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -228,31 +168,12 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_contypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all contypes">>),
-    {ok,jsonapi:resp(biz_doc:get_contype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_contype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get contype">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -267,22 +188,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create contype">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -297,22 +203,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update contype">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -329,31 +220,11 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_acctypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all acctypes">>),
-    {ok,jsonapi:resp(biz_doc:get_acctype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_acctype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get acctype">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -368,22 +239,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create acctype">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -399,21 +255,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update acctype">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -428,31 +270,12 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_roomtypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all room types">>),
-    {ok,jsonapi:resp(biz_doc:get_roomtype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_roomtype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get room type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -467,18 +290,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create room type">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -494,17 +306,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update room type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -519,31 +321,12 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_chatlangs, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all chatlangs">>),
-    {ok,jsonapi:resp(biz_doc:get_chatlang([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_chatlang', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get chatlang">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -558,22 +341,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create chatlang">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -589,21 +357,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update chatlang">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -618,32 +372,11 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_regimens, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all regimens">>),
-
-    {ok,jsonapi:resp(biz_doc:get_regimen([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_regimen', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get regimen">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -658,18 +391,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create regimen">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -685,17 +407,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update regimen">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -710,31 +422,11 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_communitytypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all community types">>),
-    {ok,jsonapi:resp(biz_doc:get_communitytype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_communitytype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get community type">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -749,18 +441,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create community type">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -776,17 +457,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update community type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -801,31 +472,12 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_messagetypes, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all message types">>),
-    {ok,jsonapi:resp(biz_doc:get_messagetype([])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_messagetype', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get message type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -841,17 +493,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = create message type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -867,17 +509,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update message type">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, opt_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -905,16 +537,17 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = get blog[s]">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, doc_norm('get')),
         fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:get_blog(filter_owner([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ]))
+                    biz_doc:get_blog(
+                        filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
                 ),
                 Hap
             }
@@ -926,7 +559,6 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = create blog">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, doc_norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -947,7 +579,6 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update blog">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, doc_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -967,60 +598,23 @@ handle(_req, #empweb_hap{
 %% Посты \ коменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{
-        action=get_all_posts, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all posts">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [string]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,
-                jsonapi:resp(
-                    biz_doc:get_post([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])
-                ),
-                Hap
-            }
-        end
-    );
 
 handle(_req, #empweb_hap{
         action=get_post, params=Params, pers_id=Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = get post">>),
-
+    ?evman_args([Hap], <<" = get post[s]">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                required    = false,
-                types       = [integer]
-            }
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [string]
-            }
-        ]),
+        norm:norm(Params, doc_norm('get')),
         fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:get_post([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    biz_doc:get_post(
+                        filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
                 ),
                 Hap
             }
@@ -1033,41 +627,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = create post">>),
     ?debug("Params = ~p~n", [Params]),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = head,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = body,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = position,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = doctype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = contype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = contype_id,
-                required    = false,
-                types       = [integer]
-            }
-        ]),
+        norm:norm(Params, doc_norm('create')),
         fun(Data)->
             ?evman_debug(Data,
                 <<" = create post data">>),
@@ -1090,42 +650,7 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update post">>),
     jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = head,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = body,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [integer]
-            }
-            #norm_rule{
-                key         = position,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = doctype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = contype_id,
-                required    = false,
-                types       = [integer]
-            }
-        ]),
+        norm:norm(Params, doc_norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -1145,36 +670,66 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action=get_all_rooms, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all rooms">>),
-    {ok,jsonapi:resp(biz_doc:get_room([{pers_id, Pers_id}])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_room', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get room">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [string]
-            }
-        ]),
+                #norm_rule{
+                    key         = type_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = ulimit,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = topic_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = treasury,
+                    required    = false,
+                    types       = [float]
+                },
+                #norm_rule{
+                    key         = weather,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
+                    key         = slogan,
+                    required    = false,
+                    types       = [string]
+                }
+                |doc_norm('get')
+            ]
+        ),
         fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:get_room([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    biz_doc:get_room(
+                        filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
                 ),
                 Hap
             }
         end
     );
+
 
 handle(_req, #empweb_hap{
         action=create_room, params=Params, pers_id=Pers_id
@@ -1183,74 +738,42 @@ handle(_req, #empweb_hap{
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = head,
-                types = [string]
-            },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [integer]
-            }
-            #norm_rule{
-                key         = position,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = doctype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = contype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = type_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = ulimit,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = topic_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = chatlang_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = chatlang_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = treasury,
-                required    = false,
-                types       = [float]
-            },
-            #norm_rule{
-                key         = weather,
-                required    = false,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = slogan,
-                required    = false,
-                types       = [string]
-            }
+                #norm_rule{
+                    key         = type_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = ulimit,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = topic_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = treasury,
+                    required    = false,
+                    types       = [float]
+                },
+                #norm_rule{
+                    key         = weather,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
+                    key         = slogan,
+                    required    = false,
+                    types       = [string]
+                }
+                |doc_norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1270,83 +793,45 @@ handle(_req, #empweb_hap{
         action=update_room, params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update room">>),
-
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key = head,
-                types = [string]
-            },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [integer]
-            }
-            #norm_rule{
-                key         = position,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = doctype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = contype_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = type_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = ulimit,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = topic_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = chatlang_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = chatlang_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = treasury,
-                required    = false,
-                types       = [float]
-            },
-            #norm_rule{
-                key         = weather,
-                required    = false,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = slogan,
-                required    = false,
-                types       = [string]
-            }
+                #norm_rule{
+                    key         = type_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = ulimit,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = topic_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = treasury,
+                    required    = false,
+                    types       = [float]
+                },
+                #norm_rule{
+                    key         = weather,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
+                    key         = slogan,
+                    required    = false,
+                    types       = [string]
+                }
+                |doc_norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1368,57 +853,12 @@ handle(_req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action=get_all_communities, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all communities">>),
-    {ok,jsonapi:resp(biz_doc:get_community([{pers_id, Pers_id}])),Hap};
-
-handle(_req, #empweb_hap{
         action='get_community', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get community">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [string]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,
-                jsonapi:resp(
-                    biz_doc:get_community([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ])
-                ),
-                Hap
-            }
-        end
-    );
-
-handle(_req, #empweb_hap{
-        action=create_community, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = create community">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = head,
-                types = [string]
-            },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [integer]
-            }
             #norm_rule{
                 key         = type_id,
                 required    = false,
@@ -1434,6 +874,47 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [string]
             }
+            |doc_norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_community(
+                        filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=create_community, params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create community">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = treasury,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = slogan,
+                required    = false,
+                types       = [string]
+            }
+            |doc_norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1458,24 +939,6 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key = head,
-                types = [string]
-            },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [integer]
-            }
-            #norm_rule{
                 key         = type_id,
                 required    = false,
                 types       = [integer]
@@ -1490,6 +953,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [string]
             }
+            |doc_norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1509,13 +973,6 @@ handle(_req, #empweb_hap{
 %% Сообщества
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-handle(_req, #empweb_hap{
-        action=get_all_messages, params=Params, pers_id=Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all messages">>),
-    {ok,jsonapi:resp(biz_doc:get_message([{pers_id, Pers_id}])),Hap};
-
 handle(_req, #empweb_hap{
         action='get_message', params=Params, pers_id=Pers_id
     } = Hap) ->
@@ -1524,34 +981,24 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
-            #norm_rule{
-                key         = type_id,
+                key         = reader_id,
                 required    = false,
                 types       = [nulluble, integer]
             },
             #norm_rule{
-                key         = reader_id,
+                key         = type_id,
                 required    = false,
                 types       = [nulluble, integer]
             }
-            #norm_rule{
-                key         = oktype_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
+            | doc_norm('get')
         ]),
         fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:get_message([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    biz_doc:get_message(
+                        Data#norm.return,
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
                 ),
                 Hap
             }
@@ -1566,33 +1013,15 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = head,
-                types = [string]
+                key         = reader_id,
+                types       = [integer]
             },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
             #norm_rule{
                 key         = type_id,
                 required    = false,
                 types       = [nulluble, integer]
-            },
-            #norm_rule{
-                key         = reader_id,
-                required    = false,
-                types       = [nulluble, integer]
             }
-            #norm_rule{
-                key         = oktype_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
+            | doc_norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1617,38 +1046,16 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = id,
+                key         = reader_id,
                 required    = false,
                 types       = [integer]
             },
             #norm_rule{
-                key = head,
-                types = [string]
-            },
-            #norm_rule{
-                key = body,
-                types = [string]
-            },
-            #norm_rule{
-                key         = parent_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
-            #norm_rule{
                 key         = type_id,
                 required    = false,
                 types       = [nulluble, integer]
-            },
-            #norm_rule{
-                key         = reader_id,
-                required    = false,
-                types       = [nulluble, integer]
             }
-            #norm_rule{
-                key         = oktype_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
+            | doc_norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -1663,13 +1070,6 @@ handle(_req, #empweb_hap{
             }
         end
     );
-
-
-
-
-
-
-
 
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
@@ -1707,9 +1107,11 @@ filter_owner(Params) ->
         proplists:get_value(owner_id, Params),
         proplists:get_value(pers_id, Params)
     } of
-        {undefined, Pers_id     } ->
-            [{owner_id, Pers_id}|proplists:delete(owner_id, Params)];
-        _ ->
+        {all     , _      } ->
+            proplists:delete(pers_id, proplists:delete(owner_id, Params));
+        {undefined, Pers_id} ->
+            [{owner_id, Pers_id}|proplists:delete(pers_id, Params)];
+        {_owner_id, _      } ->
             proplists:delete(pers_id, Params)
     end.
 
@@ -1741,7 +1143,7 @@ doc_norm('get') ->
         #norm_rule{
             key = owner_id,
             required = false,
-            types = [nullable, integer]
+            types = [nullable, allable, integer]
         }
         | jsonapi:norm('get')
     ];
@@ -1750,17 +1152,19 @@ doc_norm('create') ->
     [
         #norm_rule{
             key         = head,
+            required    = false,
             types       = [string]
         },
         #norm_rule{
             key         = body,
+            required    = false,
             types       = [string]
         },
         #norm_rule{
             key         = parent_id,
             required    = false,
             types       = [integer]
-        }
+        },
         #norm_rule{
             key         = position,
             required    = false,
@@ -1773,6 +1177,11 @@ doc_norm('create') ->
         },
         #norm_rule{
             key         = contype_id,
+            required    = false,
+            types       = [integer]
+        },
+        #norm_rule{
+            key         = oktype_id,
             required    = false,
             types       = [integer]
         }
@@ -1789,4 +1198,47 @@ doc_norm('update') ->
     ];
 
 doc_norm(X) ->
+    [].
+
+
+opt_norm('get') ->
+    [
+        #norm_rule{
+            key = alias,
+            required = false,
+            types = [string]
+        },
+        #norm_rule{
+            key = id,
+            required = false,
+            types = [integer]
+        }
+        |jsonapi:norm('get')
+    ];
+
+opt_norm('create') ->
+    [
+        #norm_rule{
+            key         = alias,
+            required    = false,
+            types       = [string]
+        },
+        #norm_rule{
+            key         = name_ti,
+            required    = false,
+            types       = [integer]
+        }
+    ];
+
+opt_norm('update') ->
+    [
+        #norm_rule{
+            key         = id,
+            required    = false,
+            types       = [integer]
+        }
+        |opt_norm('create')
+    ];
+
+opt_norm(X) ->
     [].

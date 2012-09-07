@@ -374,7 +374,7 @@ handle(_req, #empweb_hap{
                     },
                     #norm_rule{
                         key = birthday,
-                        types = [nullable, integer]
+                        types = [nullable, datetime_unixtime]
                     },
                     #norm_rule{
                         key = city,

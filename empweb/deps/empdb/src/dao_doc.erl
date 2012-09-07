@@ -88,8 +88,10 @@ table({fields, all})->
         oktype_id,
         doctype_id,
         contype_id,
+        oktype_id,
         owner_id,
         parent_id,
+        created,
         isdeleted
     ];
 

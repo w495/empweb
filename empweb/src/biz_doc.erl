@@ -408,7 +408,19 @@ update_message(Params)->
     domain_doc:update_message(Params).
 
 get_message(Params)->
-    domain_doc:get_message(Params).
+    get_message(Params, []).
 
 get_message(Params, Fields)->
+%     Fields = lists:map(
+%         fun(created)->
+%         fun(X)->
+%             X
+%         end,
+%         Afields
+%     ),
+    
     domain_doc:get_message(Params, Fields).
+
+
+
+

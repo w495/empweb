@@ -78,7 +78,6 @@ handle_post_body(Req, State, Pbody)->
 
 handle_data(Req, State, Bobject)->
     ?evman_args([Req, State, Bobject]),
-    
     try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
@@ -93,7 +92,7 @@ handle_data(Req, State, Bobject)->
             ?evman_error(#event{error={Eclass,Ereason}}),
             {jsonapi:internal_server_error(
                 {[
-                    {unknown_error, 
+                    {unknown_error,
                         {[
                             {class, jsonapi:format(Eclass)},
                             {reason, jsonapi:format(Ereason)}
@@ -151,8 +150,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_oktypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_oktypes,
-                    pers_id         =   Pid
+                    action          =   get_oktype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_oktype">> ->
                 #empweb_hap{
@@ -194,8 +194,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_doctypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_doctypes,
-                    pers_id         =   Pid
+                    action          =   get_doctype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_doctype">> ->
                 #empweb_hap{
@@ -231,8 +232,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_contypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_contypes,
-                    pers_id         =   Pid
+                    action          =   get_contype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_contype">> ->
                 #empweb_hap{
@@ -269,8 +271,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_acctypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_acctypes,
-                    pers_id         =   Pid
+                    action          =   get_acctype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_acctype">> ->
                 #empweb_hap{
@@ -306,8 +309,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_communitytypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_communitytypes,
-                    pers_id         =   Pid
+                    action          =   get_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_communitytype">> ->
                 #empweb_hap{
@@ -343,8 +347,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_roomtypes">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_roomtypes,
-                    pers_id         =   Pid
+                    action          =   get_roomtype,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_roomtype">> ->
                 #empweb_hap{
@@ -380,8 +385,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_chatlangs">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_chatlangs,
-                    pers_id         =   Pid
+                    action          =   get_chatlang,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_chatlang">> ->
                 #empweb_hap{
@@ -417,8 +423,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_regimens">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_regimens,
-                    pers_id         =   Pid
+                    action          =   get_regimen,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_regimen">> ->
                 #empweb_hap{
@@ -492,8 +499,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_posts">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_posts,
-                    pers_id         =   Pid
+                    action          =   get_post,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_post">> ->
                 #empweb_hap{
@@ -529,8 +537,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_rooms">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_rooms,
-                    pers_id         =   Pid
+                    action          =   get_room,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_room">> ->
                 #empweb_hap{
@@ -566,8 +575,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_communities">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
-                    action          =   get_all_communities,
-                    pers_id         =   Pid
+                    action          =   get_community,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_community">> ->
                 #empweb_hap{
@@ -591,6 +601,44 @@ jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
 
+            %%
+            %% Сообщения
+            %%
+            <<"get_message">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_communities">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_message">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_message">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_message">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
         %% ----------------------------------------------------------------
         %% Функции системы
         %% ----------------------------------------------------------------

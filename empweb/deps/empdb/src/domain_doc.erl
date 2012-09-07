@@ -533,6 +533,7 @@ get_message(Params)->
 
 get_message(Params, Fileds)->
     dao:with_connection(fun(Con)->
+        io:format(" --- Params --- ~n~p~n", [Params]),
         dao_message:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
