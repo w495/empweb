@@ -103,6 +103,16 @@ register(Params)->
             ]) of
                 {ok, _}->
                     {ok, Id};
+                {error,{not_unique,<<"users">>}} ->
+                    case dao_pers:update_ejabberd(ejabberd, [
+                        {username, convert:to_list(Id)},
+                        {password, Pass}
+                    ]) of
+                        {ok, _}->
+                            {ok, Id};
+                        {error, Error} ->
+                            {error, Error}
+                    end;
                 {error, Error} ->
                     {error, Error}
             end;

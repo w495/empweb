@@ -296,44 +296,7 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-            %%
-            %% Типы сообществ (обычные, тайные)
-            %%
-            <<"get_communitytype">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_doc,
-                    action          =   get_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"get_all_communitytypes">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_doc,
-                    action          =   get_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"create_communitytype">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_doc,
-                    action          =   create_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"update_communitytype">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_doc,
-                    action          =   update_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
-            <<"delete_communitytype">> ->
-                #empweb_hap{
-                    handler         =   jsonapi_doc,
-                    action          =   delete_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
-                };
+
             %%
             %% Типы чат-комнат. (страна, тюрьма, ад, рай)
             %%
@@ -445,6 +408,82 @@ jsonapi_map(Req, {List}) ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
                     action          =   delete_regimen,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            %%
+            %% Дерево тем страны
+            %%
+            <<"get_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_topics">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            %%
+            %% Типы сообществ (обычные, тайные)
+            %%
+            <<"get_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_communitytypes">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_communitytype,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_communitytype">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_communitytype,
                     pers_id         =   Pid,
                     params          =   Params
                 };

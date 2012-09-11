@@ -1294,7 +1294,367 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from trtype where alias='dynamic')
         );
 
+select 'log:topic' as log;
 
+insert into topic(alias) values ('all');
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'all topics',
+            'topic',                     'name_ti','all',
+            (select name_ti from topic where alias='all'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for all topics',
+            'topic',                     'descr_ti','all',
+            (select descr_ti from topic where alias='all'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'все темы',
+            'topic',                      'name_ti','all',
+            (select name_ti from topic  where alias='all'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'обсуждаем все темы',
+            'topic',                      'descr_ti','all',
+            (select descr_ti from topic  where alias='all'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into topic(alias, parent_id)
+    values
+        ('sex',
+            (select id from topic where alias='all')
+        ),
+        ('drugs',
+            (select id from topic where alias='all')
+        ),
+        ('rock_n_roll',
+            (select id from topic where alias='all')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'sex',
+            'topic',                     'name_ti','sex',
+            (select name_ti from topic where alias='sex'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for sex',
+            'topic',                     'descr_ti','sex',
+            (select descr_ti from topic where alias='sex'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'секс',
+            'topic',                      'name_ti','sex',
+            (select name_ti from topic  where alias='sex'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'обсуждаем секс',
+            'topic',                      'descr_ti','sex',
+            (select descr_ti from topic  where alias='sex'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'drugs',
+            'topic',                     'name_ti','drugs',
+            (select name_ti from topic where alias='drugs'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for drugs',
+            'topic',                     'descr_ti','drugs',
+            (select descr_ti from topic where alias='drugs'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'лекарства',
+            'topic',                      'name_ti','drugs',
+            (select name_ti from topic  where alias='drugs'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'все о лекарствах',
+            'topic',                      'descr_ti','drugs',
+            (select descr_ti from topic  where alias='drugs'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'rock_n_roll',
+            'topic',                     'name_ti','rock_n_roll',
+            (select name_ti from topic where alias='rock_n_roll'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for rock_n_roll',
+            'topic',                     'descr_ti','rock_n_roll',
+            (select descr_ti from topic where alias='rock_n_roll'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'музыка',
+            'topic',                      'name_ti','rock_n_roll',
+            (select name_ti from topic  where alias='rock_n_roll'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'все музыке',
+            'topic',                      'descr_ti','rock_n_roll',
+            (select descr_ti from topic  where alias='rock_n_roll'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into topic(alias, parent_id)
+    values
+        ('classic_sex',
+            (select id from topic where alias='sex')
+        ),
+        ('bdsm',
+            (select id from topic where alias='sex')
+        ),
+        ('boobs',
+            (select id from topic where alias='sex')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'classic sex',
+            'topic',                     'name_ti','classic_sex',
+            (select name_ti from topic where alias='classic_sex'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for classic sex',
+            'topic',                     'descr_ti','classic_sex',
+            (select descr_ti from topic where alias='classic_sex'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'секс',
+            'topic',                      'name_ti','classic_sex',
+            (select name_ti from topic  where alias='classic_sex'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'обсуждаем нормальный секс',
+            'topic',                      'descr_ti','classic_sex',
+            (select descr_ti from topic  where alias='classic_sex'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'bdsm',
+            'topic',                     'name_ti','bdsm',
+            (select name_ti from topic where alias='bdsm'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for bdsm',
+            'topic',                     'descr_ti','bdsm',
+            (select descr_ti from topic where alias='bdsm'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'бсдм',
+            'topic',                      'name_ti','bdsm',
+            (select name_ti from topic  where alias='bdsm'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'все о бсдм',
+            'topic',                      'descr_ti','bdsm',
+            (select descr_ti from topic  where alias='bdsm'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'boobs',
+            'topic',                     'name_ti','boobs',
+            (select name_ti from topic where alias='boobs'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for boobs',
+            'topic',                     'descr_ti','boobs',
+            (select descr_ti from topic where alias='boobs'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'cиськи',
+            'topic',                      'name_ti','boobs',
+            (select name_ti from topic  where alias='boobs'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'тема cисек',
+            'topic',                      'descr_ti','boobs',
+            (select descr_ti from topic  where alias='boobs'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into topic(alias, parent_id)
+    values
+        ('meskalin',
+            (select id from topic where alias='drugs')
+        ),
+        ('lsd',
+            (select id from topic where alias='drugs')
+        ),
+        ('plan',
+            (select id from topic where alias='drugs')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'meskalin',
+            'topic',                     'name_ti','meskalin',
+            (select name_ti from topic where alias='meskalin'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for meskalin',
+            'topic',                     'descr_ti','meskalin',
+            (select descr_ti from topic where alias='meskalin'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'домашняя химия',
+            'topic',                      'name_ti','meskalin',
+            (select name_ti from topic  where alias='meskalin'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'обсуждаем домашнюю химию',
+            'topic',                      'descr_ti','meskalin',
+            (select descr_ti from topic  where alias='meskalin'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'lsd',
+            'topic',                     'name_ti','lsd',
+            (select name_ti from topic where alias='lsd'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for lsd',
+            'topic',                     'descr_ti','lsd',
+            (select descr_ti from topic where alias='lsd'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'грибочки',
+            'topic',                      'name_ti','lsd',
+            (select name_ti from topic  where alias='lsd'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'все о грибах',
+            'topic',                      'descr_ti','lsd',
+            (select descr_ti from topic  where alias='lsd'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'plan',
+            'topic',                     'name_ti','plan',
+            (select name_ti from topic where alias='plan'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for plan',
+            'topic',                     'descr_ti','plan',
+            (select descr_ti from topic where alias='plan'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'лекарственные травы',
+            'topic',                      'name_ti','plan',
+            (select name_ti from topic  where alias='plan'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'тема о лекарственных травах',
+            'topic',                      'descr_ti','plan',
+            (select descr_ti from topic  where alias='plan'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into topic(alias, parent_id)
+    values
+        ('new_wave',
+            (select id from topic where alias='rock_n_roll')
+        ),
+        ('hard_rock',
+            (select id from topic where alias='rock_n_roll')
+        ),
+        ('pop',
+            (select id from topic where alias='rock_n_roll')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+    values
+        (   'new wave',
+            'topic',                     'name_ti','new_wave',
+            (select name_ti from topic where alias='new_wave'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for new wave',
+            'topic',                     'descr_ti','new_wave',
+            (select descr_ti from topic where alias='new_wave'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'новая волна',
+            'topic',                      'name_ti','new_wave',
+            (select name_ti from topic  where alias='new_wave'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'обсуждаем новую волну',
+            'topic',                      'descr_ti','new_wave',
+            (select descr_ti from topic  where alias='new_wave'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'hard rock',
+            'topic',                     'name_ti','hard_rock',
+            (select name_ti from topic where alias='hard_rock'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for hard rock',
+            'topic',                     'descr_ti','hard_rock',
+            (select descr_ti from topic where alias='hard_rock'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'тяжелый рок',
+            'topic',                      'name_ti','hard_rock',
+            (select name_ti from topic  where alias='hard_rock'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'все о тяжелом роке',
+            'topic',                      'descr_ti','hard_rock',
+            (select descr_ti from topic  where alias='hard_rock'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'pop',
+            'topic',                     'name_ti','pop',
+            (select name_ti from topic where alias='pop'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for pop',
+            'topic',                     'descr_ti','pop',
+            (select descr_ti from topic where alias='pop'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'попса',
+            'topic',                      'name_ti','pop',
+            (select name_ti from topic  where alias='pop'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'тема о попсе',
+            'topic',                      'descr_ti','pop',
+            (select descr_ti from topic  where alias='pop'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
 
 select 'log:communitytype' as log;
 

@@ -368,7 +368,7 @@ handle(_req, #empweb_hap{
     );
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Список режимов страны
+%% Список режимов комнаты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
@@ -417,6 +417,56 @@ handle(_req, #empweb_hap{
         end
     );
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Дерево тем комнаты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{
+        action='get_topic', params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get topic">>),
+    jsonapi:handle_params(
+        norm:norm(Params, opt_norm('get')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(biz_doc:get_topic(Data#norm.return)),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=create_topic, params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create topic">>),
+    jsonapi:handle_params(
+        norm:norm(Params, opt_norm('create')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(biz_doc:create_topic(Data#norm.return)),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=update_topic, params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update topic">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, opt_norm('update')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(biz_doc:update_topic(Data#norm.return)),
+                Hap
+            }
+        end
+    );
+    
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы сообществ (обычные, тайные)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -663,7 +713,7 @@ handle(_req, #empweb_hap{
     );
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Чат-комнаты (страны)
+%% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{

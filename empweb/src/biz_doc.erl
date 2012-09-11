@@ -85,13 +85,23 @@
 ]).
 
 %%
-%% Список режимов страны
+%% Список режимов комнаты
 %%
 -export([
     get_regimen/1,
     get_regimen/2,
     create_regimen/1,
     update_regimen/1
+]).
+
+%%
+%% Дерево тем комнаты
+%%
+-export([
+    get_topic/1,
+    get_topic/2,
+    create_topic/1,
+    update_topic/1
 ]).
 
 %%
@@ -139,7 +149,7 @@
 ]).
 
 %%
-%% Чат-комнаты (страны)
+%% Чат-комнаты (комнаты)
 %%
 -export([
     get_room/1,
@@ -280,7 +290,7 @@ get_chatlang(Params, Fields)->
     domain_doc:get_chatlang(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Список режимов страны
+%% Список режимов комнаты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_regimen(Params)->
@@ -294,6 +304,23 @@ get_regimen(Params)->
 
 get_regimen(Params, Fields)->
     domain_doc:get_regimen(Params, Fields).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Дерево тем комнаты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_topic(Params)->
+    domain_doc:create_topic(Params).
+
+update_topic(Params)->
+    domain_doc:update_topic(Params).
+
+get_topic(Params)->
+    domain_doc:get_topic(Params).
+
+get_topic(Params, Fields)->
+    domain_doc:get_topic(Params, Fields).
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы сообществ (обычные, тайные)
@@ -366,7 +393,7 @@ get_post(Params, Fields)->
     domain_doc:get_post(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Чат-комнаты (страны)
+%% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_room(Params)->

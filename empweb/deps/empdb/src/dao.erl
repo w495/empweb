@@ -609,7 +609,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_null, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    io:format("pgret ERROR: ~p - ~p~n", [E, R]),
+                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23503">> ->
@@ -619,17 +619,26 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_exists, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    io:format("pgret ERROR: ~p - ~p~n", [E, R]),
+                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23505">> ->
             try
-                {ok, Re} = re:compile("\"(.*?)*?_([^_].+)_key\""),
-                {match, [_, _, C | _]} = re:run(Msg, Re, [{capture, all, list}]),
-                {error, {not_unique, erlang:list_to_binary(C)}}
+                {ok, Reu} = re:compile("\"(.*?)*?_([^_].+)_key\""),
+                {ok, Rep} = re:compile("\"(.*?)_pkey\""),
+                case
+                    {   re:run(Msg, Reu, [{capture, all, list}]),
+                        re:run(Msg, Rep, [{capture, all, list}])
+                    }
+                of
+                    {{match, [_, _, C | _]},_} ->
+                        {error, {not_unique, erlang:list_to_binary(C)}};
+                    {nomatch,{match,[_,C]}} ->
+                        {error, {not_unique, erlang:list_to_binary(C)}}
+                end
             catch
                 E:R ->
-                    io:format("pgret ERROR: ~p - ~p~n", [E, R]),
+                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         Code ->
