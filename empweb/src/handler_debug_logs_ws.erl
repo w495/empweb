@@ -134,27 +134,33 @@ websocket_init(_Any, Req, _State) ->
     {ok, Req2, State}.
 
 websocket_handle({text, Msg}, Req, State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     {reply, {text, << "You said: ", Msg/binary >>}, Req, State};
 
 websocket_handle(_Any, Req, State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     {ok, Req, State}.
 
 
 websocket_info(tick, Req, #state{event=undefined} = State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     {ok, Req, State#state{event = []}};
 
 websocket_info(tick, Req, #state{storage=Storage, event=[]} = State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     {ok, Req, State#state{event = handle_ets(Storage)}};
 
-
 websocket_info(tick, Req, #state{storage=Storage, event=Events} = State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     Result = handle_event_list(Events),
     {reply, {text, Result}, Req, State#state{event=[]}};
 
 websocket_info(_Info, Req, State) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, #state{storage=Storage}) ->
+    ?debug("--> ~p <-- ~n", [?LINE]),
     ets:delete(Storage),
     ok.
 

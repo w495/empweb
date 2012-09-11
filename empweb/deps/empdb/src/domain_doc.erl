@@ -55,7 +55,7 @@
 ]).
 
 %%
-%% Типы чат-комнат. (страна, тюрьма, ад, рай)
+%% Типы чат-комнат. (страна, тюрьма, ад, рай).
 %%
 -export([
     get_roomtype/1,
@@ -75,7 +75,7 @@
 ]).
 
 %%
-%% Список режимов страны
+%% Список режимов комнаты: дектатура, демократия и пр.
 %%
 -export([
     get_regimen/1,
@@ -83,6 +83,28 @@
     create_regimen/1,
     update_regimen/1
 ]).
+
+%%
+%% Дерево тем комнаты.
+%% -------------------------------------------------
+%%  [Все темы]
+%%      |-[Автомобили]
+%%          |-[Хорошие]
+%%              |-[Чайка]
+%%              |-[Уазик]
+%%          |-[Плохие]
+%%              |-[Калина]
+%%              |-[Запорожец]
+%%      ...
+%% -------------------------------------------------
+%%
+-export([
+    get_topic/1,
+    get_topic/2,
+    create_topic/1,
+    update_topic/1
+]).
+
 
 %%
 %% Типы сообществ (обычные, тайные)
@@ -130,7 +152,7 @@
 ]).
 
 %%
-%% Чат-комнаты (страны)
+%% Чат-комнаты (комнаты)
 %%
 -export([
     get_room/1,
@@ -140,7 +162,7 @@
 ]).
 
 %%
-%% Сообщества
+%% Сообщества.
 %%
 -export([
     get_community/1,
@@ -185,9 +207,7 @@ update_oktype(Params)->
     end).
 
 get_oktype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_doc:get_oktype(Con, [{isdeleted, false}|Params])
-    end).
+    get_oktype(Params, []).
 
 get_oktype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -210,9 +230,7 @@ update_doctype(Params)->
     end).
 
 get_doctype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_doc:get_doctype(Con, [{isdeleted, false}|Params])
-    end).
+    get_doctype(Params, []).
 
 get_doctype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -234,9 +252,7 @@ update_contype(Params)->
     end).
 
 get_contype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_doc:get_contype(Con, [{isdeleted, false}|Params])
-    end).
+    get_contype(Params, []).
 
 get_contype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -259,9 +275,7 @@ update_acctype(Params)->
     end).
 
 get_acctype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_doc:get_acctype(Con, [{isdeleted, false}|Params])
-    end).
+    get_acctype(Params, []).
 
 get_acctype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -283,9 +297,7 @@ update_roomtype(Params)->
     end).
 
 get_roomtype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_roomtype(Con, [{isdeleted, false}|Params])
-    end).
+    get_roomtype(Params, []).
 
 get_roomtype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -307,9 +319,7 @@ update_chatlang(Params)->
     end).
 
 get_chatlang(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_chatlang(Con, [{isdeleted, false}|Params])
-    end).
+    get_chatlang(Params, []).
 
 get_chatlang(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -317,7 +327,7 @@ get_chatlang(Params, Fileds)->
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Список режимов страны
+%% Список режимов комнаты: дектатура, демократия и пр.
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_regimen(Params)->
@@ -331,13 +341,44 @@ update_regimen(Params)->
     end).
 
 get_regimen(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get_regimen(Con, [{isdeleted, false}|Params])
-    end).
+    get_regimen(Params, []).
 
 get_regimen(Params, Fileds)->
     dao:with_connection(fun(Con)->
         dao_room:get_regimen(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Дерево тем комнаты
+%% -------------------------------------------------
+%%  [Все темы]
+%%      |-[Автомобили]
+%%          |-[Хорошие]
+%%              |-[Чайка]
+%%              |-[Уазик]
+%%          |-[Плохие]
+%%              |-[Калина]
+%%              |-[Запорожец]
+%%      ...
+%% -------------------------------------------------
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_topic(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:create_topic(Con, Params)
+    end).
+
+update_topic(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:update_topic(Con, Params)
+    end).
+
+get_topic(Params)->
+    get_topic(Params, []).
+
+get_topic(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_room:get_topic(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -355,9 +396,7 @@ update_communitytype(Params)->
     end).
 
 get_communitytype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_community:get_communitytype(Con, [{isdeleted, false}|Params])
-    end).
+    get_communitytype(Params, []).
 
 get_communitytype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -379,9 +418,7 @@ update_messagetype(Params)->
     end).
 
 get_messagetype(Params)->
-    dao:with_connection(fun(Con)->
-        dao_message:get_messagetype(Con, [{isdeleted, false}|Params])
-    end).
+    get_messagetype(Params, []).
 
 get_messagetype(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -410,9 +447,7 @@ update_blog(Params)->
     end).
 
 get_blog(Params)->
-    dao:with_connection(fun(Con)->
-        dao_blog:get(Con, [{isdeleted, false}|Params])
-    end).
+    get_blog(Params, []).
 
 get_blog(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -439,9 +474,7 @@ update_post(Params)->
     end).
 
 get_post(Params)->
-    dao:with_connection(fun(Con)->
-        dao_post:get(Con, [{isdeleted, false}|Params])
-    end).
+    get_post(Params, []).
 
 get_post(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -454,7 +487,7 @@ is_post_owner(Uid, Oid)->
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Чат-комнаты (страны)
+%% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_room(Params)->
@@ -468,9 +501,7 @@ update_room(Params)->
     end).
 
 get_room(Params)->
-    dao:with_connection(fun(Con)->
-        dao_room:get(Con, [{isdeleted, false}|Params])
-    end).
+    get_room(Params, []).
 
 get_room(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -497,9 +528,7 @@ update_community(Params)->
     end).
 
 get_community(Params)->
-    dao:with_connection(fun(Con)->
-        dao_community:get(Con, [{isdeleted, false}|Params])
-    end).
+    get_community(Params, []).
 
 get_community(Params, Fileds)->
     dao:with_connection(fun(Con)->
@@ -527,9 +556,7 @@ update_message(Params)->
     end).
 
 get_message(Params)->
-    dao:with_connection(fun(Con)->
-        dao_message:get(Con, [{isdeleted, false}|Params])
-    end).
+    get_message(Params, []).
 
 get_message(Params, Fileds)->
     dao:with_connection(fun(Con)->

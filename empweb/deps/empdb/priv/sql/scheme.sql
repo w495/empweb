@@ -733,6 +733,7 @@ create table chatlang(
 create sequence seq_topic_id;
 create table topic(
     id          decimal primary key default nextval('seq_topic_id'),
+    alias       varchar(1024)   unique,
     /**
         Номер языковой сущности
     **/
@@ -742,7 +743,7 @@ create table topic(
     **/
     descr_ti    decimal unique      default nextval('seq_any_ti'),
     -- alias       varchar(1024)   unique,
-    topic_id    decimal references topic(id) default null,
+    parent_id    decimal references topic(id) default null,
     isdeleted   bool default false
 );
 
