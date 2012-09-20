@@ -111,8 +111,8 @@ table()->
     table(name).
 
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    get(Con, What, []).
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).
@@ -139,22 +139,26 @@ is_owner(Con, Owner_id, Id)->
 %% @doc Возвращает экземпляр документа и экземпляр join-наследника.
 %%      Наследник должен быть описан в модуле Module.
 %%
+% get(Module, Con, What)->
+%     dao:get([{?MODULE, id},    {Module, doc_id}], Con, What).
+
 get(Module, Con, What, Fields)->
-    dao:get({?MODULE, id},    {Module, doc_id}, Con, What, Fields).
+    io:format("What, Fields = ~p~n", [{What, Fields}]),
+    dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
 
 %%
 %% @doc Создает экземпляр документа и экземпляр join-наследника.
 %%      Наследник должен быть описан в модуле Module.
 %%
 create(Module, Con, Proplist)->
-    dao:create({?MODULE, id}, {Module, doc_id}, Con, Proplist).
+    dao:create([{?MODULE, id}, {Module, doc_id}], Con, Proplist).
 
 %%
 %% @doc Изменяет экземпляр документа и экземпляр join-наследника.
 %%      Наследник должен быть описан в модуле Module.
 %%
 update(Module, Con, Proplist)->
-    dao:update({?MODULE, id}, {Module, doc_id}, Con, Proplist).
+    dao:update([{?MODULE, id}, {Module, doc_id}], Con, Proplist).
 
 
 

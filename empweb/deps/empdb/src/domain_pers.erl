@@ -94,7 +94,9 @@
 register(Params)->
     Pass = proplists:get_value(pass, Params),
     case dao_pers:create(emp, [{phash, phash(Pass)}|Params]) of
-        {ok, Id} ->
+        {ok, Objects} ->
+            [{Pl}|_] = Objects,
+            Id = proplists:get_value(id, Pl),
             %% создаем запись в базе jabberd
             %case dao_pers:create_ejabberd(ejabberd, [
             case dao_pers:create_ejabberd(ejabberd, [
@@ -102,22 +104,22 @@ register(Params)->
                 {password, Pass}
             ]) of
                 {ok, _}->
-                    {ok, Id};
+                    {ok, Objects};
                 {error,{not_unique,<<"users">>}} ->
                     case dao_pers:update_ejabberd(ejabberd, [
                         {username, convert:to_list(Id)},
                         {password, Pass}
                     ]) of
                         {ok, _}->
-                            {ok, Id};
-                        {error, Error} ->
-                            {error, Error}
+                            {ok, Objects};
+                        {Eclass, Error} ->
+                            {Eclass, Error}
                     end;
                 {error, Error} ->
                     {error, Error}
             end;
-        {error, Error} ->
-            {error, Error}
+        {Eclass, Error} ->
+            {Eclass, Error}
     end.
 
 %%
@@ -136,19 +138,21 @@ update(Params)->
                 {phash, phash(Mbpass)}
                 |Params
             ])  of
-                {ok, Id} ->
+                {ok, Objects} ->
+                    [{Pl}|_] = Objects,
+                    Id = proplists:get_value(id, Pl),
                     %% изменяем запись в базе jabberd
                     case dao_pers:update_ejabberd(ejabberd, [
                         {username, convert:to_list(Id)},
                         {password, Mbpass}
                     ]) of
                         {ok, _}->
-                            {ok, Id};
-                        {error, Error} ->
-                            {error, Error}
+                            {ok, Objects};
+                        {Eclass, Error} ->
+                            {Eclass, Error}
                     end;
-                {error, Error} ->
-                    {error, Error}
+                {Eclass, Error} ->
+                    {Eclass, Error}
             end
     end.
 

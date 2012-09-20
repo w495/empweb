@@ -117,308 +117,968 @@ fields_fieldvars(Fields, _default, Additions) ->
     [<<" ">>, [First|Res], <<" ">>].
 
 %%% -----------------------------------------------------------------------
+%%% -----------------------------------------------------------------------
+%%% -----------------------------------------------------------------------
 
-get({Parent, Fp}, {Options, Fm}, Con, [], Fields)
-    when    erlang:is_list(Options),
-            erlang:is_list(Parent) ->
-    Ap = proplists:get_value({table, fields, all},      Parent),
-        %Parent:table({fields, all}),
-    Sp = proplists:get_value({table, fields, select},   Parent),
-        %Parent:table({fields, select}),
-    Am = proplists:get_value({table, fields, all},      Options),
-        %Module:table({fields, all}),
-    Sm = proplists:get_value({table, fields, select},   Options),
-        %Module:table({fields, select}),
-    Tfields = lists:filter(fun(F)-> lists:member(F, Sp) or lists:member(F, Sm) end, Fields),
-    Ptbl = convert:to_binary(proplists:get_value({table, name},Parent)),
-    Mtbl = convert:to_binary(proplists:get_value({table, name},Options)),
-    Dfs = dao:fields(Tfields, lists:append(Sp, Sm)),
-    Fmb = convert:to_binary(Fm),
-    Fpb = convert:to_binary(Fp),
-    dao:pgret(dao:equery(Con,[
-        <<" select ">>, Dfs,    <<" from ">>,   Ptbl,
-        <<" join ">>,   Mtbl,   <<" on ">>,
-            [Mtbl,<<".">>,Fmb], <<" =  ">>,  [Ptbl,<<".">>,Fpb]
-    ]));
+sql_and(List)->
+    {Tlist, String} = sql_list(List),
+    {   Tlist,
+        [   <<"(">>,
+                string:join(String,[<<" and ">>]),
+            <<")">>
+        ]
+    }.
 
-get({Parent, Fp}, {Options, Fm}, Con, Kvalues, Fields)
-    when    erlang:is_list(Kvalues),
-            erlang:is_list(Options),
-            erlang:is_list(Parent)  ->
-    Ap = proplists:get_value({table, fields, all},      Parent),
-        %Parent:table({fields, all}),
-    Sp = proplists:get_value({table, fields, select},   Parent),
-        %Parent:table({fields, select}),
-    Am = proplists:get_value({table, fields, all},      Options),
-        %Module:table({fields, all}),
-    Sm = proplists:get_value({table, fields, select},   Options),
-        %Module:table({fields, select}),
-    Afields = lists:append(Ap, Am),
-    Sfields = lists:append(Sp, Sm),
-    Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
-    Keys = proplists:get_keys(Kvalues),
-    io:format(" --- Kvalues --- ~n~p~n", [Kvalues]),
-    case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
-        [] ->
-            {error, {wrong_field, Keys}};
-        Ffields ->
-            io:format(" --- Ffields --- ~n~p~n", [Ffields]),
-            Ptbl = convert:to_binary(proplists:get_value({table, name},Parent)),
-            Mtbl = convert:to_binary(proplists:get_value({table, name},Options)),
-            Dfs = dao:fields(Tfields, lists:append(Sp, Sm)),
-            Fmb = convert:to_binary(Fm),
-            Fpb = convert:to_binary(Fp),
-            dao:pgret(dao:equery(Con,[
-                <<" select ">>, Dfs,    <<" from ">>,   Ptbl,
-                <<" join ">>,   Mtbl,   <<" on ">>,
-                    [Mtbl,<<".">>,Fmb], <<" =  ">>,  [Ptbl,<<".">>,Fpb],
-                <<" where ">>,
-                string:join(
-                    [   case Val of
-                            null ->
-                                io:format(" --- ~p --- ~n~p~n", [Ff, Ffields]),
-                                [
-                                    convert:to_binary(Ff),
-                                    <<" is null ">>
-                                ];
-                            _ ->
-                                [
-                                    convert:to_binary(Ff),
-                                    <<" = $">>,
-                                    convert:to_binary(Ff)
-                                ]
-                        end
-                        ||  {Ff, Val} <- Ffields
-                    ],
-                    [<<" and ">>]
-                ),
-                case proplists:get_value('limit', Kvalues) of
-                    undefined -> [];
-                    Limit -> [<<" limit ">>, convert:to_list(Limit), <<" ">> ]
+sql_or(List)->
+    {Tlist, String} = sql_list(List),
+    {   Tlist,
+        [   <<"(">>,
+                string:join(String,[<<" or ">>]),
+            <<")">>
+        ]
+    }.
+
+sql_list(List) ->
+    io:format("List = ~p~n", [List]),
+    {Tlist, String} = lists:unzip([sql_cond({Ff, Val})||{Ff, Val} <- List]),
+    io:format("String = ~p~n", [String]),
+    {lists:flatten(Tlist), String}.
+
+sql_cond({'and', List}) ->
+    sql_and(List);
+
+sql_cond({'or', List}) ->
+    sql_or(List);
+
+sql_cond({Ff, {[{X, C}]}})->
+    sql_cond({Ff, {X, C}});
+
+sql_cond({Ff, {'and', Conds}})->
+    X =
+        {   'and',
+            lists:map(
+                fun(Cond)->
+                    {Ff, Cond}
                 end,
-                case proplists:get_value('offset', Kvalues) of
-                    undefined -> [];
-                    Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
-                end
-            ], Ffields))
-    end;
+                Conds
+            )
+        },
+    sql_cond(X);
 
-get({Parent, Fp}, {Module, Fm}, Con, Kvalues, Fields)->
+sql_cond({Ff, {'or', Conds}})->
+    io:format("Conds = ~p~n", [Conds]),
+    X =
+        {   'or',
+            lists:map(
+                fun(Cond)->
+                    {Ff, Cond}
+                end,
+                Conds
+            )
+        },
+    sql_cond(X);
+
+sql_cond({Ff, {between, {Left, Right}}}) ->
+    Bnleft   = convert:to_binary([
+        <<"__">>,
+        convert:to_binary(Ff),
+        <<"__left__">>
+    ]),
+    Bnright  = convert:to_binary([
+        <<"__">>,
+        convert:to_binary(Ff),
+        <<"__right__">>
+    ]),
+    Nleft    = convert:to_atom(Bnleft),
+    Nright   = convert:to_atom(Bnright),
+    {   [{Nleft,Left},{Nright, Right}],
+        [   convert:to_binary(Ff),
+            <<" between ">>, ["$",Bnleft], <<" and ">>, ["$",Bnright]
+        ]
+    };
+
+sql_cond({Ff, {iregex, Regex}})
+    when erlang:is_binary(Regex) orelse erlang:is_list(Regex) ->
+    {   [],
+        [   convert:to_binary(Ff),
+            <<" ~* '">>,
+            convert:to_binary(Regex),
+            <<"'">>
+        ]
+    };
+
+sql_cond({Ff, {regex, Regex}})
+    when erlang:is_binary(Regex) orelse erlang:is_list(Regex) ->
+    {   [],
+        [   convert:to_binary(Ff),
+            <<" ~ '">>,
+            convert:to_binary(Regex),
+            <<"'">>
+        ]
+    };
+
+sql_cond({Ff, {startswith, Startswith}}) ->
+    sql_cond({Ff, {like, [<<"%">>, Startswith]}});
+
+sql_cond({Ff, {endswith, Endswith}}) ->
+    sql_cond({Ff, {like, [Endswith, <<"%">>]}});
+
+sql_cond({Ff, {contains, Contains}}) ->
+    sql_cond({Ff, {like, [<<"%">>, Contains, <<"%">>]}});
+
+sql_cond({Ff, {like, Like}})
+    when erlang:is_binary(Like) orelse erlang:is_list(Like) ->
+    {   [],
+        [   convert:to_binary(Ff),
+            <<" like '">>,
+            convert:to_binary(Like),
+            <<"'">>
+        ]
+    };
+
+sql_cond({Ff, {istartswith, Startswith}}) ->
+    sql_cond({Ff, {ilike, [<<"%">>, Startswith]}});
+
+sql_cond({Ff, {iendswith, Endswith}}) ->
+    sql_cond({Ff, {ilike, [Endswith, <<"%">>]}});
+
+sql_cond({Ff, {icontains, Contains}}) ->
+    sql_cond({Ff, {ilike, [<<"%">>, Contains, <<"%">>]}});
+
+sql_cond({Ff, {ilike, Like}})
+    when erlang:is_binary(Like) orelse erlang:is_list(Like) ->
+    {   [],
+        [   convert:to_binary(Ff),
+            <<" ilike '">>,
+            convert:to_binary(Like),
+            <<"'">>
+        ]
+    };
+
+sql_cond({Ff, {lt, Val}}) ->
+    {   [{Ff, Val}],
+        [   convert:to_binary(Ff),
+            <<" < $">>,
+            convert:to_binary(Ff)
+        ]
+    };
+
+sql_cond({Ff, {lte, Val}}) ->
+    {[{Ff, Val}], [convert:to_binary(Ff),<<" <= $">>,convert:to_binary(Ff)]};
+
+sql_cond({Ff, {gt, Val}}) ->
+    {[{Ff, Val}], [convert:to_binary(Ff),<<" > $">>,convert:to_binary(Ff)]};
+
+sql_cond({Ff, {gte, Val}}) ->
+    {[{Ff, Val}], [convert:to_binary(Ff),<<" >= $">>,convert:to_binary(Ff)]};
+
+sql_cond({Ff, {in, []}}) ->
+    {[], []};
+
+sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
+    {[], [
+        convert:to_binary(Ff),
+        <<" in (">>,
+        string:join(
+            [[convert:to_binary(Li)]|| Li <- List],
+            [<<",">>]
+        ),
+        <<")">>
+    ]};
+
+sql_cond({Ff, Val} = Tuple) ->
+    {[{Ff, Val}], [
+        convert:to_binary(Ff),
+        <<" = $">>,
+        convert:to_binary(Ff)
+    ]}.
+
+sql_where(<<>>)->
+    {[], []};
+
+sql_where(undefined)->
+    {[], []};
+
+sql_where([])->
+    {[], []};
+
+sql_where(Current_all_fields)->
+    {PField, Pstring} = sql_and(Current_all_fields),
+    {PField, [<<" where ">>, Pstring]}.
+
+
+
+sql_limit([])->
+    [];
+
+sql_limit(<<>>)->
+    [];
+
+sql_limit(undefined)->
+    [];
+
+sql_limit(Limit)->
+    [   <<" limit ">>,
+        convert:to_list(Limit),
+        <<" ">>
+    ].
+
+
+sql_offset([])->
+    [];
+
+sql_offset(<<>>)->
+    [];
+
+sql_offset(undefined)->
+    [];
+
+sql_offset(Limit)->
+    [   <<" offset ">>,
+        convert:to_list(Limit),
+        <<" ">>
+    ].
+
+
+sql_order([])->
+    [];
+
+sql_order(undefined)->
+    [];
+
+sql_order({asc, Order}) ->
+    sql_order(Order, asc);
+
+sql_order({desc, Order}) ->
+    sql_order(Order, desc);
+
+sql_order({Order, asc}) ->
+    sql_order(Order, asc);
+
+sql_order({Order, desc}) ->
+    sql_order(Order, desc);
+
+sql_order(Order) ->
+    sql_order(Order, asc).
+
+sql_order([O|Rorder] = Order, Direction)
+    when (
+        erlang:is_atom(O)
+        orelse erlang:is_list(O)
+        orelse erlang:is_binary(O)
+    ) andalso (
+        Direction =:= asc orelse Direction =:= desc 
+    )->
+    [   <<" order by ">>,
+        string:join(
+            [convert:to_binary(O)||O<- Order],
+            [<<",">>]
+        ),
+        <<" ">>, convert:to_binary(Direction), <<" ">>
+    ];
+
+sql_order(Order, Direction)
+    when (
+        erlang:is_atom(Order)
+        orelse erlang:is_list(Order)
+        orelse erlang:is_binary(Order)
+    ) andalso (
+        Direction =:= asc orelse Direction =:= desc
+    )->
+    [   <<" order by  ">>,
+        convert:to_binary(Order),
+        <<" ">>,
+        convert:to_binary(Direction),
+        <<" ">>
+    ].
+
+
+% case Order of
+%                         [] ->
+%                             [];
+%                         undefined ->
+%                             [];
+%                         Order_list when erlang:is_list(Order_list )->
+%                             [   <<" offset ">>,
+%                                 string:join(
+%                                     [convert:to_binary(O)||O<- Order_list],
+%                                     [<<",">>]
+%                                 ),
+%                                 <<" ">>
+%                             ]
+%                     end,
+
+sql_returning([]) ->
+    [];
+
+sql_returning(undefined) ->
+    [];
+
+sql_returning(<<>>) ->
+    [];
+
+sql_returning([{Fitem, _}|Rfilter] = Filter) ->
+    [   <<" returning ">>,
+        convert:to_binary(Fitem),
+        lists:map(fun({Item, _}) ->
+            [<<" ,">>, convert:to_binary(Item)]
+        end,Rfilter)
+    ];
+
+sql_returning([Fitem|Rfilter] = Filter) ->
+    [   <<" returning ">>,
+        convert:to_binary(Fitem),
+        lists:map(fun(Item) ->
+            [<<" ,">>, convert:to_binary(Item)]
+        end,Rfilter)
+    ];
+
+sql_returning(Filter) ->
+    [   <<" returning ">>,
+        convert:to_binary(Filter)
+    ].
+
+%%% -----------------------------------------------------------------------
+%%% -----------------------------------------------------------------------
+%%% -----------------------------------------------------------------------
+
+
+%%
+%% @doc Структура описания запроса. 
+%%      Пока не используется.
+%%
+-record(queryobj, {
+    %% Для select \ insert \ update \ delete
+        filter      = [] :: proplists:proplist(),
+    %% Для select \ insert \ update 
+        fields      = [] :: list(),
+    %% Для insert \ update
+        values      = [] :: proplists:proplist(),
+    %% Для select 
+        order       = undefined
+        :: undefined | integer(),
+    %% Для select 
+        limit       = undefined :: undefined | integer(),
+    %% Для select 
+        offset      = undefined :: undefined | integer()
+}).
+
+table_options({table, fields, all},      Current) ->
+    [   'and', 'or'
+        | proplists:get_value({table, fields, all}, Current, [])
+    ];
+
+table_options(Oname,      Current) ->
+    proplists:get_value(Oname, Current).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% @doc Выполняет select. Позволяет получить одну сущность 
+%%      единственной таблицы.
+%%
+%%      Операторы:
+%%              and 
+%%              or
+%%
+%%          Операторы надо строками, префикс i в начале означает,
+%%          что регистр учитываться не будет:
+%%
+%%                  like,           ilike
+%%                      Сопосталение в терминах sql.
+%%                  regex,           iregex
+%%                      Регулярные выражения.
+%%                  contains,       icontains
+%%                      Проверка на вхождение.
+%%                  startswith,     istartswith
+%%                      Проверка префикса.
+%%                  endswith,       iendswith
+%%                      Проверка суффикса.
+%%                  between
+%%                      Проверка вхождения.
+%%
+%%      Примеры:
+%%          ----------------------------------------------------------------
+%%          dao_some:get(Connection,
+%%              [ 
+%%                  {'or', 
+%%                      [
+%%                          {name, {contains, <<"lennon">>}},
+%%                          {name, {startswith, <<"jo">>}}
+%%                      ]
+%%                  }
+%%              ]
+%%          ).
+%%          ----------------------------------------------------------------
+%%          dao_some:get(Connection,
+%%              [
+%%                  {'fname',
+%%                      {'or', 
+%%                          [
+%%                              {contains, <<"lennon">>}, 
+%%                              {startswith, <<"jo">>}
+%%                          ]
+%%                      }
+%%                  }
+%%              ]
+%%          ).
+%%          ----------------------------------------------------------------
+%%          dao_some:get(Connection, [{id, {'between', {3, 33}}}]).
+%%          ----------------------------------------------------------------
+%%
+%%      Зарезервированные слова: limit, offset
+%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%
+%% TODO: только для двух таблиц
+%%
+get([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
+    filter  =   Filter,
+    fields  =   Fields,
+    order   =   Order,
+    limit   =   Limit,
+    offset  =   Offset
+}) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
+    Common_all_fields = lists:append(
+        table_options({table, fields, all},      Parent),
+        table_options({table, fields, all},      Current)
+    ),
+    Common_select_fields = lists:append(
+        table_options({table, fields, select},   Parent),
+        table_options({table, fields, select},   Current)
+    ),
+    Current_select_fields =
+        lists:filter(
+            fun(F)->
+                lists:member(F, Common_select_fields)
+            end,
+            Fields
+        ),
+    Current_all_fields =
+        lists:filter(
+            fun({F, _})->
+                lists:member(F, Common_all_fields)
+            end,
+            Filter
+        ),
+    Binary_parent_name =
+        convert:to_binary(table_options({table, name},Parent)),
+    Binary_table_name =
+        convert:to_binary(table_options({table, name},Current)),
+    Binary_select_fields =
+        fields(
+            Current_select_fields,
+            Common_select_fields
+        ),
+    Binary_current_field =
+        convert:to_binary(Current_field),
+    Binary_parent_field =
+        convert:to_binary(Parent_field),
+    {Pfields, Where_string} =
+        sql_where(Current_all_fields),
+    Query = [
+        %% поля обоих таблиц в перемешку
+        <<" select ">>, Binary_select_fields,
+        %% родительская таблиа
+        <<" from ">>,   Binary_parent_name,
+        %% дочерняя таблиа
+        <<" join ">>,   Binary_table_name,
+        %% сцепление таблиц
+        <<" on ">>, [
+            Binary_table_name,  <<".">>,    Binary_current_field,
+            <<" =  ">>,
+            Binary_parent_name, <<".">>,    Binary_parent_field
+        ],
+        Where_string,
+        [
+            sql_order(Order),
+            sql_limit(Limit),
+            sql_offset(Offset)
+        ]
+    ],
+    dao:pgret(dao:equery(Con, Query, Pfields));
+
+
+get([{Parent, Parent_field}, {Current, Current_field}],Con,#queryobj{}=Qo)->
     Oparent = [
         {{table, name},             Parent:table(name)},
         {{table, fields, all},      Parent:table({fields, all})},
         {{table, fields, select},   Parent:table({fields, select})}
     ],
-    Omodule = [
-        {{table, name},             Module:table(name)},
-        {{table, fields, all},      Module:table({fields, all})},
-        {{table, fields, select},   Module:table({fields, select})}
+    Ocurrent = [
+        {{table, name},             Current:table(name)},
+        {{table, fields, all},      Current:table({fields, all})},
+        {{table, fields, select},   Current:table({fields, select})}
     ],
-    get({Oparent, Fp}, {Omodule, Fm}, Con, Kvalues, Fields);
-
-
-get(Par, Cur, Con, {Key, Value}, Fields)->
-    get(Par, Cur, Con, [{Key, Value}], Fields).
-
-
-
-%%% -----------------------------------------------------------------------
-
-get(Module, Con, {Key, Value}, Fields)->
-    get(Module, Con, [{Key, Value}], Fields);
-
-get(Options, Con, [], Fields) when erlang:is_list(Options) ->
-    Sfields = proplists:get_value({table, fields, select},  Options),
-    Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
-    Mtbl = convert:to_binary(proplists:get_value({table, name},  Options)),
-    Dfs = dao:fields(Tfields, Sfields),
-    dao:pgret(dao:equery(Con,[<<"select ">>,Dfs,<<" from ">>,Mtbl]));
-
-get(Options, Con, Kvalues, Fields) when erlang:is_list(Kvalues), erlang:is_list(Options) ->
-    Afields = proplists:get_value({table, fields, all},     Options),
-    Sfields = proplists:get_value({table, fields, select},  Options),
-    Tfields = lists:filter(fun(F)-> lists:member(F, Sfields) end, Fields),
-    Keys = proplists:get_keys(Kvalues),
-    io:format(" --- Kvalues --- ~n~p~n", [Kvalues]),
-    case lists:filter(fun({F, _})-> lists:member(F, Afields) end, Kvalues) of
-        [] ->
-            {error, {wrong_field, Kvalues}};
-        Ffields ->
-            io:format(" --- Ffields --- ~n~p~n", [Ffields]),
-            Mtbl = convert:to_binary(proplists:get_value({table, name},  Options)),
-            Dfs = dao:fields(Tfields, Sfields),
-            dao:pgret(dao:equery(Con,[
-                <<"select ">>,Dfs,<<" from ">>,Mtbl,<<" where ">>,
-                string:join(
-                    [   case Val of
-                            null ->
-                                [
-                                    convert:to_binary(Ff),
-                                    <<" is null">>
-                                ];
-                            _ ->
-                                [
-                                    convert:to_binary(Ff),
-                                    <<" = $">>,
-                                    convert:to_binary(Ff)
-                                ]
-                        end
-                        ||  {Ff, Val} <- Ffields
-                    ],
-                    [<<" and ">>]
-                ),
-                case proplists:get_value(limit, Kvalues) of
-                    undefined -> [];
-                    Limit -> [<<" limit ">>, convert:to_list(Limit), <<" ">> ]
-                end,
-                case proplists:get_value(offset, Kvalues) of
-                    undefined -> [];
-                    Offset -> [<<" offset ">>, convert:to_list(Offset), <<" ">> ]
-                end
-            %], lists:filter(fun({_, null})-> false; ({_, V})-> true end, Ffields)))
-            ], Ffields))
-    end;
-
-
-
-get(Module, Con, Kvalues, Fields) when erlang:is_list(Kvalues) ->
-    Options = [
-        {{table, name},             Module:table(name)},
-        {{table, fields, all},      Module:table({fields, all})},
-        {{table, fields, select},   Module:table({fields, select})}
-    ],
-    get(Options, Con, Kvalues, Fields).
-
-
-
-
-%%% -----------------------------------------------------------------------
-
-create({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret1, Ret2)->
-    case create(Parent, Con, Proplist, Ret1) of
-        {ok, Pid} ->
-            create(Module, Con, [{Fm, Pid}|Proplist], Ret2);
-        {error, Error} ->
-            Error
-    end.
-
-create({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret2)->
-    create({Parent, Fp}, {Module, Fm}, Con, Proplist, id, Ret2).
-
-create(Module, Con, Proplist)->
-    create(Module, Con, Proplist, id).
-
-create({Parent, Fp}, {Module, Fm}, Con, Proplist) ->
-    create({Parent, Fp}, {Module, Fm}, Con, Proplist, Fp, Fm);
-
-create(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
-    Kvalues = lists:filter(
-        fun({F, _})-> lists:member(F, proplists:get_value({table, fields, insert}, Options)) end,
-        Proplist
-    ),
-    Fields = proplists:get_keys(Kvalues),
-    Required = proplists:get_value({table, fields, insert, required}, Options),
-    case lists:foldl( fun(F, R)-> R and lists:member(F, Fields) end, true, Required ) of
-        true ->
-            Mtbl =  convert:to_binary(proplists:get_value({table, name}, Options)),
-            Dfs =   dao:fields(Fields),
-            Dfvs  = dao:fieldvars(Fields),
-            Retb = convert:to_binary(Ret),
-            dao:pgret(dao:equery(Con,[
-                <<"insert into ">>,
-                    Mtbl,
-                <<"(">>,
-                    Dfs,
-                <<")values(">>,
-                    Dfvs,
-                <<") ">>,
-                case Retb of
-                    <<>> -> [];
-                    _ ->
-                    [<<"returning ">>, Retb]
-                end
-            ], Kvalues));
-        _ ->
-            {error, {required, Required}}
-    end;
-
-create(Module, Con, Proplist, Ret)->
-    Options = [
-        {{table, name},             Module:table(name)},
-        {{table, fields, insert},   Module:table({fields, insert})},
-        {{table, fields, insert, required},   Module:table({fields, insert, required})}
-    ],
-    create(Options, Con, Proplist, Ret).
-
-
-update({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret1, Ret2)->
-    case update(Parent, Con, Proplist,Ret1) of
-        {ok, Pid} ->
-            X = update(Module, Con, [{Ret2, Pid}|Proplist], Ret2),
-            io:format("X  = ~p ~n", [X]),
-            X;
-        {error, Error} ->
-            Error
-    end.
-
-update({Parent, Fp}, {Module, Fm}, Con, Proplist, Ret2)->
-    update({Parent, Fp}, {Module, Fm}, Con, Proplist, id, Ret2).
-
-update(Module, Con, Proplist)->
-    update(Module, Con, Proplist, id).
-
-update({Parent, Fp}, {Module, Fm}, Con, Proplist) ->
-    update({Parent, Fp}, {Module, Fm}, Con, Proplist, Fp, Fm);
+    io:format("Oparent = ~p~n", [Oparent]),
+    io:format("Ocurrent = ~p~n", [Ocurrent]),
+    get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
     
-update(Options, Con, Proplist, Ret) when erlang:is_list(Options)->
-    Kname = Ret,
-    Fields = lists:filter(
-        fun(F)-> lists:member(F, proplists:get_value({table, fields, update}, Options)) end,
-        proplists:get_keys(Proplist)
+get(Current, Con, #queryobj{
+    filter  =   Filter,
+    fields  =   Fields,
+    order   =   Order,
+    limit   =   Limit,
+    offset  =   Offset
+}) when erlang:is_list(Filter), erlang:is_list(Current) ->
+    Common_all_fields =
+        table_options({table, fields, all}, Current),
+    Common_select_fields =
+        table_options({table, fields, select}, Current),
+    Current_select_fields =
+        lists:filter(
+            fun(F)-> lists:member(F, Common_select_fields) end,
+            Fields
+        ),
+    Current_all_fields =
+        lists:filter(
+            fun({F, _})->
+                lists:member(F, Common_all_fields)
+            end,
+            Filter
+        ),
+    Binary_table_name =
+        convert:to_binary(table_options({table, name},  Current)),
+    Binary_select_fields =
+        fields(
+            Current_select_fields,
+            Common_select_fields
+        ),
+    {Pfields, Where_string} =
+        sql_where(Current_all_fields),
+    Query = [
+        <<"select ">>,  Binary_select_fields,
+        <<" from ">>,   Binary_table_name,
+        Where_string,
+        [
+            sql_order(Order),
+            sql_limit(Limit),
+            sql_offset(Offset)
+        ]
+    ],
+    dao:pgret(dao:equery(Con, Query, Pfields));
+
+
+get(Current,Con,#queryobj{}=Qo)  ->
+    Ocurrent = [
+        {{table, name},             Current:table(name)},
+        {{table, fields, all},      Current:table({fields, all})},
+        {{table, fields, select},   Current:table({fields, select})}
+    ],
+    io:format("Ocurrent = ~p~n", [Ocurrent]),
+    get(Ocurrent,Con,Qo);
+
+get(Current, Con, Opts) when erlang:is_list(Opts) ->
+    As_filter =
+        case proplists:get_value(filter, Opts, undefined) of
+            undefined   ->    Opts;
+            Filter      ->    Filter
+        end,
+    get(Current, Con,
+        #queryobj{
+                filter  =   As_filter,
+                fields  =
+                    proplists:get_value(fields,  Opts,
+                        proplists:get_value(returning,  Opts,
+                            proplists:get_value(return,  Opts, [])
+                        )
+                    ),
+                order   =   proplists:get_value(order,   Opts),
+                limit   =   proplists:get_value(limit,   Opts),
+                offset  =   proplists:get_value(offset,  Opts)
+        }
+    ).
+
+get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
+    io:format("Current = ~p~n", [Current]),
+    
+    As_filter =
+        case proplists:get_value(filter, Opts, undefined) of
+            undefined   ->    Opts;
+            Filter      ->    Filter
+        end,
+    get(Current, Con,
+        #queryobj{
+                filter  =   As_filter,
+                fields  =   Fields,
+                order   =   proplists:get_value(order,   Opts),
+                limit   =   proplists:get_value(limit,   Opts),
+                offset  =   proplists:get_value(offset,  Opts)
+        }
+    ).
+
+% get(    Current,
+%         Con,
+%         {Key, Value},
+%         Fields,
+%         Limit,
+%         Offset
+% )->
+%     get(Current, Con, [{Key, Value}], Fields);
+
+
+% 
+% %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% @doc Выполняет select join для таблиц описанных через
+% %%      {Parent, Parent_field}, {Current, Current_field}
+% %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% % get(Parent, Current, Con, Opts#queryobj{
+% %         filter  =   Filter,
+% %         fields  =   Fields,
+% %         limit   =   Limit,
+% %         offset  =   Offset
+% %     })->
+% %     get(Current,Con,Filter,Fields,Limit,Offset);
+% % 
+% % get([Parent, Current], Con, Opts) when erlang:is_list(Opts) ->
+% %     As_filter =
+% %         case proplists:get_value(filter, Opts, undefined) of
+% %             undefined   ->    Opts;
+% %             Filter      ->    Filter
+% %         end,
+% %     get(Parent, Current, Con, As_filter,
+% %         proplists:get_value(fields,  Opts, []),
+% %         proplists:get_value(limit,   Opts, []),
+% %         proplists:get_value(offset,  Opts, []),
+% %     ).
+% % 
+% % get([Parent, Current], Con, Opts, Fields) when erlang:is_list(Opts) ->
+% %     As_filter =
+% %         case proplists:get_value(filter, Opts, undefined) of
+% %             undefined   ->    Opts;
+% %             Filter      ->    Filter
+% %         end,
+% %     get([Parent, Current], Con, As_filter, Fields,
+% %         proplists:get_value(limit,   Opts, []),
+% %         proplists:get_value(offset,  Opts, []),
+% %     ).
+% % 
+% % get(Par, Cur, Con, {Key, Value}, Fields,Limit,Offset)->
+% %     get(Par, Cur, Con, [{Key, Value}], Fields,Limit,Offset).
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Добавление нового
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%
+%% TODO: только для двух таблиц
+%%
+create([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
+    values  =   Values,
+    fields  =   Returning
+} = Queryobj)->
+    case create(Parent,Con,Queryobj#queryobj{
+        fields=[Parent_field|Returning]
+    }) of
+        {ok, [{Parent_pl}]} ->
+            Pid = proplists:get_value(Parent_field, Parent_pl),
+            case create(Current, Con, Queryobj#queryobj{
+                values=[{Current_field, Pid}|Values]
+            }) of
+                {ok, [{Child_pl}]} ->
+                    {ok, [{lists:append(Parent_pl, Child_pl)}]};
+                {Eclass, Error} ->
+                    {Eclass, Error}
+            end;
+        {Eclass, Error} ->
+            {Eclass, Error}
+    end;
+
+create(Current, Con, #queryobj{
+    values  =   Values,
+    fields  =   Returning
+}) when erlang:is_list(Current)->
+    Common_select_fields =
+        table_options({table, fields, select}, Current),
+    Common_insert_fields =
+        table_options({table, fields, insert}, Current),
+    Common_required_fields =
+        table_options({table, fields, insert, required}, Current),
+        
+    io:format("Common_select_fields = ~p~n~n", [Common_select_fields]),
+    io:format("Returning = ~p~n~n", [Returning]),
+    
+    Current_select_fields =
+        lists:filter(
+            fun(F)-> lists:member(F, Common_select_fields) end,
+            Returning
+        ),
+    Current_insert_fields = lists:filter(
+        fun({F, _})->
+            lists:member(F, Common_insert_fields)
+        end,
+        Values
     ),
-    io:format("Kname, Proplist = ~p", [[Kname, Proplist]]),
-    case proplists:get_value(Kname, Proplist) of
-        undefined ->
-            create(Options, Con, Proplist, Ret);
-        Kval ->
-            case lists:filter(
-                    fun({F, V})->lists:member(
-                            F,
-                            proplists:get_value(
-                                {table, fields, update},
-                                Options
-                    )) end, Proplist
+    Current_returning_fields = 
+        case Current_select_fields of
+            [] ->
+                case lists:member(id, Common_select_fields) of
+                    true ->
+                        [id];
+                    _ ->
+                        [X|_] = Common_select_fields, [X]
+                end;
+            _ ->
+                Current_select_fields
+        end,
+    Current_insert_fields_keys =
+        proplists:get_keys(Current_insert_fields),
+    Has_required =
+        lists:foldl(
+            fun(F, R)->
+                R and lists:member(F, Current_insert_fields_keys)
+            end,
+            true,
+            Common_required_fields
+        ),
+    case Has_required of
+        true ->
+            Binary_table_name    = convert:to_binary(
+                table_options({table, name}, Current)
+            ),
+            Binary_insert_fields_keys =
+                fields(Current_insert_fields_keys),
+            Binary_insert_fields_vars =
+                fieldvars(Current_insert_fields_keys),
+            Query = [
+                <<"insert into ">>, Binary_table_name,
+                <<"(">>,            Binary_insert_fields_keys, <<") ">>,
+                <<"values(">>,      Binary_insert_fields_vars, <<") ">>,
+                sql_returning(Current_returning_fields)
+            ],
+            dao:pgret(dao:equery(Con, Query, Current_insert_fields));
+        _ ->
+            {error, {required, Common_required_fields}}
+    end;
+
+create(Current, Con, #queryobj{}=Queryobj)->
+    Ocurrent = [
+        {   {table, name},
+            Current:table(name)
+        },
+        {   {table, fields, select},
+            Current:table({fields, select})
+        },
+        {   {table, fields, insert},
+            Current:table({fields, insert})
+        },
+        {   {table, fields, insert, required},
+            Current:table({fields, insert, required})
+        }
+    ],
+    create(Ocurrent, Con, Queryobj);
+
+create(Current, Con, Opts) when erlang:is_list(Opts) ->
+    io:format("Opts = ~p~n~n", [Opts]),
+    As_values =
+        case proplists:get_value(values, Opts, undefined) of
+            undefined   ->    Opts;
+            Values      ->    Values
+        end,
+    create(Current, Con, #queryobj{
+        values  =   As_values,
+        fields  =
+            proplists:get_value(fields,  Opts,
+                proplists:get_value(returning,  Opts,
+                    proplists:get_value(return,  Opts, [])
+                )
+            )
+    }).
+
+create(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
+    As_values =
+        case proplists:get_value(values, Opts, undefined) of
+            undefined   ->    Opts;
+            Values      ->    Values
+        end,
+    create(Current, Con, #queryobj{
+        values  =   As_values,
+        fields  =   Fields
+    }).
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Обновление старого
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
+    values  =   Values,
+    filter  =   Filter,
+    fields  =   Returning
+} = Queryobj)->
+    case update(Parent,Con,Queryobj#queryobj{
+        fields=[Parent_field|Returning]
+    }) of
+        {ok, [{Parent_pl}]} ->
+            Pid = proplists:get_value(Parent_field, Parent_pl),
+            case update(Current, Con, Queryobj#queryobj{
+                filter=[{Current_field, Pid}|Filter]
+            }) of
+                {ok, [{Child_pl}]} ->
+                    {ok, [{lists:append(Parent_pl, Child_pl)}]};
+                {Eclass, Error} ->
+                    {Eclass, Error}
+            end;
+        {Eclass, Error} ->
+            {Eclass, Error}
+    end;
+
+update(Current, Con, #queryobj{
+    values  =   Values,
+    filter  =   Filter,
+    fields  =   Returning
+} = Queryobj) when erlang:is_list(Current) ->
+    Common_all_fields =
+        table_options({table, fields, all}, Current),
+    Common_select_fields =
+        table_options({table, fields, select}, Current),
+    Common_update_fields =
+        table_options({table, fields, update}, Current),
+    Current_select_fields =
+        lists:filter(
+            fun(F)-> lists:member(F, Common_select_fields) end,
+            Returning
+        ),
+    io:format("Returning = ~p~n~n~n", [Returning]),
+    io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+    Current_all_fields =
+        lists:filter(
+            fun({F, _})->
+                lists:member(F, Common_all_fields)
+            end,
+            Filter
+        ),
+    Current_update_fields =
+        lists:filter(
+            fun({F, _})->
+                lists:member(F, Common_update_fields)
+            end,
+            Values
+        ),
+    case Current_update_fields of
+        [] ->
+            {ok, [{[]}]};
+        _ ->
+            Current_returning_fields =
+                case Current_select_fields of
+                    [] ->
+                        case lists:member(id, Common_select_fields) of
+                            true ->
+                                [id];
+                            _ ->
+                                [X|_] = Common_select_fields, [X]
+                        end;
+                    _ ->
+                        Current_select_fields
+                end,
+            Binary_table_name = convert:to_binary(
+                table_options({table, name}, Current)
+            ),
+            Binary_update_fields = fields_fieldvars(
+                proplists:get_keys(Current_update_fields)
+            ),
+            {Pfields, Where_string} =
+                sql_where(Current_all_fields),
+            Query = [
+                <<" update  ">>,
+                    Binary_table_name,
+                <<" set ">>,
+                    Binary_update_fields,
+                Where_string,
+                sql_returning(Current_returning_fields)
+            ],
+            case dao:pgret(
+                dao:equery(
+                    Con,Query,lists:append(Current_update_fields, Pfields)
+                )
             ) of
-                [] ->
-                    {ok, Kval};
-                Pls ->
-                    Mtbl = convert:to_binary(proplists:get_value({table, name}, Options)),
-                    Dffvs = dao:fields_fieldvars(Fields),
-                    case dao:pgret(dao:equery(Con,[
-                        <<" update  ">>,
-                        Mtbl,
-                        <<" set ">>,
-                        Dffvs,
-                        <<" where ">>,
-                        [   convert:to_binary(Ret),
-                            <<" = $">>,
-                            convert:to_binary(Kname)
-                        ]
-                    ],[{Kname, Kval}|Pls])) of
-                        ok -> {ok, Kval};
-                        {error, Error} -> {error, Error}
-                    end
+                {ok, 0} ->
+                    create(Current, Con, Queryobj);
+                Result ->
+                    Result
             end
     end;
 
-update(Module, Con, Proplist, Ret)->
-    Options = [
-        {{table, name},             Module:table(name)},
-        {{table, fields, insert},   Module:table({fields, insert})},
-        {{table, fields, insert, required},   Module:table({fields, insert, required})},
-        {{table, fields, update},   Module:table({fields, update})}
+update(Current, Con, #queryobj{}=Queryobj)->
+    Ocurrent = [
+        {   {table, name},
+            Current:table(name)
+        },
+        {   {table, fields, all},
+            Current:table({fields, all})
+        },
+        {   {table, fields, select},
+            Current:table({fields, select})
+        },
+        {   {table, fields, insert},
+            Current:table({fields, insert})
+        },
+        {   {table, fields, insert, required},
+            Current:table({fields, insert, required})
+        },
+        {   {table, fields, update},
+            Current:table({fields, update})
+        }
     ],
-    update(Options, Con, Proplist, Ret).
+    update(Ocurrent, Con, Queryobj);
+
+update(Current, Con, Opts) when erlang:is_list(Opts) ->
+    As_values =
+        case proplists:get_value(values, Opts, undefined) of
+            undefined ->
+                Opts;
+            Values ->
+                Values
+        end,
+    As_filter =
+        case {
+            proplists:get_value(filter, Opts, undefined),
+            proplists:get_value(id,     Opts, undefined)
+        } of
+            {undefined, undefined}   ->
+                [];
+            {undefined, Id}   ->
+                [{id, Id}];
+            {Filter, _}   ->
+                Filter
+        end,
+    update(Current, Con, #queryobj{
+        values  =   As_values,
+        filter  =   As_filter,
+        fields  =
+            proplists:get_value(fields,  Opts,
+                proplists:get_value(returning,  Opts,
+                    proplists:get_value(return,  Opts, [])
+                )
+            )
+    }).
+
+update(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
+    As_values =
+        case proplists:get_value(values, Opts, undefined) of
+            undefined ->
+                Opts;
+            Values ->
+                Values
+        end,
+    As_filter =
+        case {
+            proplists:get_value(filter, Opts, undefined),
+            proplists:get_value(id,     Opts, undefined)
+        } of
+            {undefined, undefined}   ->
+                [];
+            {undefined, Id}   ->
+                [{id, Id}];
+            {Filter, _}   ->
+                Filter
+        end,
+    update(Current, Con, #queryobj{
+        values  =   As_values,
+        filter  =   As_filter,
+        fields  =   Fields
+    }).
 
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
@@ -555,17 +1215,16 @@ pgret([{ok, _columns, _vals}|_rest] = List) ->
 %%%
 %%% update sq & eq
 %%%
-pgret({ok, _Count}) ->
+pgret({ok, Count}) ->
+    {ok, Count};
 
-    ok;
-
-    
 %%%
 %%% insert sq & eq
 %%%
 pgret({ok, 1, Columns, Vals}) ->
-    [{[{_,Res}]}] = make_proplist(Columns, Vals, []),
-    {ok, Res};
+%     [{[{_,Res}]}] = make_proplist(Columns, Vals, []),
+%     {ok, Res};
+    {ok, make_proplist(Columns, Vals, [])};
 
 %%%
 %%% insert sq & eq
@@ -792,7 +1451,8 @@ eqret(Con, Query, Params)->
 %%%         Выполныет запрос заданный функцией.
 %%%         После самого запроса выполняется Callback
 %%%         Callback выполняется отдельным потоком,
-%%%             но при этом в случае его падения (в случае ошибки),
+%%%             но при этом в случае его падения (в случае ошибки),<<"insert into friend (pers_id, friend_id) values ($pers_id, $friend_id) returning id; ">>
+
 %%%                 текущий процесс тоже упадет
 %%%
 equery(Con, {Qfunction, Callback}, Params)
@@ -839,6 +1499,7 @@ equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
             {NewQuery, Values} = equery_pl(Query, Params),
             io:format("PQ = ~p~n", [convert:to_binary(NewQuery)]),
             io:format("PP = ~p~n", [Params]),
+            io:format("PV = ~p~n", [Values]),
             psqlcp:equery(Con, NewQuery, Values);
         _ ->
             io:format("PQ = ~p~n", [convert:to_binary(Query)]),
@@ -910,8 +1571,39 @@ squery(Con, Query) when erlang:is_list(Query) ->
 %%%                 ).
 %%%         Вернет: "select id from customer where id = $1 and uid = $2"
 %%%
-equery_pl(Query, Proplist) ->
-    equery_pl(Query, Proplist, 1, []).
+equery_pl(Query, Kvpl) ->
+    Rr = convert:to_binary(Query),
+    {Newuery, _, Resvalues} =
+        lists:foldl(fun
+            (<<"$", Item/binary>> , {Prev, Cnt, Values}) ->
+                case lists:keyfind(erlang:binary_to_atom(Item, utf8), 1, Kvpl) of
+                    {Key, Value} ->
+                        {
+                            [Prev,equery_variable([{cnt, Cnt}])],
+                            Cnt+1,
+                            [Value|Values]
+                        };
+                    false ->
+                        {[Prev, Item], Cnt, Values}
+                end;
+            (Item, {Prev, Cnt, Values}) ->
+                {[Prev, Item], Cnt, Values}
+        end, {[], 1, []}, re:split([Query, <<" ">>],"([$].*?)([\\s,;%\\(\\)])")),
+    {convert:to_binary(Newuery), lists:reverse(Resvalues)}.
+
+equery_variable(Current)->
+    equery_variable(postgres, Current).
+
+equery_variable(postgres, Current)->
+    Cnt = proplists:get_value(cnt, Current),
+    [<<"$">>, convert:to_list(Cnt)];
+
+equery_variable(mysql, Current)->
+    <<"?">>;
+
+equery_variable(Valriant, Current)->
+    <<" ">>.
+
 
 %%%
 %%% @doc
@@ -932,55 +1624,58 @@ equery_pl(Query, Proplist) ->
 %%%     Изменять не следование переменных в запросе,
 %%%     а следование параметров в списке параметров.
 %%%
-equery_pl(Query, [], _, Values) ->
-    {Query, Values};
-equery_pl(Query, [{Name, Value}|Rest], Cnt, Values) ->
-    %%%
-    %%% Мемоизациия для вычисления 1 раз.
-    %%%
-    Newquery = memo:lsave(fun equery_construct/3, [Query, Name, Cnt]),
-    case Newquery == Query of
-        true ->
-            equery_pl(Query, Rest, Cnt, Values);
-        _ ->
-            equery_pl(Newquery, Rest, Cnt + 1, lists:append(Values, [Value]))
-    end;
-equery_pl(Query, List, _, _) when erlang:is_list(List) ->
-    {Query, List}.
-
-%%%
-%%% @doc
-%%%     Функция преобразования запроса,
-%%%     Подстановка.
-%%%
-equery_construct(Query, Name, Cnt) ->
-    %%% 
-    %%% Мемоизациия для вычисления 1 раз.
-    %%% Многие паттерны встречаются достаточно часто,
-    %%%     более чем в одном запросе
-    %%% Например id, name ...
-    %%%
-    re:replace(
-        Query,
-        memo:lsave(fun equery_construct_re/1, [Name]),
-        ?SVAR ++ convert:to_list(Cnt),
-        [global, {return,list}]
-    ).
-
-%%%
-%%% @doc
-%%%     Функция преобразования запроса,
-%%%     Формирование паттерна для подстановки
-%%%
-equery_construct_re(Name)->
-    {ok, Cre} =
-        re:compile(
-            "[" ++
-                ?SVAR ++
-            "]" ++
-            convert:to_list(Name)
-        ),
-    Cre.
+% 
+% equery_pl(Query, [], _, Values) ->
+%     {Query, Values};
+% 
+% equery_pl(Query, [{Name, Value}|Rest], Cnt, Values) ->
+%     %%%
+%     %%% Мемоизациия для вычисления 1 раз.
+%     %%%
+%     Newquery = equery_construct(Query, Name, Cnt),
+%     case Newquery == Query of
+%         true ->
+%             equery_pl(Query, Rest, Cnt, Values);
+%         _ ->
+%             equery_pl(Newquery, Rest, Cnt + 1, lists:append(Values, [Value]))
+%     end;
+% 
+% equery_pl(Query, List, _, _) when erlang:is_list(List) ->
+%     {Query, List}.
+% 
+% %%%
+% %%% @doc
+% %%%     Функция преобразования запроса,
+% %%%     Подстановка.
+% %%%
+% equery_construct(Query, Name, Cnt) ->
+%     %%% 
+%     %%% Мемоизациия для вычисления 1 раз.
+%     %%% Многие паттерны встречаются достаточно часто,
+%     %%%     более чем в одном запросе
+%     %%% Например id, name ...
+%     %%%
+%     re:replace(
+%         Query,
+%         equery_construct_re(Name),
+%         ?SVAR ++ convert:to_list(Cnt),
+%         [global, {return,list}]
+%     ).
+% 
+% %%%
+% %%% @doc
+% %%%     Функция преобразования запроса,
+% %%%     Формирование паттерна для подстановки
+% %%%
+% equery_construct_re(Name)->
+%     {ok, Cre} =
+%         re:compile(
+%             "[" ++
+%                 ?SVAR ++
+%             "]" ++
+%             convert:to_list(Name)
+%         ),
+%     Cre.
 
 %%% 
 %%% @doc

@@ -22,6 +22,7 @@
     table/1,
     create/2,
     update/2,
+    update/3,
     get/2,
     get/3,
     get_perm/2,
@@ -188,8 +189,8 @@ table()->
     table(name).
 
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).
@@ -200,6 +201,9 @@ create(Con, Proplist)->
 update(Con, Proplist)->
     dao:update(?MODULE, Con, Proplist).
 
+update(Con, Proplist, Where)->
+    dao:update(?MODULE, Con, Proplist, Where).
+    
 is_owner(Con, Id, Id)->
     true;
 is_owner(Con, _, _)->
@@ -362,7 +366,7 @@ delete_friend(Con, Proplist)->
             Proplist
         )
     ) of
-        ok ->
+        {ok, 0} ->
             {error, not_exists};
         Res ->
             Res
@@ -464,10 +468,10 @@ get_ejabberd(Con, What, Fields)->
     dao:get(ejabberd(), Con, What, Fields).
 
 create_ejabberd(Con, Proplist)->
-    dao:create(ejabberd(), Con, Proplist, username).
+    dao:create(ejabberd(), Con, Proplist, [username]).
 
 update_ejabberd(Con, Proplist)->
-    dao:update(ejabberd(), Con, Proplist, username).
+    dao:update(ejabberd(), Con, Proplist, [username]).
 
 %% ===========================================================================
 %% Внутренние функции

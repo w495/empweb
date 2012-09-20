@@ -57,7 +57,7 @@ init(_, Req, #empweb_hap{
         is_auth         =   Is_auth,
         pers_id         =   Pid,
         pers_perm_names =   Pns
-    } = Hap)->
+    } = _hap)->
     %%
     %% Это нужно, чтобы понять, какая функция дальше выполнится
     %%
@@ -93,7 +93,12 @@ init(_, Req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-handle(_req, #empweb_hap{action='get_oktype', params=Params} = Hap) ->
+handle(_req, #empweb_hap{
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   'get_oktype',
+        params  =   Params
+    } = Hap) ->
     ?evman_args(Hap, <<" = get oktype">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -118,7 +123,10 @@ handle(_req, #empweb_hap{action='get_oktype', params=Params} = Hap) ->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_doctype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   'get_doctype',
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get doc type">>),
     jsonapi:handle_params(
@@ -134,7 +142,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_doctype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_doctype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create doc type">>),
     jsonapi:handle_params(
@@ -149,7 +159,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_doctype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_doctype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update doc type">>),
     jsonapi:handle_params(
@@ -168,7 +180,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_contype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   'get_contype',
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get contype">>),
     jsonapi:handle_params(
@@ -184,7 +199,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_contype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_contype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create contype">>),
     jsonapi:handle_params(
@@ -199,7 +216,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_contype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_contype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update contype">>),
     jsonapi:handle_params(
@@ -220,7 +239,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_acctype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_acctype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get acctype">>),
     jsonapi:handle_params(
@@ -235,7 +257,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_acctype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_acctype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create acctype">>),
     jsonapi:handle_params(
@@ -250,7 +274,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_acctype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_acctype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update acctype">>),
     jsonapi:handle_params(
@@ -270,7 +296,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_roomtype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_roomtype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get room type">>),
     jsonapi:handle_params(
@@ -286,7 +315,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_roomtype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_roomtype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create room type">>),
     jsonapi:handle_params(
@@ -301,7 +332,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_roomtype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_roomtype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update room type">>),
     jsonapi:handle_params(
@@ -321,7 +354,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_chatlang', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_chatlang,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get chatlang">>),
     jsonapi:handle_params(
@@ -337,7 +373,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_chatlang, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_chatlang,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create chatlang">>),
     jsonapi:handle_params(
@@ -352,7 +390,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_chatlang, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_chatlang,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update chatlang">>),
     jsonapi:handle_params(
@@ -372,7 +412,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_regimen', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_regimen,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get regimen">>),
     jsonapi:handle_params(
@@ -387,7 +430,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_regimen, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_regimen,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create regimen">>),
     jsonapi:handle_params(
@@ -402,7 +447,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_regimen, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_regimen,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update regimen">>),
     jsonapi:handle_params(
@@ -422,7 +469,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_topic', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_topic,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get topic">>),
     jsonapi:handle_params(
@@ -437,7 +487,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_topic, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_topic,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create topic">>),
     jsonapi:handle_params(
@@ -452,7 +504,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_topic, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_topic,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update topic">>),
     jsonapi:handle_params(
@@ -472,7 +526,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_communitytype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   get_communitytype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get community type">>),
     jsonapi:handle_params(
@@ -487,7 +544,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_communitytype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_communitytype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create community type">>),
     jsonapi:handle_params(
@@ -502,7 +561,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_communitytype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_communitytype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update community type">>),
     jsonapi:handle_params(
@@ -522,7 +583,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_messagetype', params=Params, pers_id=Pers_id
+        %% Возможно, просматривать список нужно разрешить всем.
+        is_auth =   true,
+        action  =   'get_messagetype',
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get message type">>),
     jsonapi:handle_params(
@@ -538,7 +602,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_messagetype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_messagetype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = create message type">>),
     jsonapi:handle_params(
@@ -554,7 +620,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_messagetype, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_messagetype,
+        params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = update message type">>),
     jsonapi:handle_params(
@@ -583,7 +651,10 @@ handle(_req, #empweb_hap{
 %% Возвращает список блогов на основе параметров
 %%
 handle(_req, #empweb_hap{
-        action='get_blog', params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   get_blog,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get blog[s]">>),
     jsonapi:handle_params(
@@ -605,7 +676,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_blog, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_blog,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create blog">>),
     jsonapi:handle_params(
@@ -625,7 +699,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_blog, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_blog,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update blog">>),
     jsonapi:handle_params(
@@ -650,7 +727,10 @@ handle(_req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action=get_post, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   get_post,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get post[s]">>),
     jsonapi:handle_params(
@@ -672,7 +752,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_post, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_post,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create post">>),
     ?debug("Params = ~p~n", [Params]),
@@ -693,7 +776,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action='update_post', params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_post,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update post">>),
     jsonapi:handle_params(
@@ -717,7 +803,10 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_room', params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   get_room,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get room">>),
     jsonapi:handle_params(
@@ -779,7 +868,10 @@ handle(_req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action=create_room, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_room,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create room">>),
     jsonapi:handle_params(
@@ -837,7 +929,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_room, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_room,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update room">>),
     jsonapi:handle_params(
@@ -900,7 +995,10 @@ handle(_req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action='get_community', params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   get_community,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get community">>),
     jsonapi:handle_params(
@@ -940,7 +1038,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_community, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_community,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create community">>),
     jsonapi:handle_params(
@@ -978,7 +1079,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_community, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_community,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update community">>),
 
@@ -1017,12 +1121,20 @@ handle(_req, #empweb_hap{
     );
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Сообщества
+%% Сообщения
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        action='get_message', params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   get_message,
+        params  =   Params
     } = Hap) ->
+    %% 
+    %% Pers_id при получении сообщения смысла не имеет.
+    %% т.к. мы смысл имеет получать как своих сообщений, 
+    %% так и чужих, которые отпарвлены мне.
+    %% Отправителя и получателя надо указывать явно.
+    %%
     ?evman_args([Hap], <<" = get message">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -1053,7 +1165,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create_message, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   create_message,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create message">>),
     jsonapi:handle_params(
@@ -1085,7 +1200,10 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update_message, params=Params, pers_id=Pers_id
+        is_auth =   true,
+        action  =   update_message,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update message">>),
 
@@ -1108,18 +1226,63 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:update_message([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    biz_doc:update_message(Data#norm.return)
                 ),
                 Hap
             }
         end
     );
 
+% handle(_req, #empweb_hap{
+%         is_auth =   true,
+%         action  =   delete_message,
+%         params  =   Params
+%     } = Hap) ->
+%     %%
+%     %% Pers_id при получении сообщения смысла не имеет.
+%     %% т.к. мы смысл имеет получать как своих сообщений,
+%     %% так и чужих, которые отпарвлены мне.
+%     %% Отправителя и получателя надо указывать явно.
+%     %%
+%     ?evman_args([Hap], <<" = delete message">>),
+%     jsonapi:handle_params(
+%         %% проверка входных параметров и приведение к нужному типу
+%         norm:norm(Params, [
+%             #norm_rule{
+%                 key         = reader_id,
+%                 required    = false,
+%                 types       = [integer]
+%             },
+%             #norm_rule{
+%                 key         = type_id,
+%                 required    = false,
+%                 types       = [nulluble, integer]
+%             }
+%             | doc_norm('update')
+%         ]),
+%         fun(Data)->
+%             ?evman_debug(Data, <<" = Data">>),
+%             {ok,
+%                 jsonapi:resp(
+%                     biz_doc:update_message([
+%                         {owner_id, Pers_id}
+%                         |Data#norm.return
+%                     ])
+%                 ),
+%                 Hap
+%             }
+%         end
+%     );
+    
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% То что не прошло сопоставления с образцом.
+%% В частности, неавторизованого пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 handle(_req, #empweb_hap{
-        action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
+        is_auth =   Is_auth,
+        action  =   Action,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_notice({hap, [
         {forbidden,     true},
@@ -1188,6 +1351,11 @@ doc_norm('get') ->
             types = [nullable, integer]
         },
         #norm_rule{
+            key         = parent_id,
+            required    = false,
+            types       = [integer]
+        },
+        #norm_rule{
             key = owner_id,
             required = false,
             types = [nullable, allable, integer]
@@ -1244,7 +1412,7 @@ doc_norm('update') ->
         |doc_norm('create')
     ];
 
-doc_norm(X) ->
+doc_norm(_) ->
     [].
 
 
@@ -1287,5 +1455,5 @@ opt_norm('update') ->
         |opt_norm('create')
     ];
 
-opt_norm(X) ->
+opt_norm(_) ->
     [].
