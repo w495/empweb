@@ -3,6 +3,16 @@
 %% Description: TODO: Add description to biz_user
 -module(domain_doc).
 
+%% ===========================================================================
+%% Заголовочные файлы
+%% ===========================================================================
+
+%%
+%% Структры для работы с запросами к базе данных
+%%
+-include("empdb.hrl").
+
+
 %% ==========================================================================
 %% Экспортируемые функции
 %% ==========================================================================
@@ -177,6 +187,10 @@
 -export([
     get_message/1,
     get_message/2,
+    get_message_for_me/1,
+    get_message_for_me/2,
+    get_message_from_me/1,
+    get_message_from_me/2,
     create_message/1,
     update_message/1
 ]).
@@ -583,6 +597,11 @@ update_message(Params)->
         dao_message:update(Con, Params)
     end).
 
+delete_message_for_me(Params)->
+    dao:with_connection(fun(Con)->
+        dao_message:update(Con, Params)
+    end).
+
 get_message(Params)->
     dao:with_connection(fun(Con)->
         dao_message:get(Con, [{isdeleted, false}|Params])
@@ -597,6 +616,19 @@ is_message_owner(Uid, Oid)->
     dao:with_connection(fun(Con)->
         dao_message:is_owner(Con, Uid, Oid)
     end).
+
+get_message_for_me(Params)->
+    get_message([{isdfr, false},Params]).
+
+get_message_for_me(Params, Fields)->
+    get_message([{isdfr, false},Params], Fields).
+
+get_message_from_me(Params)->
+    get_message([{isdfo, false},Params]).
+
+get_message_from_me(Params, Fields)->
+    get_message([{isdfo, false},Params], Fields).
+
 
 %%
 %% Local Functions

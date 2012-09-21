@@ -671,6 +671,20 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            <<"delete_message_for_me">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_message_for_me,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_message_from_me">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_message_from_me,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
             <<"delete_message">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,

@@ -51,7 +51,7 @@ table({fields, insert, required})-> [];
 %% @doc Возвращает список полей таблицы для выборки
 %%
 table({fields, select})->
-    table({fields, all});
+    table({fields, all}) -- [isdfo, isdfr];
 
 %%
 %% @doc Возвращает список полей таблицы для обновления
@@ -63,7 +63,7 @@ table({fields, update})->
 %% @doc Возвращает список полей таблицы для создания
 %%
 table({fields, insert})->
-    table({fields, all}) -- [id];
+    table({fields, all}) -- [id, isdfo, isdfr];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -72,7 +72,9 @@ table({fields, all})->
     [
         doc_id,
         type_id,
-        reader_id
+        reader_id,
+        isdfo,
+        isdfr
     ];
 
 %%

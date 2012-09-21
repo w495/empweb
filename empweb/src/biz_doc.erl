@@ -13,6 +13,15 @@
 %%
 -module(biz_doc).
 
+%% ===========================================================================
+%% Заголовочные файлы
+%% ===========================================================================
+
+%%
+%% Структры для работы с запросами к базе данных
+%%
+-include_lib("empdb/include/empdb.hrl").
+
 %% ==========================================================================
 %% Экспортируемые функции
 %% ==========================================================================
@@ -175,6 +184,10 @@
 -export([
     get_message/1,
     get_message/2,
+    get_message_for_me/1,
+    get_message_for_me/2,
+    get_message_from_me/1,
+    get_message_from_me/2,
     create_message/1,
     update_message/1
 ]).
@@ -435,19 +448,21 @@ update_message(Params)->
     domain_doc:update_message(Params).
 
 get_message(Params)->
-    get_message(Params, []).
+    domain_doc:get_message(Params).
 
-get_message(Params, Fields)->
-%     Fields = lists:map(
-%         fun(created)->
-%         fun(X)->
-%             X
-%         end,
-%         Afields
-%     ),
-    
+get_message(Params, Fields)->    
     domain_doc:get_message(Params, Fields).
 
+get_message_for_me(Params)->
+    domain_doc:get_message([{isdfr, false},Params]).
 
+get_message_for_me(Params, Fields)->
+    domain_doc:get_message([{isdfr, false},Params], Fields).
+
+get_message_from_me(Params)->
+    domain_doc:get_message([{isdfo, false},Params]).
+
+get_message_from_me(Params, Fields)->
+    domain_doc:get_message([{isdfo, false},Params], Fields).
 
 

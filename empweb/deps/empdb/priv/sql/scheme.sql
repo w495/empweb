@@ -857,7 +857,15 @@ create table messagetype(
 create table message(
     doc_id              decimal unique references doc(id),
     type_id             decimal references messagetype(id) default null,
-    reader_id           decimal references pers(id) default null
+    reader_id           decimal references pers(id) default null,
+    /**
+        Удалено для отправителя (из почтового ящика отправителя)
+    **/
+    isdfo               bool default false,
+    /**
+        Удалено для получателя (из почтового ящика получателя)
+    **/
+    isdfr               bool default false
 );
 
 

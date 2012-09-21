@@ -31,6 +31,12 @@
 -include_lib("evman/include/evman_transform.hrl").
 
 
+%%
+%% Структры для работы с запросами к базе данных
+%%
+-include_lib("empdb/include/empdb.hrl").
+
+
 %% ===========================================================================
 %% Экспортируемые функции
 %% ===========================================================================
@@ -1229,6 +1235,74 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:update_message(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_message_for_me,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update message">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = reader_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [nulluble, integer]
+            }
+            | doc_norm('update')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_message_for_me(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_message_from_me,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update message">>),
+
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = reader_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [nulluble, integer]
+            }
+            | doc_norm('update')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_message_from_me(Data#norm.return)
                 ),
                 Hap
             }

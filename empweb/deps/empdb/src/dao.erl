@@ -3,6 +3,8 @@
 
 -include_lib("epgsql/include/pgsql.hrl").
 
+-include("empdb.hrl").
+
 -compile(export_all).
 
 -define(SVAR, "$").
@@ -484,24 +486,6 @@ sql_returning(Filter) ->
 %%% -----------------------------------------------------------------------
 
 
-%%
-%% @doc Структура описания запроса. 
-%%      Пока не используется.
-%%
--record(queryobj, {
-    %% Для select \ insert \ update \ delete
-        filter      = [] :: proplists:proplist(),
-    %% Для select \ insert \ update 
-        fields      = [] :: list(),
-    %% Для insert \ update
-        values      = [] :: proplists:proplist(),
-    %% Для select 
-        order       = [] :: atom() | list() | {asc|desc, any()},
-    %% Для select 
-        limit       = undefined :: undefined | integer(),
-    %% Для select 
-        offset      = undefined :: undefined | integer()
-}).
 
 table_options({table, fields, all},      Current) ->
     [   'and', 'or'
