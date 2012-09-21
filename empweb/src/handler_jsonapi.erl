@@ -765,19 +765,21 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_authorities">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_authorities'
+                    action          =   get_authority,
+                    params          =   Params
                 };
             <<"get_authority">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_authority',
+                    action          =   get_authority,
                     params          =   Params
                 };
 
             <<"get_all_mstatuses">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_mstatuses'
+                    action          =   'get_mstatus',
+                    params          =   Params
                 };
             <<"get_mstatus">> ->
                 #empweb_hap{
@@ -789,7 +791,8 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_pstatuses">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_pstatuses'
+                    action          =   'get_pstatus',
+                    params          =   Params
                 };
             <<"get_pstatus">> ->
                 #empweb_hap{
@@ -801,7 +804,8 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_emotions">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   'get_all_emotions'
+                    action          =   'get_emotion',
+                    params          =   Params
                 };
             <<"get_emotion">> ->
                 #empweb_hap{
@@ -888,7 +892,7 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_perss">> ->
                 #empweb_hap{
                     handler         =   jsonapi_pers,
-                    action          =   get_all_perss,
+                    action          =   get_pers,
                     params          =   Params,
                     is_auth         =   Is_auth,
                     pers_id         =   Pid,

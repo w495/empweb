@@ -57,7 +57,7 @@ table({fields, select})->
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    table({fields, all}) -- [id];
+    [isdeleted|table({fields, all})] -- [id];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
@@ -90,11 +90,10 @@ table(name)->
 table()->
     table(name).
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
-    io:format(" --- What --- ~n~p~n", [What]),
     dao_doc:get(?MODULE, Con, What, Fields).
 
 create(Con, Proplist)->
@@ -111,7 +110,7 @@ is_owner(Con, Owner_id, Obj_id) ->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_messagetype(Con, What) ->
-    get_messagetype(Con, What, []).
+    dao:get(messagetype(), Con, What).
 
 get_messagetype(Con, What, Fields)->
     dao:get(messagetype(), Con, What, Fields).

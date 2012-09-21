@@ -205,21 +205,17 @@ update(Params)->
     domain_pers:update(Params).
 
 
-%%
-%% Получить всех пользователей
-%%
-get([]) ->
-    ?evman_args([[]], <<"get all perss">>),
-    domain_pers:get(
-        [],
-        dao_pers:table({fields, select}) -- [phash]
-    );
 
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),
     domain_pers:get(
         Params,
-        dao_pers:table({fields, select}) -- [phash]
+        case proplists:get_value(fields, Params) of
+            undefined ->
+                dao_pers:table({fields, select}) -- [phash];
+            Fields ->
+                Fields
+        end
     ).
 
 %%

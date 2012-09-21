@@ -151,8 +151,13 @@ sql_cond({'or', List}) ->
     sql_or(List);
 
 sql_cond({Ff, {[{X, C}]}})->
+    io:format("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}}]),
     sql_cond({Ff, {X, C}});
 
+sql_cond({Ff, {X, C}}) when erlang:is_list(X) orelse erlang:is_binary(X)->
+    io:format("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
+    sql_cond({Ff, {convert:to_atom(X), C}});
+    
 sql_cond({Ff, {'and', Conds}})->
     X =
         {   'and',
@@ -178,7 +183,7 @@ sql_cond({Ff, {'or', Conds}})->
         },
     sql_cond(X);
 
-sql_cond({Ff, {between, {Left, Right}}}) ->
+sql_cond({Ff, {between, [Left, Right]}}) ->
     Bnleft   = convert:to_binary([
         <<"__">>,
         convert:to_binary(Ff),
@@ -286,7 +291,10 @@ sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
         <<")">>
     ]};
 
+
+    
 sql_cond({Ff, Val} = Tuple) ->
+    io:format("Tuple = ~p~n~n", [Tuple]),
     {[{Ff, Val}], [
         convert:to_binary(Ff),
         <<" = $">>,
@@ -346,51 +354,84 @@ sql_order([])->
 sql_order(undefined)->
     [];
 
-sql_order({asc, Order}) ->
-    sql_order(Order, asc);
+sql_order(O)
+    when erlang:is_atom(O)
+    orelse erlang:is_binary(O) ->
+    sql_order([O]);
 
-sql_order({desc, Order}) ->
-    sql_order(Order, desc);
+sql_order({O, D}) ->
+    sql_order([{O, D}]);
 
-sql_order({Order, asc}) ->
-    sql_order(Order, asc);
-
-sql_order({Order, desc}) ->
-    sql_order(Order, desc);
-
-sql_order(Order) ->
-    sql_order(Order, asc).
-
-sql_order([O|Rorder] = Order, Direction)
-    when (
-        erlang:is_atom(O)
-        orelse erlang:is_list(O)
-        orelse erlang:is_binary(O)
-    ) andalso (
-        Direction =:= asc orelse Direction =:= desc 
-    )->
+sql_order(Order) when erlang:is_list(Order) ->
     [   <<" order by ">>,
         string:join(
-            [convert:to_binary(O)||O<- Order],
+            [[sql_order_one(O)] ||O <- Order],
             [<<",">>]
         ),
-        <<" ">>, convert:to_binary(Direction), <<" ">>
-    ];
-
-sql_order(Order, Direction)
-    when (
-        erlang:is_atom(Order)
-        orelse erlang:is_list(Order)
-        orelse erlang:is_binary(Order)
-    ) andalso (
-        Direction =:= asc orelse Direction =:= desc
-    )->
-    [   <<" order by  ">>,
-        convert:to_binary(Order),
-        <<" ">>,
-        convert:to_binary(Direction),
         <<" ">>
     ].
+
+sql_order_one({[{D, O}]}) ->
+    sql_order_one({D, O});
+
+sql_order_one({D, O})
+    when (
+        erlang:is_atom(O)
+        orelse erlang:is_binary(O)
+    ) andalso (
+        D =:= asc orelse D=:= desc
+    )->
+    [   convert:to_binary(O),
+        <<" ">>,
+        convert:to_binary(D)
+    ];
+
+sql_order_one({O, D})
+    when (
+        erlang:is_atom(O)
+        orelse erlang:is_binary(O)
+    ) andalso (
+        D =:= asc orelse D=:= desc
+    )->
+    [   convert:to_binary(O),
+        <<" ">>,
+        convert:to_binary(D)
+    ];
+
+sql_order_one(O) ->
+    sql_order_one({asc, O}).
+
+% 
+% sql_order([O|Rorder] = Order, Direction)
+%     when (
+%         erlang:is_atom(O)
+%         orelse erlang:is_list(O)
+%         orelse erlang:is_binary(O)
+%     ) andalso (
+%         Direction =:= asc orelse Direction =:= desc 
+%     )->
+%     [   <<" order by ">>,
+%         string:join(
+%             [[convert:to_binary(O)]||O<- Order],
+%             [<<",">>]
+%         ),
+%         <<" ">>, convert:to_binary(Direction), <<" ">>
+%     ];
+
+% sql_order(Order, Direction)
+%     when (
+%         erlang:is_atom(Order)
+%         orelse erlang:is_list(Order)
+%         orelse erlang:is_binary(Order)
+%     ) andalso (
+%         Direction =:= asc orelse Direction =:= desc
+%     )->
+%     [   <<" order by  ">>,
+%         convert:to_binary(Order),
+%         <<" ">>,
+%         convert:to_binary(Direction),
+%         <<" ">>
+%     ].
 
 
 % case Order of
@@ -455,8 +496,7 @@ sql_returning(Filter) ->
     %% Для insert \ update
         values      = [] :: proplists:proplist(),
     %% Для select 
-        order       = undefined
-        :: undefined | integer(),
+        order       = [] :: atom() | list() | {asc|desc, any()},
     %% Для select 
         limit       = undefined :: undefined | integer(),
     %% Для select 
@@ -528,6 +568,11 @@ table_options(Oname,      Current) ->
 %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+get(Current, Con, #queryobj{order=Order}=Obj)
+    when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
+    io:format("Order = ~p~n~n", [Order]),
+    get(Current, Con, Obj#queryobj{order=[Order]});
+
 %%
 %% TODO: только для двух таблиц
 %%
@@ -560,6 +605,15 @@ get([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
             end,
             Filter
         ),
+    Current_order =
+        lists:filter(
+            fun(F)->
+                lists:member(F, Common_all_fields)
+            end,
+            Order
+        ),
+    io:format("Order = ~p~n~n", [Current_order]),
+    
     Binary_parent_name =
         convert:to_binary(table_options({table, name},Parent)),
     Binary_table_name =
@@ -590,7 +644,7 @@ get([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
         ],
         Where_string,
         [
-            sql_order(Order),
+            sql_order(Current_order),
             sql_limit(Limit),
             sql_offset(Offset)
         ]
@@ -612,7 +666,7 @@ get([{Parent, Parent_field}, {Current, Current_field}],Con,#queryobj{}=Qo)->
     io:format("Oparent = ~p~n", [Oparent]),
     io:format("Ocurrent = ~p~n", [Ocurrent]),
     get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
-    
+
 get(Current, Con, #queryobj{
     filter  =   Filter,
     fields  =   Fields,
@@ -636,6 +690,16 @@ get(Current, Con, #queryobj{
             end,
             Filter
         ),
+    Current_order =
+        lists:filter(
+            fun
+                (F)->
+                    lists:member(F, Common_all_fields)
+            end,
+            Order
+        ),
+    io:format("Order = ~p~n~n", [Current_order]),
+    
     Binary_table_name =
         convert:to_binary(table_options({table, name},  Current)),
     Binary_select_fields =
@@ -650,7 +714,7 @@ get(Current, Con, #queryobj{
         <<" from ">>,   Binary_table_name,
         Where_string,
         [
-            sql_order(Order),
+            sql_order(Current_order),
             sql_limit(Limit),
             sql_offset(Offset)
         ]
@@ -682,7 +746,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
                             proplists:get_value(return,  Opts, [])
                         )
                     ),
-                order   =   proplists:get_value(order,   Opts),
+                order   =   proplists:get_value(order,   Opts, []),
                 limit   =   proplists:get_value(limit,   Opts),
                 offset  =   proplists:get_value(offset,  Opts)
         }
@@ -700,7 +764,7 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
         #queryobj{
                 filter  =   As_filter,
                 fields  =   Fields,
-                order   =   proplists:get_value(order,   Opts),
+                order   =   proplists:get_value(order,   Opts, []),
                 limit   =   proplists:get_value(limit,   Opts),
                 offset  =   proplists:get_value(offset,  Opts)
         }
@@ -777,7 +841,18 @@ create([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                 values=[{Current_field, Pid}|Values]
             }) of
                 {ok, [{Child_pl}]} ->
-                    {ok, [{lists:append(Parent_pl, Child_pl)}]};
+                    {   ok,
+                        [
+                            {   lists:append(
+                                    Parent_pl,
+                                    proplists:delete(
+                                        Current_field,
+                                        Child_pl
+                                    )
+                                )
+                            }
+                        ]
+                    };
                 {Eclass, Error} ->
                     {Eclass, Error}
             end;
@@ -827,13 +902,19 @@ create(Current, Con, #queryobj{
     Has_required =
         lists:foldl(
             fun(F, R)->
-                R and lists:member(F, Current_insert_fields_keys)
+                R and lists:keymember(F, 1, Current_insert_fields)
             end,
             true,
             Common_required_fields
         ),
-    case Has_required of
-        true ->
+
+    io:format("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
+    io:format("Common_required_fields = ~p~n~n", [Common_required_fields]),
+    
+    case {Has_required, Current_insert_fields_keys} of
+        {true, []} ->
+            {error, {empty, Common_required_fields}};
+        {true, _} ->
             Binary_table_name    = convert:to_binary(
                 table_options({table, name}, Current)
             ),
@@ -910,6 +991,22 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     case update(Parent,Con,Queryobj#queryobj{
         fields=[Parent_field|Returning]
     }) of
+        {ok, [{[]}]} ->
+            Pid_pl =
+                case proplists:get_value(Parent_field, Filter) of
+                    undefined ->
+                        [];
+                    Pid ->
+                        [{Current_field, Pid}]
+                end,
+            case update(Current, Con, Queryobj#queryobj{
+                filter=lists:append(Pid_pl, Filter)
+            }) of
+                {ok, [{Child_pl}]} ->
+                    {ok, [{lists:append([], Child_pl)}]};
+                {Eclass, Error} ->
+                    {Eclass, Error}
+            end;
         {ok, [{Parent_pl}]} ->
             Pid = proplists:get_value(Parent_field, Parent_pl),
             case update(Current, Con, Queryobj#queryobj{

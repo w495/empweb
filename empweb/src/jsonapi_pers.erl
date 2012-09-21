@@ -283,22 +283,21 @@ handle(_req, #empweb_hap{
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key     = id,
-                        types   = [integer]
-                    },
-                    #norm_rule{
-                        key     = room_id,
-                        types   = [integer]
-                    },
-                    #norm_rule{
-                        key     = community_id,
-                        types   = [integer]
-                    }
-                ]
-            }
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = [integer]
+            }|jsonapi:norm('get')
         ]),
         fun(Data)->
             {ok,jsonapi:resp(biz_pers:get(Data#norm.return)),Hap}
@@ -306,15 +305,15 @@ handle(_req, #empweb_hap{
         Hap
     );
 
-
-%%
-%% Функция отрабатывает только если пользователь идентифицирован
-%%
-handle(_req, #empweb_hap{
-        action=get_all_perss, params=Params, is_auth=true
-    } = Hap) ->
-    ?evman_args(Hap, <<" = get all perss">>),
-    {ok,jsonapi:resp(biz_pers:get([])),Hap};
+% 
+% %%
+% %% Функция отрабатывает только если пользователь идентифицирован
+% %%
+% handle(_req, #empweb_hap{
+%         action=get_all_perss, params=Params, is_auth=true
+%     } = Hap) ->
+%     ?evman_args(Hap, <<" = get all perss">>),
+%     {ok,jsonapi:resp(biz_pers:get([])),Hap};
 
 %%
 %% Функция отрабатывает только если пользователь идентиф ицирован
@@ -392,9 +391,9 @@ handle(_req, #empweb_hap{
 %% Авторитет пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action='get_all_authorities'} = Hap) ->
-    ?evman_args(Hap, <<" = get all authorities">>),
-    {ok,jsonapi:resp(biz_pers:get_authority([])),Hap};
+% handle(_req, #empweb_hap{action='get_all_authorities'} = Hap) ->
+%     ?evman_args(Hap, <<" = get all authorities">>),
+%     {ok,jsonapi:resp(biz_pers:get_authority([])),Hap};
 
 
 handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
@@ -402,18 +401,11 @@ handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_one{
-                rules=[
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    },
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    }
-                ]
-            }
+            #norm_rule{
+                key = level,
+                required = false,
+                types = [integer]
+            }|opt_norm('get')
         ]),
         fun(Data)->
             {ok,jsonapi:resp(biz_pers:get_authority(Data#norm.return)),Hap}
@@ -425,20 +417,15 @@ handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
 %% Семейное положение пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
-    ?evman_args(Hap, <<" = get all mstatuses">>),
-    {ok,jsonapi:resp(biz_pers:get_mstatus([])),Hap};
+% handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
+%     ?evman_args(Hap, <<" = get all mstatuses">>),
+%     {ok,jsonapi:resp(biz_pers:get_mstatus([])),Hap};
 
 handle(_req, #empweb_hap{action='get_mstatus', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = get mstatus">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             {ok,jsonapi:resp(biz_pers:get_mstatus(Data#norm.return)),Hap}
         end,
@@ -449,20 +436,15 @@ handle(_req, #empweb_hap{action='get_mstatus', params=Params} = Hap) ->
 %% Статус пользователя пользователя: в сети \ не в сети.
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action='get_all_pstatuses'} = Hap) ->
-    ?evman_args(Hap, <<" = get all pstatuses">>),
-    {ok,jsonapi:resp(biz_pers:get_pstatus([])),Hap};
+% handle(_req, #empweb_hap{action='get_all_pstatuses'} = Hap) ->
+%     ?evman_args(Hap, <<" = get all pstatuses">>),
+%     {ok,jsonapi:resp(biz_pers:get_pstatus([])),Hap};
 
 handle(_req, #empweb_hap{action='get_pstatus', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = get pstatus">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             {ok,jsonapi:resp(biz_pers:get_pstatus(Data#norm.return)),Hap}
         end,
@@ -473,20 +455,15 @@ handle(_req, #empweb_hap{action='get_pstatus', params=Params} = Hap) ->
 %% Эмоции пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{action='get_all_emotions'} = Hap) ->
-    ?evman_args(Hap, <<" = get all emotions">>),
-    {ok,jsonapi:resp(biz_pers:get_emotion([])),Hap};
+% handle(_req, #empweb_hap{action='get_all_emotions'} = Hap) ->
+%     ?evman_args(Hap, <<" = get all emotions">>),
+%     {ok,jsonapi:resp(biz_pers:get_emotion([])),Hap};
 
 handle(_req, #empweb_hap{action='get_emotion', params=Params} = Hap) ->
     ?evman_args(Hap, <<" = get emotion">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            }
-        ]),
+        norm:norm(Params, opt_norm('get')),
         fun(Data)->
             {ok,jsonapi:resp(biz_pers:get_emotion(Data#norm.return)),Hap}
         end,
@@ -519,3 +496,46 @@ at_list_one([]) ->
 at_list_one([Return|_]) ->
     {ok, Return}.
 
+
+
+opt_norm('get') ->
+    [
+        #norm_rule{
+            key = alias,
+            required = false,
+            types = [string]
+        },
+        #norm_rule{
+            key = id,
+            required = false,
+            types = [integer]
+        }
+        |jsonapi:norm('get')
+    ];
+
+opt_norm('create') ->
+    [
+        #norm_rule{
+            key         = alias,
+            required    = false,
+            types       = [string]
+        },
+        #norm_rule{
+            key         = name_ti,
+            required    = false,
+            types       = [integer]
+        }
+    ];
+
+opt_norm('update') ->
+    [
+        #norm_rule{
+            key         = id,
+            required    = false,
+            types       = [integer]
+        }
+        |opt_norm('create')
+    ];
+
+opt_norm(_) ->
+    [].

@@ -24,12 +24,6 @@
 ]).
 
 
-
-%%
-%% API Functions
-%%
-
-
 %%
 %% API Functions
 %%
@@ -83,9 +77,8 @@ table(name)->
 table()->
     table(name).
 
-
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).

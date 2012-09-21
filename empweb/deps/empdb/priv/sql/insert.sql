@@ -856,7 +856,12 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
 select 'log:doctype' as log;
 
 insert into doctype(alias)
-    values ('blog'), ('post'), ('gallery'), ('photo'), ('attach_descr');
+    values  ('blog'),
+            ('post'),
+            ('message'),
+            ('gallery'),
+            ('photo'),
+            ('attach_descr');
 
 insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
     values

@@ -20,6 +20,7 @@
     norm/2,
     norm/3,
     norm/4,
+    to_rule_type/2,
     test/0,
     test/1
 ]).

@@ -839,6 +839,9 @@ create table event(
 -- Сообщения
 ------------------------------------------------------------------------------
 
+/**
+    Что это такое, не очень понятно.
+**/
 create sequence seq_messagetype_id;
 create table messagetype(
     id          decimal primary key default nextval('seq_messagetype_id'),

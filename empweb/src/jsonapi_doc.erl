@@ -360,11 +360,13 @@ handle(_req, #empweb_hap{
         params  =   Params
     } = Hap) ->
     ?evman_args([Hap], <<" = get chatlang">>),
+    io:format("Params = ~p~n~n", [Params]),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, opt_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
+            io:format("Data#norm.return = ~p~n~n", [Data#norm.return]),
             {ok,
                 jsonapi:resp(biz_doc:get_chatlang(Data#norm.return)),
                 Hap
@@ -1426,7 +1428,7 @@ opt_norm('get') ->
         #norm_rule{
             key = id,
             required = false,
-            types = [integer]
+            types = [any]
         }
         |jsonapi:norm('get')
     ];

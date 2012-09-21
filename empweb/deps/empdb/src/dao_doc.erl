@@ -69,7 +69,7 @@ table({fields, select})->
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    table({fields, all}) -- [id, isdeleted];
+    table({fields, all}) -- [id];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
@@ -110,12 +110,26 @@ table(name)->
 table()->
     table(name).
 
-
 get(Con, What) ->
-    get(Con, What, []).
+    get(Con, What).
+
+%%
+%% @doc Возвращает экземпляр документа и экземпляр join-наследника.
+%%      Наследник должен быть описан в модуле Module.
+%%
+get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
+    dao:get([{?MODULE, id}, {Module, doc_id}], Con, What);
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).
+
+%%
+%% @doc Возвращает экземпляр документа и экземпляр join-наследника.
+%%      Наследник должен быть описан в модуле Module.
+%%
+get(Module, Con, What, Fields)->
+    io:format("What, Fields = ~p~n", [{What, Fields}]),
+    dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
 
 create(Con, Proplist)->
     dao:create(?MODULE, Con, Proplist).
@@ -136,17 +150,6 @@ is_owner(Con, Owner_id, Id)->
 
 
 %%
-%% @doc Возвращает экземпляр документа и экземпляр join-наследника.
-%%      Наследник должен быть описан в модуле Module.
-%%
-% get(Module, Con, What)->
-%     dao:get([{?MODULE, id},    {Module, doc_id}], Con, What).
-
-get(Module, Con, What, Fields)->
-    io:format("What, Fields = ~p~n", [{What, Fields}]),
-    dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
-
-%%
 %% @doc Создает экземпляр документа и экземпляр join-наследника.
 %%      Наследник должен быть описан в модуле Module.
 %%
@@ -163,7 +166,7 @@ update(Module, Con, Proplist)->
 
 
 get_acctype(Con, What) ->
-    get_acctype(Con, What, []).
+    dao:get(acctype(), Con, What).
 
 get_acctype(Con, What, Fields)->
     dao:get(acctype(), Con, What, Fields).
@@ -176,7 +179,7 @@ update_acctype(Con, Proplist)->
 
 
 get_doctype(Con, What) ->
-    get_doctype(Con, What, []).
+    dao:get(doctype(), Con, What).
 
 get_doctype(Con, What, Fields)->
     dao:get(doctype(), Con, What, Fields).
@@ -189,7 +192,7 @@ update_doctype(Con, Proplist)->
 
 
 get_contype(Con, What) ->
-    get_contype(Con, What, []).
+    dao:get(contype(), Con, What).
 
 get_contype(Con, What, Fields)->
     dao:get(contype(), Con, What, Fields).
@@ -202,7 +205,7 @@ update_contype(Con, Proplist)->
 
 
 get_oktype(Con, What) ->
-    get_oktype(Con, What, []).
+    dao:get(oktype(), Con, What).
 
 get_oktype(Con, What, Fields)->
     dao:get(oktype(), Con, What, Fields).

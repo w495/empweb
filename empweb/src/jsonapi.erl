@@ -20,6 +20,7 @@
 
 -export([
     norm/1,
+    normlist/1,
     ok/0,
     ok/1,
     ok/2,
@@ -492,33 +493,129 @@ handle_params(Data, Function, Pstate) ->
 norm('get') ->
     [
         #norm_rule{
-            key = limit,
-            nkey = 'limit',
-            required = false,
-            types = [nullable, integer]
+            key         = order,
+            nkey        = order,
+            required    = false,
+            types       = [normpair([atom]), normlist([normpair([atom])])]
         },
         #norm_rule{
-            key = offset,
-            nkey = 'offset',
-            required = false,
-            types = [nullable, integer]
+            key         = limit,
+            nkey        = limit,
+            required    = false,
+            types       = [nullable, integer]
         },
         #norm_rule{
-            key = fields,
-            nkey = 'fields',
-            required = false,
-            types = [
-                fun
-                    (null)->
-                        [];
-                    (List)->
-                        lists:map(
-                            fun(Item)->
-                                erlang:binary_to_atom(Item, utf8)
-                            end,
-                            List
-                        )
-                end
-            ]
+            key         = offset,
+            nkey        = offset,
+            required    = false,
+            types       = [nullable, integer]
+        },
+        #norm_rule{
+            key         = fields,
+            nkey        = fields,
+            required    = false,
+            types       = [normlist([atom])]
         }
     ].
+
+normlist(Types)->
+    fun
+        (null) ->
+            [];
+        (List) when erlang:is_list(List) ->
+            lists:map(
+                fun(Item)->
+                    {ok, Res} = norm:to_rule_type(Item, Types),
+                    Res
+                end,
+                List
+            )
+    end.
+
+normpair(Types)->
+    fun
+        (null) ->
+            {null, null};
+        ({[{Fitem,Sitem}]}) ->
+            {ok, Fres} = norm:to_rule_type(Fitem, Types),
+            {ok, Sres} = norm:to_rule_type(Sitem, Types),
+            {Fres, Sres}
+    end.
+
+normcond(Types)->
+    fun(Params) ->
+        norm:norm(Params, [
+            #norm_rule{
+                key         = iregex,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = regex,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = contains,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = icontains,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = startswith,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = istartswith,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = endswith,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = iendswith,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = lt,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = gt,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = lte,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = gte,
+                required    = false,
+                types       = [Types]
+            },
+            #norm_rule{
+                key         = in,
+                required    = false,
+                types       = [normlist([Types])]
+            },
+            #norm_rule{
+                key         = between,
+                required    = false,
+                types       = [normlist([Types])]
+            }
+        ])
+    end.
+
+

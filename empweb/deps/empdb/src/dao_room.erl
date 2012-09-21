@@ -129,8 +129,8 @@ table(name)->
 table()->
     table(name).
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     dao_doc:get(?MODULE, Con, What, Fields).
@@ -149,7 +149,7 @@ is_owner(Con, Owner_id, Obj_id) ->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_roomtype(Con, What) ->
-    get_roomtype(Con, What, []).
+    dao:get(roomtype(), Con, What).
 
 get_roomtype(Con, What, Fields)->
     dao:get(roomtype(), Con, What, Fields).
@@ -165,7 +165,7 @@ update_roomtype(Con, Proplist)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_chatlang(Con, What) ->
-    get_chatlang(Con, What, []).
+    dao:get(chatlang(), Con, What).
 
 get_chatlang(Con, What, Fields)->
     dao:get(chatlang(), Con, What, Fields).
@@ -182,7 +182,7 @@ update_chatlang(Con, Proplist)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_regimen(Con, What) ->
-    get_regimen(Con, What, []).
+    dao:get(regimen(), Con, What).
 
 get_regimen(Con, What, Fields)->
     dao:get(regimen(), Con, What, Fields).
@@ -198,7 +198,7 @@ update_regimen(Con, Proplist)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_topic(Con, What) ->
-    get_topic(Con, What, []).
+    dao:get(topic(), Con, What).
 
 get_topic(Con, What, Fields)->
     dao:get(topic(), Con, What, Fields).
