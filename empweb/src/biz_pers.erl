@@ -292,9 +292,10 @@ restore_pass(Params) ->
             end, {false, []}, [email, phone]),
             case Status of
                 true ->
+                    {ok, [{Upl}]} = domain_pers:update([{id, Id}, {pass, Pass}])
                     {ok, [{[
-                        domain_pers:update([{id, Id}, {pass, Pass}]),
                         {errors, [{Reasons}]}
+                        | Upl
                     ]}]};
                 false ->
                     {error,{no_enough_info,{[{id, Id}]}}}
