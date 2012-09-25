@@ -1,17 +1,31 @@
-create language plpgsql;
+create or replace language plpgsql;
 
 /**
     Aтомарное создание комнаты для новичков.
 **/
+
+create sequence seq_noobsroom_id;
 create or replace function  mknoobsroom() returns numeric as $$
+declare
+     _res numeric;
+begin
+        select mknoobsroom((select -nextval('seq_any_ti'))) into _res;
+        return _res;
+end;
+$$ language 'plpgsql';
+
+
+create or replace function  mknoobsroom(did numeric) returns numeric as $$
 declare
      _doc_id numeric;
 begin
     lock table room  in exclusive mode;
         insert into doc (
+            "id",
             "head", 
             "body"
         ) values (
+            $1, 
             'head', 
             'body'
         ) returning id into _doc_id;    
