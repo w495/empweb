@@ -1,3 +1,4 @@
+create or replace language plpgsql;
 
 /**
     Aтомарное создание комнаты для новичков.
