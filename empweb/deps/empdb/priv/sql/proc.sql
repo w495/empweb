@@ -1,4 +1,4 @@
-create or replace language plpgsql;
+create language plpgsql;
 
 /**
     Aтомарное создание комнаты для новичков.
