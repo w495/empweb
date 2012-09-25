@@ -919,7 +919,7 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
 select 'log:roomtype' as log;
 
 insert into roomtype(alias)
-    values ('land'), ('prison'), ('hell'), ('heaven');
+    values ('land'), ('prison'), ('hell'), ('heaven'), ('noobs');
 
 insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
     values
@@ -960,6 +960,16 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
         ),
         (   'рай',          'roomtype',     'name_ti','heaven',
             (select name_ti from roomtype where alias='heaven'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'noobs',       'roomtype',      'name_ti','noobs',
+            (select name_ti from roomtype where alias='noobs'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'новички',      'roomtype',     'name_ti','noobs',
+            (select name_ti from roomtype where alias='noobs'),
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
         );
@@ -1692,3 +1702,22 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from trtype where alias='dynamic')
         );
 
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+/**
+    При создании пользователя помещаем его в комнату для новичков
+**/
+
+alter table pers alter column room_id set default noobsroom();

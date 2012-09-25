@@ -68,7 +68,7 @@
             shift
             rm -rf $SESSIONDBPATH
             erl \
-                -pz $BINPATH \
+                -pa $BINPATH \
                 -boot start_sasl \
                 -config ${CONFIG} \
                 -name ${MAIN_NODE} \
@@ -81,7 +81,7 @@
         else
             erl \
                 -noinput \
-                -pz $BINPATH \
+                -pa $BINPATH \
                 -name ${CTRL_NODE} \
                 -setcookie ${COOKIE} \
                 -s nodeclt \
