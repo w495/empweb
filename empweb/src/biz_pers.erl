@@ -292,7 +292,7 @@ restore_pass(Params) ->
             end, {false, []}, [email, phone]),
             case Status of
                 true ->
-                    {ok, [{Upl}]} = domain_pers:update([{id, Id}, {pass, Pass}])
+                    {ok, [{Upl}]} = domain_pers:update([{id, Id}, {pass, Pass}]),
                     {ok, [{[
                         {errors, [{Reasons}]}
                         | Upl

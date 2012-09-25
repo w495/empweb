@@ -1409,7 +1409,7 @@ doc_norm('get') ->
         #norm_rule{
             key = id,
             required = false,
-            types = [normcond([integer])]
+            types = [integer]
         },
         #norm_rule{
             key = doctype_id,
