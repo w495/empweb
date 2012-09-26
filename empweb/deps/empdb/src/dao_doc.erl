@@ -118,7 +118,12 @@ get(Con, What) ->
 %%      Наследник должен быть описан в модуле Module.
 %%
 get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
-    dao:get([{?MODULE, id}, {Module, doc_id}], Con, What);
+   case dao:get([{?MODULE, id}, {Module, doc_id}], Con, What) of
+        {ok, Doc} ->
+            {ok, id2alias_pl(Doc, [])};
+        Error ->
+            Error 
+    end;
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).
@@ -129,7 +134,12 @@ get(Con, What, Fields)->
 %%
 get(Module, Con, What, Fields)->
     io:format("What, Fields = ~p~n", [{What, Fields}]),
-    dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
+    case dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields) of
+        {ok, Doc} ->
+            {ok, id2alias_pl(Doc, [])};
+        Error ->
+            Error 
+    end.
 
 create(Con, Proplist)->
     dao:create(?MODULE, Con, Proplist).
@@ -148,6 +158,20 @@ is_owner(Con, {owner_id, Owner_id}, {id, Id})->
 is_owner(Con, Owner_id, Id)->
     is_owner(Con, {owner_id, Owner_id}, {id, Id}).
 
+
+id2alias_pl(Doc, Options) ->
+    lists:map(fun({Proplist})->
+        {lists:map(fun
+            ({oktype_id, Id})->
+                {oktype, dao:id2alias(oktype, Id, Options)};
+            ({contype_id, Id})->
+                {contype, dao:id2alias(contype, Id, Options)};
+            ({doctype_id, Id})->
+                {doctype, dao:id2alias(doctype, Id, Options)};
+            (X)->
+                X
+        end,Proplist)}    
+    end,Doc).
 
 %%
 %% @doc Создает экземпляр документа и экземпляр join-наследника.

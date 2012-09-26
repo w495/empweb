@@ -78,29 +78,30 @@ handle_post_body(Req, State, Pbody)->
 
 handle_data(Req, State, Bobject)->
     ?evman_args([Req, State, Bobject]),
-    try
+    % try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
         ?evman_debug({object, Object},          <<"native object">>),
         {Res, Reqres}  =  jsonapi_map(Req, Object),
         ?evman_debug({jsonapi_result, Res},  <<"jsonapi result">>),
         {Res, Reqres}
-    catch
-        throw:{invalid_json, _} ->
-            {jsonapi:not_extended(invalid_json), Req};
-        Eclass:Ereason ->
-            ?evman_error(#event{error={Eclass,Ereason}}),
-            {jsonapi:internal_server_error(
-                {[
-                    {unknown_error,
-                        {[
-                            {class, jsonapi:format(Eclass)},
-                            {reason, jsonapi:format(Ereason)}
-                        ]}
-                    }
-                ]}
-            ), Req}
-    end.
+%     catch
+%         throw:{invalid_json, _} ->
+%             {jsonapi:not_extended(invalid_json), Req};
+%         Eclass:Ereason ->
+%             ?evman_error(#event{error={Eclass,Ereason}}),
+%             {jsonapi:internal_server_error(
+%                 {[
+%                     {unknown_error,
+%                         {[
+%                             {class, jsonapi:format(Eclass)},
+%                             {reason, jsonapi:format(Ereason)}
+%                         ]}
+%                     }
+%                 ]}
+%             ), Req}
+%     end
+    .
 
 terminate(Req, State) ->
     ?evman_args([Req, State]),

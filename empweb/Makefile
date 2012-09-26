@@ -1,4 +1,6 @@
-REBAR=which rebar || ./rebar
+#REBAR= which rebar || ./rebar
+
+REBAR=./rebar
 
 all: app ria
 app: get-deps

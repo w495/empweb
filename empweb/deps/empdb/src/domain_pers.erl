@@ -107,7 +107,7 @@ register(Params)->
                     {ok, Objects};
                 {error,{not_unique,<<"users">>}} ->
                     case dao_pers:update_ejabberd(ejabberd, [
-                        {username, convert:to_list(Id)},
+                        {filter, [{username, convert:to_list(Id)}]},
                         {password, Pass}
                     ]) of
                         {ok, _}->
@@ -115,8 +115,8 @@ register(Params)->
                         {Eclass, Error} ->
                             {Eclass, Error}
                     end;
-                {error, Error} ->
-                    {error, Error}
+                {Eclass, Error} ->
+                    {Eclass , Error}
             end;
         {Eclass, Error} ->
             {Eclass, Error}

@@ -36,6 +36,64 @@ behaviour_info(_Other) ->
     undefined.
 
 
+%%
+%%
+%% @spec id2alias(
+%%      Object::atom(), 
+%%      Id::integer(), 
+%%      Options::proplists:proplist()
+%% ) -> Alias::atom()
+%% 
+%% @param Object    atom()                  имя таблицы
+%% @param Id        integer()               id объекта
+%% @param Options   proplists:proplist()    настройки преобразования
+%% 
+
+
+id2alias(doctype, _, _options) ->
+    null;
+
+id2alias(contype, _, _options) ->
+    null;
+    
+id2alias(oktype, 3, _options) ->
+    ok;
+
+id2alias(oktype, _, _options) ->
+    null;
+
+id2alias(_object, _id, _options) ->
+    undefined.
+
+%%
+%%
+%% @spec id2alias(
+%%      Object::atom(), 
+%%      Alias::atom(), 
+%%      Options::proplists:proplist()
+%% ) -> Alias::atom()
+%% 
+%% @param Object    atom()                  имя таблицы
+%% @param Alias     atom()                  id объекта
+%% @param Options   proplists:proplist()    настройки преобразования
+%% 
+
+
+alias2id(doctype, _, _options) ->
+    null;
+
+alias2id(contype, _, _options) ->
+    null;
+    
+alias2id(oktype, ok, _options) ->
+    3;
+
+alias2id(oktype, _, _options) ->
+    null;
+
+alias2id(_object, _alias, _options) ->
+    null.
+
 
 %%% -----------------------------------------------------------------------
 
@@ -557,6 +615,17 @@ get(Current, Con, #queryobj{order=Order}=Obj)
     io:format("Order = ~p~n~n", [Order]),
     get(Current, Con, Obj#queryobj{order=[Order]});
 
+get(Current, Con, #queryobj{filter=Filter}=Obj)
+    when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
+    io:format("Filter = ~p~n~n", [Filter]),
+    get(Current, Con, Obj#queryobj{filter=[Filter]});
+
+
+get(Current, Con, #queryobj{fields=Fields}=Obj)
+    when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
+    io:format("Fields = ~p~n~n", [Fields]),
+    get(Current, Con, Obj#queryobj{fields=[Fields]});
+    
 %%
 %% TODO: только для двух таблиц
 %%
@@ -809,6 +878,18 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 %% Добавление нового
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+create(Current, Con, #queryobj{values=Values}=Obj)
+    when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
+    io:format("Values = ~p~n~n", [Values]),
+    create(Current, Con, Obj#queryobj{order=[Values]});
+
+create(Current, Con, #queryobj{fields=Fields}=Obj)
+    when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
+    io:format("Fields = ~p~n~n", [Fields]),
+    create(Current, Con, Obj#queryobj{fields=[Fields]});
+    
+    
 %%
 %% TODO: только для двух таблиц
 %%
@@ -967,6 +1048,23 @@ create(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
 %% Обновление старого
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+update(Current, Con, #queryobj{values=Values}=Obj)
+    when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
+    io:format("Values = ~p~n~n", [Values]),
+    update(Current, Con, Obj#queryobj{order=[Values]});
+
+update(Current, Con, #queryobj{filter=Filter}=Obj)
+    when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
+    io:format("Filter = ~p~n~n", [Filter]),
+    update(Current, Con, Obj#queryobj{filter=[Filter]});
+
+update(Current, Con, #queryobj{fields=Fields}=Obj)
+    when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
+    io:format("Fields = ~p~n~n", [Fields]),
+    update(Current, Con, Obj#queryobj{fields=[Fields]});
+    
+    
 update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     values  =   Values,
     filter  =   Filter,

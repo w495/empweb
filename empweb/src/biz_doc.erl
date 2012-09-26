@@ -465,4 +465,3 @@ get_message_from_me(Params)->
 get_message_from_me(Params, Fields)->
     domain_doc:get_message([{isdfo, false},Params], Fields).
 
-
