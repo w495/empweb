@@ -118,7 +118,7 @@ get(Con, What) ->
 %%      Наследник должен быть описан в модуле Module.
 %%
 get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
-   case dao:get([{?MODULE, id}, {Module, doc_id}], Con, What) of
+   case dao:get([{?MODULE, id}, {Module, doc_id}], Con, alias2id_pl(What, [])) of
         {ok, Doc} ->
             {ok, id2alias_pl(Doc, [])};
         Error ->
@@ -134,18 +134,18 @@ get(Con, What, Fields)->
 %%
 get(Module, Con, What, Fields)->
     io:format("What, Fields = ~p~n", [{What, Fields}]),
-    case dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields) of
+    case dao:get([{?MODULE, id},{Module, doc_id}], Con, alias2id_pl(What, []), alias2id_fields(Fields, [])) of
         {ok, Doc} ->
             {ok, id2alias_pl(Doc, [])};
         Error ->
             Error 
     end.
 
-create(Con, Proplist)->
-    dao:create(?MODULE, Con, Proplist).
+create(Con, What)->
+    dao:create(?MODULE, Con, alias2id_pl(What, [])).
 
-update(Con, Proplist)->
-    dao:update(?MODULE, Con, Proplist).
+update(Con, What)->
+    dao:update(?MODULE, Con, alias2id_pl(What, [])).
 
 is_owner(Con, {owner_id, Owner_id}, {id, Id})->
     case get(Con, {id, Id}, [owner_id]) of
@@ -158,19 +158,55 @@ is_owner(Con, {owner_id, Owner_id}, {id, Id})->
 is_owner(Con, Owner_id, Id)->
     is_owner(Con, {owner_id, Owner_id}, {id, Id}).
 
+alias2id_fields(List, Options) ->
+    lists:foldl(fun
+        (oktype)->
+            oktype_id;
+        (contype)->
+            contype_id;
+        (doctype)->
+            doctype_id;
+        (X)->
+            X
+    end,List).
+
+alias2id_pl(Proplist, Options) ->
+    lists:map(fun
+        ({oktype, Alias})->
+            {oktype_id,        dao:alias2id(oktype, Alias, Options)};
+        ({contype, Alias})->
+            {contype_id,    dao:alias2id(contype, Alias, Options)};
+        ({doctype, Alias})->
+            {doctype_id,    dao:alias2id(doctype, Alias, Options)};
+        ({fields, List}) ->
+            {fields,        alias2id_fields(List, Options)};
+        (X)->
+            X
+    end,Proplist).
+
 
 id2alias_pl(Doc, Options) ->
     lists:map(fun({Proplist})->
-        {lists:map(fun
-            ({oktype_id, Id})->
-                {oktype, dao:id2alias(oktype, Id, Options)};
-            ({contype_id, Id})->
-                {contype, dao:id2alias(contype, Id, Options)};
-            ({doctype_id, Id})->
-                {doctype, dao:id2alias(doctype, Id, Options)};
-            (X)->
-                X
-        end,Proplist)}    
+        {lists:foldl(fun
+            ({oktype_id, Id}, Acc)->
+                [   {oktype_id, Id},
+                    {oktype,        dao:id2alias(oktype, Id, Options)}
+                    |Acc
+                ];
+            ({contype_id, Id}, Acc)->
+                [   {contype_id, Id},
+                    {contype,       dao:id2alias(contype, Id, Options)}
+                    |Acc
+                ];
+            ({doctype_id, Id}, Acc)->
+                [   
+                    {doctype_id, Id},
+                    {doctype,       dao:id2alias(doctype, Id, Options)}
+                    |Acc
+                ];
+            (X, Acc)->
+                [X|Acc]
+        end, [], Proplist)}    
     end,Doc).
 
 %%
