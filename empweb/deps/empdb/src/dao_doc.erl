@@ -159,7 +159,7 @@ is_owner(Con, Owner_id, Id)->
     is_owner(Con, {owner_id, Owner_id}, {id, Id}).
 
 alias2id_fields(List, Options) ->
-    lists:foldl(fun
+    lists:map(fun
         (oktype)->
             oktype_id;
         (contype)->
