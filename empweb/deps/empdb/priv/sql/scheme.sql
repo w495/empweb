@@ -72,12 +72,18 @@ create table tr(
         Краткое описание, оно не уникален в этой таблице.
     **/
     ta          varchar(1024)   default null,
-    lang_id     decimal references lang(id)   default null,
     /**
         Типы многоязыкового содержимого можно сделать булевским полем.
         Но возможно, будет много типов.
     **/
-    type_id     decimal references trtype(id)   default null,
+    lang_id     decimal         references lang(id)      default null,
+    lang_alias  varchar(1024)   references lang(alias)   default null,
+    /**
+        Типы многоязыкового содержимого можно сделать булевским полем.
+        Но возможно, будет много типов.
+    **/
+    trtype_id       decimal         references trtype(id)       default null,
+    trtype_alias    varchar(1024)   references trtype(alias)    default null,
     text        text default null,
     isdeleted   bool default false,
     constraint  tr_ti_lang_id_many_key unique (ti,lang_id)
@@ -311,10 +317,12 @@ create table pers(
     empl        varchar(1024)   default null,
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
+    
     pregion_id  decimal references  pregion(id)     default null,
+    
+    
     birthday    timestamp       without time zone not null default now(),
     -- gender_id           decimal references gender(id)      default null,
-    lang_id     decimal     references lang(id) default null,
     ismale      bool    default false,
     /**
         ------------------------------------------------------------
@@ -322,14 +330,35 @@ create table pers(
         ------------------------------------------------------------
     **/
     money               real,
-    pstatus_id          decimal references pstatus(id)     default null,
-    authority_id        decimal references authority(id)   default null,
-    emotion_id          decimal references emotion(id)     default null,
-
+    /**
+        Статус online \ offline
+    **/
+    pstatus_id          decimal         references pstatus(id),
+    pstatus_alias       varchar(1024)   references pstatus(alias),
+    /**
+        Авторитет пользователя
+    **/
+    authority_id        decimal         references authority(id)   default null,
+    authority_alias     varchar(1024)   references authority(alias)   default null,
+    /**
+        Эмоции пользователя
+    **/
+    emotion_id          decimal         references emotion(id)     default null,
+    emotion_alias       varchar(1024)   references emotion(alias)  default null,
+    /**
+        Семейное положения пользователя
+    **/
     mstatus_id          decimal references mstatus(id)     default null,
-    married_id          decimal references pers(id)        default null,
-    mother_id           decimal references pers(id)        default null,
-    father_id           decimal references pers(id)        default null,
+    mstatus_alias       varchar(1024)   references mstatus(alias)     default null,
+    /**
+        язык пользователя
+    **/
+    lang_id             decimal         references lang(id)     default null,
+    lang_alias          varchar(1024)   references lang(alias)  default null,
+
+    married_pers_id          decimal references pers(id)        default null,
+    mother_pers_id           decimal references pers(id)        default null,
+    father_pers_id           decimal references pers(id)        default null,
     /** Общество в котором он состоит
         [см далее]: community_id decimal references community(id) default null,
     **/
@@ -344,7 +373,30 @@ create table pers(
             Внутрениие поля
         ------------------------------------------------------------
     **/
+
+    /**
+        позиция в списке
+    **/
+    position            numeric default null,
+    /**
+        дата создания
+    **/
     created             timestamp without time zone not null default now(),
+    /**
+        дата последний модификации
+    **/
+    updated             timestamp without time zone not null default now(),
+    /**
+        количество просмотров
+    **/
+    vcounter            decimal default null,
+    /**
+        количество обновлений
+    **/
+    nupdates            decimal default 0,
+    /**
+        флаг удаления
+    **/    
     isdeleted           bool default false
 );
 
@@ -540,45 +592,76 @@ create table doc(
     id                  decimal primary key default     nextval('seq_doc_id'),
     head                text,
     body                text default null,
-
+    /**
+        Владелец документа
+    **/
+    owner_id            decimal references pers(id)         default null,
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
-    oktype_id    decimal references oktype(id) default null,
-
+    oktype_id           decimal         references oktype(id)     default null,
+    oktype_alias        varchar(1024)   references oktype(alias)  default null,
     /**
         Тип документа: блог, коммент к блогу, галерея,
             фото, коммент к фото, attach descr.
     **/
-    doctype_id          decimal references doctype(id)      default null,
-
+    doctype_id          decimal         references doctype(id)    default null,
+    doctype_alias       varchar(1024)   references doctype(alias) default null,
+    
     /**
         Типы контента: Обычный, эротический
     **/
-    contype_id          decimal references contype(id)      default null,
-    --     /**
-    --         Разрешение на чтение
-    --     **/
-    --     read_acctype_id     decimal references acctype(id)      default null,
-    --     /**
-    --         Разрешение комментов
-    --     **/
-    --     comm_acctype_id     decimal references acctype(id)      default null,
-    --
-    owner_id            decimal references pers(id)         default null,
-    parent_id           decimal references doc(id)          default null,
-
-
+    contype_id          decimal         references contype(id)    default null,
+    contype_alias       varchar(1024)   references contype(alias) default null,
     /**
-        количество просмотров документа
+        Разрешение на чтение
     **/
-    view_counter        decimal default null,
-
+    read_acctype_id     decimal         references acctype(id)    default null,
+    read_acctype_alias  varchar(1024)   references acctype(alias) default null,
+    /**
+        Разрешение комментов
+    **/
+    comm_acctype_id     decimal         references acctype(id)    default null,
+    comm_acctype_alias  varchar(1024)   references acctype(alias) default null,
+    /**
+        Родительский элемент
+    **/
+    parent_id           decimal         references doc(id)        default null,
+    /**
+        Оповещение комментов
+    **/
+    commnotice          bool default false,
+    /**
+        количество детей (дочерних элементов)
+    **/
+    nchildren           decimal default 0,
+    /**
+        количество вершин в кусте
+    **/
+    nnodes              decimal default 0,
     /**
         позиция в списке
     **/
     position            numeric default null,
+    /**
+        дата создания
+    **/
     created             timestamp without time zone not null default now(),
+    /**
+        дата последний модификации
+    **/
+    updated             timestamp without time zone not null default now(),
+    /**
+        количество просмотров документа
+    **/
+    vcounter            decimal default null,
+    /**
+        количество обновлений
+    **/
+    nupdates            decimal default 0,
+    /**
+        флаг удаления
+    **/    
     isdeleted           bool default false
 );
 
@@ -587,21 +670,24 @@ create table doc(
 -- Аттачи
 ------------------------------------------------------------------------------
 
-create sequence seq_atttype_id;
-create table atttype(
-    id              decimal primary key default     nextval('seq_atttype_id'),
+create sequence seq_attachtype_id;
+create table attachtype(
+    id              decimal primary key default     nextval('seq_attachtype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti         decimal unique default nextval('seq_any_ti'),
-    alias           varchar(1024)   unique,
+    name_ti           decimal unique default nextval('seq_any_ti'),
+    alias             varchar(1024)   unique,
     isdeleted         bool default false
 );
 
-create table att(
-    doc_id      decimal unique references doc(id)       default null,
-    type_id     decimal references atttype(id)          default null,
-    file_id     decimal references file(id)    default null
+create table attach(
+    doc_id          decimal unique references doc(id)   default null,
+    
+    attachtype_id      decimal         references attachtype(id)      default null,
+    attachtype_alias   varchar(1024)   references attachtype(alias)   default null,
+    
+    file_id         decimal references file(id)         default null
 );
 
 ------------------------------------------------------------------------------
@@ -618,35 +704,23 @@ create table att(
  *  Используется таблица repost.
 **/
 create table blog(
-    doc_id              decimal unique references doc(id),
-    /**
-        Разрешение на чтение
-    **/
-    read_acctype_id     decimal references acctype(id)     default null,
-    /**
-        Разрешение комментов
-    **/
-    comm_acctype_id     decimal references acctype(id)     default null
+    doc_id              decimal unique references doc(id)
 );
 
 /**
- *  Запись блога \ комментарий
+ *  Запись блога 
 **/
 create table post(
-    doc_id              decimal unique references doc(id),
-    /**
-        Разрешение на чтение
-    **/
-    read_acctype_id     decimal references acctype(id)     default null,
-    /**
-        Разрешение комментов
-    **/
-    comm_acctype_id     decimal references acctype(id)     default null,
-    /**
-        Оповещение комментов
-    **/
-    commnotice          bool default false
+    doc_id              decimal unique references doc(id)
 );
+
+/**
+ *  Запись комментарий
+**/
+create table comment(
+    doc_id              decimal unique references doc(id)
+);
+
 
 -- /**
 --  *  Опрос
@@ -671,14 +745,6 @@ create table post(
 create table gallery(
     doc_id              decimal unique references doc(id),
     /**
-        Разрешение на чтение
-    **/
-    read_acctype_id     decimal references acctype(id)     default null,
-    /**
-        Разрешение комментов
-    **/
-    comm_acctype_id     decimal references acctype(id)     default null,
-    /**
         Разрешение на перепост
     **/
     repost              bool default false
@@ -688,7 +754,7 @@ create table gallery(
  *  Картинка галереи
 **/
 create table gpic(
-    att_id              decimal unique references att(doc_id)
+    att_id              decimal unique references attach(doc_id)
 );
 
 -- ...
@@ -743,7 +809,18 @@ create table topic(
     **/
     descr_ti    decimal unique      default nextval('seq_any_ti'),
     -- alias       varchar(1024)   unique,
+    /**
+        Родительский элемент
+    **/
     parent_id    decimal references topic(id) default null,
+    /**
+        количество детей (дочерних элементов)
+    **/
+    nchildren           decimal default 0,
+    /**
+        количество вершин в кусте
+    **/
+    nnodes              decimal default 0,
     isdeleted   bool default false
 );
 
@@ -764,11 +841,28 @@ create table regimen(
 
 create table room(
     doc_id              decimal unique references doc(id),
-    type_id             decimal references roomtype(id) default null,
     ulimit              decimal default null,
-    chatlang_id         decimal references chatlang(id) default null,
+    
+    /**
+        Тип комнаты
+    **/
+    roomtype_id         decimal         references roomtype(id)     default null,
+    roomtype_alias      varchar(1024)   references roomtype(alias)  default null,    
+    
+    /**
+        Язык комнаты
+    **/
+    chatlang_id         decimal         references chatlang(id)     default null,
+    chatlang_alias      varchar(1024)   references chatlang(alias)  default null,
+   
+    /**
+        Режим комнаты
+    **/
+    regimen_id          decimal         references regimen(id)      default null,
+    regimen_alias       varchar(1024)   references regimen(alias)   default null,
+
     topic_id            decimal references topic(id) default null,
-    regimen_id          decimal references regimen(id) default null,
+    
     slogan              text default null,
     weather             text default null,
     treasury            decimal default null
@@ -780,6 +874,7 @@ create table room(
 
 alter table pers add  column room_id
     decimal references room(doc_id) default null;
+
 
 ------------------------------------------------------------------------------
 -- Сообщество
@@ -802,10 +897,14 @@ create table communitytype(
 
 
 create table community(
-    doc_id              decimal unique references doc(id),
-    type_id             decimal references communitytype(id) default null,
-    slogan              text default null,
-    treasury            decimal default null
+    doc_id                  decimal unique references doc(id),
+    /**
+        Тип сообщества
+    **/
+    communitytype_id        decimal         references communitytype(id)    default null,
+    communitytype_alias     varchar(1024)   references communitytype(alias) default null,
+    slogan                  text default null,
+    treasury                decimal default null
 );
 
 alter table pers add column community_id
@@ -830,8 +929,9 @@ create table eventtype(
 
 create table event(
     doc_id              decimal unique references doc(id),
-    type_id             decimal references eventtype(id) default null,
-    pers_id              decimal references pers(id) default null
+    eventtype_id        decimal         references eventtype(id)    default null,
+    eventtype_alias     varchar(1024)   references eventtype(alias) default null,
+    pers_id             decimal references pers(id) default null
 );
 
 
@@ -856,7 +956,12 @@ create table messagetype(
 
 create table message(
     doc_id              decimal unique references doc(id),
-    type_id             decimal references messagetype(id) default null,
+    /**
+        Тип сообщения (пока не понятно, что это)
+    **/
+    messagetype_id      decimal         references messagetype(id)      default null,
+    messagetype_alias   varchar(1024)   references messagetype(alias)   default null,
+    
     reader_id           decimal references pers(id) default null,
     /**
         Удалено для отправителя (из почтового ящика отправителя)
@@ -868,6 +973,70 @@ create table message(
     isdfr               bool default false
 );
 
+
+
+/****************************************************************************
+    =====================================================================
+                                ВЕЩИ-ПОКУПКИ
+    =====================================================================
+****************************************************************************/
+
+create sequence seq_thingtype_id;
+create table thingtype(
+    id              decimal primary key default nextval('seq_thingtype_id'),
+    alias           varchar(1024)   unique,
+    /**
+        Номер языковой сущности
+    **/
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    /**
+        Номер языковой сущности
+    **/
+    descr_ti        decimal unique      default nextval('seq_any_ti'),
+    /**
+        Родительский элемент
+    **/
+    parent_id       decimal references thingtype(id) default null,
+    /**
+        количество детей (дочерних элементов)
+    **/
+    nchildren           decimal default 0,
+    /**
+        количество вершин в кусте
+    **/
+    nnodes              decimal default 0,
+    
+    isdeleted       bool    default false
+);
+
+
+create sequence seq_thing_id;
+create sequence seq_thing_alias;
+create table thing(
+    id              decimal primary key default nextval('seq_thing_id'),
+    alias           varchar(1024) default '_'
+                        || CAST (nextval('seq_thing_alias')
+                            as varchar(1024))
+                        || '_'
+                        || extract(epoch from now())
+                        || '_' not null unique,
+    /**
+        Номер языковой сущности
+    **/
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    /**
+        Номер языковой сущности
+    **/
+    descr_ti        decimal unique      default nextval('seq_any_ti'),
+    
+    /**
+        Ccылка на вершину дерева типов вещей
+    **/
+    thingtype_id    decimal references thingtype(id) default null,
+    
+    price           real    default null,
+    isdeleted       bool    default false
+);
 
 
 -------------------------------------------------------------------------------
@@ -888,5 +1057,16 @@ create table perm2pgroup (
 create table pers2pgroup (
     pers_id decimal references pers(id) not null,
     group_id decimal references pgroup(id) not null
+);
+
+/**
+ *  Многие ко многим для пользователей и вещей
+**/
+create table pers2thing (
+    pers_id             decimal references pers(id) not null,
+    thing_id            decimal references thing(id) not null,
+    created             timestamp without time zone not null default now(),
+    counter             timestamp without time zone not null default now(),
+    isdeleted           bool default false
 );
 

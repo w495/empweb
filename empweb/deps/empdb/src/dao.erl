@@ -833,6 +833,7 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 %     get(Current, Con, [{Key, Value}], Fields);
 
 
+
 % 
 % %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% @doc Выполняет select join для таблиц описанных через

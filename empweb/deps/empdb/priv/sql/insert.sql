@@ -22,7 +22,7 @@ insert into trtype (alias, descr)
         ('static',  'static translation'),
         ('dynamic', 'dynamic translation');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'english',         'lang',     'name_ti','en_gb',
             (select name_ti from lang  where alias='en_gb'),
@@ -45,7 +45,7 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from trtype where alias='dynamic')
         );
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'static',      'trtype',       'name_ti','static',
             (select name_ti from trtype  where alias='static'),
@@ -117,7 +117,7 @@ insert into permtype (alias)
     values
         ('static');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'static',       'permtype',     'name_ti','static',
             (select name_ti from permtype where alias='static'),
@@ -136,7 +136,7 @@ insert into permentitytype (alias)
     values
         ('pers');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'pers',         'permentitytype',     'name_ti','pers',
             (select name_ti from permentitytype where alias='pers'),
@@ -182,7 +182,7 @@ insert into perm (alias, permtype_id, entitytype_id)
             (select id from permentitytype where alias='pers')
         );
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'allowed only for the system itself',
             'perm','name_ti','system',
@@ -278,7 +278,7 @@ insert into pgroup (alias)
         ('sysconfiger'),
         ('contman');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'administrators',
             'pgroup','name_ti','admin',
@@ -354,128 +354,13 @@ insert into perm2pgroup (perm_id, group_id)
         ( (select id from perm where alias='contman'),
             (select id from pgroup where alias='contman'));
 
-select 'log:pers' as log;
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-100500, 'fadmin', 'sadmin', 'padmin@padmin.ru',
-            093203230230, 'admin', 'admin', '21232F297A57A5A743894A0E4A801FC3');
-
-select 'test users' as log;
-
--- insert into pers (id, fname, sname, email, phone, nick, login, phash)
---     values (1, 'fname-1', 'sname-1', 'email-1@email.ru',
---             293203230231, 'nick-1', 'login-1', '21232F297A57A5A743894A0E4A801FC3');
--- 
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-1001, 'test_1_fname-1', 'test_1_sname-1', 'test_1_email-1@email.ru',
-            293203230231, 'test_1_nick-1', 'test_1_login-1', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-2001, 'test_1_fname-2', 'test_1_sname-2', 'test_1_email-2@email.ru',
-            293203230231, 'test_1_nick-2', 'test_1_login-2', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-3001, 'test_1_fname-3', 'test_1_sname-3', 'test_1_email-3@email.ru',
-            293203230231, 'test_1_nick-3', 'test_1_login-3', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-4001, 'test_1_fname-4', 'test_1_sname-4', 'test_1_email-4@email.ru',
-            293203230231, 'test_1_nick-4', 'test_1_login-4', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-5001, 'test_1_fname-5', 'test_1_sname-5', 'test_1_email-5@email.ru',
-            293203230231, 'test_1_nick-5', 'test_1_login-5', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-6001, 'test_1_fname-6', 'test_1_sname-6', 'test_1_email-6@email.ru',
-            293203230231, 'test_1_nick-6', 'test_1_login-6', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-7001, 'test_1_fname-7', 'test_1_sname-7', 'test_1_email-7@email.ru',
-            293203230231, 'test_1_nick-7', 'test_1_login-7', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-8001, 'test_1_fname-8', 'test_1_sname-8', 'test_1_email-8@email.ru',
-            293203230231, 'test_1_nick-8', 'test_1_login-8', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-10001, 'test_1_fname-10', 'test_1_sname-10', 'test_1_email-10@email.ru',
-            293203230231, 'test_1_nick-10', 'test_1_login-10', '21232F297A57A5A743894A0E4A801FC3');
-
-
-
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-1002, 'test_2_fname-1', 'test_2_sname-1', 'test_2_email-1@email.ru',
-            293203230231, 'test_2_nick-1', 'test_2_login-1', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-2002, 'test_2_fname-2', 'test_2_sname-2', 'test_2_email-2@email.ru',
-            293203230231, 'test_2_nick-2', 'test_2_login-2', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-3002, 'test_2_fname-3', 'test_2_sname-3', 'test_2_email-3@email.ru',
-            293203230231, 'test_2_nick-3', 'test_2_login-3', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-4002, 'test_2_fname-4', 'test_2_sname-4', 'test_2_email-4@email.ru',
-            293203230231, 'test_2_nick-4', 'test_2_login-4', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-5002, 'test_2_fname-5', 'test_2_sname-5', 'test_2_email-5@email.ru',
-            293203230231, 'test_2_nick-5', 'test_2_login-5', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-6002, 'test_2_fname-6', 'test_2_sname-6', 'test_2_email-6@email.ru',
-            293203230231, 'test_2_nick-6', 'test_2_login-6', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-7002, 'test_2_fname-7', 'test_2_sname-7', 'test_2_email-7@email.ru',
-            293203230231, 'test_2_nick-7', 'test_2_login-7', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-8002, 'test_2_fname-8', 'test_2_sname-8', 'test_2_email-8@email.ru',
-            293203230231, 'test_2_nick-8', 'test_2_login-8', '21232F297A57A5A743894A0E4A801FC3');
-
-insert into pers (id, fname, sname, email, phone, nick, login, phash)
-    values (-10002, 'test_2_fname-10', 'test_2_sname-10', 'test_2_email-10@email.ru',
-            293203230231, 'test_2_nick-10', 'test_2_login-10', '21232F297A57A5A743894A0E4A801FC3');
-
-
-
-
-    --//
-    --     admin -> 21232F297A57A5A743894A0E4A801FC3
-    --// новыйпароль
-    --     yjdsqgfhjkm -> C7BCC36975D86BB977D99A7DFB8EBDA0
-    --//
-    --     c7bcc36975d86bb977d99a7dfb8ebda0 -> D28847DA5504EE1365C159BC8FA18198
-    --// md5sum этого файла
-    --     ac4e05cfe177d66bf630dab627e81ab0 -> 344F01D45FFCE96499C7B8966BD176E0
-    --//
-    --     mjkqgjdsyhf -> C72DC633185E52C9FD363EEED7220C85
-    --//
-    --     etsuken -> C61B248A4D509E2923EBD983A8658C55
-
-
-select 'log:pers2pgroup' as log;
-
-insert into pers2pgroup (pers_id, group_id)
-    values
-        ((select id from pers where login='admin'),
-            (select id from pgroup where alias='admin')),
-        ((select id from pers where login='admin'),
-            (select id from pgroup where alias='sysmsg')),
-        ((select id from pers where login='admin'),
-            (select id from pgroup where alias='contman'));
 
 select 'log:emotion' as log;
 
 insert into emotion(alias)
     values ('happy'), ('indifferent'), ('sad');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'happy',        'emotion',      'name_ti','happy',
             (select name_ti from emotion  where alias='happy'),
@@ -519,7 +404,7 @@ insert into authority(alias, level)
         ('citizen',     100),
         ('elder',       150);
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'troll',        'authority',      'name_ti','troll',
             (select name_ti from authority  where alias='troll'),
@@ -587,7 +472,7 @@ select 'log:pstatus' as log;
 insert into pstatus(alias)
     values ('online'),('offline'),('banned'),('killed');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'online',       'pstatus',      'name_ti','online',
             (select name_ti from pstatus  where alias='online'),
@@ -635,7 +520,7 @@ select 'log:mstatus' as log;
 insert into mstatus(alias)
     values ('single'),('engaged'),('married'),('divorced');
 
-insert into tr (text, tt, tf, ta, ti,  lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'single',       'mstatus',      'name_ti','single',
             (select name_ti from mstatus  where alias='single'),
@@ -690,7 +575,7 @@ insert into sysvartype (alias)
     values  ('text'), ('int'), ('bool'), ('real'), ('void');
 
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'text',         'sysvartype',      'name_ti','text',
             (select name_ti from sysvartype  where alias='text'),
@@ -744,16 +629,16 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
         );
 
 
--------------------------------------------------------------------------------
+-----------------------------------------------------------------------
 -- Документы
--------------------------------------------------------------------------------
+-----------------------------------------------------------------------
 
 select 'log:oktype' as log;
 
 insert into oktype (alias)
     values ('ncons'), ('forbidden'), ('ok');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'not considered',   'oktype',  'name_ti','ncons',
             (select name_ti from oktype  where alias='ncons'),
@@ -791,7 +676,7 @@ select 'log:acctype' as log;
 insert into acctype (alias)
     values ('private'), ('protected'), ('public');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'private',      'acctype',      'name_ti','private',
             (select name_ti from acctype  where alias='private'),
@@ -829,7 +714,7 @@ select 'log:contype' as log;
 insert into contype(alias)
     values ('common'), ('adult_only');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'common',       'contype',     'name_ti','common',
             (select name_ti from contype where alias='common'),
@@ -858,12 +743,14 @@ select 'log:doctype' as log;
 insert into doctype(alias)
     values  ('blog'),
             ('post'),
+            ('comment'),
+            ('attach'),
+            ('room'),
+            ('community'),
             ('message'),
-            ('gallery'),
-            ('photo'),
-            ('attach_descr');
-
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+            ('event');
+            
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'blog',         'doctype',     'name_ti','blog',
             (select name_ti from doctype where alias='blog'),
@@ -885,6 +772,70 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from lang where alias='ru_ru'),
             (select id from trtype where alias='dynamic')
         ),
+        (   'comment',      'doctype',     'name_ti','comment',
+            (select name_ti from doctype where alias='comment'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'комментарий',  'doctype',     'name_ti','comment',
+            (select name_ti from doctype where alias='comment'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'attach',       'doctype',     'name_ti','attach',
+            (select name_ti from doctype where alias='attach'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'вложение',     'doctype',     'name_ti','attach',
+            (select name_ti from doctype where alias='attach'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        
+        (   'room',         'doctype',     'name_ti','room',
+            (select name_ti from doctype where alias='room'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'комната',      'doctype',     'name_ti','room',
+            (select name_ti from doctype where alias='room'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+
+        (   'community',    'doctype',     'name_ti','community',
+            (select name_ti from doctype where alias='community'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'cooбщество',      'doctype',     'name_ti','community',
+            (select name_ti from doctype where alias='community'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        
+        (   'message',      'doctype',     'name_ti','message',
+            (select name_ti from doctype where alias='message'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'сообщение',      'doctype',   'name_ti','message',
+            (select name_ti from doctype where alias='message'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'event',        'doctype',     'name_ti','event',
+            (select name_ti from doctype where alias='event'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'событие',      'doctype',   'name_ti','event',
+            (select name_ti from doctype where alias='event'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        
         (   'gallery',      'doctype',     'name_ti','gallery',
             (select name_ti from doctype where alias='gallery'),
             (select id from lang where alias='en_gb'),
@@ -921,7 +872,7 @@ select 'log:roomtype' as log;
 insert into roomtype(alias)
     values ('land'), ('prison'), ('hell'), ('heaven'), ('noobs');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'land',         'roomtype',     'name_ti','land',
             (select name_ti from roomtype where alias='land'),
@@ -986,7 +937,7 @@ insert into chatlang(alias)
         ('fr_fr') -- французский
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'english',      'chatlang',     'name_ti','en_gb',
             (select name_ti from chatlang where alias='en_gb'),
@@ -1066,7 +1017,7 @@ insert into regimen(alias)
         ('feudal'),
         ('tribe');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'despotism',
             'regimen', 'name_ti', 'despotism',
@@ -1170,7 +1121,7 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
             (select id from lang where alias='en_gb'),
             (select id from trtype where alias='dynamic')
         ),(
-            'Real power in the country belongs not to the king, and the Knights, the most romantic structure — here is thriving cult of beautiful ladies (ladies heart).',
+            'Real power in the country belongs not to the king, and the Knights, the most romantic_flowers structure — here is thriving cult of beautiful ladies (ladies heart).',
             'regimen', 'descr_ti', 'feudal',
             (select descr_ti from regimen where alias='feudal'),
             (select id from lang where alias='en_gb'),
@@ -1313,7 +1264,7 @@ select 'log:topic' as log;
 
 insert into topic(alias) values ('all');
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'all topics',
             'topic',                     'name_ti','all',
@@ -1352,7 +1303,7 @@ insert into topic(alias, parent_id)
         )
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'sex',
             'topic',                     'name_ti','sex',
@@ -1435,7 +1386,7 @@ insert into topic(alias, parent_id)
         )
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'classic sex',
             'topic',                     'name_ti','classic_sex',
@@ -1518,7 +1469,7 @@ insert into topic(alias, parent_id)
         )
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'meskalin',
             'topic',                     'name_ti','meskalin',
@@ -1601,7 +1552,7 @@ insert into topic(alias, parent_id)
         )
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'new wave',
             'topic',                     'name_ti','new_wave',
@@ -1679,7 +1630,7 @@ insert into communitytype(alias)
         ('secret') -- секретное
         ;
 
-insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values
         (   'common',       'communitytype',     'name_ti','common',
             (select name_ti from communitytype where alias='common'),
@@ -1703,21 +1654,572 @@ insert into tr (text, tt, tf, ta, ti, lang_id, type_id)
         );
 
 
+
+select 'log:thingtype' as log;
+
+insert into thingtype(alias) values ('all');
+
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
+    values
+        (   'all thingtypes',
+            'thingtype',                     'name_ti','all',
+            (select name_ti from thingtype where alias='all'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for all thingtypes',
+            'thingtype',                     'descr_ti','all',
+            (select descr_ti from thingtype where alias='all'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'все вещи',
+            'thingtype',                      'name_ti','all',
+            (select name_ti from thingtype  where alias='all'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание всех вещей',
+            'thingtype',                      'descr_ti','all',
+            (select descr_ti from thingtype  where alias='all'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into thingtype(alias, parent_id)
+    values
+        ('counter',
+            (select id from thingtype where alias='all')
+        ),
+        ('closes',
+            (select id from thingtype where alias='all')
+        ),
+        ('flowers',
+            (select id from thingtype where alias='all')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
+    values
+        (   'counter',
+            'thingtype',                     'name_ti','counter',
+            (select name_ti from thingtype where alias='counter'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for counter',
+            'thingtype',                     'descr_ti','counter',
+            (select descr_ti from thingtype where alias='counter'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'cчетчики',
+            'thingtype',                      'name_ti','counter',
+            (select name_ti from thingtype  where alias='counter'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание cчетчиков',
+            'thingtype',                      'descr_ti','counter',
+            (select descr_ti from thingtype  where alias='counter'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'closes',
+            'thingtype',                     'name_ti','closes',
+            (select name_ti from thingtype where alias='closes'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for closes',
+            'thingtype',                     'descr_ti','closes',
+            (select descr_ti from thingtype where alias='closes'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'одежда',
+            'thingtype',                      'name_ti','closes',
+            (select name_ti from thingtype  where alias='closes'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание одежды',
+            'thingtype',                      'descr_ti','closes',
+            (select descr_ti from thingtype  where alias='closes'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'flowers',
+            'thingtype',                     'name_ti','flowers',
+            (select name_ti from thingtype where alias='flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for flowers',
+            'thingtype',                     'descr_ti','flowers',
+            (select descr_ti from thingtype where alias='flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'цветы',
+            'thingtype',                      'name_ti','flowers',
+            (select name_ti from thingtype  where alias='flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание цветов',
+            'thingtype',                      'descr_ti','flowers',
+            (select descr_ti from thingtype  where alias='flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+
+insert into thingtype(alias, parent_id)
+    values
+        ('costume',
+            (select id from thingtype where alias='closes')
+        ),
+        ('dress',
+            (select id from thingtype where alias='closes')
+        ),
+        ('cap',
+            (select id from thingtype where alias='closes')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
+    values
+        (   'costume',
+            'thingtype',                     'name_ti','costume',
+            (select name_ti from thingtype where alias='costume'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for costume',
+            'thingtype',                     'descr_ti','costume',
+            (select descr_ti from thingtype where alias='costume'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'костюм',
+            'thingtype',                      'name_ti','costume',
+            (select name_ti from thingtype  where alias='costume'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание костюма',
+            'thingtype',                      'descr_ti','costume',
+            (select descr_ti from thingtype  where alias='costume'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'dress',
+            'thingtype',                     'name_ti','dress',
+            (select name_ti from thingtype where alias='dress'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for dress',
+            'thingtype',                     'descr_ti','dress',
+            (select descr_ti from thingtype where alias='dress'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'платье',
+            'thingtype',                      'name_ti','dress',
+            (select name_ti from thingtype  where alias='dress'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание платьев',
+            'thingtype',                      'descr_ti','dress',
+            (select descr_ti from thingtype  where alias='dress'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'cap',
+            'thingtype',                     'name_ti','cap',
+            (select name_ti from thingtype where alias='cap'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for cap',
+            'thingtype',                     'descr_ti','cap',
+            (select descr_ti from thingtype where alias='cap'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'шапка',
+            'thingtype',                      'name_ti','cap',
+            (select name_ti from thingtype  where alias='cap'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание шапок',
+            'thingtype',                      'descr_ti','cap',
+            (select descr_ti from thingtype  where alias='cap'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
+
+insert into thingtype(alias, parent_id)
+    values
+        ('romantic_flowers',
+            (select id from thingtype where alias='flowers')
+        ),
+        ('official_flowers',
+            (select id from thingtype where alias='flowers')
+        ),  
+        ('funeral_flowers',
+            (select id from thingtype where alias='flowers')
+        )
+        ;
+
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
+    values
+        (   'romantic flowers',
+            'thingtype',                     'name_ti','romantic_flowers',
+            (select name_ti from thingtype where alias='romantic_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for romantic flowers',
+            'thingtype',                     'descr_ti','romantic_flowers',
+            (select descr_ti from thingtype where alias='romantic_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'романтичные',
+            'thingtype',                      'name_ti','romantic_flowers',
+            (select name_ti from thingtype  where alias='romantic_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание романтичных цветов',
+            'thingtype',                      'descr_ti','romantic_flowers',
+            (select descr_ti from thingtype  where alias='romantic_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'official_flowers',
+            'thingtype',                     'name_ti','official_flowers',
+            (select name_ti from thingtype where alias='official_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for official_flowers',
+            'thingtype',                     'descr_ti','official_flowers',
+            (select descr_ti from thingtype where alias='official_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'официальные',
+            'thingtype',                      'name_ti','official_flowers',
+            (select name_ti from thingtype  where alias='official_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание официальных цветов',
+            'thingtype',                      'descr_ti','official_flowers',
+            (select descr_ti from thingtype  where alias='official_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'funeral_flowers',
+            'thingtype',                     'name_ti','funeral_flowers',
+            (select name_ti from thingtype where alias='funeral_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for funeral_flowers',
+            'thingtype',                     'descr_ti','funeral_flowers',
+            (select descr_ti from thingtype where alias='funeral_flowers'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'похоронные',
+            'thingtype',                      'name_ti','funeral_flowers',
+            (select name_ti from thingtype  where alias='funeral_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание похоронных цветов',
+            'thingtype',                      'descr_ti','funeral_flowers',
+            (select descr_ti from thingtype  where alias='funeral_flowers'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
         
         
         
+select 'log:thing' as log;
+        
+insert into thing(alias, price, thingtype_id)
+    values
+        ('rose', 
+            11,
+            (select id from thingtype where alias='romantic_flowers')
+        ),
+        ('chamomile', 
+            12,
+            (select id from thingtype where alias='romantic_flowers')
+        ),  
+        ('simple_counter', 
+            1000,
+            (select id from thingtype where alias='counter')
+        )
+        ;
         
         
         
+insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
+    values
+        (   'rose',
+            'thing',                     'name_ti','rose',
+            (select name_ti from thing where alias='rose'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for rose',
+            'thing',                     'descr_ti','rose',
+            (select descr_ti from thing where alias='rose'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'роза',
+            'thing',                      'name_ti','rose',
+            (select name_ti from thing  where alias='rose'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание розы',
+            'thing',                      'descr_ti','rose',
+            (select descr_ti from thing  where alias='rose'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'chamomile',
+            'thing',                     'name_ti','chamomile',
+            (select name_ti from thing where alias='chamomile'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for chamomile',
+            'thing',                     'descr_ti','chamomile',
+            (select descr_ti from thing where alias='chamomile'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'ромашка',
+            'thing',                      'name_ti','chamomile',
+            (select name_ti from thing  where alias='chamomile'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание ромашки',
+            'thing',                      'descr_ti','chamomile',
+            (select descr_ti from thing  where alias='chamomile'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'simple counter',
+            'thing',                     'name_ti','simple_counter',
+            (select name_ti from thing where alias='simple_counter'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),( 'for simple counter',
+            'thing',                     'descr_ti','simple_counter',
+            (select descr_ti from thing where alias='simple_counter'),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='dynamic')
+        ),
+        (   'простой счетчик',
+            'thing',                      'name_ti','simple_counter',
+            (select name_ti from thing  where alias='simple_counter'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        ),( 'описание простого счетчика',
+            'thing',                      'descr_ti','simple_counter',
+            (select descr_ti from thing  where alias='simple_counter'),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='dynamic')
+        )
+        ;
         
         
-        
-        
-        
-        
+
+select 'log:pers' as log;
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-100500, 'fadmin', 'sadmin', 'padmin@padmin.ru',
+            093203230230, 'admin', 'admin', '21232F297A57A5A743894A0E4A801FC3');
+
+select 'test users' as log;
+
+-- insert into pers (id, fname, sname, email, phone, nick, login, phash)
+--     values (1, 'fname-1', 'sname-1', 'email-1@email.ru',
+--             293203230231, 'nick-1', 'login-1', '21232F297A57A5A743894A0E4A801FC3');
+-- 
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-1001, 'test_1_fname-1', 'test_1_sname-1', 'test_1_email-1@email.ru',
+            293203230231, 'test_1_nick-1', 'test_1_login-1', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-2001, 'test_1_fname-2', 'test_1_sname-2', 'test_1_email-2@email.ru',
+            293203230231, 'test_1_nick-2', 'test_1_login-2', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-3001, 'test_1_fname-3', 'test_1_sname-3', 'test_1_email-3@email.ru',
+            293203230231, 'test_1_nick-3', 'test_1_login-3', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-4001, 'test_1_fname-4', 'test_1_sname-4', 'test_1_email-4@email.ru',
+            293203230231, 'test_1_nick-4', 'test_1_login-4', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-5001, 'test_1_fname-5', 'test_1_sname-5', 'test_1_email-5@email.ru',
+            293203230231, 'test_1_nick-5', 'test_1_login-5', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-6001, 'test_1_fname-6', 'test_1_sname-6', 'test_1_email-6@email.ru',
+            293203230231, 'test_1_nick-6', 'test_1_login-6', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-7001, 'test_1_fname-7', 'test_1_sname-7', 'test_1_email-7@email.ru',
+            293203230231, 'test_1_nick-7', 'test_1_login-7', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-8001, 'test_1_fname-8', 'test_1_sname-8', 'test_1_email-8@email.ru',
+            293203230231, 'test_1_nick-8', 'test_1_login-8', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-10001, 'test_1_fname-10', 'test_1_sname-10', 'test_1_email-10@email.ru',
+            293203230231, 'test_1_nick-10', 'test_1_login-10', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-1002, 'test_2_fname-1', 'test_2_sname-1', 'test_2_email-1@email.ru',
+            293203230231, 'test_2_nick-1', 'test_2_login-1', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-2002, 'test_2_fname-2', 'test_2_sname-2', 'test_2_email-2@email.ru',
+            293203230231, 'test_2_nick-2', 'test_2_login-2', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-3002, 'test_2_fname-3', 'test_2_sname-3', 'test_2_email-3@email.ru',
+            293203230231, 'test_2_nick-3', 'test_2_login-3', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-4002, 'test_2_fname-4', 'test_2_sname-4', 'test_2_email-4@email.ru',
+            293203230231, 'test_2_nick-4', 'test_2_login-4', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-5002, 'test_2_fname-5', 'test_2_sname-5', 'test_2_email-5@email.ru',
+            293203230231, 'test_2_nick-5', 'test_2_login-5', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-6002, 'test_2_fname-6', 'test_2_sname-6', 'test_2_email-6@email.ru',
+            293203230231, 'test_2_nick-6', 'test_2_login-6', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-7002, 'test_2_fname-7', 'test_2_sname-7', 'test_2_email-7@email.ru',
+            293203230231, 'test_2_nick-7', 'test_2_login-7', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-8002, 'test_2_fname-8', 'test_2_sname-8', 'test_2_email-8@email.ru',
+            293203230231, 'test_2_nick-8', 'test_2_login-8', '21232F297A57A5A743894A0E4A801FC3');
+
+insert into pers (id, fname, sname, email, phone, nick, login, phash)
+    values (-10002, 'test_2_fname-10', 'test_2_sname-10', 'test_2_email-10@email.ru',
+            293203230231, 'test_2_nick-10', 'test_2_login-10', '21232F297A57A5A743894A0E4A801FC3');
+
+
+
+
+    --//
+    --     admin -> 21232F297A57A5A743894A0E4A801FC3
+    --// новыйпароль
+    --     yjdsqgfhjkm -> C7BCC36975D86BB977D99A7DFB8EBDA0
+    --//
+    --     c7bcc36975d86bb977d99a7dfb8ebda0 -> D28847DA5504EE1365C159BC8FA18198
+    --// md5sum этого файла
+    --     ac4e05cfe177d66bf630dab627e81ab0 -> 344F01D45FFCE96499C7B8966BD176E0
+    --//
+    --     mjkqgjdsyhf -> C72DC633185E52C9FD363EEED7220C85
+    --//
+    --     etsuken -> C61B248A4D509E2923EBD983A8658C55
+
+
+select 'log:pers2pgroup' as log;
+
+insert into pers2pgroup (pers_id, group_id)
+    values
+        ((select id from pers where login='admin'),
+            (select id from pgroup where alias='admin')),
+        ((select id from pers where login='admin'),
+            (select id from pgroup where alias='sysmsg')),
+        ((select id from pers where login='admin'),
+            (select id from pgroup where alias='contman'));
+
+    
         
 /**
     При создании пользователя помещаем его в комнату для новичков
 **/
+-- alter table pers alter column room_id set default noobsroom();
 
-alter table pers alter column room_id set default noobsroom();
+
+
+/**
+    Тригер присвоения типа документа при создании сообщения
+**/
+create or replace function update_something() returns "trigger" as $$
+begin
+    new.updated = now(); 
+    new.nupdates = new.nupdates + 1; 
+    return new;
+end;
+$$ language plpgsql;
+
+
+create trigger update_something before update
+   on doc for each row execute procedure update_something();
+   
+
+create or replace function doc() returns setof doc as $$
+        select * from doc;
+$$ language sql;
+
+    /*
+    create or replace function vcup(numeric, varchar) returns numeric as $$
+    update doc set vcounter = vcounter + 1 where id = $1 returning id;
+    $$ language sql;*/
+
+
+create or replace function vcup(
+    i numeric, 
+    t varchar, 
+    f varchar default 'vcounter') 
+returns numeric as $$
+begin
+    execute 'update '||quote_ident(t)
+    ||' set '||quote_ident(f)||' = '||quote_ident(f)||' + 1'
+    ||' where id =  '||cast(i as varchar)||';';
+    return i;
+end; $$ language plpgsql;
+
+/*
+
+CREATE OR REPLACE VIEW pers_v AS
+    select pers.*, from doc 
+        left join doctype on
+            doctype.id = doc.doctype_id
+        left join contype on
+            contype.id = doc.contype_id;
+
+
+CREATE OR REPLACE VIEW doc_v AS
+    select doc.*, doctype.alias as doctype_alias, contype.alias as contype_alias from doc 
+        left join doctype on
+            doctype.id = doc.doctype_id
+        left join contype on
+            contype.id = doc.contype_id;
+            
+            */
+/*
+CREATE OR REPLACE VIEW room_v AS
+    select doc.*, doctype.alias as doctype_alias, contype.alias as contype_alias from doc 
+        left join doctype on
+            doctype.id = doc.doctype_id
+        left join contype on
+            contype.id = doc.contype_id;
+
+
+CREATE OR REPLACE VIEW pers_v AS
+    select pers.*, from doc 
+        left join doctype on
+            doctype.id = doc.doctype_id
+        left join contype on
+            contype.id = doc.contype_id;
+            pstatus_id*/
