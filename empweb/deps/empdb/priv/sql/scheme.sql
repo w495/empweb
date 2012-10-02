@@ -356,9 +356,9 @@ create table pers(
     lang_id             decimal         references lang(id)     default null,
     lang_alias          varchar(1024)   references lang(alias)  default null,
 
-    married_pers_id          decimal references pers(id)        default null,
-    mother_pers_id           decimal references pers(id)        default null,
-    father_pers_id           decimal references pers(id)        default null,
+    married_id          decimal references pers(id)        default null,
+    mother_id           decimal references pers(id)        default null,
+    father_id           decimal references pers(id)        default null,
     /** Общество в котором он состоит
         [см далее]: community_id decimal references community(id) default null,
     **/

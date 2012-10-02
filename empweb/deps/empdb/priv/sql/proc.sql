@@ -1,5 +1,5 @@
-create or replace language plpgsql;
-
+-- create or replace language plpgsql;
+create language plpgsql;
 
 /**
     Тригер присвоения типа документа при создании блога
