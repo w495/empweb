@@ -143,7 +143,7 @@ update(Params)->
                     Id = proplists:get_value(id, Pl),
                     %% изменяем запись в базе jabberd
                     case dao_pers:update_ejabberd(ejabberd, [
-                        {username, convert:to_list(Id)},
+                        {filter, [{username, convert:to_list(Id)}]},
                         {password, Mbpass}
                     ]) of
                         {ok, _}->

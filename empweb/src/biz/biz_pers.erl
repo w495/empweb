@@ -261,11 +261,11 @@ pass(Params) ->
     %%
     case {proplists:get_value(is_auth,Params), Id == Pers_id} of
         {true, true}->
-            restore_pass([{id, Id}]);
+            restore_pass(Params);
         {false, _}->
-            restore_pass([{id, Id}]);
+            restore_pass(Params);
         {undefined, _}->
-            restore_pass([{id, Id}]);
+            restore_pass(Params);
         _ ->
             {error,{bad_pers,{[{id, Id}]}}}
     end.
@@ -277,32 +277,43 @@ pass(Params) ->
 %%
 restore_pass(Params) ->
     Id = proplists:get_value(id,Params),
+    Email = proplists:get_value(email,Params),
     case domain_pers:get(Params, [email, phone]) of
         {ok,[]} ->
-            {error,{bad_pers,{[{id, Id}]}}};
+            {error,{bad_pers,{[{id, Id}, {email,Email}]}}};
         {ok,[{Perspl}]} ->
-            {ok, Pass} = lgps:new(),
-            {Status, Reasons} = lists:foldl(fun(Type, {Status, Reasons})->
-                case restore_pass_send_guarded(#send{
-                    type        =   Type,
-                    message     =   {pass,  Pass},
-                    destination =   proplists:get_value(Type, Perspl)
-                }) of
-                    {ok,    was_sent} ->
-                        {true or Status, Reasons};
-                    {error, Reason} ->
-                        {false or Status, [{Type, Reason}|Reasons]}
-                end
-            end, {false, []}, [email, phone]),
-            case Status of
+            case Email == proplists:get_value(email, Perspl) of
                 true ->
-                    {ok, [{Upl}]} = domain_pers:update([{id, Id}, {pass, Pass}]),
-                    {ok, [{[
-                        {errors, [{Reasons}]}
-                        | Upl
-                    ]}]};
-                false ->
-                    {error,{no_enough_info,{[{id, Id}]}}}
+                    {ok, Pass} = lgps:new(),
+                    {Status, Reasons} = lists:foldl(fun(Type, {Status, Reasons})->
+                        case restore_pass_send_guarded(#send{
+                            type        =   Type,
+                            message     =   {pass,  Pass},
+                            destination =   proplists:get_value(Type, Perspl)
+                        }) of
+                            {ok,    was_sent} ->
+                                {true or Status, Reasons};
+                            {error, Reason} ->
+                                {false or Status, [{Type, Reason}|Reasons]}
+                        end
+                    end, {false, []}, [email, phone]),
+                    case Status of
+                        true ->
+                            case domain_pers:update([{id, Id}, {pass, Pass}]) of
+                                {ok, [{Upl}]} ->
+                                    {ok, [{[
+                                        {errors, [{Reasons}]}
+                                        | Upl
+                                    ]}]};
+                                {error,{required,[username,password]}} ->
+                                    {error,{this_is_test_user,{[{id, Id}]}}}
+                            end;
+                        false ->
+                            {error,{no_enough_info,{[{id, Id}]}}}
+                    end;
+                _ -> 
+                    io:format("~n ==> ~p ~n", [Perspl]),
+                    {error,{bad_pers,{[{id, Id}, {email,Email}]}}}
             end;
         {error, Error} ->
             {error, Error}

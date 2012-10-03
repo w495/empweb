@@ -126,6 +126,10 @@ handle(Req, #empweb_hap{
             #norm_rule{
                 key = id,
                 types = [integer]
+            },
+            #norm_rule{
+                key = email,
+                types = [string]
             }
         ]),
         fun(Data)->

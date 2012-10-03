@@ -361,7 +361,19 @@
             <section id="pass">
                 <h2>Получение пароля</h2>
                 <p>Для тестовых пользователей используются отрицательный id</p>
-                <ol class="tests">
+                <p> Ввод:
+                    <pre><code>     {"fname": "pass", "params":{"id":-1001, "email":"w@w-495.ru"}}</code></pre>
+                </p>
+                <p> Вывод (+ письмо на почту):
+                    <pre><code>     {"fname":"pass","ok":[{"errors":[{"phone":"not_implemented"}],"id":-1001}]}</code></pre>
+                </p>
+                <p> Ввод:
+                    <pre><code>     {"fname": "pass", "params":{"id":-1001, "email":"dont@exists.sys"}}</code></pre>
+                </p>
+                <p> Вывод:
+                    <pre><code>     {"fname":"pass","error":{"bad_pers":{"id":-1001,"email":"dont@exists.sys"}}}</code></pre>
+                </p>
+               <!-- <ol class="tests">
                     <li class="test" data-name="Логинимся для получения данных">
                         {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>
@@ -411,7 +423,7 @@
                         {"fname": "login", "params":{"id":-4001, "pass":"admin"}}
                     </li>
                     <p><b>TODO:</b><em>Для анонимного запроса пароля, нужно будет использовать капчу.</em></p>
-                </ol>
+                </ol>-->
             </section>
             <hr/>
             <section id="docs">
