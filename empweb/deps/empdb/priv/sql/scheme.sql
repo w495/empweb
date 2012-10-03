@@ -704,14 +704,17 @@ create table attach(
  *  Используется таблица repost.
 **/
 create table blog(
-    doc_id              decimal unique references doc(id)
+    doc_id              decimal unique references doc(id),
+    nposts              decimal default 0,
+    ncomments           decimal default 0
 );
 
 /**
  *  Запись блога 
 **/
 create table post(
-    doc_id              decimal unique references doc(id)
+    doc_id              decimal unique references doc(id),
+    ncomments           decimal default 0
 );
 
 /**

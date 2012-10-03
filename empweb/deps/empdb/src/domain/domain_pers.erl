@@ -93,10 +93,10 @@
 %%
 register(Params)->
     Pass = proplists:get_value(pass, Params),
-    case dao_pers:create(emp, [{phash, phash(Pass)}|Params]) of
-        {ok, Objects} ->
-            [{Pl}|_] = Objects,
-            Id = proplists:get_value(id, Pl),
+    case create__(phash(Pass), Params) of
+        {ok, Persobj} ->
+            [{Perspl}|_] = Persobj,
+            Id = proplists:get_value(id, Perspl),
             %% создаем запись в базе jabberd
             %case dao_pers:create_ejabberd(ejabberd, [
             case dao_pers:create_ejabberd(ejabberd, [
@@ -104,14 +104,14 @@ register(Params)->
                 {password, Pass}
             ]) of
                 {ok, _}->
-                    {ok, Objects};
+                    {ok, Persobj};
                 {error,{not_unique,<<"users">>}} ->
                     case dao_pers:update_ejabberd(ejabberd, [
                         {filter, [{username, convert:to_list(Id)}]},
                         {password, Pass}
                     ]) of
                         {ok, _}->
-                            {ok, Objects};
+                            {ok, Persobj};
                         {Eclass, Error} ->
                             {Eclass, Error}
                     end;
@@ -122,6 +122,24 @@ register(Params)->
             {Eclass, Error}
     end.
 
+
+create__(Pass, Params)->
+    dao:with_connection(emp, fun(Con)->
+        case dao_pers:create(Con, [{phash, phash(Pass)}|Params]) of
+            {ok, Persobj}->
+                [{Perspl}|_] = Persobj,
+                case dao_blog:create(Con, [{owner_id, 1}, {head, null}, {body, null}]) of
+                    {ok, [{Docpl}]} ->
+                        {ok, [{[{blog_id, proplists:get_value(id, Docpl)}|Perspl]}]};
+                    {Eclass, Error} ->
+                        {Eclass, Error}
+                end;
+            {Eclass, Error} ->
+                {Eclass, Error}
+        end
+    end).
+
+    
 %%
 %% @doc Обновляет пользователя. Если у пользователя указан пароль,
 %% то обновляется хешь пароля в базе данных сервера приложений,
@@ -138,16 +156,16 @@ update(Params)->
                 {phash, phash(Mbpass)}
                 |Params
             ])  of
-                {ok, Objects} ->
-                    [{Pl}|_] = Objects,
-                    Id = proplists:get_value(id, Pl),
+                {ok, Persobj} ->
+                    [{Perspl}|_] = Persobj,
+                    Id = proplists:get_value(id, Perspl),
                     %% изменяем запись в базе jabberd
                     case dao_pers:update_ejabberd(ejabberd, [
                         {filter, [{username, convert:to_list(Id)}]},
                         {password, Mbpass}
                     ]) of
                         {ok, _}->
-                            {ok, Objects};
+                            {ok, Persobj};
                         {Eclass, Error} ->
                             {Eclass, Error}
                     end;
