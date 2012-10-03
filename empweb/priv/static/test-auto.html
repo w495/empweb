@@ -431,13 +431,13 @@
                         {"fname": "create_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(long_string))"}}
                     </li>
                     <li class="test" data-name="Обновить комнату (абстрактную страну)">
-                        {"fname": "update_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(long_string))", "id": 2, "ulimit":100, "type_id":1}}
+                        {"fname": "update_room", "params":{"head":"room head ~(random(string))", "body":"room body ~(random(long_string))", "id": 2, "ulimit":100, "roomtype_alias":"lang"}}
                     </li>
                     <li class="test" data-name="Создать пост ">
                         {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "parent_id": 1}}
                     </li>
                     <li class="test" data-name="Создать коммент">
-                        {"fname": "create_post", "params":{"head":"comment head ~(random(string))", "body":"comment body ~(random(long_string))", "parent_id": 3}}
+                        {"fname": "create_comment", "params":{"head":"comment head ~(random(string))", "body":"comment body ~(random(long_string))", "parent_id": 3}}
                     </li>
                     <li class="test" data-name="Обновить пост ">
                         {"fname": "update_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "id": 3}}
@@ -449,7 +449,7 @@
                         {"fname": "create_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))"}}
                     </li>
                     <li class="test" data-name="Обновить сообщество">
-                        {"fname": "update_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))", "oktype_id": 2, "id": 5, "slogan":"community slogan ~(random(string))", "type_id":1}}
+                        {"fname": "update_community", "params":{"head":"community head ~(random(string))", "body":"community body ~(random(long_string))", "oktype_alias": "ok", "id": 5, "slogan":"community slogan ~(random(string))", "communitytype_alias":"secret"}}
                     </li>
                     <li class="test" data-name="Получить 3 блога текущего пользователя">
                         {"fname": "get_blog", "params":{"limit":3}}
@@ -488,7 +488,7 @@
                         {"fname": "get_post", "params":{"id": 3}}
                     </li>
                     <li class="test" data-name="Получить комент">
-                        {"fname": "get_post", "params":{"id": 4}}
+                        {"fname": "get_comment", "params":{"id": 4}}
                     </li>
                     <li class="test" data-name="Получить сообществo">
                         {"fname": "get_community", "params":{"id": 5}}
@@ -505,7 +505,35 @@
                     <li class="test" data-name="Список пользователей в сообществе 5">
                         {"fname": "get_pers", "params":{"community_id":5}}
                     </li>
+                    
+                    <li class="test" data-name="Создать пост (для удаления)">
+                        {"fname": "create_post", "params":{"head":"post head ~(random(string))", "body":"post body ~(random(long_string))", "parent_id": 1}}
+                    </li>
+                    <li class="test" data-name="Получить пост (до удаления)">
+                        {"fname": "get_post", "params":{"id": 6}}
+                    </li>
+                    <li class="test" data-name="Удалить пост ">
+                        {"fname": "delete_post", "params":{"id": 6}}
+                    </li>
+                    <li class="test" data-name="Получить пост  (после удаления)">
+                        {"fname": "get_post", "params":{"id": 6}}
+                    </li>
+                    
+                    <li class="test" data-name="Создать коммент (для удаления)">
+                        {"fname": "create_comment", "params":{"head":"comment head ~(random(string))", "body":"comment body ~(random(long_string))", "parent_id": 3}}
+                    </li>
+                    <li class="test" data-name="Получить комент (до удаления)">
+                        {"fname": "get_comment", "params":{"id": 7}}
+                    </li>
+                    <li class="test" data-name="Удалить комент">
+                        {"fname": "delete_comment", "params":{"id": 7}}
+                    </li>
+                    <li class="test" data-name="Получить комент (после удаления)">
+                        {"fname": "get_comment", "params":{"id": 7}}
+                    </li>
+                    
                     <hr/>
+                    
                     <li class="test" data-name="Логинимся как -1001">
                         {"fname": "login", "params":{"id":-1001, "pass":"admin"}}
                     </li>

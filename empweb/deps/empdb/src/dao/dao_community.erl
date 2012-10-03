@@ -72,6 +72,7 @@ table({fields, all})->
     [
         doc_id,
         communitytype_id,
+        communitytype_alias,
         slogan,
         treasury
     ];

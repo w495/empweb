@@ -144,7 +144,8 @@
     get_blog/1,
     get_blog/2,
     create_blog/1,
-    update_blog/1
+    update_blog/1,
+    delete_blog/1
 ]).
 
 %%
@@ -154,7 +155,20 @@
     get_post/1,
     get_post/2,
     create_post/1,
-    update_post/1
+    update_post/1,
+    delete_post/1
+]).
+
+
+%%
+%% Посты \ коменты
+%%
+-export([
+    get_comment/1,
+    get_comment/2,
+    create_comment/1,
+    update_comment/1,
+    delete_comment/1
 ]).
 
 %%
@@ -164,7 +178,8 @@
     get_room/1,
     get_room/2,
     create_room/1,
-    update_room/1
+    update_room/1,
+    delete_room/1
 ]).
 
 %%
@@ -174,7 +189,8 @@
     get_community/1,
     get_community/2,
     create_community/1,
-    update_community/1
+    update_community/1,
+    delete_community/1
 ]).
 
 
@@ -189,7 +205,9 @@
     get_message_from_me/1,
     get_message_from_me/2,
     create_message/1,
-    update_message/1
+    update_message/1,
+    delete_message_for_me/1,
+    delete_message_from_me/1
 ]).
 
 
@@ -383,6 +401,11 @@ create_blog(Params)->
 update_blog(Params)->
     domain_doc:update_blog(Params).
 
+
+delete_blog(Params)->
+    domain_doc:delete_blog(Params).
+
+    
 get_blog(Params)->
     get_blog(Params, []).
 
@@ -399,11 +422,35 @@ create_post(Params)->
 update_post(Params)->
     domain_doc:update_post(Params).
 
+
+delete_post(Params)->
+    domain_doc:delete_post(Params).
+
 get_post(Params)->
     domain_doc:get_post(Params).
 
 get_post(Params, Fields)->
     domain_doc:get_post(Params, Fields).
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Посты \ коменты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_comment(Params)->
+    domain_doc:create_comment(Params).
+
+update_comment(Params)->
+    domain_doc:update_comment(Params).
+
+
+delete_comment(Params)->
+    domain_doc:delete_comment(Params).
+
+get_comment(Params)->
+    domain_doc:get_comment(Params).
+
+get_comment(Params, Fields)->
+    domain_doc:get_comment(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Чат-комнаты (комнаты)
@@ -414,6 +461,9 @@ create_room(Params)->
 
 update_room(Params)->
     domain_doc:update_room(Params).
+
+delete_room(Params)->
+    domain_doc:delete_room(Params).
 
 get_room(Params)->
     domain_doc:get_room(Params).
@@ -431,6 +481,9 @@ create_community(Params)->
 update_community(Params)->
     domain_doc:update_community(Params).
 
+delete_community(Params)->
+    domain_doc:update_room(Params).
+
 get_community(Params)->
     domain_doc:get_community(Params).
 
@@ -447,6 +500,9 @@ create_message(Params)->
 update_message(Params)->
     domain_doc:update_message(Params).
 
+delete_message(Params)->
+    domain_doc:delete_message(Params).
+
 get_message(Params)->
     domain_doc:get_message(Params).
 
@@ -454,14 +510,20 @@ get_message(Params, Fields)->
     domain_doc:get_message(Params, Fields).
 
 get_message_for_me(Params)->
-    domain_doc:get_message([{isdfr, false},Params]).
+    domain_doc:get_message(Params).
+
+delete_message_for_me(Params)->
+    domain_doc:get_message(Params).
 
 get_message_for_me(Params, Fields)->
-    domain_doc:get_message([{isdfr, false},Params], Fields).
+    domain_doc:get_message(Params, Fields).
 
 get_message_from_me(Params)->
-    domain_doc:get_message([{isdfo, false},Params]).
+    domain_doc:get_message(Params).
+
+delete_message_from_me(Params)->
+    domain_doc:get_message(Params).
 
 get_message_from_me(Params, Fields)->
-    domain_doc:get_message([{isdfo, false},Params], Fields).
+    domain_doc:get_message(Params, Fields).
 

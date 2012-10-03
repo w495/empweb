@@ -4,114 +4,73 @@ create language plpgsql;
 /**
     Тригер присвоения типа документа при создании блога
 **/
-create or replace function insert_bog() returns "trigger"
+create or replace function on_insert_subdoc_inst() returns "trigger"
     as $$
 begin
-    update doc set doctype_id = (select id from doctype where alias='blog') where id=new.doc_id;
+    update doc set 
+        doctype_id = (select id from doctype where alias=TG_ARGV[0]),
+        doctype_alias = TG_ARGV[0]
+    where 
+        id=new.doc_id;
     return new;
 end;
 $$ language plpgsql;
-create trigger insert_bog after insert
-   on blog for each row execute procedure insert_bog();
+
+/**
+    Тригер присвоения типа документа при создании блога
+**/
+drop trigger if exists on_insert_subdoc_inst on blog;
+create trigger on_insert_subdoc_inst after insert
+   on blog for each row execute procedure on_insert_subdoc_inst('blog');
 
 /**
     Тригер присвоения типа документа при создании записи в блог
 **/
-create or replace function insert_post() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='post') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_post after insert
-   on post for each row execute procedure insert_post();
+drop trigger if exists on_insert_subdoc_inst on post;
+create trigger on_insert_subdoc_inst after insert
+   on post for each row execute procedure on_insert_subdoc_inst('post');
 
 /**
-    Тригер присвоения типа документа при создании комментария блога
+    Тригер присвоения типа документа при создании комментарий записи блога
 **/
-create or replace function insert_comment() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='comment') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_comment after insert
-   on comment for each row execute procedure insert_comment();
-
+drop trigger if exists on_insert_subdoc_inst on comment;
+create trigger on_insert_subdoc_inst after insert
+   on comment for each row execute procedure on_insert_subdoc_inst('comment');
 
 /**
-    Тригер присвоения типа документа при создании комментария блога
+    Тригер присвоения типа документа при создании вложения
 **/
-create or replace function insert_attach() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='attach') where id=new.doc_id;
-    return new;
-end;    
-$$ language plpgsql;
-create trigger insert_attach after insert
-   on attach for each row execute procedure insert_attach();
-
+drop trigger if exists on_insert_subdoc_inst on attach;
+create trigger on_insert_subdoc_inst after insert
+   on attach for each row execute procedure on_insert_subdoc_inst('attach');
 
 /**
     Тригер присвоения типа документа при создании комнаты
 **/
-create or replace function insert_room() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='room') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_room after insert
-   on room for each row execute procedure insert_room();
- 
+drop trigger if exists on_insert_subdoc_inst on room;
+create trigger on_insert_subdoc_inst after insert
+   on room for each row execute procedure on_insert_subdoc_inst('room');
 
 /**
     Тригер присвоения типа документа при создании сообщества
 **/
-create or replace function insert_community() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='community') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_community after insert
-   on community for each row execute procedure insert_community();
- 
- 
+drop trigger if exists on_insert_subdoc_inst on community;
+create trigger on_insert_subdoc_inst after insert
+   on community for each row execute procedure on_insert_subdoc_inst('community');
+
+/**
+    Тригер присвоения типа документа при создании комнаты
+**/
+drop trigger if exists on_insert_subdoc_inst on message;
+create trigger on_insert_subdoc_inst after insert
+   on message for each row execute procedure on_insert_subdoc_inst('message');
+
 /**
     Тригер присвоения типа документа при создании сообщения
 **/
-create or replace function insert_message() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='message') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_message after insert
-   on message for each row execute procedure insert_message();
- 
- 
-/**
-    Тригер присвоения типа документа при создании сообщества
-**/
-create or replace function insert_event() returns "trigger"
-    as $$
-begin
-    update doc set doctype_id = (select id from doctype where alias='event') where id=new.doc_id;
-    return new;
-end;
-$$ language plpgsql;
-create trigger insert_event after insert
-   on event for each row execute procedure insert_event();
- 
-
-
+drop trigger if exists on_insert_subdoc_inst on event;
+create trigger on_insert_subdoc_inst after insert
+   on event for each row execute procedure on_insert_subdoc_inst('event');
  
 /**
     Aтомарное создание комнаты для новичков.
@@ -733,7 +692,6 @@ on doc for each row execute procedure doc_util_fields_on_update();
      
      
      
-
 /**
     @room Обеспечивает совместное состояние комнаты
 **/
@@ -806,7 +764,76 @@ $$ language plpgsql;
 drop trigger if exists room_util_fields_on_update on room ;
 create trigger room_util_fields_on_update before update
 on room for each row execute procedure room_util_fields_on_update();
+
      
+create or replace function room_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+    *  Типы чат-комнат. (страна, тюрьма, ад, рай)
+    **/
+    if (not (new.roomtype_id is null)) and (new.roomtype_alias is null) then
+        new.roomtype_alias = 
+            (select roomtype.alias 
+                from 
+                    roomtype 
+                where 
+                    roomtype.id = new.roomtype_id);
+    end if;
+    if (new.roomtype_id is null) and (not (new.roomtype_alias is null)) then
+        new.roomtype_id = 
+            (select roomtype.id 
+                from 
+                    roomtype 
+                where 
+                    roomtype.alias = new.roomtype_alias);
+    end if;
+    /*
+        -- Язык комнаты
+        if (not (new.chatang_id is null)) and (new.chatang_alias is null) then
+            new.chatlang_alias = 
+                (select chatlang.alias 
+                    from 
+                        chatlang 
+                    where 
+                        chatlang.id = new.chatlang_id);
+        end if;
+        if (new.chatang_id is null) and (not (new.chatang_alias is null)) then
+            new.chatlang_id = 
+                (select chatlang.id 
+                    from 
+                        chatlang 
+                    where 
+                        chatlang.alias = new.chatlang_alias);
+        end if;
+
+        -- Режим комнаты
+        if (not (new.regimen_id is null)) and (new.regimen_alias is null) then
+            new.regimen_alias = 
+                (select regimen.alias 
+                    from 
+                        regimen 
+                    where 
+                        regimen.id = new.regimen_id
+                );
+        end if;
+        if (new.regimen_id is null) and (not (new.regimen_alias is null)) then
+            new.regimen_id = 
+                (select regimen.id 
+                    from 
+                        regimen 
+                    where 
+                        regimen.alias = new.regimen_alias
+                );
+        end if;
+    */
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists room_util_fields_on_insert on room ;
+create trigger room_util_fields_on_insert before insert
+on room for each row execute procedure room_util_fields_on_insert();
 
 
 /**
@@ -843,14 +870,46 @@ create trigger attach_util_fields_on_update before update
 on attach for each row execute procedure attach_util_fields_on_update();
 
 
+create or replace function attach_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+    *  Типы аттачей
+    **/
+    if (not (new.attachtype_id is null)) and (new.attachtype_alias is null) then
+        new.attachtype_alias = 
+            (select attachtype.alias 
+                from 
+                    attachtype 
+                where 
+                    attachtype.id = new.attachtype_id);
+    end if;
+    if (new.attachtype_id is null) and (not (new.attachtype_alias is null)) then
+        new.attachtype_id = 
+            (select attachtype.id 
+                from 
+                    attachtype 
+                where 
+                    attachtype.alias = new.attachtype_alias);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists attach_util_fields_on_insert on attach ;
+create trigger attach_util_fields_on_insert before insert
+on attach for each row execute procedure attach_util_fields_on_insert();
+
 
 /**
+    --------------------------------------------------------------------------
     @doc Обеспечивает совместное состояние cooбщества
+    --------------------------------------------------------------------------
 **/
 create or replace function community_util_fields_on_update() returns "trigger" as $$
 begin
     /**
-    *  Типы сообщества
+        Типы сообщества
     **/
     if new.communitytype_id != old.communitytype_id then
         new.communitytype_alias = 
@@ -878,10 +937,42 @@ create trigger community_util_fields_on_update before update
 on community for each row execute procedure community_util_fields_on_update();
 
 
+create or replace function community_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+    *  Типы сообщества
+    **/
+    if (not (new.communitytype_id is null)) and (new.communitytype_alias is null) then
+        new.communitytype_alias = 
+            (select communitytype.alias 
+                from 
+                    communitytype 
+                where 
+                    communitytype.id = new.communitytype_id);
+    end if;
+    if (new.communitytype_id is null) and (not (new.communitytype_alias is null)) then
+        new.communitytype_id = 
+            (select communitytype.id 
+                from 
+                    communitytype 
+                where 
+                    communitytype.alias = new.communitytype_alias);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists community_util_fields_on_insert on community ;
+create trigger community_util_fields_on_insert before insert
+on community for each row execute procedure community_util_fields_on_insert();
+
 
 
 /**
-    @doc Обеспечивает совместное состояние cooбщества
+    --------------------------------------------------------------------------
+        @doc Обеспечивает совместное состояние cooбщения
+    --------------------------------------------------------------------------
 **/
 create or replace function message_util_fields_on_update() returns "trigger" as $$
 begin
@@ -917,6 +1008,7 @@ on message for each row execute procedure message_util_fields_on_update();
 /**
     @doc Обеспечивает совместное состояние cooбщества
 **/
+
 create or replace function event_util_fields_on_update() returns "trigger" as $$
 begin
     /**
@@ -946,5 +1038,36 @@ $$ language plpgsql;
 drop trigger if exists event_util_fields_on_update on event ;
 create trigger event_util_fields_on_update before update
 on event for each row execute procedure event_util_fields_on_update();
+
+
+create or replace function event_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+    *  Типы событий
+    **/
+    if (not (new.eventtype_id is null)) and (new.eventtype_alias is null) then
+        new.eventtype_alias = 
+            (select eventtype.alias 
+                from 
+                    eventtype 
+                where 
+                    eventtype.id = new.eventtype_id);
+    end if;
+    if (new.eventtype_id is null) and (not (new.eventtype_alias is null)) then
+        new.eventtype_id = 
+            (select eventtype.id 
+                from 
+                    eventtype 
+                where 
+                    eventtype.alias = new.eventtype_alias);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists event_util_fields_on_insert on event ;
+create trigger event_util_fields_on_insert before insert
+on event for each row execute procedure event_util_fields_on_insert();
 
 

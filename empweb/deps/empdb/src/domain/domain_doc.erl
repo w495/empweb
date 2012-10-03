@@ -148,18 +148,33 @@
     get_blog/1,
     get_blog/2,
     create_blog/1,
-    update_blog/1
+    update_blog/1,
+    delete_blog/1
 ]).
 
 %%
-%% Посты \ коменты
+%% Посты 
 %%
 -export([
     get_post/1,
     get_post/2,
     create_post/1,
-    update_post/1
+    update_post/1,
+    delete_post/1
 ]).
+
+
+%%
+%% Коменты
+%%
+-export([
+    get_comment/1,
+    get_comment/2,
+    create_comment/1,
+    update_comment/1,
+    delete_comment/1
+]).
+
 
 %%
 %% Чат-комнаты (комнаты)
@@ -168,7 +183,8 @@
     get_room/1,
     get_room/2,
     create_room/1,
-    update_room/1
+    update_room/1,
+    delete_room/1
 ]).
 
 %%
@@ -178,7 +194,8 @@
     get_community/1,
     get_community/2,
     create_community/1,
-    update_community/1
+    update_community/1,
+    delete_community/1
 ]).
 
 %%
@@ -192,7 +209,9 @@
     get_message_from_me/1,
     get_message_from_me/2,
     create_message/1,
-    update_message/1
+    update_message/1,
+    delete_message_for_me/1,
+    delete_message_from_me/1
 ]).
 
 
@@ -490,13 +509,18 @@ get_blog(Params, Fileds)->
         dao_blog:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
+delete_blog(Params)->
+    dao:with_connection(fun(Con)->
+        dao_blog:update(Con, [{isdeleted, true}|Params])
+    end).
+
 is_blog_owner(Uid, Oid)->
     dao:with_connection(fun(Con)->
         dao_blog:is_owner(Con, Uid, Oid)
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Посты \ коменты
+%% Посты 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_post(Params)->
@@ -507,6 +531,11 @@ create_post(Params)->
 update_post(Params)->
     dao:with_connection(fun(Con)->
         dao_post:update(Con, Params)
+    end).
+
+delete_post(Params)->
+    dao:with_connection(fun(Con)->
+        dao_post:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_post(Params)->
@@ -525,6 +554,41 @@ is_post_owner(Uid, Oid)->
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Kоменты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+create_comment(Params)->
+    dao:with_connection(fun(Con)->
+        dao_comment:create(Con, Params)
+    end).
+
+update_comment(Params)->
+    dao:with_connection(fun(Con)->
+        dao_comment:update(Con, Params)
+    end).
+
+delete_comment(Params)->
+    dao:with_connection(fun(Con)->
+        dao_comment:update(Con, [{isdeleted, true}|Params])
+    end).
+
+get_comment(Params)->
+    dao:with_connection(fun(Con)->
+        dao_comment:get(Con, [{isdeleted, false}|Params])
+    end).
+
+get_comment(Params, Fileds)->
+    dao:with_connection(fun(Con)->
+        dao_comment:get(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+is_comment_owner(Uid, Oid)->
+    dao:with_connection(fun(Con)->
+        dao_comment:is_owner(Con, Uid, Oid)
+    end).
+    
+    
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -536,6 +600,11 @@ create_room(Params)->
 update_room(Params)->
     dao:with_connection(fun(Con)->
         dao_room:update(Con, Params)
+    end).
+
+delete_room(Params)->
+    dao:with_connection(fun(Con)->
+        dao_room:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_room(Params)->
@@ -565,6 +634,11 @@ create_community(Params)->
 update_community(Params)->
     dao:with_connection(fun(Con)->
         dao_community:update(Con, Params)
+    end).
+
+delete_community(Params)->
+    dao:with_connection(fun(Con)->
+        dao_community:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_community(Params)->
@@ -599,7 +673,13 @@ update_message(Params)->
 
 delete_message_for_me(Params)->
     dao:with_connection(fun(Con)->
-        dao_message:update(Con, Params)
+        dao_message:update(Con, [{isdfr, true},Params])
+    end).
+
+
+delete_message_from_me(Params)->
+    dao:with_connection(fun(Con)->
+        dao_message:update(Con, [{isdfr, true},Params])
     end).
 
 get_message(Params)->

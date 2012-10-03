@@ -729,10 +729,58 @@ handle(_req, #empweb_hap{
         end
     );
 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Посты \ коменты
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   update_blog,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update blog">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('update')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:update_blog([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_blog,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update blog">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('delete')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_blog([
+                        {filter, [
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ]}
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Посты 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
         is_auth =   true,
@@ -805,6 +853,134 @@ handle(_req, #empweb_hap{
             }
         end
     );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_post,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update post">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('delete')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_post([
+                        {filter, [
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ]}
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Коменты
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_comment,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get comment[s]">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('get')),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_comment(
+                        filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   create_comment,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create comment">>),
+    ?debug("Params = ~p~n", [Params]),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('create')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:create_comment([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   update_comment,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update comment">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('update')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:update_comment([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_comment,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update comment">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('delete')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_comment([
+                        {filter, [
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ]}
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Чат-комнаты (комнаты)
@@ -886,7 +1062,7 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
-                    key         = type_id,
+                    key         = roomtype_id,
                     required    = false,
                     types       = [integer]
                 },
@@ -947,7 +1123,7 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
-                    key         = type_id,
+                    key         = roomtype_id,
                     required    = false,
                     types       = [integer]
                 },
@@ -997,6 +1173,31 @@ handle(_req, #empweb_hap{
         end
     );
 
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_room,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update room">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('delete')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_room([
+                        {filter, [
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ]}
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сообщества
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1013,9 +1214,14 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = type_id,
+                key         = communitytype_id,
                 required    = false,
-                types       = [integer]
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communitytype_alias,
+                required    = false,
+                types       = [nullable, atom]
             },
             #norm_rule{
                 key         = treasury,
@@ -1056,9 +1262,14 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = type_id,
+                key         = communitytype_id,
                 required    = false,
-                types       = [integer]
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communitytype_alias,
+                required    = false,
+                types       = [nullable, atom]
             },
             #norm_rule{
                 key         = treasury,
@@ -1098,9 +1309,14 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = type_id,
+                key         = communitytype_id,
                 required    = false,
-                types       = [integer]
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communitytype_alias,
+                required    = false,
+                types       = [nullable, atom]
             },
             #norm_rule{
                 key         = treasury,
@@ -1121,6 +1337,31 @@ handle(_req, #empweb_hap{
                     biz_doc:update_community([
                         {owner_id, Pers_id}
                         |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_community,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update community">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('delete')),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_community([
+                        {filter, [
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ]}
                     ])
                 ),
                 Hap
@@ -1471,6 +1712,15 @@ doc_norm('update') ->
         |doc_norm('create')
     ];
 
+
+doc_norm('delete') ->
+    [
+        #norm_rule{
+            key         = id,
+            required    = false,
+            types       = [integer]
+        }
+    ];
 
 doc_norm([])->
     [

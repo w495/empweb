@@ -348,7 +348,7 @@ create table pers(
     /**
         Семейное положения пользователя
     **/
-    mstatus_id          decimal references mstatus(id)     default null,
+    mstatus_id          decimal         references mstatus(id)     default null,
     mstatus_alias       varchar(1024)   references mstatus(alias)     default null,
     /**
         язык пользователя

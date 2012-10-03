@@ -78,29 +78,29 @@ handle_post_body(Req, State, Pbody)->
 
 handle_data(Req, State, Bobject)->
     ?evman_args([Req, State, Bobject]),
-    % try
+    try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
         ?evman_debug({object, Object},          <<"native object">>),
         {Res, Reqres}  =  jsonapi_map(Req, Object),
         ?evman_debug({jsonapi_result, Res},  <<"jsonapi result">>),
         {Res, Reqres}
-%     catch
-%         throw:{invalid_json, _} ->
-%             {jsonapi:not_extended(invalid_json), Req};
-%         Eclass:Ereason ->
-%             ?evman_error(#event{error={Eclass,Ereason}}),
-%             {jsonapi:internal_server_error(
-%                 {[
-%                     {unknown_error,
-%                         {[
-%                             {class, jsonapi:format(Eclass)},
-%                             {reason, jsonapi:format(Ereason)}
-%                         ]}
-%                     }
-%                 ]}
-%             ), Req}
-%     end
+    catch
+        throw:{invalid_json, _} ->
+            {jsonapi:not_extended(invalid_json), Req};
+        Eclass:Ereason ->
+            ?evman_error(#event{error={Eclass,Ereason}}),
+            {jsonapi:internal_server_error(
+                {[
+                    {unknown_error,
+                        {[
+                            {class, jsonapi:format(Eclass)},
+                            {reason, jsonapi:format(Ereason)}
+                        ]}
+                    }
+                ]}
+            ), Req}
+    end
     .
 
 terminate(Req, State) ->
@@ -598,7 +598,7 @@ jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
             %%
-            %% Посты \ коменты
+            %% Посты 
             %%
             <<"get_post">> ->
                 #empweb_hap{
@@ -635,6 +635,44 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            %%
+            %% Kоменты
+            %%
+            <<"get_comment">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_comment,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_comments">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_comment,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_comment">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   create_comment,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_comment">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   update_comment,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_comment">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_comment,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };  
             %%
             %% Чат-комнаты (страны)
             %%
