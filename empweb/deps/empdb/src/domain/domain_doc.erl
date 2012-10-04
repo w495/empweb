@@ -558,17 +558,32 @@ is_post_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_comment(Params)->
-    dao:with_connection(fun(Con)->
-        dao_comment:create(Con, Params)
+    dao:with_transaction(fun(Con)->
+        Res = dao_comment:create(Con, Params),
+        case dao_post:update(Con, [
+            {filter, [{id, proplists:get_value(parent_id, Params)}]},
+            {values, [{ncomments, {incr, 1}}]},
+            {fields, [parent_id]}
+        ]) of
+            {ok, [{Postpl}]} ->
+                io:format("-> ~p ~n~n", [Postpl]),
+                dao_blog:update(Con, [
+                    {filter, [{id, proplists:get_value(parent_id, Postpl)}]},
+                    {values, [{ncomments, {incr, 1}}]}
+                ]),     
+                Res;
+            {Eclass, Error} ->
+                {Eclass, Error}            
+        end
     end).
 
 update_comment(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_comment:update(Con, Params)
     end).
 
 delete_comment(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_comment:update(Con, [{isdeleted, true}|Params])
     end).
 

@@ -176,6 +176,70 @@ fields_fieldvars(Fields, _default, Additions) ->
     end,Fields),
     [<<" ">>, [First|Res], <<" ">>].
 
+    
+    
+
+fieldtuples_fieldvars(Fields)->
+    fieldtuples_fieldvars(Fields, []).
+
+fieldtuples_fieldvars(Fields, Default)->
+    fieldtuples_fieldvars(Fields, Default, []).
+
+fieldtuples_fieldvars([], Default, _additions) ->
+    Default;
+    
+fieldtuples_fieldvars(Fields, _default, Additions) ->
+    [[_|First]|Res] = lists:map(
+        fun
+            ({Field, {incr, Num}})->
+                [   <<",">> , 
+                    [   convert:to_binary(Field), 
+                        <<" = ">>, 
+                        convert:to_binary(Field),
+                        <<" + ">>, 
+                        convert:to_list(Num)
+                    ]
+                ];
+            ({Field, {decr, Num}})->
+                [   <<",">> , 
+                    [   convert:to_binary(Field), 
+                        <<" = ">>, 
+                        convert:to_binary(Field),
+                        <<" - ">>, 
+                        convert:to_list(Num)
+                    ]
+                ];
+            ({incr, {Field, Num}})->
+                [   <<",">> , 
+                    [   convert:to_binary(Field), 
+                        <<" = ">>, 
+                        convert:to_binary(Field),
+                        <<" + ">>, 
+                        convert:to_list(Num)
+                    ]
+                ];
+            ({decr, {Field, Num}})->
+                [   <<",">> , 
+                    [   convert:to_binary(Field), 
+                        <<" = ">>, 
+                        convert:to_binary(Field),
+                        <<" - ">>, 
+                        convert:to_list(Num)
+                    ]
+                ];
+            ({Field, _})->
+                [   <<",">> , 
+                    [   convert:to_binary(Field), 
+                        <<"=$">>, 
+                        convert:to_binary(Field)
+                    ]
+                ]
+        end,
+    Fields
+    ),
+    [<<" ">>, [First|Res], <<" ">>].
+
+    
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
@@ -1120,8 +1184,8 @@ update(Current, Con, #queryobj{
             fun(F)-> lists:member(F, Common_select_fields) end,
             Returning
         ),
-    io:format("Returning = ~p~n~n~n", [Returning]),
-    io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+%     io:format("Returning = ~p~n~n~n", [Returning]),
+%     io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
     Current_all_fields =
         lists:filter(
             fun({F, _})->
@@ -1131,11 +1195,24 @@ update(Current, Con, #queryobj{
         ),
     Current_update_fields =
         lists:filter(
-            fun({F, _})->
-                lists:member(F, Common_update_fields)
+            fun
+                ({incr, {F, _}})->
+%                     io:format("F = ~p~n~n~n", [F]),
+                    lists:member(F, Common_update_fields);
+                ({decr, {F, _}})->
+%                     io:format("F = ~p~n~n~n", [F]),
+                    lists:member(F, Common_update_fields);
+                ({F, _})->
+%                     io:format("F = ~p~n~n~n", [F]),
+                    lists:member(F, Common_update_fields)
             end,
             Values
         ),
+% 
+%     io:format("Values = ~p~n~n~n", [Values]),
+%     io:format("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
+%     
+%     io:format("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
     case Current_update_fields of
         [] ->
             {ok, [{[]}]};
@@ -1155,9 +1232,7 @@ update(Current, Con, #queryobj{
             Binary_table_name = convert:to_binary(
                 table_options({table, name}, Current)
             ),
-            Binary_update_fields = fields_fieldvars(
-                proplists:get_keys(Current_update_fields)
-            ),
+            Binary_update_fields = fieldtuples_fieldvars(Current_update_fields),
             {Pfields, Where_string} =
                 sql_where(Current_all_fields),
             Query = [
@@ -1168,6 +1243,7 @@ update(Current, Con, #queryobj{
                 Where_string,
                 sql_returning(Current_returning_fields)
             ],
+            io:format("Q = ~p~n", [Query]),
             case dao:pgret(
                 dao:equery(
                     Con,Query,lists:append(Current_update_fields, Pfields)

@@ -55,8 +55,8 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
-        read_acctype_id,
-        comm_acctype_id
+        nposts,
+        ncomments
     ];
 
 %%

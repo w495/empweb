@@ -1,17 +1,40 @@
 -- create or replace language plpgsql;
 create language plpgsql;
 
+
+   
 /**
     Тригер присвоения типа документа при создании блога
 **/
 create or replace function on_insert_subdoc_inst() returns "trigger"
     as $$
+declare
+    _doc_parent_id numeric;
 begin
     update doc set 
-        doctype_id = (select id from doctype where alias=TG_ARGV[0]),
-        doctype_alias = TG_ARGV[0]
+        doctype_id      = (select id from doctype where alias=TG_ARGV[0]),
+        doctype_alias   = TG_ARGV[0]
     where 
-        id=new.doc_id;
+        id=new.doc_id 
+    returning 
+        doc.parent_id 
+    into 
+        _doc_parent_id;
+    /*
+    if 'post' = TG_ARGV[0] then
+        update blog set
+            nposts = 1 + nposts 
+        where 
+            blog.doc_id = _doc_parent_id;
+    end if;
+    
+    if 'comment' = TG_ARGV[0] then
+        update post set
+            ncomments = 1 + ncomments
+        where 
+            post.doc_id = _doc_parent_id;
+    end if;
+    */
     return new;
 end;
 $$ language plpgsql;

@@ -93,7 +93,7 @@
 %%
 register(Params)->
     Pass = proplists:get_value(pass, Params),
-    case create__(phash(Pass), Params) of
+    case create__(Pass, Params) of
         {ok, Persobj} ->
             [{Perspl}|_] = Persobj,
             Id = proplists:get_value(id, Perspl),

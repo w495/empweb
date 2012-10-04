@@ -721,7 +721,8 @@ create table post(
  *  Запись комментарий
 **/
 create table comment(
-    doc_id              decimal unique references doc(id)
+    doc_id              decimal unique references doc(id),
+    ncomments           decimal default 0
 );
 
 
