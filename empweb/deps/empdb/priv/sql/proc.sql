@@ -577,27 +577,64 @@ begin
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
-    new.oktype_alias        = 'ncons';
-    new.oktype_id           = 
-        (select id from oktype    where alias = new.oktype_alias);
+    if (new.oktype_alias is null) then
+        if not (new.oktype_id is null) then
+            new.oktype_alias = 
+                (select id from oktype where alias = new.oktype_id);
+        else
+            new.oktype_alias        = 'ncons';
+        end if;
+    end if;
+    if (new.oktype_id is null) then
+        new.oktype_id           = 
+            (select id from oktype    where alias = new.oktype_alias);
+    end if;
     /**
         Разрешение на чтение
     **/
-    new.read_acctype_alias  = 'public';
-    new.read_acctype_id     = 
-        (select id from acctype   where alias = new.read_acctype_alias); 
+    if (new.read_acctype_alias is null) then
+        if not (new.read_acctype_id is null) then
+            new.read_acctype_alias = 
+                (select id from acctype where alias = new.read_acctype_id);
+        else
+            new.read_acctype_alias  = 'public';
+        end if;
+        
+    end if;
+    if (new.read_acctype_id is null) then
+        new.read_acctype_id     = 
+            (select id from acctype   where alias = new.read_acctype_alias); 
+    end if;
     /**
         Разрешение комментов
     **/
-    new.comm_acctype_alias  = 'private';
-    new.comm_acctype_id     = 
-        (select id from acctype   where alias = new.comm_acctype_alias);
+    if (new.comm_acctype_alias is null) then
+        if not (new.comm_acctype_id is null) then
+            new.comm_acctype_alias = 
+                (select id from acctype where alias = new.comm_acctype_id);
+        else
+            new.comm_acctype_alias  = 'private';
+        end if;
+    end if;
+    if (new.comm_acctype_id is null) then
+        new.comm_acctype_id     = 
+            (select id from acctype   where alias = new.comm_acctype_alias);
+    end if;
     /**
         Типы контента: Обычный, эротический
     **/
-    new.contype_alias       = 'common';
-    new.contype_id          = 
-        (select id from contype   where alias = new.contype_alias);
+    if (new.contype_alias is null) then
+        if not (new.contype_id is null) then
+            new.contype_alias = 
+                (select id from contype where alias = new.contype_id);
+        else
+            new.contype_alias       = 'common';
+        end if;
+    end if;
+    if (new.contype_id is null) then
+        new.contype_id          = 
+            (select id from contype   where alias = new.contype_alias);
+    end if;
     return new;
 end;
 $$ language plpgsql;

@@ -1215,7 +1215,16 @@ update(Current, Con, #queryobj{
 %     io:format("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
     case Current_update_fields of
         [] ->
-            {ok, [{[]}]};
+            %{ok, [{[]}]};
+            case Current_select_fields of
+                [] -> 
+                    {ok, [{[]}]};
+                _ ->    
+                    get(Current, Con, #queryobj{
+                        filter=Filter, 
+                        fields=Current_select_fields
+                    })
+            end;
         _ ->
             Current_returning_fields =
                 case Current_select_fields of
@@ -1836,7 +1845,7 @@ equery_pl(Query, Kvpl) ->
                     {Key, Value} ->
                         {
                             [Prev,equery_variable([{cnt, Cnt}])],
-                            Cnt+1,
+                            Cnt + 1,
                             [Value|Values]
                         };
                     false ->

@@ -230,22 +230,22 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_oktype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:create_oktype(Con, Params)
     end).
 
 update_oktype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:update_oktype(Con, Params)
     end).
 
 get_oktype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_oktype(Con, [{isdeleted, false}|Params])
     end).
 
 get_oktype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_oktype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -255,22 +255,22 @@ get_oktype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_doctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:create_doctype(Con, Params)
     end).
 
 update_doctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:update_doctype(Con, Params)
     end).
 
 get_doctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_doctype(Con, [{isdeleted, false}|Params])
     end).
 
 get_doctype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_doctype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -279,22 +279,22 @@ get_doctype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_contype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:create_contype(Con, Params)
     end).
 
 update_contype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:update_contype(Con, Params)
     end).
 
 get_contype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_contype(Con, [{isdeleted, false}|Params])
     end).
 
 get_contype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_contype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -304,22 +304,22 @@ get_contype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_acctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:create_acctype(Con, Params)
     end).
 
 update_acctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:update_acctype(Con, Params)
     end).
 
 get_acctype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_acctype(Con, [{isdeleted, false}|Params])
     end).
 
 get_acctype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_doc:get_acctype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -328,22 +328,22 @@ get_acctype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_roomtype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:create_roomtype(Con, Params)
     end).
 
 update_roomtype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update_roomtype(Con, Params)
     end).
 
 get_roomtype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_roomtype(Con, [{isdeleted, false}|Params])
     end).
 
 get_roomtype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_roomtype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -352,22 +352,22 @@ get_roomtype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_chatlang(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:create_chatlang(Con, Params)
     end).
 
 update_chatlang(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update_chatlang(Con, Params)
     end).
 
 get_chatlang(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_chatlang(Con, [{isdeleted, false}|Params])
     end).
 
 get_chatlang(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_chatlang(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -376,22 +376,22 @@ get_chatlang(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_regimen(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:create_regimen(Con, Params)
     end).
 
 update_regimen(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update_regimen(Con, Params)
     end).
 
 get_regimen(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_regimen(Con, [{isdeleted, false}|Params])
     end).
 
 get_regimen(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_regimen(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -411,22 +411,22 @@ get_regimen(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_topic(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:create_topic(Con, Params)
     end).
 
 update_topic(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update_topic(Con, Params)
     end).
 
 get_topic(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_topic(Con, [{isdeleted, false}|Params])
     end).
 
 get_topic(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get_topic(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -435,22 +435,22 @@ get_topic(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_communitytype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:create_communitytype(Con, Params)
     end).
 
 update_communitytype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:update_communitytype(Con, Params)
     end).
 
 get_communitytype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:get_communitytype(Con, [{isdeleted, false}|Params])
     end).
 
 get_communitytype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:get_communitytype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -459,22 +459,22 @@ get_communitytype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_messagetype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:create_messagetype(Con, Params)
     end).
 
 update_messagetype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:update_messagetype(Con, Params)
     end).
 
 get_messagetype(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:get_messagetype(Con, [{isdeleted, false}|Params])
     end).
 
 get_messagetype(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:get_messagetype(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
@@ -490,32 +490,32 @@ get_messagetype(Params, Fileds)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_blog(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:create(Con, Params)
     end).
 
 update_blog(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:update(Con, Params)
     end).
 
 get_blog(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_blog(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 delete_blog(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:update(Con, [{isdeleted, true}|Params])
     end).
 
 is_blog_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_blog:is_owner(Con, Uid, Oid)
     end).
 
@@ -524,32 +524,32 @@ is_blog_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_post(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:create(Con, Params)
     end).
 
 update_post(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:update(Con, Params)
     end).
 
 delete_post(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_post(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_post(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_post_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_post:is_owner(Con, Uid, Oid)
     end).
 
@@ -557,23 +557,41 @@ is_post_owner(Uid, Oid)->
 %% Kоменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+%%
+%% @doc Добавляет комментарий, 
+%% Увеливает счетчик комментариев у поста и блога.
+%% Все действия в одной транзакции.
+%%
 create_comment(Params)->
     dao:with_transaction(fun(Con)->
+        %% Создаем
         Res = dao_comment:create(Con, Params),
-        case dao_post:update(Con, [
-            {filter, [{id, proplists:get_value(parent_id, Params)}]},
-            {values, [{ncomments, {incr, 1}}]},
-            {fields, [parent_id]}
-        ]) of
-            {ok, [{Postpl}]} ->
-                io:format("-> ~p ~n~n", [Postpl]),
-                dao_blog:update(Con, [
-                    {filter, [{id, proplists:get_value(parent_id, Postpl)}]},
-                    {values, [{ncomments, {incr, 1}}]}
-                ]),     
+        case proplists:get_value(parent_id, Params) of
+            undefined ->
                 Res;
-            {Eclass, Error} ->
-                {Eclass, Error}            
+            Parent_id ->
+                %% Увеличиваем счетчик комментариев у поста,
+                %% к которому относитсится этот комментарий
+                case dao_post:update(Con, [
+                    {filter, [{id, Parent_id}]},
+                    {values, [{ncomments, {incr, 1}}]},
+                    {fields, [parent_id]}
+                ]) of
+                    {ok, [{Postpl}]} ->
+                        %% Увеличиваем счетчик комментариев у блога,
+                        %% к которому относитсится пост этотого комментария.
+                        dao_blog:update(Con, [
+                            {filter, [
+                                {id, proplists:get_value(parent_id, Postpl)}
+                            ]},
+                            {values, [{ncomments, {incr, 1}}]}
+                        ]),     
+                        Res;
+                    {Eclass, Error} ->
+                        {Eclass, Error}            
+                end
         end
     end).
 
@@ -582,23 +600,52 @@ update_comment(Params)->
         dao_comment:update(Con, Params)
     end).
 
-delete_comment(Params)->
+%%
+%% @doc Удаляет комментарий, 
+%% Уменьшает счетчик комментариев у поста и блога. 
+%% Все действия в одной транзакции.
+%%
+delete_comment(Filter)->
     dao:with_transaction(fun(Con)->
-        dao_comment:update(Con, [{isdeleted, true}|Params])
+        %% Удаляем
+        {ok, [{Respl}]}= Res = dao_comment:update(Con, [
+            {values, [{isdeleted, true}]}, 
+            {filter, [{isdeleted, false}|Filter]},
+            {fields, [parent_id]}
+        ]),
+        io:format("Respl = ~p~n", [Respl]),
+        %% Уменьшаем счетчик комментариев у поста,
+        %% к которому относитсится этот комментарий.
+        case dao_post:update(Con, [
+            {filter, [{id, proplists:get_value(parent_id, Respl)}]},
+            {values, [{ncomments, {decr, 1}}]},
+            {fields, [parent_id]}
+        ]) of
+            {ok, [{Postpl}]} ->
+                %% Уменьшаем счетчик комментариев у блога,
+                %% к которому относитсится пост этотого комментария.
+                dao_blog:update(Con, [
+                    {filter, [{id, proplists:get_value(parent_id, Postpl)}]},
+                    {values, [{ncomments, {decr, 1}}]}
+                ]),     
+                Res;
+            {Eclass, Error} ->
+                {Eclass, Error}
+        end
     end).
 
 get_comment(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_comment:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_comment(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_comment:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_comment_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_comment:is_owner(Con, Uid, Oid)
     end).
     
@@ -608,32 +655,32 @@ is_comment_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_room(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:create(Con, Params)
     end).
 
 update_room(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update(Con, Params)
     end).
 
 delete_room(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_room(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_room(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_room_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_room:is_owner(Con, Uid, Oid)
     end).
 
@@ -642,32 +689,32 @@ is_room_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_community(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:create(Con, Params)
     end).
 
 update_community(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:update(Con, Params)
     end).
 
 delete_community(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:update(Con, [{isdeleted, true}|Params])
     end).
 
 get_community(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_community(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_community_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_community:is_owner(Con, Uid, Oid)
     end).
 
@@ -677,38 +724,38 @@ is_community_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_message(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:create(Con, Params)
     end).
 
 update_message(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:update(Con, Params)
     end).
 
 delete_message_for_me(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:update(Con, [{isdfr, true},Params])
     end).
 
 
 delete_message_from_me(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:update(Con, [{isdfr, true},Params])
     end).
 
 get_message(Params)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_message(Params, Fileds)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_message_owner(Uid, Oid)->
-    dao:with_connection(fun(Con)->
+    dao:with_transaction(fun(Con)->
         dao_message:is_owner(Con, Uid, Oid)
     end).
 
