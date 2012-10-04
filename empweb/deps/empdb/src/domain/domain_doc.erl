@@ -523,7 +523,11 @@ is_blog_owner(Uid, Oid)->
 %% Посты 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-create_post(Params)->
+%%
+%% @doc Добавляет пост в блог.
+%% Все действия в одной транзакции.
+%%
+create_post(Params) ->
     dao:with_transaction(fun(Con)->
         dao_post:create(Con, Params)
     end).
@@ -533,11 +537,20 @@ update_post(Params)->
         dao_post:update(Con, Params)
     end).
 
-delete_post(Params)->
+%%
+%% @doc Удаляет пост. 
+%% Все действия в одной транзакции.
+%%
+delete_post(Filter)->
     dao:with_transaction(fun(Con)->
-        dao_post:update(Con, [{isdeleted, true}|Params])
+        %% Удаляем
+        dao_post:update(Con, [
+            {values, [{isdeleted, true}]}, 
+            {filter, [{isdeleted, false}|Filter]}
+        ])
     end).
 
+    
 get_post(Params)->
     dao:with_transaction(fun(Con)->
         dao_post:get(Con, [{isdeleted, false}|Params])
@@ -557,42 +570,14 @@ is_post_owner(Uid, Oid)->
 %% Kоменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 %%
 %% @doc Добавляет комментарий, 
-%% Увеливает счетчик комментариев у поста и блога.
 %% Все действия в одной транзакции.
 %%
 create_comment(Params)->
     dao:with_transaction(fun(Con)->
         %% Создаем
-        Res = dao_comment:create(Con, Params),
-        case proplists:get_value(parent_id, Params) of
-            undefined ->
-                Res;
-            Parent_id ->
-                %% Увеличиваем счетчик комментариев у поста,
-                %% к которому относитсится этот комментарий
-                case dao_post:update(Con, [
-                    {filter, [{id, Parent_id}]},
-                    {values, [{ncomments, {incr, 1}}]},
-                    {fields, [parent_id]}
-                ]) of
-                    {ok, [{Postpl}]} ->
-                        %% Увеличиваем счетчик комментариев у блога,
-                        %% к которому относитсится пост этотого комментария.
-                        dao_blog:update(Con, [
-                            {filter, [
-                                {id, proplists:get_value(parent_id, Postpl)}
-                            ]},
-                            {values, [{ncomments, {incr, 1}}]}
-                        ]),     
-                        Res;
-                    {Eclass, Error} ->
-                        {Eclass, Error}            
-                end
-        end
+        dao_comment:create(Con, Params)
     end).
 
 update_comment(Params)->
@@ -602,36 +587,14 @@ update_comment(Params)->
 
 %%
 %% @doc Удаляет комментарий, 
-%% Уменьшает счетчик комментариев у поста и блога. 
 %% Все действия в одной транзакции.
 %%
 delete_comment(Filter)->
     dao:with_transaction(fun(Con)->
-        %% Удаляем
-        {ok, [{Respl}]}= Res = dao_comment:update(Con, [
+        dao_comment:update(Con, [
             {values, [{isdeleted, true}]}, 
-            {filter, [{isdeleted, false}|Filter]},
-            {fields, [parent_id]}
-        ]),
-        io:format("Respl = ~p~n", [Respl]),
-        %% Уменьшаем счетчик комментариев у поста,
-        %% к которому относитсится этот комментарий.
-        case dao_post:update(Con, [
-            {filter, [{id, proplists:get_value(parent_id, Respl)}]},
-            {values, [{ncomments, {decr, 1}}]},
-            {fields, [parent_id]}
-        ]) of
-            {ok, [{Postpl}]} ->
-                %% Уменьшаем счетчик комментариев у блога,
-                %% к которому относитсится пост этотого комментария.
-                dao_blog:update(Con, [
-                    {filter, [{id, proplists:get_value(parent_id, Postpl)}]},
-                    {values, [{ncomments, {decr, 1}}]}
-                ]),     
-                Res;
-            {Eclass, Error} ->
-                {Eclass, Error}
-        end
+            {filter, [{isdeleted, false}|Filter]}
+        ])
     end).
 
 get_comment(Params)->

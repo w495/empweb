@@ -17,6 +17,7 @@
     table/0,
     create/2,
     update/2,
+    count_comments/2,
     get/2,
     get/3
 ]).
@@ -89,7 +90,18 @@ update(Con, Proplist)->
 is_owner(Con, Owner_id, Obj_id) ->
     dao_doc:is_owner(Con, Owner_id, Obj_id).
 
-
+count_comments(Con, Params)->
+    dao:eqret(Con,
+        " select "
+            " count(doc_comment.id) "
+        " from "
+            " doc as doc_comment "
+        " where "
+            "       doc_comment.doctype_alias  = 'comment' "
+            " and   doc_comment.isdeleted      = false ",
+            " and   doc_comment.parent_id      = $id ",
+        Params
+    ).
 
 %%
 %% Local Functions

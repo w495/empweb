@@ -97,6 +97,7 @@ table({fields, all})->
         contype_alias,
         owner_id,
         parent_id,
+        vcounter,
         created,
         nchildren,  %% количество детей
         nnodes,     %% количество потомков
@@ -126,12 +127,18 @@ get(Con, What) ->
 %%      Наследник должен быть описан в модуле Module.
 %%
 get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
-   case dao:get([{?MODULE, id}, {Module, doc_id}], Con, alias2id_pl(What, [])) of
-        {ok, Doc} ->
-            {ok, id2alias_pl(Doc, [])};
-        Error ->
-            Error 
-    end;
+    ?MODULE:update(Con, [
+        {filter, What},
+        {values, [{vcounter, {incr, 1}}]}
+    ]),
+    dao:get([{?MODULE, id}, {Module, doc_id}], Con, What);
+
+%     case dao:get([{?MODULE, id}, {Module, doc_id}], Con, alias2id_pl(What, [])) of
+%         {ok, Doc} ->
+%             {ok, id2alias_pl(Doc, [])};
+%         Error ->
+%             Error 
+%     end;
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).
@@ -142,12 +149,19 @@ get(Con, What, Fields)->
 %%
 get(Module, Con, What, Fields)->
     io:format("What, Fields = ~p~n", [{What, Fields}]),
-    case dao:get([{?MODULE, id},{Module, doc_id}], Con, alias2id_pl(What, []), alias2id_fields(Fields, [])) of
-        {ok, Doc} ->
-            {ok, id2alias_pl(Doc, [])};
-        Error ->
-            Error 
-    end.
+    ?MODULE:update(Con, [
+        {filter, What},
+        {values, [{vcounter, {incr, 1}}]}
+    ]),
+    dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
+    
+    
+%     case dao:get([{?MODULE, id},{Module, doc_id}], Con, alias2id_pl(What, []), alias2id_fields(Fields, [])) of
+%         {ok, Doc} ->
+%             {ok, id2alias_pl(Doc, [])};
+%         Error ->
+%             Error 
+%     end.
 
 create(Con, What)->
     dao:create(?MODULE, Con, alias2id_pl(What, [])).

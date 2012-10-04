@@ -385,21 +385,21 @@ sql_cond({Ff, {ilike, Like}})
     };
 
 sql_cond({Ff, {lt, Val}}) ->
-    {   [{Ff, Val}],
+    {   [{cond_atom(Ff), Val}],
         [   convert:to_binary(Ff),
             <<" < $">>,
-            convert:to_binary(Ff)
+            convert:to_binary(cond_atom(Ff))
         ]
     };
 
 sql_cond({Ff, {lte, Val}}) ->
-    {[{Ff, Val}], [convert:to_binary(Ff),<<" <= $">>,convert:to_binary(Ff)]};
+    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" <= $">>,convert:to_binary(cond_atom(Ff))]};
 
 sql_cond({Ff, {gt, Val}}) ->
-    {[{Ff, Val}], [convert:to_binary(Ff),<<" > $">>,convert:to_binary(Ff)]};
+    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" > $">>,convert:to_binary(cond_atom(Ff))]};
 
 sql_cond({Ff, {gte, Val}}) ->
-    {[{Ff, Val}], [convert:to_binary(Ff),<<" >= $">>,convert:to_binary(Ff)]};
+    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" >= $">>,convert:to_binary(cond_atom(Ff))]};
 
 sql_cond({Ff, {in, []}}) ->
     {[], []};
@@ -419,12 +419,16 @@ sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
     
 sql_cond({Ff, Val} = Tuple) ->
     io:format("Tuple = ~p~n~n", [Tuple]),
-    {[{Ff, Val}], [
+    {[{cond_atom(Ff), Val}], [
         convert:to_binary(Ff),
         <<" = $">>,
-        convert:to_binary(Ff)
+        convert:to_binary(cond_atom(Ff))
     ]}.
 
+cond_atom(Ff)->
+    erlang:list_to_atom("`" ++ erlang:atom_to_list(Ff) ++ "@filter`").
+
+    
 sql_where(<<>>)->
     {[], []};
 
@@ -1259,7 +1263,8 @@ update(Current, Con, #queryobj{
                 )
             ) of
                 {ok, 0} ->
-                    create(Current, Con, Queryobj);
+                    {ok, []};
+                    %create(Current, Con, Queryobj);
                 Result ->
                     Result
             end

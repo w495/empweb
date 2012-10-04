@@ -42,57 +42,57 @@ $$ language plpgsql;
 /**
     Тригер присвоения типа документа при создании блога
 **/
-drop trigger if exists on_insert_subdoc_inst on blog;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on blog;
+create trigger t1on_insert_subdoc_inst after insert
    on blog for each row execute procedure on_insert_subdoc_inst('blog');
 
 /**
     Тригер присвоения типа документа при создании записи в блог
 **/
-drop trigger if exists on_insert_subdoc_inst on post;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on post;
+create trigger t1on_insert_subdoc_inst after insert
    on post for each row execute procedure on_insert_subdoc_inst('post');
 
 /**
     Тригер присвоения типа документа при создании комментарий записи блога
 **/
-drop trigger if exists on_insert_subdoc_inst on comment;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on comment;
+create trigger t1on_insert_subdoc_inst after insert
    on comment for each row execute procedure on_insert_subdoc_inst('comment');
 
 /**
     Тригер присвоения типа документа при создании вложения
 **/
-drop trigger if exists on_insert_subdoc_inst on attach;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on attach;
+create trigger t1on_insert_subdoc_inst after insert
    on attach for each row execute procedure on_insert_subdoc_inst('attach');
 
 /**
     Тригер присвоения типа документа при создании комнаты
 **/
-drop trigger if exists on_insert_subdoc_inst on room;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on room;
+create trigger t1on_insert_subdoc_inst after insert
    on room for each row execute procedure on_insert_subdoc_inst('room');
 
 /**
     Тригер присвоения типа документа при создании сообщества
 **/
-drop trigger if exists on_insert_subdoc_inst on community;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on community;
+create trigger t1on_insert_subdoc_inst after insert
    on community for each row execute procedure on_insert_subdoc_inst('community');
 
 /**
     Тригер присвоения типа документа при создании комнаты
 **/
-drop trigger if exists on_insert_subdoc_inst on message;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on message;
+create trigger t1on_insert_subdoc_inst after insert
    on message for each row execute procedure on_insert_subdoc_inst('message');
 
 /**
     Тригер присвоения типа документа при создании сообщения
 **/
-drop trigger if exists on_insert_subdoc_inst on event;
-create trigger on_insert_subdoc_inst after insert
+drop trigger if exists t1on_insert_subdoc_inst on event;
+create trigger t1on_insert_subdoc_inst after insert
    on event for each row execute procedure on_insert_subdoc_inst('event');
  
 /**
@@ -390,16 +390,16 @@ $$ language plpgsql;
 **/
 create or replace function count_children_on(t varchar) returns void as $$
 begin
-    execute 'drop trigger if exists count_children_on_update on '||t||';
-    create trigger count_children_on_update before update
+    execute 'drop trigger if exists t1count_children_on_update on '||t||';
+    create trigger t1count_children_on_update before update
     on '||t||' for each row execute procedure count_children_on_update();
     
-    drop trigger if exists count_children_on_insert on '||t||'  ;
-    create trigger count_children_on_insert after insert
+    drop trigger if exists t1count_children_on_insert on '||t||'  ;
+    create trigger t1count_children_on_insert after insert
     on '||t||' for each row execute procedure count_children_on_insert();
 
-    drop trigger if exists count_children_on_delete on '||t||'  ;
-    create trigger count_children_on_delete after delete
+    drop trigger if exists t1count_children_on_delete on '||t||'  ;
+    create trigger t1count_children_on_delete after delete
     on '||t||' for each row execute procedure count_children_on_delete();';
     return;
 end;
@@ -412,6 +412,9 @@ select count_children_on('topic');
     --- тригеры для подсчета дочерних элементов дерева тем.
 select count_children_on('thingtype');
     --- тригеры для подсчета дочерних элементов дерева типов вещей.
+    
+
+    
     
 
 
@@ -459,8 +462,8 @@ $$ language plpgsql;
 /**
     Тригер начального состояния пользователя
 **/
-drop trigger if exists pers_util_fields_on_insert on pers ;
-create trigger pers_util_fields_on_insert before insert
+drop trigger if exists t1pers_util_fields_on_insert on pers ;
+create trigger t1pers_util_fields_on_insert before insert
 on pers for each row execute procedure pers_util_fields_on_insert();
      
 
@@ -565,8 +568,8 @@ $$ language plpgsql;
 
      
      
-drop trigger if exists pers_util_fields_on_update on pers ;
-create trigger pers_util_fields_on_update before update
+drop trigger if exists t1pers_util_fields_on_update on pers ;
+create trigger t1pers_util_fields_on_update before update
 on pers for each row execute procedure pers_util_fields_on_update();
      
 /**
@@ -640,8 +643,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists doc_util_fields_on_insert on doc ;
-create trigger doc_util_fields_on_insert before insert
+drop trigger if exists t1doc_util_fields_on_insert on doc ;
+create trigger t1doc_util_fields_on_insert before insert
 on doc for each row execute procedure doc_util_fields_on_insert();
      
 
@@ -686,19 +689,19 @@ begin
     **/
     if new.read_acctype_id != old.read_acctype_id then
         new.read_acctype_alias = 
-            (select read_acctype.alias 
+            (select acctype.alias 
                 from 
-                    read_acctype 
+                    acctype 
                 where 
-                    read_acctype.id = new.read_acctype_id);
+                    acctype.id = new.read_acctype_id);
     end if;
     if new.read_acctype_alias != old.read_acctype_alias then
         new.read_acctype_id = 
-            (select read_acctype.id 
+            (select acctype.id 
                 from 
-                    read_acctype 
+                    acctype 
                 where 
-                    read_acctype.alias = new.read_acctype_alias);
+                    acctype.alias = new.read_acctype_alias);
     end if;
     /**
         Разрешение комментов
@@ -746,8 +749,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists doc_util_fields_on_update on doc ;
-create trigger doc_util_fields_on_update before update
+drop trigger if exists t1doc_util_fields_on_update on doc ;
+create trigger t1doc_util_fields_on_update before update
 on doc for each row execute procedure doc_util_fields_on_update();
      
      
@@ -821,8 +824,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists room_util_fields_on_update on room ;
-create trigger room_util_fields_on_update before update
+drop trigger if exists t1room_util_fields_on_update on room ;
+create trigger t1room_util_fields_on_update before update
 on room for each row execute procedure room_util_fields_on_update();
 
      
@@ -891,8 +894,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists room_util_fields_on_insert on room ;
-create trigger room_util_fields_on_insert before insert
+drop trigger if exists t1room_util_fields_on_insert on room ;
+create trigger t1room_util_fields_on_insert before insert
 on room for each row execute procedure room_util_fields_on_insert();
 
 
@@ -925,8 +928,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists attach_util_fields_on_update on attach ;
-create trigger attach_util_fields_on_update before update
+drop trigger if exists t1attach_util_fields_on_update on attach ;
+create trigger t1attach_util_fields_on_update before update
 on attach for each row execute procedure attach_util_fields_on_update();
 
 
@@ -956,8 +959,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists attach_util_fields_on_insert on attach ;
-create trigger attach_util_fields_on_insert before insert
+drop trigger if exists t1attach_util_fields_on_insert on attach ;
+create trigger t1attach_util_fields_on_insert before insert
 on attach for each row execute procedure attach_util_fields_on_insert();
 
 
@@ -992,8 +995,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists community_util_fields_on_update on community ;
-create trigger community_util_fields_on_update before update
+drop trigger if exists t1community_util_fields_on_update on community ;
+create trigger t1community_util_fields_on_update before update
 on community for each row execute procedure community_util_fields_on_update();
 
 
@@ -1023,8 +1026,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists community_util_fields_on_insert on community ;
-create trigger community_util_fields_on_insert before insert
+drop trigger if exists t1community_util_fields_on_insert on community ;
+create trigger t1community_util_fields_on_insert before insert
 on community for each row execute procedure community_util_fields_on_insert();
 
 
@@ -1060,8 +1063,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists message_util_fields_on_update on message ;
-create trigger message_util_fields_on_update before update
+drop trigger if exists t1message_util_fields_on_update on message ;
+create trigger t1message_util_fields_on_update before update
 on message for each row execute procedure message_util_fields_on_update();
 
 
@@ -1095,8 +1098,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists event_util_fields_on_update on event ;
-create trigger event_util_fields_on_update before update
+drop trigger if exists t1event_util_fields_on_update on event ;
+create trigger t1event_util_fields_on_update before update
 on event for each row execute procedure event_util_fields_on_update();
 
 
@@ -1126,8 +1129,8 @@ end;
 $$ language plpgsql;
 
 
-drop trigger if exists event_util_fields_on_insert on event ;
-create trigger event_util_fields_on_insert before insert
+drop trigger if exists t1event_util_fields_on_insert on event ;
+create trigger t1event_util_fields_on_insert before insert
 on event for each row execute procedure event_util_fields_on_insert();
 
 
