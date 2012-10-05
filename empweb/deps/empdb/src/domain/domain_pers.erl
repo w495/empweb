@@ -237,11 +237,41 @@ login({Uf, Uv}, Params) ->
                                 ]}
                         }};
                     _ ->
-                        {ok,[{[{id,Pstatus_id}]}]} = dao_pers:get_pstatus(Con, [{alias, online}], [id]),
+                        {ok,[{[{id,Pstatus_id}]}]} =
+                            dao_pers:get_pstatus(Con, [{alias, online}], [id]),
+                        %%
+                        %% Ставим пользователю статус online
+                        %%
                         dao_pers:update(Con, [{pstatus_id, Pstatus_id}|Params]),
+                        %%
+                        %% Получаем блог пользователя.
+                        %%
+                        {ok, [Blog]} =
+                            dao_blog:get_adds(Con, dao_blog:get(Con, [
+                                {owner_id, proplists:get_value(id, Userpl)},
+                                {limit, 1}
+                            ], [
+                                vcounter,
+                                nprotectedposts,
+                                nprivateposts,
+                                npublicposts,
+                                ncomments,
+                                nposts,
+                                contype_alias,
+                                contype_id,
+                                comm_acctype_alias,
+                                comm_acctype_id,
+                                read_acctype_alias,
+                                read_acctype_id,
+                                id
+                            ])),
+                        %%
+                        %% Получаем комнату пользователя
+                        %%
                         {ok, [Room]} =
-                            dao_room:get(emp, [
-                                {id, proplists:get_value(room_id, Userpl)}
+                            dao_room:get(Con, [
+                                {id, proplists:get_value(room_id, Userpl)},
+                                {limit, 1}
                             ], [
                                 id,
                                 head,
@@ -258,7 +288,12 @@ login({Uf, Uv}, Params) ->
                                 weather,
                                 treasury
                             ]),
-                        {ok, [{[{perm_names, Perm_names}, {room, Room}|Userpl]}]}
+                        {ok, [{[
+                            {perm_names, Perm_names},
+                            {blog, Blog},
+                            {room, Room}
+                            |Userpl
+                        ]}]}
                 end;
             _ ->
                 %% Нет такого пользователя

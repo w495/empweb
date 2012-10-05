@@ -685,6 +685,30 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
+        action  =   get_my_blog,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get blog[s]">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('get')),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_blog([
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ],
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
         action  =   create_blog,
         params  =   Params,
         pers_id =   Pers_id
@@ -1475,7 +1499,7 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   delete_message_for_me,
-        params  =   Params,
+        params  =   Params, 
         pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update message">>),
