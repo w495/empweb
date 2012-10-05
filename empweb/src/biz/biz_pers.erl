@@ -242,7 +242,12 @@ login(Params) ->
                 {pers,          Userpl},
                 {session_id,    Session_id}
             ]}),
-            {ok, [{[{session_id, Session_id}|proplists:delete(perm_names,   Userpl)]}]};
+            {ok, [{[
+                {session_id, Session_id}
+                |   proplists:delete(perm_names,
+                        proplists:delete(phash,   Userpl)
+                    )
+            ]}]};
         {error, Error} ->
             {error, Error}
     end.
