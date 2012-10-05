@@ -831,6 +831,30 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
+        action  =   get_my_post,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get post[s]">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('get')),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_post([
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ],
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
         action  =   create_post,
         params  =   Params,
         pers_id =   Pers_id
@@ -929,6 +953,31 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_my_comment,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get comment[s]">>),
+    jsonapi:handle_params(
+        norm:norm(Params, doc_norm('get')),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_comment([
+                            {owner_id, Pers_id}
+                            |Data#norm.return
+                        ],
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create_comment,
@@ -1015,7 +1064,12 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
-                    key         = type_id,
+                    key         = roomtype_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = roomtype_alias,
                     required    = false,
                     types       = [integer]
                 },
@@ -1031,6 +1085,11 @@ handle(_req, #empweb_hap{
                 },
                 #norm_rule{
                     key         = chatlang_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_alias,
                     required    = false,
                     types       = [integer]
                 },
@@ -1079,6 +1138,11 @@ handle(_req, #empweb_hap{
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+                #norm_rule{
+                    key         = roomtype_id,
+                    required    = false,
+                    types       = [integer]
+                },
                 #norm_rule{
                     key         = roomtype_id,
                     required    = false,

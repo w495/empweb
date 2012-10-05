@@ -128,7 +128,7 @@ create__(Pass, Params)->
         case dao_pers:create(Con, [{phash, phash(Pass)}|Params]) of
             {ok, Persobj}->
                 [{Perspl}|_] = Persobj,
-                case dao_blog:create(Con, [{owner_id, 1}, {head, null}, {body, null}]) of
+                case dao_blog:create(Con, [{owner_id,  proplists:get_value(id, Perspl)}, {head, null}, {body, null}]) of
                     {ok, [{Docpl}]} ->
                         {ok, [{[{blog_id, proplists:get_value(id, Docpl)}|Perspl]}]};
                     {Eclass, Error} ->
