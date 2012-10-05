@@ -767,10 +767,8 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:delete_blog([
-                        {filter, [
-                            {owner_id, Pers_id}
-                            |Data#norm.return
-                        ]}
+                        {owner_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap
@@ -868,10 +866,8 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:delete_post([
-                        {filter, [
-                            {owner_id, Pers_id}
-                            |Data#norm.return
-                        ]}
+                        {owner_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap
@@ -970,10 +966,8 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:delete_comment([
-                        {filter, [
-                            {owner_id, Pers_id}
-                            |Data#norm.return
-                        ]}
+                        {owner_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap
@@ -1187,10 +1181,8 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:delete_room([
-                        {filter, [
-                            {owner_id, Pers_id}
-                            |Data#norm.return
-                        ]}
+                        {owner_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap
@@ -1358,10 +1350,8 @@ handle(_req, #empweb_hap{
             {ok,
                 jsonapi:resp(
                     biz_doc:delete_community([
-                        {filter, [
-                            {owner_id, Pers_id}
-                            |Data#norm.return
-                        ]}
+                        {owner_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap
