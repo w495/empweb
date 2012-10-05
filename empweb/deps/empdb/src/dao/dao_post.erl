@@ -56,8 +56,8 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        doc_id,
-        ncomments
+        doc_id
+%         ncomments
     ];
 
 %%
@@ -75,8 +75,8 @@ table(name)->
 table()->
     table(name).
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     dao_doc:get(?MODULE, Con, What, Fields).
@@ -98,7 +98,7 @@ count_comments(Con, Params)->
             " doc as doc_comment "
         " where "
             "       doc_comment.doctype_alias  = 'comment' "
-            " and   doc_comment.isdeleted      = false ",
+            " and   doc_comment.isdeleted      = false "
             " and   doc_comment.parent_id      = $id ",
         Params
     ).

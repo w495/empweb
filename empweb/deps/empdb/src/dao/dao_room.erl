@@ -105,9 +105,12 @@ table({fields, all})->
     [
         doc_id,
         roomtype_id,
+        roomtype_alias,
         ulimit,
         chatlang_id,
+        chatlang_alias,
         regimen_id,
+        regimen_alias,
         topic_id,
         slogan,
         weather,

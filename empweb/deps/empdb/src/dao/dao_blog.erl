@@ -56,12 +56,12 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        doc_id,
-        nposts,
-        npublicposts,
-        nprivateposts,
-        nprotectedposts,
-        ncomments
+        doc_id
+%        nposts,
+%         npublicposts,
+%         nprivateposts,
+%         nprotectedposts,
+%        ncomments
     ];
 
 %%
@@ -79,8 +79,8 @@ table(name)->
 table()->
     table(name).
 
-get(Con, Some) ->
-    get(Con, Some, []).
+get(Con, What) ->
+    dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     io:format("What, Fields = ~p~n", [{What, Fields}]),
@@ -109,7 +109,7 @@ count_posts(Con, Params)->
                 ]}
                 end, List_
             ),
-            [
+            {ok, [
                 {[
                     {read_acctype_alias, all},
                     {count, lists:foldl(fun({Itempl}, Acc)->
@@ -117,10 +117,15 @@ count_posts(Con, Params)->
                         end, 0, List
                     )}
                 ]}|List
-            ];
+            ]};
         {Eclass, Error} ->
             {Eclass, Error}
     end.
+% 
+% count_posts_and_comments(Con, Params)->
+%     {ok, List} = count_posts(Con, Params)
+%     {[{read_acctype_alias,Typ},{count,10}]}
+%
 
 count_comments(Con, Params)->
     dao:eqret(Con,

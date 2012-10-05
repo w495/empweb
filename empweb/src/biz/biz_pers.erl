@@ -238,12 +238,11 @@ login(Params) ->
                 login       =   Login,
                 perm_names  =   Perm_names
             }),
-            % {ok, [{User}]} = domain_pers:get_opt(Params, [{with, room}]),
             ?evman_info({login, [
                 {pers,          Userpl},
                 {session_id,    Session_id}
             ]}),
-            {ok, [{[{session_id, Session_id}|Userpl]}]};
+            {ok, [{[{session_id, Session_id}|proplists:delete(perm_names,   Userpl)]}]};
         {error, Error} ->
             {error, Error}
     end.

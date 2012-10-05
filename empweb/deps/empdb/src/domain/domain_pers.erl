@@ -239,7 +239,26 @@ login({Uf, Uv}, Params) ->
                     _ ->
                         {ok,[{[{id,Pstatus_id}]}]} = dao_pers:get_pstatus(Con, [{alias, online}], [id]),
                         dao_pers:update(Con, [{pstatus_id, Pstatus_id}|Params]),
-                        {ok, [{[{perm_names, Perm_names}|Userpl]}]}
+                        {ok, [Room]} =
+                            dao_room:get(emp, [
+                                {id, proplists:get_value(room_id, Userpl)}
+                            ], [
+                                id,
+                                head,
+                                body,
+                                roomtype_id,
+                                roomtype_alias,
+                                ulimit,
+                                chatlang_id,
+                                chatlang_alias,
+                                regimen_id,
+                                regimen_alias,
+                                topic_id,
+                                slogan,
+                                weather,
+                                treasury
+                            ]),
+                        {ok, [{[{perm_names, Perm_names}, {room, Room}|Userpl]}]}
                 end;
             _ ->
                 %% Нет такого пользователя

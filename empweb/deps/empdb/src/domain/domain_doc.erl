@@ -501,13 +501,49 @@ update_blog(Params)->
 
 get_blog(Params)->
     dao:with_transaction(fun(Con)->
-        dao_blog:get(Con, [{isdeleted, false}|Params])
+        get_blog_adds(Con,dao_blog:get(Con, [{isdeleted, false}|Params]))
     end).
 
 get_blog(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_blog:get(Con, [{isdeleted, false}|Params], Fileds)
+        get_blog_adds(Con,
+            dao_blog:get(Con, [{isdeleted, false}|Params], Fileds)
+        )
     end).
+
+get_blog_adds(Con, Getresult) ->
+    case Getresult of
+        {ok, List} ->
+            {ok, lists:map(fun({Itempl})->
+                case proplists:get_value(id, Itempl) of
+                    undefined ->
+                        {Itempl};
+                    Id ->
+                        {ok, Postcnts}     = dao_blog:count_posts(Con, [{id, Id}]),
+                        {ok, Comments}     = dao_blog:count_comments(Con, [{id, Id}]),
+                        Npostspl = lists:foldl(fun({Postpl}, Acc)->
+                            case proplists:get_value(read_acctype_alias, Postpl) of
+                                all ->
+                                    [{nposts, proplists:get_value(count, Postpl)}|Acc];
+                                public ->
+                                    [{npublicposts, proplists:get_value(count, Postpl)}|Acc];
+                                private ->
+                                    [{nprivateposts, proplists:get_value(count, Postpl)}|Acc];
+                                protected ->
+                                    [{nprotectedposts, proplists:get_value(count, Postpl)}|Acc];
+                                _ ->
+                                    Acc
+                            end
+                        end, [], Postcnts),
+                        Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
+                            [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
+                        end, [], Comments),
+                        {lists:append([Npostspl, Ncommentspl, Itempl])}
+                end
+            end, List)};
+        {Eclass, Error} ->
+            {Eclass, Error}
+    end.
 
 delete_blog(Params)->
     dao:with_transaction(fun(Con)->
@@ -527,11 +563,12 @@ is_blog_owner(Uid, Oid)->
 %% @doc Добавляет пост в блог.
 %% Все действия в одной транзакции.
 %%
-create_post(Params) ->
+create_post(Params)->
     dao:with_transaction(fun(Con)->
         dao_post:create(Con, Params)
     end).
-
+    
+    
 update_post(Params)->
     dao:with_transaction(fun(Con)->
         dao_post:update(Con, Params)
@@ -553,14 +590,33 @@ delete_post(Filter)->
     
 get_post(Params)->
     dao:with_transaction(fun(Con)->
-        dao_post:get(Con, [{isdeleted, false}|Params])
+        get_post_adds(Con, dao_post:get(Con, [{isdeleted, false}|Params]))
     end).
 
 get_post(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_post:get(Con, [{isdeleted, false}|Params], Fileds)
+        get_post_adds(Con, dao_post:get(Con, [{isdeleted, false}|Params], Fileds))
     end).
 
+get_post_adds(Con, Getresult) ->
+    case Getresult of
+        {ok, List} ->
+            {ok, lists:map(fun({Itempl})->
+                case proplists:get_value(id, Itempl) of
+                    undefined ->
+                        {Itempl};
+                    Id ->
+                        {ok, Comments}     = dao_post:count_comments(Con, [{id, Id}]),
+                        Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
+                            [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
+                        end, [], Comments),
+                        {lists:append([Ncommentspl, Itempl])}
+                end
+            end, List)};
+        {Eclass, Error} ->
+            {Eclass, Error}
+    end.
+    
 is_post_owner(Uid, Oid)->
     dao:with_transaction(fun(Con)->
         dao_post:is_owner(Con, Uid, Oid)
@@ -593,7 +649,8 @@ delete_comment(Filter)->
     dao:with_transaction(fun(Con)->
         dao_comment:update(Con, [
             {values, [{isdeleted, true}]}, 
-            {filter, [{isdeleted, false}|Filter]}
+            {filter, [{isdeleted, false}|Filter]},
+            {fields, [parent_id]}
         ])
     end).
 

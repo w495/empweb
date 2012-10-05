@@ -733,7 +733,9 @@ get([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
             end,
             Order
         ),
-    io:format("Order = ~p~n~n", [Current_order]),
+
+    io:format("Fields = ~p~n~n", [Fields]),
+    io:format("Current_select_fields = ~p~n~n", [Current_select_fields]),
     
     Binary_parent_name =
         convert:to_binary(table_options({table, name},Parent)),
@@ -858,6 +860,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
+    io:format("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
     get(Current, Con,
         #queryobj{
                 filter  =   As_filter,
