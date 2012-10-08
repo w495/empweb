@@ -2142,40 +2142,18 @@ insert into pers2pgroup (pers_id, group_id)
         ((select id from pers where login='admin'),
             (select id from pgroup where alias='contman'));
 
-    
-        
+
 /**
     При создании пользователя помещаем его в комнату для новичков
+    @depricated перенесено в триггеры
 **/
--- alter table pers alter column room_id set default noobsroom();
+-- alter table pers alter column live_room_id set default noobsroom();
 
 
-
-/**
-    Тригер присвоения типа документа при создании сообщения
-**/
-create or replace function update_something() returns "trigger" as $$
-begin
-    new.updated = now(); 
-    new.nupdates = new.nupdates + 1; 
-    return new;
-end;
-$$ language plpgsql;
-
-
-create trigger update_something before update
-   on doc for each row execute procedure update_something();
-   
-
+/*
 create or replace function doc() returns setof doc as $$
         select * from doc;
 $$ language sql;
-
-    /*
-    create or replace function vcup(numeric, varchar) returns numeric as $$
-    update doc set vcounter = vcounter + 1 where id = $1 returning id;
-    $$ language sql;*/
-
 
 create or replace function vcup(
     i numeric, 
@@ -2189,34 +2167,28 @@ begin
     return i;
 end; $$ language plpgsql;
 
-/*
-
-CREATE OR REPLACE VIEW pers_v AS
+create or replace view pers_v as
     select pers.*, from doc 
         left join doctype on
             doctype.id = doc.doctype_id
         left join contype on
             contype.id = doc.contype_id;
 
-
-CREATE OR REPLACE VIEW doc_v AS
-    select doc.*, doctype.alias as doctype_alias, contype.alias as contype_alias from doc 
-        left join doctype on
-            doctype.id = doc.doctype_id
-        left join contype on
-            contype.id = doc.contype_id;
-            
-            */
-/*
-CREATE OR REPLACE VIEW room_v AS
+create or replace view doc_v as
     select doc.*, doctype.alias as doctype_alias, contype.alias as contype_alias from doc 
         left join doctype on
             doctype.id = doc.doctype_id
         left join contype on
             contype.id = doc.contype_id;
 
+create or replace view room_v as
+    select doc.*, doctype.alias as doctype_alias, contype.alias as contype_alias from doc 
+        left join doctype on
+            doctype.id = doc.doctype_id
+        left join contype on
+            contype.id = doc.contype_id;
 
-CREATE OR REPLACE VIEW pers_v AS
+create or replace view pers_v as
     select pers.*, from doc 
         left join doctype on
             doctype.id = doc.doctype_id

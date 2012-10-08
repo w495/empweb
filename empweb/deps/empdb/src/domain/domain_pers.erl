@@ -7,6 +7,8 @@
 %% Заголовочные файлы
 %% ===========================================================================
 
+-include("empdb.hrl").
+
 %% ===========================================================================
 %% Экспортируемые функции
 %% ===========================================================================
@@ -212,9 +214,9 @@ login({Uf, Uv}, Params) ->
                     convert:to_atom(proplists:get_value(alias, Permpl))
                 end, Perm_list),
                 Phash = proplists:get_value(phash, Userpl),
-                io:format("Userpl   = ~p~n~n", [Userpl]),
-                io:format("Phash   = ~p~n~n", [Phash]),
-                io:format("Mbphash = ~p~n~n", [Mbphash]),
+                ?debug("Userpl   = ~p~n~n", [Userpl]),
+                ?debug("Phash   = ~p~n~n", [Phash]),
+                ?debug("Mbphash = ~p~n~n", [Mbphash]),
                 case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
                     {true, false} ->
                         %% Фиктиная ветка, в реалности не выполняется.
@@ -237,17 +239,30 @@ login({Uf, Uv}, Params) ->
                                 ]}
                         }};
                     _ ->
-                        {ok,[{[{id,Pstatus_id}]}]} =
-                            dao_pers:get_pstatus(Con, [{alias, online}], [id]),
-                        %%
-                        %% Ставим пользователю статус online
-                        %%
-                        dao_pers:update(Con, [{pstatus_id, Pstatus_id}|Params]),
+                        spawn_link(fun()->
+                            %% Ключевой момент: без spawn_link код ниже может 
+                            %% привести к блокировкам, а так, 
+                            %% он выполняется независимо.
+                            case proplists:get_value(pstatus_alias, Userpl) of
+                                <<"offline">> ->
+                                    dao:with_transaction(emp, fun(Con) ->
+                                        %%
+                                        %% Ставим пользователю статус online
+                                        %%
+                                        dao_pers:update(Con, [
+                                            {pstatus_alias, <<"online">>}
+                                            |Params
+                                        ])
+                                    end);
+                                _ ->
+                                    ok
+                            end
+                        end),
                         %%
                         %% Получаем блог пользователя.
                         %%
                         {ok, [Blog]} =
-                            dao_blog:get_adds(Con, dao_blog:get(Con, [
+                            case dao_blog:get_adds(Con, dao_blog:get(Con, [
                                 {owner_id, proplists:get_value(id, Userpl)},
                                 {limit, 1}
                             ], [
@@ -264,13 +279,16 @@ login({Uf, Uv}, Params) ->
                                 read_acctype_alias,
                                 read_acctype_id,
                                 id
-                            ])),
+                            ])) of
+                                {ok, []} -> {ok, [null]};
+                                Res -> Res
+                            end,
                         %%
                         %% Получаем комнату пользователя
                         %%
                         {ok, [Room]} =
                             dao_room:get(Con, [
-                                {id, proplists:get_value(room_id, Userpl)},
+                                {id, proplists:get_value(live_room_id, Userpl)},
                                 {limit, 1}
                             ], [
                                 id,
@@ -343,7 +361,7 @@ get_opt(Con, Params, [], Proplist)
     -> {ok, Proplist};
 
 get_opt(Con,Params, [Option|Options], [{Acc}])->
-    io:format("Option = ~p~n", [Option]),
+    ?debug("Option = ~p~n", [Option]),
     case Option of
         %% ------------------------------------------------------------------
         {perm_list, Spec} when erlang:is_list(Spec) ->

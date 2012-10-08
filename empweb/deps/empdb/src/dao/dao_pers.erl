@@ -166,12 +166,20 @@ table({fields, all})->
 
         mstatus_id,
         mstatus_alias,
-        
+
         married_id,
         mother_id,
         father_id,
+        
         community_id,
-        room_id,
+        community_head,
+
+        live_room_id,
+        live_room_head,
+
+        own_room_id,
+        own_room_head,
+        
         allowauctionoffer,
         perspicbody_id,
         perspichead_id,
@@ -354,7 +362,8 @@ add_friend(Con, Proplist)->
     case dao:pgret(
         dao:equery(Con,
             <<"insert into friend (pers_id, friend_id) "
-            "values ($pers_id, $friend_id) returning id; ">>,
+                "values ($pers_id, $friend_id) "
+                "returning id">>,
             Proplist
         )
     ) of
@@ -390,8 +399,8 @@ get_friends(Con, Proplist)->
             " pers.id as id, "
             " pstatus.alias as pstatus_alias, "
             " pers.nick as nick, "
-            " doc.head as room_head, "
-            " doc.id as room_id "
+            " doc.head as live_room_head, "
+            " doc.id as live_room_id "
         " from "
             " friend "
         " join pers on "
@@ -399,7 +408,7 @@ get_friends(Con, Proplist)->
         " left join pstatus on "
             " pstatus.id = pers.pstatus_id "
         " left join doc on "
-            " doc.id = pers.room_id "
+            " doc.id = pers.live_room_id "
         " join room on "
             " room.doc_id = doc.id "
         " where "

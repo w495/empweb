@@ -1,8 +1,46 @@
--- create or replace language plpgsql;
+
+/**
+    @doc Выполняет кроссверсионный вариант
+    create or replace language plpgsql;
+**/
+
+create or replace function make_plpgsql()
+returns void
+language sql
+as $$
 create language plpgsql;
+$$;
+
+select
+    case
+    when exists(
+        select 1
+        from pg_catalog.pg_language
+        where lanname='plpgsql'
+    )
+    then null
+    else make_plpgsql() end;
+
+drop function make_plpgsql();
 
 
-   
+/**
+    Тригер присвоения типа документа при создании чего бы то ни было.
+    пока не нужно.
+**/
+-- create or replace function update_something() returns "trigger" as $$
+-- begin
+--     new.updated = now();
+--     new.nupdates = new.nupdates + 1;
+--     return new;
+-- end;
+-- $$ language plpgsql;
+-- 
+-- create trigger update_something before update
+--    on doc for each row execute procedure update_something();
+
+
+
 /**
     Тригер присвоения типа документа при создании блога
 **/
@@ -99,12 +137,12 @@ create trigger t1on_insert_subdoc_inst after insert
     Aтомарное создание комнаты для новичков.
 **/
 
-create sequence seq_noobsroom_id;
+create sequence seq_noobslive_room_id;
 create or replace function  mknoobsroom() returns numeric as $$
 declare
      _res numeric;
 begin
-        select mknoobsroom((select -nextval('seq_noobsroom_id'))) into _res;
+        select mknoobsroom((select -nextval('seq_noobslive_room_id'))) into _res;
         return _res;
 end;
 $$ language 'plpgsql';
@@ -453,7 +491,8 @@ begin
     new.lang_alias      = 'en_gb';
     new.lang_id         = 
         (select id from lang      where alias = new.lang_alias);
-    new.room_id         = (select noobsroom());
+    new.live_room_id         = (select noobsroom());
+    new.live_room_head       = (select doc.head from doc where doc.id = new.live_room_id and doc.doctype_alias = 'room');
     return new;
 end;
 $$ language plpgsql;
@@ -472,6 +511,18 @@ on pers for each row execute procedure pers_util_fields_on_insert();
 **/
 create or replace function pers_util_fields_on_update() returns "trigger" as $$
 begin
+    if new.own_room_id != old.own_room_id then
+        new.own_room_head =
+            (select doc.head from doc where doc.id = new.own_room_id and doc.doctype_alias = 'room');
+    end if;
+    if new.live_room_id != old.live_room_id then
+        new.live_room_head =
+            (select doc.head from doc where doc.id = new.live_room_id and doc.doctype_alias = 'room');
+    end if;
+    if new.community_id != old.community_id then
+        new.community_head =
+            (select doc.head from doc where doc.id = new.community_id and doc.doctype_alias = 'community');
+    end if;
     /**
         Статус online \ offline
     **/
@@ -578,12 +629,29 @@ on pers for each row execute procedure pers_util_fields_on_update();
 create or replace function doc_util_fields_on_insert() returns "trigger" as $$
 begin
     /**
+        Владелец документа
+    **/
+    if (new.owner_nick is null) then
+        if not (new.owner_id is null) then
+            new.owner_nick =
+                (select pers.nick from pers where pers.id = new.owner_id);
+        else
+            new.owner_nick        = null;
+        end if;
+    end if;
+
+--     if (new.owner_id is null) then
+--         new.owner_id           =
+--             (select pers.id from pers where pers.nick = new.owner_nick);
+--     end if;
+
+    /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
     if (new.oktype_alias is null) then
         if not (new.oktype_id is null) then
             new.oktype_alias = 
-                (select id from oktype where alias = new.oktype_id);
+                (select alias from oktype where id = new.oktype_id);
         else
             new.oktype_alias        = 'ncons';
         end if;
@@ -598,11 +666,10 @@ begin
     if (new.read_acctype_alias is null) then
         if not (new.read_acctype_id is null) then
             new.read_acctype_alias = 
-                (select id from acctype where alias = new.read_acctype_id);
+                (select alias from acctype where id = new.read_acctype_id);
         else
             new.read_acctype_alias  = 'public';
         end if;
-        
     end if;
     if (new.read_acctype_id is null) then
         new.read_acctype_id     = 
@@ -614,7 +681,7 @@ begin
     if (new.comm_acctype_alias is null) then
         if not (new.comm_acctype_id is null) then
             new.comm_acctype_alias = 
-                (select id from acctype where alias = new.comm_acctype_id);
+                (select alias from acctype where id = new.comm_acctype_id);
         else
             new.comm_acctype_alias  = 'private';
         end if;
@@ -629,7 +696,7 @@ begin
     if (new.contype_alias is null) then
         if not (new.contype_id is null) then
             new.contype_alias = 
-                (select id from contype where alias = new.contype_id);
+                (select alias from contype where id = new.contype_id);
         else
             new.contype_alias       = 'common';
         end if;
@@ -653,6 +720,23 @@ on doc for each row execute procedure doc_util_fields_on_insert();
 **/
 create or replace function doc_util_fields_on_update() returns "trigger" as $$
 begin
+    /**
+        Владелец документа
+    **/
+    if new.owner_id != old.owner_id then
+        new.owner_nick =
+            (select pers.nick from pers where pers.id = new.owner_id);
+    end if;
+
+    if new.head != old.head then
+        if new.doctype_alias = 'room' then
+            update pers set live_room_head = new.head where pers.live_room_id = new.id;
+            update pers set own_room_head = new.head where pers.own_room_id = new.id;
+        end if;
+        if new.doctype_alias = 'community' then
+            update pers set community_head = new.head where pers.community_id = new.id;
+        end if;
+    end if;
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/

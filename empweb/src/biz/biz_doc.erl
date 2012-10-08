@@ -207,7 +207,8 @@
     create_message/1,
     update_message/1,
     delete_message_for_me/1,
-    delete_message_from_me/1
+    delete_message_from_me/1,
+    count_message/1
 ]).
 
 
@@ -527,3 +528,5 @@ delete_message_from_me(Params)->
 get_message_from_me(Params, Fields)->
     domain_doc:get_message(Params, Fields).
 
+count_message(Params) ->
+    domain_doc:count_message(Params).

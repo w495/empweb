@@ -38,7 +38,8 @@ new(#biz_session{uid=undefined} = Biz_session) ->
         uid = gen_uid(Biz_session#biz_session.id)
     });
 
-new(#biz_session{uid=Uid} = Biz_session) ->
+new(#biz_session{uid=Uid, id=Id} = Biz_session) ->
+    remove_dubles(Id),
     write(
         ?SESSION_TABLE_NAME,
         Biz_session#biz_session{
@@ -67,8 +68,14 @@ remove(Uid) ->
 seconds(Item) ->
     calendar:datetime_to_gregorian_seconds(Item#biz_session.time).
 
+id(Item) ->
+    Item#biz_session.id.
+
 expired(Curtime, Item) ->
     Curtime - seconds(Item) > ?BIZ_SESSION_EXPIRE_TIMEOUT.
+
+eqid(Id, Item) ->
+    Id == Item#biz_session.id.
 
 remove_expired() ->
     Curtime = calendar:datetime_to_gregorian_seconds(erlang:localtime()),
@@ -88,6 +95,38 @@ remove_expired() ->
                 end,
                 Set
             )
+        end,
+    ?MODULE:transaction(Function).
+
+remove_dubles(Id) ->
+    Function =
+        fun() ->
+            Query =
+                qlc:q([
+                    Item || Item
+                    <- mnesia:table(?SESSION_TABLE_NAME),
+                    eqid(Id, Item)
+                ]),
+            Set = qlc:e(Query),
+            case  erlang:length(Set) > 10 of
+                true ->
+                    {Ruid, _} = lists:foldl(
+                        fun(#biz_session{'time' = Time, uid = Uid}, {Auid, Atime}) ->
+                            Ctime = calendar:datetime_to_gregorian_seconds(Time),
+                            case Ctime < Atime of
+                                true ->
+                                    {Uid, Ctime};
+                                _ ->
+                                    {Auid, Atime}
+                            end
+                        end,
+                        {[], calendar:datetime_to_gregorian_seconds(erlang:localtime())},
+                        Set
+                    ),
+                    mnesia:delete({?SESSION_TABLE_NAME, Ruid});
+                false ->
+                    ok
+            end
         end,
     ?MODULE:transaction(Function).
 

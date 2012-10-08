@@ -484,7 +484,14 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = get topic">>),
     jsonapi:handle_params(
-        norm:norm(Params, opt_norm('get')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [nullable, integer]
+            }
+            | opt_norm('get')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -1450,6 +1457,34 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сообщения
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   count_message,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    %%
+    %% Pers_id при получении сообщения смысла не имеет.
+    %% т.к. мы смысл имеет получать как своих сообщений,
+    %% так и чужих, которые отпарвлены мне.
+    %% Отправителя и получателя надо указывать явно.
+    %%
+    ?evman_args([Hap], <<" = count message">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, []),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:count_message(
+                        [{pers_id, Pers_id}|Data#norm.return]
+                    )
+                ),
+                Hap
+            }
+        end
+    );
 
 handle(_req, #empweb_hap{
         is_auth =   true,

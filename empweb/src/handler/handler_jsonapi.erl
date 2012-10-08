@@ -753,6 +753,13 @@ jsonapi_map(Req, {List}) ->
             %%
             %% Сообщения
             %%
+            <<"count_message">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   count_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
             <<"get_message">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
@@ -760,7 +767,7 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-            <<"get_all_communities">> ->
+            <<"get_all_messages">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
                     action          =   get_message,

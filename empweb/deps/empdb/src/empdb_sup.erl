@@ -27,6 +27,14 @@ init([]) ->
         [psqlcp]
     },
 
+    Dao_static_cashe = {
+        dao_static_cashe,
+        {term_cache_ets, start_link, [[{'size', '40Mb'}, {name, dao_static_cashe}]]},
+        permanent,
+        5000,
+        supervisor,
+        [dao_static_cashe]
+    },
     %Psqlcp
     
-	{ok, {{one_for_one, 10, 10}, [Psqlcp]}}.
+	{ok, {{one_for_one, 10, 10}, [Psqlcp, Dao_static_cashe]}}.

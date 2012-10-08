@@ -96,6 +96,7 @@ table({fields, all})->
         contype_id,
         contype_alias,
         owner_id,
+        owner_nick,
         parent_id,
         vcounter,
         created,
@@ -127,10 +128,10 @@ get(Con, What) ->
 %%      Наследник должен быть описан в модуле Module.
 %%
 get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
-    ?MODULE:update(Con, [
-        {filter, What},
-        {values, [{vcounter, {incr, 1}}]}
-    ]),
+%     ?MODULE:update(Con, [
+%         {filter, What},
+%         {values, [{vcounter, {incr, 1}}]}
+%     ]),
     dao:get([{?MODULE, id}, {Module, doc_id}], Con, What);
 
 %     case dao:get([{?MODULE, id}, {Module, doc_id}], Con, alias2id_pl(What, [])) of
@@ -149,10 +150,10 @@ get(Con, What, Fields)->
 %%
 get(Module, Con, What, Fields)->
     io:format("What, Fields = ~p~n", [{What, Fields}]),
-    ?MODULE:update(Con, [
-        {filter, What},
-        {values, [{vcounter, {incr, 1}}]}
-    ]),
+%     ?MODULE:update(Con, [
+%         {filter, What},
+%         {values, [{vcounter, {incr, 1}}]}
+%     ]),
     dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
     
     

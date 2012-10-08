@@ -15,6 +15,8 @@
 
 -export([behaviour_info/1]).
 
+-define(DAO_STATIC_CASHE, dao_static_cashe).
+
 behaviour_info(callbacks) ->
     [
         {table,     0},
@@ -36,6 +38,15 @@ behaviour_info(_Other) ->
     undefined.
 
 
+memocashe(Key, Fun)->
+    case term_cache_ets:get(?DAO_STATIC_CASHE, Key) of
+        not_found ->
+            Item = Fun(),
+            term_cache_ets:put(?DAO_STATIC_CASHE, Key, Item),
+            Item;
+        {ok, Item} ->
+            Item
+    end.
 %%
 %%
 %% @spec id2alias(
@@ -263,9 +274,9 @@ sql_or(List)->
     }.
 
 sql_list(List) ->
-    io:format("List = ~p~n", [List]),
+    ?debug("List = ~p~n", [List]),
     {Tlist, String} = lists:unzip([sql_cond({Ff, Val})||{Ff, Val} <- List]),
-    io:format("String = ~p~n", [String]),
+    ?debug("String = ~p~n", [String]),
     {lists:flatten(Tlist), String}.
 
 sql_cond({'and', List}) ->
@@ -275,11 +286,11 @@ sql_cond({'or', List}) ->
     sql_or(List);
 
 sql_cond({Ff, {[{X, C}]}})->
-    io:format("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}}]),
+    ?debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}}]),
     sql_cond({Ff, {X, C}});
 
 sql_cond({Ff, {X, C}}) when erlang:is_list(X) orelse erlang:is_binary(X)->
-    io:format("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
+    ?debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
     sql_cond({Ff, {convert:to_atom(X), C}});
     
 sql_cond({Ff, {'and', Conds}})->
@@ -295,7 +306,7 @@ sql_cond({Ff, {'and', Conds}})->
     sql_cond(X);
 
 sql_cond({Ff, {'or', Conds}})->
-    io:format("Conds = ~p~n", [Conds]),
+    ?debug("Conds = ~p~n", [Conds]),
     X =
         {   'or',
             lists:map(
@@ -418,7 +429,7 @@ sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
 
     
 sql_cond({Ff, Val} = Tuple) ->
-    io:format("Tuple = ~p~n~n", [Tuple]),
+    ?debug("Tuple = ~p~n~n", [Tuple]),
     {[{cond_atom(Ff), Val}], [
         convert:to_binary(Ff),
         <<" = $">>,
@@ -680,102 +691,105 @@ table_options(Oname,      Current) ->
 
 get(Current, Con, #queryobj{order=Order}=Obj)
     when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
-    io:format("Order = ~p~n~n", [Order]),
+    ?debug("Order = ~p~n~n", [Order]),
     get(Current, Con, Obj#queryobj{order=[Order]});
 
 get(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    io:format("Filter = ~p~n~n", [Filter]),
+    ?debug("Filter = ~p~n~n", [Filter]),
     get(Current, Con, Obj#queryobj{filter=[Filter]});
 
 
 get(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    io:format("Fields = ~p~n~n", [Fields]),
+    ?debug("Fields = ~p~n~n", [Fields]),
     get(Current, Con, Obj#queryobj{fields=[Fields]});
     
 %%
 %% TODO: только для двух таблиц
 %%
-get([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
+get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
     filter  =   Filter,
     fields  =   Fields,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
-}) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
-    Common_all_fields = lists:append(
-        table_options({table, fields, all},      Parent),
-        table_options({table, fields, all},      Current)
-    ),
-    Common_select_fields = lists:append(
-        table_options({table, fields, select},   Parent),
-        table_options({table, fields, select},   Current)
-    ),
-    Current_select_fields =
-        lists:filter(
-            fun(F)->
-                lists:member(F, Common_select_fields)
-            end,
-            Fields
+} = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
+    {Query, Pfields} = memocashe({Op, Qo}, fun() ->
+        Common_all_fields = lists:append(
+            table_options({table, fields, all},      Parent),
+            table_options({table, fields, all},      Current)
         ),
-    Current_all_fields =
-        lists:filter(
-            fun({F, _})->
-                lists:member(F, Common_all_fields)
-            end,
-            Filter
+        Common_select_fields = lists:append(
+            table_options({table, fields, select},   Parent),
+            table_options({table, fields, select},   Current)
         ),
-    Current_order =
-        lists:filter(
-            fun(F)->
-                lists:member(F, Common_all_fields)
-            end,
-            Order
-        ),
+        Current_select_fields =
+            lists:filter(
+                fun(F)->
+                    lists:member(F, Common_select_fields)
+                end,
+                Fields
+            ),
+        Current_all_fields =
+            lists:filter(
+                fun({F, _})->
+                    lists:member(F, Common_all_fields)
+                end,
+                Filter
+            ),
+        Current_order =
+            lists:filter(
+                fun(F)->
+                    lists:member(F, Common_all_fields)
+                end,
+                Order
+            ),
 
-    io:format("Fields = ~p~n~n", [Fields]),
-    io:format("Current_select_fields = ~p~n~n", [Current_select_fields]),
-    
-    Binary_parent_name =
-        convert:to_binary(table_options({table, name},Parent)),
-    Binary_table_name =
-        convert:to_binary(table_options({table, name},Current)),
-    Binary_select_fields =
-        fields(
-            Current_select_fields,
-            Common_select_fields
-        ),
-    Binary_current_field =
-        convert:to_binary(Current_field),
-    Binary_parent_field =
-        convert:to_binary(Parent_field),
-    {Pfields, Where_string} =
-        sql_where(Current_all_fields),
-    Query = [
-        %% поля обоих таблиц в перемешку
-        <<" select ">>, Binary_select_fields,
-        %% родительская таблиа
-        <<" from ">>,   Binary_parent_name,
-        %% дочерняя таблиа
-        <<" join ">>,   Binary_table_name,
-        %% сцепление таблиц
-        <<" on ">>, [
-            Binary_table_name,  <<".">>,    Binary_current_field,
-            <<" =  ">>,
-            Binary_parent_name, <<".">>,    Binary_parent_field
+        ?debug("Fields = ~p~n~n", [Fields]),
+        ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
+
+        Binary_parent_name =
+            convert:to_binary(table_options({table, name},Parent)),
+        Binary_table_name =
+            convert:to_binary(table_options({table, name},Current)),
+        Binary_select_fields =
+            fields(
+                Current_select_fields,
+                Common_select_fields
+            ),
+        Binary_current_field =
+            convert:to_binary(Current_field),
+        Binary_parent_field =
+            convert:to_binary(Parent_field),
+        {Pfields, Where_string} =
+            sql_where(Current_all_fields),
+        Query = [
+            %% поля обоих таблиц в перемешку
+            <<" select ">>, Binary_select_fields,
+            %% родительская таблиа
+            <<" from ">>,   Binary_parent_name,
+            %% дочерняя таблиа
+            <<" join ">>,   Binary_table_name,
+            %% сцепление таблиц
+            <<" on ">>, [
+                Binary_table_name,  <<".">>,    Binary_current_field,
+                <<" =  ">>,
+                Binary_parent_name, <<".">>,    Binary_parent_field
+            ],
+            Where_string,
+            [
+                sql_order(Current_order),
+                sql_limit(Limit),
+                sql_offset(Offset)
+            ]
         ],
-        Where_string,
-        [
-            sql_order(Current_order),
-            sql_limit(Limit),
-            sql_offset(Offset)
-        ]
-    ],
+        {Query, Pfields}
+    end),
     dao:pgret(dao:equery(Con, Query, Pfields));
 
 
-get([{Parent, Parent_field}, {Current, Current_field}],Con,#queryobj{}=Qo)->
+get([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)->
     Oparent = [
         {{table, name},             Parent:table(name)},
         {{table, fields, all},      Parent:table({fields, all})},
@@ -786,8 +800,9 @@ get([{Parent, Parent_field}, {Current, Current_field}],Con,#queryobj{}=Qo)->
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    io:format("Oparent = ~p~n", [Oparent]),
-    io:format("Ocurrent = ~p~n", [Ocurrent]),
+    ?debug("Oparent = ~p~n", [Oparent]),
+    ?debug("Ocurrent = ~p~n", [Ocurrent]),
+    
     get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
 
 get(Current, Con, #queryobj{
@@ -796,52 +811,55 @@ get(Current, Con, #queryobj{
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
-}) when erlang:is_list(Filter), erlang:is_list(Current) ->
-    Common_all_fields =
-        table_options({table, fields, all}, Current),
-    Common_select_fields =
-        table_options({table, fields, select}, Current),
-    Current_select_fields =
-        lists:filter(
-            fun(F)-> lists:member(F, Common_select_fields) end,
-            Fields
-        ),
-    Current_all_fields =
-        lists:filter(
-            fun({F, _})->
-                lists:member(F, Common_all_fields)
-            end,
-            Filter
-        ),
-    Current_order =
-        lists:filter(
-            fun
-                (F)->
+} = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
+    {Query, Pfields} = memocashe({Current, Qo}, fun() ->
+        Common_all_fields =
+            table_options({table, fields, all}, Current),
+        Common_select_fields =
+            table_options({table, fields, select}, Current),
+        Current_select_fields =
+            lists:filter(
+                fun(F)-> lists:member(F, Common_select_fields) end,
+                Fields
+            ),
+        Current_all_fields =
+            lists:filter(
+                fun({F, _})->
                     lists:member(F, Common_all_fields)
-            end,
-            Order
-        ),
-    io:format("Order = ~p~n~n", [Current_order]),
-    
-    Binary_table_name =
-        convert:to_binary(table_options({table, name},  Current)),
-    Binary_select_fields =
-        fields(
-            Current_select_fields,
-            Common_select_fields
-        ),
-    {Pfields, Where_string} =
-        sql_where(Current_all_fields),
-    Query = [
-        <<"select ">>,  Binary_select_fields,
-        <<" from ">>,   Binary_table_name,
-        Where_string,
-        [
-            sql_order(Current_order),
-            sql_limit(Limit),
-            sql_offset(Offset)
-        ]
-    ],
+                end,
+                Filter
+            ),
+        Current_order =
+            lists:filter(
+                fun
+                    (F)->
+                        lists:member(F, Common_all_fields)
+                end,
+                Order
+            ),
+        ?debug("Order = ~p~n~n", [Current_order]),
+
+        Binary_table_name =
+            convert:to_binary(table_options({table, name},  Current)),
+        Binary_select_fields =
+            fields(
+                Current_select_fields,
+                Common_select_fields
+            ),
+        {Pfields, Where_string} =
+            sql_where(Current_all_fields),
+        Query = [
+            <<"select ">>,  Binary_select_fields,
+            <<" from ">>,   Binary_table_name,
+            Where_string,
+            [
+                sql_order(Current_order),
+                sql_limit(Limit),
+                sql_offset(Offset)
+            ]
+        ],
+        {Query, Pfields}
+    end),
     dao:pgret(dao:equery(Con, Query, Pfields));
 
 
@@ -851,7 +869,7 @@ get(Current,Con,#queryobj{}=Qo)  ->
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    io:format("Ocurrent = ~p~n", [Ocurrent]),
+    ?debug("Ocurrent = ~p~n", [Ocurrent]),
     get(Ocurrent,Con,Qo);
 
 get(Current, Con, Opts) when erlang:is_list(Opts) ->
@@ -860,7 +878,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    io:format("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
+    ?debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
     get(Current, Con,
         #queryobj{
                 filter  =   As_filter,
@@ -877,7 +895,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
     ).
 
 get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    io:format("Current = ~p~n", [Current]),
+    ?debug("Current = ~p~n", [Current]),
     
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
@@ -953,12 +971,12 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 
 create(Current, Con, #queryobj{values=Values}=Obj)
     when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
-    io:format("Values = ~p~n~n", [Values]),
+    ?debug("Values = ~p~n~n", [Values]),
     create(Current, Con, Obj#queryobj{order=[Values]});
 
 create(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    io:format("Fields = ~p~n~n", [Fields]),
+    ?debug("Fields = ~p~n~n", [Fields]),
     create(Current, Con, Obj#queryobj{fields=[Fields]});
     
     
@@ -1008,8 +1026,8 @@ create(Current, Con, #queryobj{
     Common_required_fields =
         table_options({table, fields, insert, required}, Current),
         
-    io:format("Common_select_fields = ~p~n~n", [Common_select_fields]),
-    io:format("Returning = ~p~n~n", [Returning]),
+    ?debug("Common_select_fields = ~p~n~n", [Common_select_fields]),
+    ?debug("Returning = ~p~n~n", [Returning]),
     
     Current_select_fields =
         lists:filter(
@@ -1045,8 +1063,8 @@ create(Current, Con, #queryobj{
             Common_required_fields
         ),
 
-    io:format("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
-    io:format("Common_required_fields = ~p~n~n", [Common_required_fields]),
+    ?debug("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
+    ?debug("Common_required_fields = ~p~n~n", [Common_required_fields]),
     
     case {Has_required, Current_insert_fields_keys} of
         {true, []} ->
@@ -1088,7 +1106,7 @@ create(Current, Con, #queryobj{}=Queryobj)->
     create(Ocurrent, Con, Queryobj);
 
 create(Current, Con, Opts) when erlang:is_list(Opts) ->
-    io:format("Opts = ~p~n~n", [Opts]),
+    ?debug("Opts = ~p~n~n", [Opts]),
     As_values =
         case proplists:get_value(values, Opts, undefined) of
             undefined   ->    Opts;
@@ -1123,17 +1141,17 @@ create(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
 
 update(Current, Con, #queryobj{values=Values}=Obj)
     when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
-    io:format("Values = ~p~n~n", [Values]),
+    ?debug("Values = ~p~n~n", [Values]),
     update(Current, Con, Obj#queryobj{order=[Values]});
 
 update(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    io:format("Filter = ~p~n~n", [Filter]),
+    ?debug("Filter = ~p~n~n", [Filter]),
     update(Current, Con, Obj#queryobj{filter=[Filter]});
 
 update(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    io:format("Fields = ~p~n~n", [Fields]),
+    ?debug("Fields = ~p~n~n", [Fields]),
     update(Current, Con, Obj#queryobj{fields=[Fields]});
     
     
@@ -1191,8 +1209,8 @@ update(Current, Con, #queryobj{
             fun(F)-> lists:member(F, Common_select_fields) end,
             Returning
         ),
-%     io:format("Returning = ~p~n~n~n", [Returning]),
-%     io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+%     ?debug("Returning = ~p~n~n~n", [Returning]),
+%     ?debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
     Current_all_fields =
         lists:filter(
             fun({F, _})->
@@ -1204,22 +1222,22 @@ update(Current, Con, #queryobj{
         lists:filter(
             fun
                 ({incr, {F, _}})->
-%                     io:format("F = ~p~n~n~n", [F]),
+%                     ?debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields);
                 ({decr, {F, _}})->
-%                     io:format("F = ~p~n~n~n", [F]),
+%                     ?debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields);
                 ({F, _})->
-%                     io:format("F = ~p~n~n~n", [F]),
+%                     ?debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields)
             end,
             Values
         ),
 % 
-%     io:format("Values = ~p~n~n~n", [Values]),
-%     io:format("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
+%     ?debug("Values = ~p~n~n~n", [Values]),
+%     ?debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
 %     
-%     io:format("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
+%     ?debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
     case Current_update_fields of
         [] ->
             %{ok, [{[]}]};
@@ -1259,7 +1277,7 @@ update(Current, Con, #queryobj{
                 Where_string,
                 sql_returning(Current_returning_fields)
             ],
-            io:format("Q = ~p~n", [Query]),
+            ?debug("Q = ~p~n", [Query]),
             case dao:pgret(
                 dao:equery(
                     Con,Query,lists:append(Current_update_fields, Pfields)
@@ -1421,7 +1439,7 @@ to_type(V, varchar) ->
 to_type(V, text) ->
     V;
 to_type(V, Type) ->
-    io:format("Type= ~p~n", [Type]),
+    ?debug("Type= ~p~n", [Type]),
     V.
 
 
@@ -1541,7 +1559,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_null, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23503">> ->
@@ -1551,7 +1569,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_exists, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23505">> ->
@@ -1570,11 +1588,11 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 end
             catch
                 E:R ->
-                    io:format("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         Code ->
-            io:format("Code ~p ~n", [Code]),
+            ?debug("Code ~p ~n", [Code]),
             {error, {unknown, Msg}}
     end;
 pgreterr(E) ->
@@ -1672,9 +1690,9 @@ simple(Query, Params) ->
 %%%         Кроме запроса необходимо еще указать соединение.
 %%%
 eqret(Con, Query)->
-    io:format("1 eqret(Con, Query)->~n"),
+    ?debug("1 eqret(Con, Query)->~n"),
     S = pgret(equery(Con, Query)),
-    io:format("2 eqret(Con, Query)->~n"),
+    ?debug("2 eqret(Con, Query)->~n"),
     S.
 
 %%%
@@ -1697,9 +1715,9 @@ sqret(Con, Query)->
 %%%         Кроме запроса необходимо еще указать соединение.
 %%%
 eqret(Con, Query, Params)->
-    io:format("1 eqret(Con, Query, Params)->~n"),
+    ?debug("1 eqret(Con, Query, Params)->~n"),
     X = pgret(equery(Con, Query, Params)),
-    io:format("2 eqret(Con, Query, Params)->~n"),
+    ?debug("2 eqret(Con, Query, Params)->~n"),
     X.
 
 % ---------------------------------------------------------------------------
@@ -1766,19 +1784,22 @@ equery(Con, Qfunction, Params) when erlang:is_function(Qfunction) ->
 %%%         Последнее очень не удобно для запросов с более чем 5 параметров.
 %%%
 equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
-    case is_proplist(Params) of
-        true ->
-            io:format("FQ = ~p~n", [convert:to_binary(Query)]),
-            {NewQuery, Values} = equery_pl(Query, Params),
-            io:format("PQ = ~p~n", [convert:to_binary(NewQuery)]),
-            io:format("PP = ~p~n", [Params]),
-            io:format("PV = ~p~n", [Values]),
-            psqlcp:equery(Con, NewQuery, Values);
-        _ ->
-            io:format("PQ = ~p~n", [convert:to_binary(Query)]),
-            io:format("PP = ~p~n", [Params]),
-            psqlcp:equery(Con, Query, Params)
-    end.
+    {Nq, Val} = memocashe({Query, Params}, fun()->
+        case is_proplist(Params) of
+            true ->
+                ?debug("FQ = ~p~n", [convert:to_binary(Query)]),
+                {Newquery, Values} = equery_pl(Query, Params),
+                ?debug("PQ = ~p~n", [convert:to_binary(Newquery)]),
+                ?debug("PP = ~p~n", [Params]),
+                ?debug("PV = ~p~n", [Values]),
+                {Newquery, Values};
+            _ ->
+                ?debug("PQ = ~p~n", [convert:to_binary(Query)]),
+                ?debug("PP = ~p~n", [Params]),
+                {Query, Params}
+        end
+    end),
+    psqlcp:equery(Con, Nq, Val).
 
 %%% 
 %%% @doc    Обертка для функции ?MODULE:equery/2
@@ -1807,7 +1828,7 @@ equery(Con, Function) when erlang:is_function(Function) ->
     equery(Con, fquery(Con, Function, []));
 
 equery(Con, Query) when erlang:is_list(Query); erlang:is_binary(Query) ->
-    io:format("equery(Con, Query) when erlang:is_list(Query) "),
+    ?debug("equery(Con, Query) when erlang:is_list(Query) "),
     psqlcp:equery(Con, Query).
 
 

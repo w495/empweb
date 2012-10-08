@@ -211,7 +211,8 @@
     create_message/1,
     update_message/1,
     delete_message_for_me/1,
-    delete_message_from_me/1
+    delete_message_from_me/1,
+    count_message/1
 ]).
 
 
@@ -791,6 +792,11 @@ get_message_from_me(Params)->
 get_message_from_me(Params, Fields)->
     get_message([{isdfo, false},Params], Fields).
 
+count_message(Params)->
+    Pers_id = proplists:get_value(Params),
+    dao:with_transaction(fun(Con)->
+        dao_message:count(Con, Params)
+    end).
 
 %%
 %% Local Functions

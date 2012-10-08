@@ -335,53 +335,95 @@ handle(_req, #empweb_hap{
             },
             #norm_at_least_one{
                 rules=[
-                    #norm_rule{
-                        key = nick,
-                        types = [string]
-                    },
-                    #norm_rule{
-                        key = description,
-                        types = [string]
-                    },
+                %% ----------------------------------------------------
+                %% Пароль
                     #norm_rule{
                         key = pass,
                         types = [string]
                     },
+                %% Почта
                     #norm_rule{
                         key = email,
                         types = [nullable, email]
                     },
+                %% Телефон
                     #norm_rule{
                         key = phone,
                         types = [nullable, integer]
                     },
-                    #norm_rule{
-                        key = room_id,
-                        types = [nullable, integer]
-                    },
-                    #norm_rule{
-                        key = community_id,
-                        types = [nullable, integer]
-                    },
-                    #norm_rule{
-                        key = hobby,
-                        types = [nullable, string]
-                    },
+                %% ----------------------------------------------------
+                %% Имя
                     #norm_rule{
                         key = fname,
                         types = [nullable, string]
                     },
+                %% Фамилия
                     #norm_rule{
                         key = sname,
                         types = [nullable, string]
                     },
+                %% Род занятий
+                    #norm_rule{
+                        key = empl,
+                        types = [nullable, string]
+                    },
+                %% Xобби
+                    #norm_rule{
+                        key = hobby,
+                        types = [nullable, string]
+                    },
+                %% Oписание
+                    #norm_rule{
+                        key = descr,
+                        types = [nullable, string]
+                    },
+                %% Регион pregion_id
+                    #norm_rule{
+                        key = pregion_id,
+                        types = [nullable, integer]
+                    },
+                %% Дата рождения
                     #norm_rule{
                         key = birthday,
                         types = [nullable, datetime_unixtime]
                     },
+                %% Флаг пола
                     #norm_rule{
-                        key = city,
+                        key = ismale,
+                        types = [nullable, boolean]
+                    },
+                %% Комната
+                    #norm_rule{
+                        key = live_room_id,
+                        types = [nullable, integer]
+                    },
+                %% Сообщество
+                    #norm_rule{
+                        key = community_id,
+                        types = [nullable, integer]
+                    },
+                %% Эмоции пользователя.
+                    #norm_rule{
+                        key = emotion_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = emotion_alias,
                         types = [nullable, string]
+                    },
+                %% Язык пользователя.
+                    #norm_rule{
+                        key = lang_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = lang_alias,
+                        types = [nullable, string]
+                    },
+                %% Принимать, не принимать аукционы
+                    #norm_rule{
+                        key = allowauctionoffer,
+                        types = [nullable, boolean]
                     }
                 ]
             }

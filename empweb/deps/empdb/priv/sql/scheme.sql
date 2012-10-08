@@ -297,13 +297,19 @@ create table pers(
         ------------------------------------------------------------
     **/
     id decimal primary key default nextval('seq_pers_id'),
-    login               varchar(1024) default '_'
+    login               varchar(1024) default 'user_'
                         || CAST (nextval('seq_pers_fakelogin')
                             as varchar(1024))
                         || '_'
                         || extract(epoch from now())
                         || '_' not null unique,
-    nick        varchar(1024),
+    nick                varchar(1024) default 'user_'
+                        || CAST (nextval('seq_pers_fakelogin')
+                            as varchar(1024))
+                        || '_'
+                        || extract(epoch from now())
+                        || '_' not null unique,
+    -- nick        varchar(1024)   not null unique,
     phash       char(32)        not null,
     email       varchar(1024)   default null,
     phone       numeric         default null,
@@ -362,9 +368,18 @@ create table pers(
     /** Общество в котором он состоит
         [см далее]: community_id decimal references community(id) default null,
     **/
+    community_head      varchar(1024) /*references doc(head)*/ default null,
     /** Страна \ рай \ aд
-        [см далее]: room_id decimal references room(id) default null,
+        [см далее]: live_room_id decimal references room(id) default null,
     **/
+    live_room_head           varchar(1024) /*references doc(head)*/ default null,
+
+    /** Страна \ рай \ aд
+        [см далее]: own_room_id decimal references room(id) default null,
+    **/
+    
+    own_room_head       varchar(1024) /*references doc(head)*/ default null,
+    
     allowauctionoffer   bool default false,
     perspicbody_id      decimal references perspicbody(id)   default null,
     perspichead_id      decimal references perspichead(id)   default null,
@@ -595,7 +610,8 @@ create table doc(
     /**
         Владелец документа
     **/
-    owner_id            decimal references pers(id)         default null,
+    owner_id            decimal         references pers(id)     default null,
+    owner_nick          varchar(1024)   references pers(nick)   default null,
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
@@ -879,9 +895,11 @@ create table room(
 );
 
 
-alter table pers add  column room_id
+alter table pers add  column live_room_id
     decimal references room(doc_id) default null;
 
+alter table pers add  column own_room_id
+    decimal references room(doc_id) default null;
 
 ------------------------------------------------------------------------------
 -- Сообщество
@@ -1053,23 +1071,32 @@ create table thing(
 /**
  *  Многие ко многим для прав и групп
 **/
+
+create sequence seq_perm2pgroup_id;
 create table perm2pgroup (
-    perm_id decimal references perm(id) not null,
-    group_id decimal references pgroup(id) not null
+    perm2pgroup_id      decimal primary key default nextval('seq_perm2pgroup_id'),
+    perm_id decimal     references perm(id) not null,
+    group_id decimal    references pgroup(id) not null,
+    isdeleted           bool default false
 );
 
 /**
  *  Многие ко многим для пользователей и групп
 **/
+create sequence seq_pers2pgroup_id;
 create table pers2pgroup (
-    pers_id decimal references pers(id) not null,
-    group_id decimal references pgroup(id) not null
+    pers2pgroup_id      decimal primary key default nextval('seq_pers2pgroup_id'),
+    pers_id decimal     references pers(id) not null,
+    group_id decimal    references pgroup(id) not null,
+    isdeleted           bool default false
 );
 
 /**
  *  Многие ко многим для пользователей и вещей
 **/
+create sequence seq_pers2thing_id;
 create table pers2thing (
+    pers2thing_id       decimal primary key default nextval('pers2thing'),
     pers_id             decimal references pers(id) not null,
     thing_id            decimal references thing(id) not null,
     created             timestamp without time zone not null default now(),
