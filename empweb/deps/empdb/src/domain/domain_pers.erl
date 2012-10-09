@@ -420,7 +420,25 @@ get_opt(Con,Params, [Option|Options], Accs)->
 
 add_friend(Params)->
     dao:with_connection(emp, fun(Con)->
-        dao_pers:add_friend(Con, Params)
+        case dao_pers:add_friend(Con, Params) of
+            {ok, _frndpls} ->
+                %% TODO: костыль
+                %% Возможно, иммет смысл получать 
+                %% на основе _frndpls
+                dao_pers:get(Con,
+                    [{isdeleted, false},
+                    {id, proplists:get_value(friend_id, Params)}],
+                    [   id,
+                        nick,
+                        pstatus_id,
+                        pstatus_alias,
+                        live_room_id,
+                        live_room_head
+                    ]
+                );
+            Error ->
+                Error
+        end
     end).
 
 delete_friend(Params)->
