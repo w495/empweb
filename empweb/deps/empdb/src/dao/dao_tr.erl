@@ -56,7 +56,19 @@ table({fields, insert})->
 %% @doc Возвращает полный список полей таблицы
 %%
 table({fields, all})->
-    [id, ti, lang_id, text, isdeleted];
+    [
+        id,
+        tt,
+        tf,
+        ta,
+        ti,
+        lang_id,
+        lang_alias,
+        text,
+        trtype_id,
+        trtype_alias,
+        isdeleted
+    ];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -75,7 +87,7 @@ table()->
 
 
 get(Con, Some) ->
-    get(Con, Some, []).
+   dao:get(?MODULE, Con, Some).
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).

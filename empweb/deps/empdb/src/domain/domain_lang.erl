@@ -64,9 +64,6 @@ is_tr_owner(Uid, Oid)->
         dao_tr:is_owner(Con, Uid, Oid)
     end).
 
-
-
-
 create_lang(Params)->
     dao:with_connection(fun(Con)->
         dao_lang:create(Con, Params)

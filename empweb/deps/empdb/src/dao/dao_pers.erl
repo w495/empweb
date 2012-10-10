@@ -25,6 +25,7 @@
     update/3,
     get/2,
     get/3,
+    count/2,
     get_perm/2,
     get_perm/3,
     get_group/2,
@@ -205,6 +206,9 @@ table()->
 
 get(Con, What) ->
     dao:get(?MODULE, Con, What).
+
+count(Con, What) ->
+    dao:count(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     dao:get(?MODULE, Con, What, Fields).

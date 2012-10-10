@@ -208,11 +208,18 @@
     get_message_for_me/2,
     get_message_from_me/1,
     get_message_from_me/2,
+
+    count_message/1,
+    count_message_types/1,
+    count_message_for_me/1,
+    count_message_from_me/1,
+    
     create_message/1,
     update_message/1,
+    
     delete_message_for_me/1,
     delete_message_from_me/1,
-    count_message/1
+    delete_message/1
 ]).
 
 
@@ -754,15 +761,10 @@ update_message(Params)->
         dao_message:update(Con, Params)
     end).
 
-delete_message_for_me(Params)->
-    dao:with_transaction(fun(Con)->
-        dao_message:update(Con, [{isdfr, true},Params])
-    end).
 
-
-delete_message_from_me(Params)->
+is_message_owner(Uid, Oid)->
     dao:with_transaction(fun(Con)->
-        dao_message:update(Con, [{isdfr, true},Params])
+        dao_message:is_owner(Con, Uid, Oid)
     end).
 
 get_message(Params)->
@@ -775,27 +777,182 @@ get_message(Params, Fileds)->
         dao_message:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-is_message_owner(Uid, Oid)->
+get_message_for_me(Params)->
     dao:with_transaction(fun(Con)->
-        dao_message:is_owner(Con, Uid, Oid)
+        dao_message:get(Con, [
+            {isdfr,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Params) of
+                undefined ->
+                    Params;
+                Reader_id ->
+                    [{reader_id, Reader_id}|Params]
+            end
+        ])
     end).
 
-get_message_for_me(Params)->
-    get_message([{isdfr, false},Params]).
-
 get_message_for_me(Params, Fields)->
-    get_message([{isdfr, false},Params], Fields).
+    dao:with_transaction(fun(Con)->
+        dao_message:get(Con, [
+            {isdfr,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Params) of
+                undefined ->
+                    Params;
+                Reader_id ->
+                    [{reader_id, Reader_id}|Params]
+            end
+        ], Fields)
+    end).
 
 get_message_from_me(Params)->
-    get_message([{isdfo, false},Params]).
+    dao:with_transaction(fun(Con)->
+        dao_message:get(Con, [
+            {isdfo,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Params) of
+                undefined ->
+                    Params;
+                Owner_id ->
+                    [{owner_id, Owner_id}|Params]
+            end
+        ])
+    end).
 
 get_message_from_me(Params, Fields)->
-    get_message([{isdfo, false},Params], Fields).
-
-count_message(Params)->
-    Pers_id = proplists:get_value(Params),
     dao:with_transaction(fun(Con)->
-        dao_message:count(Con, Params)
+        dao_message:get(Con, [
+            {isdfo,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Params) of
+                undefined ->
+                    Params;
+                Owner_id ->
+                    [{owner_id, Owner_id}|Params]
+            end
+        ], Fields)
+    end).
+
+count_message(Filter)->
+    dao:with_transaction(fun(Con)->
+        dao_message:count(Con, [{isdeleted, false}|Filter])
+    end).
+
+
+count_message_types(Filter)->
+    dao:with_transaction(fun(Con)->
+        {ok,[{[{count,Cm_for_me_ok}]}]}     =  count_message_for_me_(Con,   [
+            {oktype_alias, ok}|Filter
+        ]),
+        {ok,[{[{count,Cm_from_me_ok}]}]}    =  count_message_from_me_(Con,  [
+            {oktype_alias, ok}|Filter
+        ]),
+        {ok,[{[{count,Cm_for_me_new}]}]}    =  count_message_for_me_(Con,   [
+            {oktype_alias, {neq, ok}}|Filter
+        ]),
+        {ok,[{[{count,Cm_from_me_new}]}]}   =  count_message_from_me_(Con,  [
+            {oktype_alias, {neq, ok}}|Filter
+        ]),
+        {ok, [
+            {[
+                {for_me, {[
+                    {ok, Cm_for_me_ok},
+                    {new, Cm_for_me_new},
+                    {all, Cm_for_me_ok + Cm_for_me_new}
+                ]}}
+            ]},
+            {[
+                {from_me,{[
+                    {ok, Cm_from_me_ok},
+                    {new, Cm_from_me_new},
+                    {all, Cm_from_me_ok + Cm_from_me_new}
+                ]}}
+            ]}
+        ]}
+    end).
+
+count_message_for_me(Filter)->
+    dao:with_transaction(fun(Con)->
+        count_message_for_me_(Con, Filter)
+    end).
+
+count_message_for_me_(Con, Filter)->
+    dao_message:count(Con,[
+        {filter, [
+            {isdfr,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Filter) of
+                undefined ->
+                    Filter;
+                Reader_id ->
+                    [{reader_id, Reader_id}|Filter]
+            end
+        ]}
+    ]).
+
+    
+count_message_from_me(Filter)->
+    dao:with_transaction(fun(Con)->
+        count_message_from_me_(Con, Filter)
+    end).
+
+count_message_from_me_(Con, Filter)->
+    dao_message:count(Con,[
+        {filter, [
+            {isdfo,     false},
+            {isdeleted, false}
+            |case proplists:get_value(pers_id, Filter) of
+                undefined ->
+                    Filter;
+                Owner_id ->
+                    [{owner_id, Owner_id}|Filter]
+            end
+        ]}
+    ]).
+
+delete_message(Filter)->
+    dao:with_transaction(fun(Con)->
+        dao_message:update(Con, [
+            {values, [{isdeleted, true}]},
+            {filter, [{isdeleted, false}|Filter]}
+        ])
+    end).
+
+delete_message_for_me(Filter)->
+    io:format("~n <<<< Filter = ~p >>>> ~n", [Filter]),
+    dao:with_transaction(fun(Con)->
+        dao_message:update(Con, [
+            {values, [{isdfr, true}]},
+            {filter, [
+                {isdfr,     false},
+                {isdeleted, false}
+                |case proplists:get_value(pers_id, Filter) of
+                    undefined ->
+                        Filter;
+                    Reader_id ->
+                        [{reader_id, Reader_id}|Filter]
+                end
+            ]},
+            {fields,[id,doctype_id]}
+        ])
+    end).
+
+delete_message_from_me(Filter)->
+    dao:with_transaction(fun(Con)->
+        dao_message:update(Con, [
+            {values, [{isdfo, true}]},
+            {filter, [
+                {isdfo,     false},
+                {isdeleted, false}
+                |case proplists:get_value(pers_id, Filter) of
+                    undefined ->
+                        Filter;
+                    Owner_id ->
+                        [{owner_id, Owner_id}|Filter]
+                end
+            ]},
+            {fields,[id,doctype_id]}
+        ])
     end).
 
 %%

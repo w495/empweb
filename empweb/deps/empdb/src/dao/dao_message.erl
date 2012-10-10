@@ -21,7 +21,9 @@
     create/2,
     update/2,
     get/2,
-    get/3
+    get/3,
+    count/2,
+    count/3
 ]).
 
 %%
@@ -51,7 +53,7 @@ table({fields, insert, required})-> [];
 %% @doc Возвращает список полей таблицы для выборки
 %%
 table({fields, select})->
-    table({fields, all}) -- [isdfo, isdfr];
+    table({fields, all});
 
 %%
 %% @doc Возвращает список полей таблицы для обновления
@@ -98,10 +100,19 @@ get(Con, What) ->
 get(Con, What, Fields)->
     dao_doc:get(?MODULE, Con, What, Fields).
 
+
+count(Con, What) ->
+    dao_doc:count(?MODULE, Con, What).
+
+count(Con, What, Fields)->
+    dao_doc:count(?MODULE, Con, What, Fields).
+
+
 create(Con, Proplist)->
     dao_doc:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
+    io:format("~n <<<< Proplist  = ~p >>>> ~n", [Proplist]),
     dao_doc:update(?MODULE, Con, Proplist).
 
 is_owner(Con, Owner_id, Obj_id) ->

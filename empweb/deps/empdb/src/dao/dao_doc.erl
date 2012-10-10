@@ -14,16 +14,17 @@
     update/2,
     get/2,
     get/3,
+    count/2,
+    count/3,
     is_owner/3
 ]).
 
 -export([
     create/3,
     update/3,
-    get/4
+    get/4,
+    count/4
 ]).
-
-
 
 -export([
     get_acctype/2,
@@ -40,15 +41,12 @@
     update_contype/2
 ]).
 
-
-
 -export([
     get_oktype/2,
     get_oktype/3,
     create_oktype/2,
     update_oktype/2
 ]).
-
 
 %%
 %% API Functions
@@ -120,8 +118,29 @@ table(name)->
 table()->
     table(name).
 
+count(Con, What) ->
+    dao:count(?MODULE, Con, What).
+
+%%
+%% @doc Возвращает экземпляр документа и экземпляр join-наследника.
+%%      Наследник должен быть описан в модуле Module.
+%%
+count(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
+    dao:count([{?MODULE, id}, {Module, doc_id}], Con, What);
+
+
+count(Con, What, Fields)->
+    dao:count(?MODULE, Con, What, Fields).
+
+%%
+%% @doc Возвращает экземпляр документа и экземпляр join-наследника.
+%%      Наследник должен быть описан в модуле Module.
+%%
+count(Module, Con, What, Fields)->
+    dao:count([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
+
 get(Con, What) ->
-    get(Con, What).
+    dao:get(?MODULE, Con, What).
 
 %%
 %% @doc Возвращает экземпляр документа и экземпляр join-наследника.
@@ -149,20 +168,11 @@ get(Con, What, Fields)->
 %%      Наследник должен быть описан в модуле Module.
 %%
 get(Module, Con, What, Fields)->
-    io:format("What, Fields = ~p~n", [{What, Fields}]),
 %     ?MODULE:update(Con, [
 %         {filter, What},
 %         {values, [{vcounter, {incr, 1}}]}
 %     ]),
     dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
-    
-    
-%     case dao:get([{?MODULE, id},{Module, doc_id}], Con, alias2id_pl(What, []), alias2id_fields(Fields, [])) of
-%         {ok, Doc} ->
-%             {ok, id2alias_pl(Doc, [])};
-%         Error ->
-%             Error 
-%     end.
 
 create(Con, What)->
     dao:create(?MODULE, Con, alias2id_pl(What, [])).

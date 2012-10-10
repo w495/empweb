@@ -208,7 +208,10 @@
     update_message/1,
     delete_message_for_me/1,
     delete_message_from_me/1,
-    count_message/1
+    count_message_for_me/1,
+    count_message_from_me/1,
+    count_message/1,
+    count_message_types/1
 ]).
 
 
@@ -501,9 +504,6 @@ create_message(Params)->
 update_message(Params)->
     domain_doc:update_message(Params).
 
-delete_message(Params)->
-    domain_doc:delete_message(Params).
-
 get_message(Params)->
     domain_doc:get_message(Params).
 
@@ -511,22 +511,34 @@ get_message(Params, Fields)->
     domain_doc:get_message(Params, Fields).
 
 get_message_for_me(Params)->
-    domain_doc:get_message(Params).
-
-delete_message_for_me(Params)->
-    domain_doc:get_message(Params).
-
-get_message_for_me(Params, Fields)->
-    domain_doc:get_message(Params, Fields).
+    domain_doc:get_message_for_me(Params).
 
 get_message_from_me(Params)->
-    domain_doc:get_message(Params).
+    domain_doc:get_message_from_me(Params).
 
-delete_message_from_me(Params)->
-    domain_doc:get_message(Params).
+get_message_for_me(Params, Fields)->
+    domain_doc:get_message_for_me(Params, Fields).
 
 get_message_from_me(Params, Fields)->
-    domain_doc:get_message(Params, Fields).
+    domain_doc:get_message_from_me(Params, Fields).
+
+delete_message(Params)->
+    domain_doc:delete_message(Params).
+
+delete_message_for_me(Params)->
+    domain_doc:delete_message_for_me(Params).
+
+delete_message_from_me(Params)->
+    domain_doc:delete_message_from_me(Params).
+
+count_message_for_me(Params)->
+    domain_doc:count_message_for_me(Params).
+
+count_message_from_me(Params)->
+    domain_doc:count_message_from_me(Params).
 
 count_message(Params) ->
     domain_doc:count_message(Params).
+
+count_message_types(Params) ->
+    domain_doc:count_message_types(Params).

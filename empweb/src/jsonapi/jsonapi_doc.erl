@@ -1460,7 +1460,7 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   count_message,
+        action  =   count_message_types,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -1470,14 +1470,14 @@ handle(_req, #empweb_hap{
     %% так и чужих, которые отпарвлены мне.
     %% Отправителя и получателя надо указывать явно.
     %%
-    ?evman_args([Hap], <<" = count message">>),
+    ?evman_args([Hap], <<" = count message types">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, []),
+        norm:norm(Params, doc_norm('get')),
         fun(Data)->
             {ok,
                 jsonapi:resp(
-                    biz_doc:count_message(
+                    biz_doc:count_message_types(
                         [{pers_id, Pers_id}|Data#norm.return]
                     )
                 ),
@@ -1489,7 +1489,8 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   get_message,
-        params  =   Params
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     %% 
     %% Pers_id при получении сообщения смысла не имеет.
@@ -1526,6 +1527,91 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_message_for_me,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    %%
+    %% Pers_id при получении сообщения смысла не имеет.
+    %% т.к. мы смысл имеет получать как своих сообщений,
+    %% так и чужих, которые отпарвлены мне.
+    %% Отправителя и получателя надо указывать явно.
+    %%
+    ?evman_args([Hap], <<" = get message for me">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = reader_id,
+                required    = false,
+                types       = [nulluble, integer]
+            },
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [nulluble, integer]
+            }
+            | doc_norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_message_for_me(
+                        [{pers_id, Pers_id}|Data#norm.return],
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_message_from_me,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    %%
+    %% Pers_id при получении сообщения смысла не имеет.
+    %% т.к. мы смысл имеет получать как своих сообщений,
+    %% так и чужих, которые отпарвлены мне.
+    %% Отправителя и получателя надо указывать явно.
+    %%
+    ?evman_args([Hap], <<" = get message from me">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = reader_id,
+                required    = false,
+                types       = [nulluble, integer]
+            },
+            #norm_rule{
+                key         = type_id,
+                required    = false,
+                types       = [nulluble, integer]
+            }
+            | doc_norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                jsonapi:resp(
+                    biz_doc:get_message_from_me(
+                        [{pers_id, Pers_id}|Data#norm.return],
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+    
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create_message,
@@ -1601,28 +1687,16 @@ handle(_req, #empweb_hap{
         params  =   Params, 
         pers_id =   Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = update message">>),
+    ?evman_args([Hap], <<" = delete message for me">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = reader_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = type_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
-            | doc_norm('update')
-        ]),
+        norm:norm(Params, doc_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:delete_message_for_me(Data#norm.return)
+                    biz_doc:delete_message_for_me([{pers_id, Pers_id}|Data#norm.return])
                 ),
                 Hap
             }
@@ -1635,28 +1709,16 @@ handle(_req, #empweb_hap{
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = update message">>),
+    ?evman_args([Hap], <<" =  delete message from me">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = reader_id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = type_id,
-                required    = false,
-                types       = [nulluble, integer]
-            }
-            | doc_norm('update')
-        ]),
+        norm:norm(Params, doc_norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 jsonapi:resp(
-                    biz_doc:delete_message_from_me(Data#norm.return)
+                    biz_doc:delete_message_from_me([{pers_id, Pers_id}|Data#norm.return])
                 ),
                 Hap
             }

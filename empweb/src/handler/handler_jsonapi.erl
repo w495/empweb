@@ -760,10 +760,31 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            <<"count_message_types">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   count_message_types,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
             <<"get_message">> ->
                 #empweb_hap{
                     handler         =   jsonapi_doc,
                     action          =   get_message,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_message_for_me">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_message_for_me,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_message_from_me">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   get_message_from_me,
                     pers_id         =   Pid,
                     params          =   Params
                 };
@@ -826,8 +847,9 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_langs">> ->
                 #empweb_hap{
                     handler         =   jsonapi_conf,
-                    action          =   get_all_langs,
-                    pers_id         =   Pid
+                    action          =   get_lang,
+                    pers_id         =   Pid,
+                    params          =   Params
                 };
             <<"create_lang">> ->
                 #empweb_hap{
@@ -863,7 +885,7 @@ jsonapi_map(Req, {List}) ->
             <<"get_all_trs">> ->
                 #empweb_hap{
                     handler         =   jsonapi_conf,
-                    action          =   get_all_trs,
+                    action          =   get_tr,
                     pers_id         =   Pid,
                     params          =   Params
                 };
