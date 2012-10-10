@@ -83,70 +83,11 @@ init(_, Req, #empweb_hap{
 %% Языки
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{
-        action=get_all_langs, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all langs">>),
-    {ok,jsonapi:resp(biz_conf:get_lang([])),Hap};
 
 handle(_req, #empweb_hap{
-        action='get_lang', params=Params, pers_id=Owner_id
+        action='get', params=Params, pers_id=Owner_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = get lang">>),
-
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:get_lang(Data#norm.return)),Hap}
-        end
-    );
-
-handle(_req, #empweb_hap{
-        action=create_lang, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = create lang">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = id,
-                required    = false,
-                types       = [integer]
-            },
-            #norm_rule{
-                key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_lang(Data#norm.return)),Hap}
-        end
-    );
-
-handle(_req, #empweb_hap{
-        action=update_lang, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = update lang">>),
+    ?evman_args([Hap], <<" = get thing">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -158,95 +99,70 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = alias,
-                types       = [string]
-            },
-            #norm_rule{
-                key         = descr,
-                types       = [string]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_lang(Data#norm.return)),Hap}
-        end
-    );
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Переводы
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-handle(_req, #empweb_hap{
-        action=get_all_trs, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all trs">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key         = lang_id,
                 required    = false,
                 types       = [string]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:get_tr(Data#norm.return)),Hap}
-        end
-    );
-
-handle(_req, #empweb_hap{
-        action='get_tr', params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get tr">>),
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_rule{
-                key = ti,
-                types = [string]
             },
             #norm_rule{
-                key = lang_id,
-                types = [integer]
+                key         = price,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = [integer]
             }
+            |jsonapi:norm('get')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:get_tr(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_thing:get(Data#norm.return)),Hap}
         end
     );
 
 handle(_req, #empweb_hap{
-        action=create_tr, params=Params, pers_id=Owner_id
+        action=create, params=Params, pers_id=Owner_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = create tr">>),
+    ?evman_args([Hap], <<" = create thing">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = id,
+                key         = alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = name_ti,
                 required    = false,
                 types       = [integer]
             },
             #norm_rule{
-                key         = alias,
-                types       = [string]
+                key         = descr_ti,
+                required    = false,
+                types       = [integer]
             },
             #norm_rule{
-                key         = descr,
-                types       = [string]
+                key         = price,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = [integer]
             }
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_tr(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_thing:create(Data#norm.return)),Hap}
         end
     );
 
 handle(_req, #empweb_hap{
-        action=update_tr, params=Params, pers_id=Owner_id
+        action=update, params=Params, pers_id=Owner_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = update tr">>),
+    ?evman_args([Hap], <<" = update thing">>),
 
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -258,19 +174,35 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = alias,
+                required    = false,
                 types       = [string]
             },
             #norm_rule{
-                key         = descr,
-                types       = [string]
+                key         = name_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = descr_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = [integer]
             }
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_tr(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_thing:update(Data#norm.return)),Hap}
         end
     );
-
 
 
 

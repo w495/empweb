@@ -722,6 +722,7 @@ create table attach(
 create table blog(
     doc_id              decimal unique references doc(id),
     nposts              decimal default 0,
+    nvotes              decimal default 0,
     npublicposts        decimal default 0,
     nprivateposts       decimal default 0,
     nprotectedposts     decimal default 0,
@@ -733,7 +734,8 @@ create table blog(
 **/
 create table post(
     doc_id              decimal unique references doc(id),
-    ncomments           decimal default 0
+    ncomments           decimal default 0,
+    nvotes              decimal default 0
 );
 
 /**

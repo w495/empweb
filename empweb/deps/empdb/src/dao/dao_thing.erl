@@ -60,7 +60,7 @@ table({fields, all})->
         alias, 
         name_ti,
         descr_ti,
-        type_id,
+        thingtype_id,
         price,
         isdeleted
     ];

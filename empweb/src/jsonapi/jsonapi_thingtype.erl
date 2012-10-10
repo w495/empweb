@@ -83,43 +83,12 @@ init(_, Req, #empweb_hap{
 %% Языки
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle(_req, #empweb_hap{
-        action=get_all_thingtypes, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = get all thingtypes">>),
-    {ok,jsonapi:resp(biz_conf:get_thingtype([])),Hap};
 
 handle(_req, #empweb_hap{
-        action='get_thingtype', params=Params, pers_id=Owner_id
+        action='get', params=Params, pers_id=Owner_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get thingtype">>),
 
-    jsonapi:handle_params(
-        %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
-            #norm_at_least_one{
-                rules=[
-                    #norm_rule{
-                        key = id,
-                        types = [integer]
-                    },
-                    #norm_rule{
-                        key = alias,
-                        types = [string]
-                    }
-                ]
-            }
-        ]),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:get_thingtype(Data#norm.return)),Hap}
-        end
-    );
-
-handle(_req, #empweb_hap{
-        action=create_thingtype, params=Params, pers_id=Owner_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = create thingtype">>),
     jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -130,21 +99,58 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = alias,
+                required    = false,
                 types       = [string]
             },
             #norm_rule{
-                key         = descr,
-                types       = [string]
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
             }
+            |jsonapi:norm('get')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_thingtype(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_thingtype:get(Data#norm.return)),Hap}
         end
     );
 
 handle(_req, #empweb_hap{
-        action=update_thingtype, params=Params, pers_id=Owner_id
+        action=create, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create thingtype">>),
+    jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = name_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = descr_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,jsonapi:resp(biz_thingtype:create(Data#norm.return)),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=update, params=Params, pers_id=Owner_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update thingtype">>),
 
@@ -158,16 +164,28 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = alias,
+                required    = false,
                 types       = [string]
             },
             #norm_rule{
-                key         = descr,
-                types       = [string]
+                key         = name_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = descr_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
             }
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            {ok,jsonapi:resp(biz_conf:create_thingtype(Data#norm.return)),Hap}
+            {ok,jsonapi:resp(biz_thingtype:update(Data#norm.return)),Hap}
         end
     );
 

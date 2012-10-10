@@ -180,7 +180,7 @@ jsonapi_map(Req, {List}) ->
             <<"get_thingtype">> ->
                 #empweb_hap{
                     handler         =   jsonapi_thingtype,
-                    action          =   get_thingtype,
+                    action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
@@ -216,7 +216,7 @@ jsonapi_map(Req, {List}) ->
             <<"get_thing">> ->
                 #empweb_hap{
                     handler         =   jsonapi_thing,
-                    action          =   get_thing,
+                    action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };

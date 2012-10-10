@@ -61,6 +61,8 @@ table({fields, all})->
         name_ti,
         descr_ti,
         parent_id,
+        nchildren,
+        nnodes,
         isdeleted
     ];
 

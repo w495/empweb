@@ -57,7 +57,8 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        doc_id
+        doc_id,
+        nvotes
 %        nposts,
 %         npublicposts,
 %         nprivateposts,
