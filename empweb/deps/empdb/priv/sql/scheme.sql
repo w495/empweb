@@ -989,7 +989,8 @@ create table message(
     messagetype_id      decimal         references messagetype(id)      default null,
     messagetype_alias   varchar(1024)   references messagetype(alias)   default null,
     
-    reader_id           decimal references pers(id) default null,
+    reader_id           decimal         references pers(id) default null,
+    reader_nick         varchar(1024)   references pers(nick) default null,
     /**
         Удалено для отправителя (из почтового ящика отправителя)
     **/
@@ -1098,7 +1099,7 @@ create table pers2pgroup (
 **/
 create sequence seq_pers2thing_id;
 create table pers2thing (
-    pers2thing_id       decimal primary key default nextval('pers2thing'),
+    id                  decimal primary key default nextval('pers2thing'),
     pers_id             decimal references pers(id) not null,
     thing_id            decimal references thing(id) not null,
     created             timestamp without time zone not null default now(),

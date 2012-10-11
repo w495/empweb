@@ -74,7 +74,9 @@ table({fields, all})->
     [
         doc_id,
         messagetype_id,
+        messagetype_alias,
         reader_id,
+        reader_nick,
         isdfo,
         isdfr
     ];

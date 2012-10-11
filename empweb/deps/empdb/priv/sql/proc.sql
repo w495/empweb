@@ -720,11 +720,10 @@ begin
             new.owner_nick        = null;
         end if;
     end if;
-
---     if (new.owner_id is null) then
---         new.owner_id           =
---             (select pers.id from pers where pers.nick = new.owner_nick);
---     end if;
+    if (new.owner_id is null) then
+        new.owner_id           =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
 
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
@@ -806,6 +805,10 @@ begin
     if new.owner_id != old.owner_id then
         new.owner_nick =
             (select pers.nick from pers where pers.id = new.owner_id);
+    end if;
+    if new.owner_nick != old.owner_nick then
+        new.owner_id =
+            (select pers.id from pers where pers.nick = new.owner_nick);
     end if;
 
     if new.head != old.head then
@@ -1197,10 +1200,68 @@ on community for each row execute procedure community_util_fields_on_insert();
         @doc Обеспечивает совместное состояние cooбщения
     --------------------------------------------------------------------------
 **/
+
+
+create or replace function message_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+        Получатель сообщения
+    **/
+    if (new.reader_nick is null) then
+        if not (new.reader_id is null) then
+            new.reader_nick =
+                (select pers.nick from pers where pers.id = new.reader_id);
+        else
+            new.reader_nick        = null;
+        end if;
+    end if;
+    if (new.reader_id is null) then
+        new.reader_id           =
+            (select pers.id from pers where pers.nick = new.reader_nick);
+    end if;
+
+    /**
+    *  Типы сообщества
+    **/
+    if (not (new.messagetype_id is null)) and (new.messagetype_alias is null) then
+        new.messagetype_alias =
+            (select messagetype.alias
+                from
+                    messagetype
+                where
+                    messagetype.id = new.messagetype_id);
+    end if;
+    if (new.messagetype_id is null) and (not (new.messagetype_alias is null)) then
+        new.messagetype_id =
+            (select messagetype.id
+                from
+                    messagetype
+                where
+                    messagetype.alias = new.messagetype_alias);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1message_util_fields_on_insert on message ;
+create trigger t1message_util_fields_on_insert before insert
+on message for each row execute procedure message_util_fields_on_insert();
+
 create or replace function message_util_fields_on_update() returns "trigger" as $$
 begin
     /**
-    *  Типы сообщества
+        Получатель сообщения
+    **/
+    if new.reader_id != old.reader_id then
+        new.reader_nick =
+            (select pers.nick from pers where pers.id = new.reader_id);
+    end if;
+    if new.reader_nick != old.reader_nick then
+        new.reader_id =
+            (select pers.id from pers where pers.nick = new.reader_nick);
+    end if;
+    /**
+    *  Типы cooбщения
     **/
     if new.messagetype_id != old.messagetype_id then
         new.messagetype_alias = 
@@ -1229,7 +1290,7 @@ on message for each row execute procedure message_util_fields_on_update();
 
 
 /**
-    @doc Обеспечивает совместное состояние cooбщества
+    @doc Обеспечивает совместное состояние события
 **/
 
 create or replace function event_util_fields_on_update() returns "trigger" as $$

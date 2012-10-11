@@ -1503,12 +1503,12 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = reader_id,
+                key         = reader_nick,
                 required    = false,
-                types       = [nulluble, integer]
+                types       = [nulluble, string]
             },
             #norm_rule{
-                key         = type_id,
+                key         = reader_id,
                 required    = false,
                 types       = [nulluble, integer]
             }
@@ -1548,6 +1548,11 @@ handle(_req, #empweb_hap{
                 key         = reader_id,
                 required    = false,
                 types       = [nulluble, integer]
+            },
+            #norm_rule{
+                key         = reader_nick,
+                required    = false,
+                types       = [nulluble, string]
             },
             #norm_rule{
                 key         = type_id,
@@ -1592,6 +1597,11 @@ handle(_req, #empweb_hap{
                 types       = [nulluble, integer]
             },
             #norm_rule{
+                key         = reader_nick,
+                required    = false,
+                types       = [nulluble, string]
+            },
+            #norm_rule{
                 key         = type_id,
                 required    = false,
                 types       = [nulluble, integer]
@@ -1624,7 +1634,13 @@ handle(_req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key         = reader_id,
+                required    = false,
                 types       = [integer]
+            },
+            #norm_rule{
+                key         = reader_nick,
+                required    = false,
+                types       = [string]
             },
             #norm_rule{
                 key         = type_id,
@@ -1663,6 +1679,11 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [integer]
             },
+            #norm_rule{
+                key         = reader_nick,
+                required    = false,
+                types       = [string]
+            },  
             #norm_rule{
                 key         = type_id,
                 required    = false,
