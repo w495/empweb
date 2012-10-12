@@ -123,49 +123,161 @@ register(Params)->
         {Eclass, Error} ->
             {Eclass, Error}
     end.
-% 
-% suggest_nick(Nick, Pass)->
-%     {Year,Month,Day} = erlang:date(),
-% 
-%     Prewords = [
-%         convert:to_binary(convert:to_list(Year)),
-%         convert:to_binary(convert:to_list(Year+1)),
-%         convert:to_binary(convert:to_list(Month)),
-%         convert:to_binary(convert:to_list(Month+1)),
-%         <<"the">>,
-%         <<"dr">>,
-%         <<"emp">>,
-%         <<"super">>,
-%         <<"cool">>
-%     ]
-% 
-% 
-%     Lr = [
-%         [<<"empire.">>, Nick],
-%         [<<"emp.">>,    Nick],
-%         [<<"super.">>,  Nick],
-%         [<<"cool.">>,   Nick],
-%         [Nick, <<"1">>]
-%         [Nick, <<"1">>],
-%         [Nick, <<"2">>],
-%         [Nick, <<"3">>],
-%         [Nick, <<"3">>],
-%     ]
-%     Nick.
-% 
-% 
-% nick_match(Nick, Patterns) ->
-%     case binary:match(Nick, Patterns,[]) of
-%         nomatch ->
-%             false;
-%         _ ->
-%             true
-%     end.
+
+suggest_nick(Con, Orgnick, Pass)->
+    {Year,Month,Day} = erlang:date(),
+
+    Seps = lists:usort([
+        <<"">>,
+        <<"-">>,
+        <<"+">>,
+        <<"$">>,
+        <<"%">>,
+        <<"!">>,
+        <<"*">>,
+        <<"#">>,
+        <<"@">>,
+        <<"&">>,
+        <<"_">>,
+        <<".">>
+    ]),
+
+
+    Prewords = lists:usort([
+        <<"re">>,
+        <<"my">>,
+        <<"true">>,
+        <<"super">>,
+        <<"cool">>
+    ]),
+
+
+    Postwords = lists:usort([
+        convert:to_binary(convert:to_list(Day)),
+        convert:to_binary(convert:to_list(Month)),
+        convert:to_binary(convert:to_list(Year)),
+        convert:to_binary(convert:to_list(Year - 2000)),
+        <<"s">>,
+        <<"us">>,
+        <<"er">>,
+        <<"me">>,
+        <<"man">>,
+        <<"nick">>,
+        <<"user">>
+    ]),
+
+    Stoppunkts = lists:append([
+        [
+            <<" ">>,
+            <<"(">>,
+            <<")">>,
+            <<"<">>,
+            <<">">>,
+            <<"[">>,
+            <<"]">>,
+            <<"{">>,
+            <<"}">>,
+            <<"-">>,
+            <<"+">>,
+            <<"$">>,
+            <<"%">>,
+            <<"^">>,
+            <<"!">>,
+            <<"*">>,
+            <<"~">>,
+            <<"`">>,
+            <<"'">>,
+            <<"\"">>,
+            <<"#">>,
+            <<"@">>,
+            <<"&">>,
+            <<"_">>,
+            <<".">>,
+            <<",">>,
+            <<"?">>
+        ],
+        Seps -- [<<"">>],
+        [convert:to_binary(convert:to_list(X)) || X <- lists:seq(0, 9)]
+    ]),
+
+    Stopwords = lists:append([
+        Prewords,
+        [
+            <<"man">>,
+            <<"nick">>,
+            <<"user">>
+        ]
+    ]),
+
+    Norgnick = Orgnick,
+
+    Nickparts__ = binary:split(Norgnick, Stoppunkts, [global, trim]),
+
+    Nickparts_ = lists:foldl(fun(Nn, Acc) -> lists:append(binary:split(
+        Nn,
+        Stopwords ,
+        [trim]
+    ), Acc) end, [], Nickparts__),
+
+    Nickparts =
+        case lists:filter(fun(<<>>)-> false; (_)-> true end,  Nickparts_) of
+            [] ->
+                [Norgnick];
+            Nres ->
+                Nres
+        end,
+
+    Sugs_ = lists:append([
+        [ convert:to_binary([Preword, Sep, Nick]) ||
+            Nick <- Nickparts,
+            Preword <- Prewords,
+            Sep <- Seps,
+            not nick_match(Nick, [Preword, Sep]) and
+            (Nick =/= <<>>)
+        ] -- [Orgnick],
+        [ convert:to_binary([Nick, Sep, Postword]) ||
+            Nick <- Nickparts,
+            Sep <- Seps,
+            Postword <- Postwords,
+            not nick_match(Nick, [Sep, Postword])and
+            (Nick =/= <<>>)
+        ] -- [Orgnick]
+    ]),
+
+    Sugs = lists:sort(
+        fun(X, Y) ->
+            erlang:byte_size(X) < erlang:byte_size(Y)
+        end,
+        lists:sort(
+            lists:filter(
+                fun(Nick)->
+                    case dao_pers:get(Con, [{nick, Nick}]) of
+                        {ok, []} ->
+                            true;
+                        _ ->
+                            false
+                    end
+                end,
+                Sugs_
+            )
+        )
+    ),
+
+    Sugs.
+
+
+nick_match(Nick, Patterns) ->
+    case binary:match(Nick, Patterns -- [<<"">>],[]) of
+        nomatch ->
+            false;
+        _ ->
+            true
+    end.
 
 
 create__(Pass, Params)->
     dao:with_connection(emp, fun(Con)->
-        case dao_pers:create(Con, [{phash, phash(Pass)}|Params]) of
+        case dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, nick]}|Params]) of
             {ok, Persobj}->
                 [{Perspl}|_] = Persobj,
                 case dao_blog:create(Con, [{owner_id,  proplists:get_value(id, Perspl)}, {head, null}, {body, null}]) of
@@ -175,10 +287,9 @@ create__(Pass, Params)->
                         {Eclass, Error}
                 end;
             {error,{not_unique,<<"nick">>}}->
-
                     Nick = proplists:get_value(nick, Params),
-                    io:format("Nick = ~p~n", [Nick]),
-                {error,{not_unique,<<"nick">>}};
+                    Sugs = suggest_nick(Con, Nick, Pass),
+                {error,{not_unique_nick,Sugs}};
             {Eclass, Error} ->
                 {Eclass, Error}
         end

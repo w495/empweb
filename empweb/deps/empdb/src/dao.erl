@@ -928,7 +928,7 @@ get(Current, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
-    io:format("Qo = ~p~n~n", [Qo]),
+%     io:format("Qo = ~p~n~n", [Qo]),
     {Query, Pfields} = memocashe({Current, Qo}, fun() ->
         Common_all_fields =
             table_options({table, fields, all}, Current),

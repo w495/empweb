@@ -22,10 +22,10 @@
 
 
 -ifndef(debug).
-    -define(debug(F),  spawn_link(fun()-> io:format(F) end)).
-    -define(debug(F, P),  spawn_link(fun()-> io:format(F, P) end)).
-    %-define(debug(F),  spawn_link(fun()-> ok end)).
-    %-define(debug(F, P),  spawn_link(fun()-> ok end)).
+%     -define(debug(F),  spawn_link(fun()-> io:format(F) end)).
+%     -define(debug(F, P),  spawn_link(fun()-> io:format(F, P) end)).
+    -define(debug(F),  spawn_link(fun()-> ok end)).
+    -define(debug(F, P),  spawn_link(fun()-> ok end)).
 -endif.
 
 -endif. %%% __EMPDB_3024595043__
