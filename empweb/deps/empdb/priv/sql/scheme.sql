@@ -1095,17 +1095,16 @@ create table thing(
 /**
  *  Многие ко многим для пользователей и вещей
 **/
-create sequence seq_purchasetype_id;
-create table purchasetype (
-    id                  decimal primary key default nextval('seq_purchasetype_id'),
-
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique      default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    isdeleted   bool default false
-);
+-- create sequence seq_purchasetype_id;
+-- create table purchasetype (
+--     id                  decimal primary key default nextval('seq_purchasetype_id'),
+--     /**
+--         Номер языковой сущности
+--     **/
+--     name_ti     decimal unique      default nextval('seq_any_ti'),
+--     alias       varchar(1024)   unique,
+--     isdeleted   bool default false
+-- );
 
 /**
  *  Многие ко многим для пользователей и вещей
@@ -1137,7 +1136,7 @@ create table purchase (
     created             timestamp without time zone not null default utcnow(),
     counter             timestamp without time zone not null default utcnow(),
     
-    expired             timestamp without time zone          default null,
+    -- expired             timestamp without time zone          default null,
 
     isdeleted           bool default false
 );

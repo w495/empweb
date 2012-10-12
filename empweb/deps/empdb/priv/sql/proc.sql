@@ -986,13 +986,13 @@ begin
 
     if new.topic_id !=  old.topic_id then
         update topic set
-            topic.nchildtargets = topic.nchildtargets + 1
+            nchildtargets = nchildtargets + 1
         where
-            topic.id = new.topic_id;
+            id = new.topic_id;
         update topic set
-            topic.nchildtargets = topic.nchildtargets - 1
+            nchildtargets = nchildtargets - 1
         where
-            topic.id = old.topic_id;
+            id = old.topic_id;
     end if;
 
 
@@ -1006,15 +1006,15 @@ begin
     if new.doctype_alias = 'room' then
         if (new.isdeleted = true) and (old.isdeleted = false) then
             update topic set
-                topic.nchildtargets = topic.nchildtargets - 1
+                nchildtargets = nchildtargets - 1
             where
-                topic.id = (select topic_id from room where room.doc_id = new.id);
+                id = (select topic_id from room where room.doc_id = new.id);
         end if;
         if (new.isdeleted = false) and (old.isdeleted = true) then
             update topic set
-                topic.nchildtargets = topic.nchildtargets + 1
+                nchildtargets = nchildtargets + 1
             where
-                topic.id = (select topic_id from room where room.doc_id = new.id);
+                id = (select topic_id from room where room.doc_id = new.id);
         end if;
     end if;
     return new;
@@ -1095,9 +1095,9 @@ begin
     */
     if not (new.topic_id is null) then
         update topic set
-            topic.nchildtargets = topic.nchildtargets + 1
+            nchildtargets = nchildtargets + 1
         where
-            topic.id = new.topic_id;
+            id = new.topic_id;
     end if;
     
     return new;
@@ -1116,7 +1116,7 @@ begin
         update topic set
             nchildtargets   = nchildtargets - 1
         where
-            topic.id = old.topic_id;
+            id = old.topic_id;
     end if;
     return old;
 end;
@@ -1129,7 +1129,7 @@ begin
         update topic set
             nchildtargets   = nchildtargets - 1
         where
-            topic.id = old.topic_id;
+            id = old.topic_id;
         end if;
     end if;
     return new;
@@ -1440,6 +1440,9 @@ on event for each row execute procedure event_util_fields_on_insert();
 
 
 
+/**
+    @doc Обеспечивает совместное состояние вещей (thing)
+**/
 
 create or replace function thing_util_fields_on_update() returns "trigger" as $$
 begin
@@ -1509,6 +1512,113 @@ $$ language plpgsql;
 drop trigger if exists t1thing_util_fields_on_delete on thing ;
 create trigger t1thing_util_fields_on_delete before delete
 on thing for each row execute procedure thing_util_fields_on_delete();
+
+--(2012.10.12 14:38:23:554386209)---------------------------------------------
+
+/**
+    @doc Обеспечивает совместное состояние покупок (purchase)
+**/
+create or replace function purchase_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+        Плательщик покупки
+    **/
+    if (new.buyer_nick is null) then
+        if not (new.buyer_id is null) then
+            new.buyer_nick =
+                (select pers.nick from pers where pers.id = new.buyer_id);
+        else
+            new.buyer_nick        = null;
+        end if;
+    end if;
+    if (new.buyer_id is null) then
+        new.buyer_id           =
+            (select pers.id from pers where pers.nick = new.buyer_nick);
+    end if;
+    /**
+        Владелец покупки
+    **/
+    if (new.owner_nick is null) then
+        if not (new.owner_id is null) then
+            new.owner_nick =
+                (select pers.nick from pers where pers.id = new.owner_id);
+        else
+            /**
+                если владелец не указан, то им становится, тот кто покупает
+            **/
+            new.owner_nick        = new.buyer_nick;
+        end if;
+    end if;
+    if (new.owner_id is null) then
+        new.owner_id           =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    /**
+        Покупаемая вещь
+    **/
+    if (new.thing_alias is null) then
+        if not (new.thing_id is null) then
+            new.thing_alias =
+                (select thing.nick from thing where thing.id = new.thing_id);
+        else
+            new.thing_alias        = null;
+        end if;
+    end if;
+    if (new.thing_id is null) then
+        new.thing_id           =
+            (select thing.id from thing where thing.nick = new.thing_alias);
+    end if;
+    
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1purchase_util_fields_on_insert on purchase ;
+create trigger t1purchase_util_fields_on_insert before insert
+on purchase for each row execute procedure purchase_util_fields_on_insert();
+
+create or replace function purchase_util_fields_on_update() returns "trigger" as $$
+begin
+    /**
+        Плательщик покупки
+    **/
+    if new.owner_id != old.owner_id then
+        new.owner_nick =
+            (select pers.nick from pers where pers.id = new.owner_id);
+    end if;
+    if new.owner_nick != old.owner_nick then
+        new.owner_id =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    /**
+        Владелец покупки
+    **/
+    if new.buyer_id != old.buyer_id then
+        new.buyer_nick =
+            (select pers.nick from pers where pers.id = new.buyer_id);
+    end if;
+    if new.buyer_nick != old.buyer_nick then
+        new.buyer_id =
+            (select pers.id from pers where pers.nick = new.buyer_nick);
+    end if;
+    /**
+        Покупаемая вещь
+    **/
+    if new.thing_id != old.thing_id then
+        new.thing_alias =
+            (select thing.nick from thing where thing.id = new.thing_id);
+    end if;
+    if new.thing_alias != old.thing_alias then
+        new.thing_id =
+            (select thing.id from thing where thing.nick = new.thing_alias);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1purchase_util_fields_on_update on purchase ;
+create trigger t1purchase_util_fields_on_update before update
+on purchase for each row execute procedure purchase_util_fields_on_update();
 
 
 

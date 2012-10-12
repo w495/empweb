@@ -123,6 +123,44 @@ register(Params)->
         {Eclass, Error} ->
             {Eclass, Error}
     end.
+% 
+% suggest_nick(Nick, Pass)->
+%     {Year,Month,Day} = erlang:date(),
+% 
+%     Prewords = [
+%         convert:to_binary(convert:to_list(Year)),
+%         convert:to_binary(convert:to_list(Year+1)),
+%         convert:to_binary(convert:to_list(Month)),
+%         convert:to_binary(convert:to_list(Month+1)),
+%         <<"the">>,
+%         <<"dr">>,
+%         <<"emp">>,
+%         <<"super">>,
+%         <<"cool">>
+%     ]
+% 
+% 
+%     Lr = [
+%         [<<"empire.">>, Nick],
+%         [<<"emp.">>,    Nick],
+%         [<<"super.">>,  Nick],
+%         [<<"cool.">>,   Nick],
+%         [Nick, <<"1">>]
+%         [Nick, <<"1">>],
+%         [Nick, <<"2">>],
+%         [Nick, <<"3">>],
+%         [Nick, <<"3">>],
+%     ]
+%     Nick.
+% 
+% 
+% nick_match(Nick, Patterns) ->
+%     case binary:match(Nick, Patterns,[]) of
+%         nomatch ->
+%             false;
+%         _ ->
+%             true
+%     end.
 
 
 create__(Pass, Params)->
@@ -136,6 +174,11 @@ create__(Pass, Params)->
                     {Eclass, Error} ->
                         {Eclass, Error}
                 end;
+            {error,{not_unique,<<"nick">>}}->
+
+                    Nick = proplists:get_value(nick, Params),
+                    io:format("Nick = ~p~n", [Nick]),
+                {error,{not_unique,<<"nick">>}};
             {Eclass, Error} ->
                 {Eclass, Error}
         end
