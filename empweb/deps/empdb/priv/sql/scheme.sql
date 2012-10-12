@@ -4,6 +4,12 @@
  *
 ***********************************************************************/
 
+-- set timezone to 'UTC';
+
+create or replace function utcnow() returns timestamp as $$
+        select now() at time zone 'UTC'
+$$ language sql;
+
 
 /****************************************************************************
     =====================================================================
@@ -28,7 +34,7 @@ create table lang(
     alias           varchar(1024) unique,
     name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
-    created         timestamp without time zone not null default now(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
 
@@ -44,7 +50,7 @@ create table trtype(
     alias           varchar(1024) unique,
     name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
-    created         timestamp without time zone not null default now(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
 
@@ -107,7 +113,7 @@ create table filetype(
     mime        varchar(1024)   default null,
     ext         varchar(1024)   default null,
     dir         varchar(1024)   default null,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -122,7 +128,7 @@ create table fileinfo(
     name       varchar(1024)                    default null,
     dir        varchar(1024)                    default null,
     type_id    decimal references filetype(id)      default null,
-    created    timestamp without time zone not null default now(),
+    created    timestamp without time zone not null default utcnow(),
     isdeleted  bool default false
 );
 
@@ -145,7 +151,7 @@ create table file(
     **/
     fileinfo      decimal references fileinfo(id)    default null,
     issystem      bool default false,
-    created       timestamp without time zone not null default now(),
+    created       timestamp without time zone not null default utcnow(),
     isdeleted     bool default false
 );
 
@@ -168,7 +174,7 @@ create table emotion(
     **/
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -184,7 +190,7 @@ create table authority(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     level       decimal default 0,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -199,7 +205,7 @@ create table pstatus(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -215,7 +221,7 @@ create table mstatus(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -250,7 +256,7 @@ create table perspichead(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -262,7 +268,7 @@ create table perspicbody(
     **/
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 
@@ -279,7 +285,7 @@ create table pregion(
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024),
     pregion_id  decimal references pregion(id)     default null,
-    created     timestamp without time zone not null default now(),
+    created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false,
     constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
 );
@@ -327,7 +333,7 @@ create table pers(
     pregion_id  decimal references  pregion(id)     default null,
     
     
-    birthday    timestamp       without time zone not null default now(),
+    birthday    timestamp       without time zone not null default utcnow(),
     -- gender_id           decimal references gender(id)      default null,
     ismale      bool    default false,
     /**
@@ -396,11 +402,11 @@ create table pers(
     /**
         дата создания
     **/
-    created             timestamp without time zone not null default now(),
+    created             timestamp without time zone not null default utcnow(),
     /**
         дата последний модификации
     **/
-    updated             timestamp without time zone not null default now(),
+    updated             timestamp without time zone not null default utcnow(),
     /**
         количество просмотров
     **/
@@ -507,7 +513,7 @@ create table sysvartype(
     id              decimal primary key default nextval('seq_sysvartype_id'),
     alias           varchar(1024) not null unique,
     name_ti         decimal unique default nextval('seq_any_ti'),
-    created         timestamp without time zone not null default now(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
 
@@ -523,7 +529,7 @@ create table sysvar(
     val             varchar(1024) not null,
     sysvar_id       decimal references sysvar(id),
     name_ti         decimal unique default nextval('seq_any_ti'),
-    created         timestamp without time zone not null default now(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
 
@@ -662,11 +668,11 @@ create table doc(
     /**
         дата создания
     **/
-    created             timestamp without time zone not null default now(),
+    created             timestamp without time zone not null default utcnow(),
     /**
         дата последний модификации
     **/
-    updated             timestamp without time zone not null default now(),
+    updated             timestamp without time zone not null default utcnow(),
     /**
         количество просмотров документа
     **/
@@ -838,14 +844,24 @@ create table topic(
         Родительский элемент
     **/
     parent_id    decimal references topic(id) default null,
+
+    /**
+        целевых ссылок на эту сущность
+    **/
+    nchildtargets   decimal default 0,
+
+    /**
+        целевых ссылок на эту сущность и ее детей
+    **/
+    nnodetargets    decimal default 0,
     /**
         количество детей (дочерних элементов)
     **/
-    nchildren           decimal default 0,
+    nchildren       decimal default 0,
     /**
         количество вершин в кусте
     **/
-    nnodes              decimal default 0,
+    nnodes          decimal default 0,
     isdeleted   bool default false
 );
 
@@ -1025,6 +1041,15 @@ create table thingtype(
         Родительский элемент
     **/
     parent_id       decimal references thingtype(id) default null,
+
+    /**
+        целевых ссылок на эту сущность
+    **/
+    nchildtargets   decimal default 0,
+    /**
+        целевых ссылок на эту сущность и ее детей
+    **/
+    nnodetargets    decimal default 0,
     /**
         количество детей (дочерних элементов)
     **/
@@ -1067,6 +1092,56 @@ create table thing(
 );
 
 
+/**
+ *  Многие ко многим для пользователей и вещей
+**/
+create sequence seq_purchasetype_id;
+create table purchasetype (
+    id                  decimal primary key default nextval('seq_purchasetype_id'),
+
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+/**
+ *  Многие ко многим для пользователей и вещей
+**/
+create sequence seq_purchase_id;
+create table purchase (
+    id                  decimal primary key default nextval('seq_purchase_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    buyer_id            decimal         references pers(id)     not null,
+    buyer_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id            decimal         references pers(id)     not null,
+    owner_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Вещь которую приобрели
+    **/
+    thing_id            decimal         references thing(id)    not null,
+    thing_alias         varchar(1024)   references thing(alias) not null,
+
+    -- price               real    default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    counter             timestamp without time zone not null default utcnow(),
+    
+    expired             timestamp without time zone          default null,
+
+    isdeleted           bool default false
+);
+
 -------------------------------------------------------------------------------
 -- СВЯЗКИ МНОГИЕ КО МНОГИМ
 -------------------------------------------------------------------------------
@@ -1094,16 +1169,4 @@ create table pers2pgroup (
     isdeleted           bool default false
 );
 
-/**
- *  Многие ко многим для пользователей и вещей
-**/
-create sequence seq_pers2thing_id;
-create table pers2thing (
-    id                  decimal primary key default nextval('pers2thing'),
-    pers_id             decimal references pers(id) not null,
-    thing_id            decimal references thing(id) not null,
-    created             timestamp without time zone not null default now(),
-    counter             timestamp without time zone not null default now(),
-    isdeleted           bool default false
-);
 

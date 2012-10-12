@@ -983,14 +983,55 @@ begin
                     regimen.alias = new.regimen_alias
             );
     end if;
+
+    if new.topic_id !=  old.topic_id then
+        update topic set
+            topic.nchildtargets = topic.nchildtargets + 1
+        where
+            topic.id = new.topic_id;
+        update topic set
+            topic.nchildtargets = topic.nchildtargets - 1
+        where
+            topic.id = old.topic_id;
+    end if;
+
+
     return new;
 end;
 $$ language plpgsql;
 
 
+create or replace function room_util_fields_on_update_doc() returns "trigger" as $$
+begin
+    if new.doctype_alias = 'room' then
+        if (new.isdeleted = true) and (old.isdeleted = false) then
+            update topic set
+                topic.nchildtargets = topic.nchildtargets - 1
+            where
+                topic.id = (select topic_id from room where room.doc_id = new.id);
+        end if;
+        if (new.isdeleted = false) and (old.isdeleted = true) then
+            update topic set
+                topic.nchildtargets = topic.nchildtargets + 1
+            where
+                topic.id = (select topic_id from room where room.doc_id = new.id);
+        end if;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1room_util_fields_on_update_doc on doc;
+create trigger t1room_util_fields_on_update_doc before update
+on doc for each row execute procedure room_util_fields_on_update_doc();
+
+
 drop trigger if exists t1room_util_fields_on_update on room ;
 create trigger t1room_util_fields_on_update before update
 on room for each row execute procedure room_util_fields_on_update();
+
+
 
 create or replace function room_util_fields_on_insert() returns "trigger" as $$
 begin
@@ -1052,6 +1093,13 @@ begin
                 );
         end if;
     */
+    if not (new.topic_id is null) then
+        update topic set
+            topic.nchildtargets = topic.nchildtargets + 1
+        where
+            topic.id = new.topic_id;
+    end if;
+    
     return new;
 end;
 $$ language plpgsql;
@@ -1060,6 +1108,42 @@ $$ language plpgsql;
 drop trigger if exists t1room_util_fields_on_insert on room ;
 create trigger t1room_util_fields_on_insert before insert
 on room for each row execute procedure room_util_fields_on_insert();
+
+
+create or replace function room_util_fields_on_delete() returns "trigger" as $$
+begin
+    if not (old.topic_id is null) then
+        update topic set
+            nchildtargets   = nchildtargets - 1
+        where
+            topic.id = old.topic_id;
+    end if;
+    return old;
+end;
+$$ language plpgsql;
+
+create or replace function room_util_fields_on_delete_doc() returns "trigger" as $$
+begin
+    if new.doctype_alias = 'room' then
+        if not (old.topic_id is null) then
+        update topic set
+            nchildtargets   = nchildtargets - 1
+        where
+            topic.id = old.topic_id;
+        end if;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1room_util_fields_on_delete_doc on doc;
+create trigger t1room_util_fields_on_delete_doc before delete
+on doc for each row execute procedure room_util_fields_on_delete_doc();
+
+drop trigger if exists t1room_util_fields_on_delete on room ;
+create trigger t1room_util_fields_on_delete before delete
+on room for each row execute procedure room_util_fields_on_delete();
 
 
 /**
@@ -1353,5 +1437,78 @@ $$ language plpgsql;
 drop trigger if exists t1event_util_fields_on_insert on event ;
 create trigger t1event_util_fields_on_insert before insert
 on event for each row execute procedure event_util_fields_on_insert();
+
+
+
+
+create or replace function thing_util_fields_on_update() returns "trigger" as $$
+begin
+    if new.thingtype_id != old.thingtype_id then
+        update thingtype set
+            nchildtargets   = nchildtargets + 1
+        where
+            thingtype.id = new.thingtype_id;
+        update thingtype set
+            nchildtargets   = nchildtargets - 1
+        where
+            thingtype.id = new.thingtype_id;
+    end if;
+    if (new.isdeleted = true) and (old.isdeleted = false) then
+        update thingtype set
+            nchildtargets   = nchildtargets - 1
+        where
+            thingtype.id = new.thingtype_id;
+    end if;
+    if (new.isdeleted = false) and (old.isdeleted = true) then
+        update thingtype set
+            nchildtargets   = nchildtargets + 1
+        where
+            thingtype.id = new.thingtype_id;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1thing_util_fields_on_update on thing ;
+create trigger t1thing_util_fields_on_update before update
+on thing for each row execute procedure thing_util_fields_on_update();
+
+
+create or replace function thing_util_fields_on_insert() returns "trigger" as $$
+begin
+    if not (new.thingtype_id is null) then
+        update thingtype set
+            nchildtargets   = nchildtargets + 1
+        where
+            thingtype.id = new.thingtype_id;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1thing_util_fields_on_insert on thing ;
+create trigger t1thing_util_fields_on_insert before insert
+on thing for each row execute procedure thing_util_fields_on_insert();
+
+
+create or replace function thing_util_fields_on_delete() returns "trigger" as $$
+begin
+    if not (old.thingtype_id is null) then
+        update thingtype set
+            nchildtargets   = nchildtargets - 1
+        where
+            thingtype.id = old.thingtype_id;
+    end if;
+    return old;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1thing_util_fields_on_delete on thing ;
+create trigger t1thing_util_fields_on_delete before delete
+on thing for each row execute procedure thing_util_fields_on_delete();
+
 
 

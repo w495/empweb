@@ -2149,6 +2149,10 @@ insert into pers2pgroup (pers_id, group_id)
 **/
 -- alter table pers alter column live_room_id set default noobsroom();
 
+create or replace function utcnow() returns timestamp as $$
+        select now() at time zone 'UTC'
+$$ language sql;
+
 
 /*
 create or replace function doc() returns setof doc as $$

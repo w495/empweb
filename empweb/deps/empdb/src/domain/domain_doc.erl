@@ -509,13 +509,13 @@ update_blog(Params)->
 
 get_blog(Params)->
     dao:with_transaction(fun(Con)->
-        get_blog_adds(Con,dao_blog:get(Con, [{isdeleted, false}|Params]))
+        get_blog_adds(Con,dao_blog:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params]))
     end).
 
 get_blog(Params, Fileds)->
     dao:with_transaction(fun(Con)->
         get_blog_adds(Con,
-            dao_blog:get(Con, [{isdeleted, false}|Params], Fileds)
+            dao_blog:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
         )
     end).
 
@@ -555,7 +555,7 @@ get_blog_adds(Con, Getresult) ->
 
 delete_blog(Params)->
     dao:with_transaction(fun(Con)->
-        dao_blog:update(Con, [{isdeleted, true}|Params])
+        dao_blog:update(Con, [{order, {desc, created}}, {isdeleted, true}|Params])
     end).
 
 is_blog_owner(Uid, Oid)->
@@ -598,12 +598,12 @@ delete_post(Filter)->
     
 get_post(Params)->
     dao:with_transaction(fun(Con)->
-        get_post_adds(Con, dao_post:get(Con, [{isdeleted, false}|Params]))
+        get_post_adds(Con, dao_post:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params]))
     end).
 
 get_post(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        get_post_adds(Con, dao_post:get(Con, [{isdeleted, false}|Params], Fileds))
+        get_post_adds(Con, dao_post:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds))
     end).
 
 get_post_adds(Con, Getresult) ->
@@ -664,12 +664,12 @@ delete_comment(Filter)->
 
 get_comment(Params)->
     dao:with_transaction(fun(Con)->
-        dao_comment:get(Con, [{isdeleted, false}|Params])
+        dao_comment:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
     end).
 
 get_comment(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_comment:get(Con, [{isdeleted, false}|Params], Fileds)
+        dao_comment:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
     end).
 
 is_comment_owner(Uid, Oid)->
@@ -699,12 +699,12 @@ delete_room(Params)->
 
 get_room(Params)->
     dao:with_transaction(fun(Con)->
-        dao_room:get(Con, [{isdeleted, false}|Params])
+        dao_room:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
     end).
 
 get_room(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_room:get(Con, [{isdeleted, false}|Params], Fileds)
+        dao_room:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
     end).
 
 is_room_owner(Uid, Oid)->
@@ -733,12 +733,12 @@ delete_community(Params)->
 
 get_community(Params)->
     dao:with_transaction(fun(Con)->
-        dao_community:get(Con, [{isdeleted, false}|Params])
+        dao_community:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
     end).
 
 get_community(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_community:get(Con, [{isdeleted, false}|Params], Fileds)
+        dao_community:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
     end).
 
 is_community_owner(Uid, Oid)->
@@ -769,12 +769,12 @@ is_message_owner(Uid, Oid)->
 
 get_message(Params)->
     dao:with_transaction(fun(Con)->
-        dao_message:get(Con, [{isdeleted, false}|Params])
+        dao_message:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
     end).
 
 get_message(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_message:get(Con, [{isdeleted, false}|Params], Fileds)
+        dao_message:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
     end).
 
 get_message_for_me(Params)->

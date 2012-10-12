@@ -48,7 +48,18 @@ memocashe(Key, Fun)->
 %             Item
 %     end.
     Fun().
-    
+
+
+pself(Some)->
+    case whereis(Some) of
+        undefined ->
+            self();
+        _ -> Some
+    end.
+
+notify(To, Mess) ->
+    gen_event:notify(pself(To), {To, Mess}).
+
 %%
 %%
 %% @spec id2alias(
@@ -917,6 +928,7 @@ get(Current, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
+    io:format("Qo = ~p~n~n", [Qo]),
     {Query, Pfields} = memocashe({Current, Qo}, fun() ->
         Common_all_fields =
             table_options({table, fields, all}, Current),
@@ -937,6 +949,14 @@ get(Current, Con, #queryobj{
         Current_order =
             lists:filter(
                 fun
+                    ({desc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, desc})->
+                        lists:member(F, Common_all_fields);
+                    ({asc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, asc})->
+                        lists:member(F, Common_all_fields);
                     (F)->
                         lists:member(F, Common_all_fields)
                 end,
@@ -1797,7 +1817,7 @@ to_type(V,  timestamp) ->
     {X, {H, M, S}} = V,
     Ts = trunc(S),
     Cur = calendar:datetime_to_gregorian_seconds({X, {H, M, Ts}}),
-    trunc((Cur - Bas + S - Ts) * 1000000);
+    trunc((Cur - Bas));
 
 to_type(V, int4) ->
     convert:to_integer(V);
