@@ -302,11 +302,19 @@ topic() ->
             parent_id,  %% ссылка на родительскую тему
             nchildren,  %% количество детей
             nnodes,     %% количество потомков
+            nchildtargets,
             isdeleted
         ]},
         %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [
-            id, name_ti, descr_ti, parent_id, alias, nchildren, nnodes
+            id,
+            name_ti,
+            descr_ti,
+            parent_id,
+            alias,
+            nchildtargets,
+            nchildren,
+            nnodes
         ]},
         %% Список полей таблицы для создания.
         {{table, fields, insert},             [

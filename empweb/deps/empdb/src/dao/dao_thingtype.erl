@@ -61,6 +61,7 @@ table({fields, all})->
         name_ti,
         descr_ti,
         parent_id,
+        nchildtargets,
         nchildren,
         nnodes,
         isdeleted
