@@ -124,20 +124,24 @@ register(Params)->
             {Eclass, Error}
     end.
 
+lgps_new(X) ->
+    {ok, Res} = lgps:new(X),
+    Res.
+
 suggest_nick(Con, Orgnick, Pass)->
     {Year,Month,Day} = erlang:date(),
 
     Seps = lists:usort([
         <<"">>,
         <<"-">>,
-        <<"+">>,
-        <<"$">>,
-        <<"%">>,
-        <<"!">>,
-        <<"*">>,
-        <<"#">>,
-        <<"@">>,
-        <<"&">>,
+%         <<"+">>,
+%         <<"$">>,
+%         <<"%">>,
+%         <<"!">>,
+%         <<"*">>,
+%         <<"#">>,
+%         <<"@">>,
+%         <<"&">>,
         <<"_">>,
         <<".">>
     ]),
@@ -227,7 +231,7 @@ suggest_nick(Con, Orgnick, Pass)->
                 Nres
         end,
 
-    Sugs_ = lists:append([
+    Sugs__ = lists:append([
         [ convert:to_binary([Preword, Sep, Nick]) ||
             Nick <- Nickparts,
             Preword <- Prewords,
@@ -243,6 +247,17 @@ suggest_nick(Con, Orgnick, Pass)->
             (Nick =/= <<>>)
         ] -- [Orgnick]
     ]),
+
+    Sugs_ = [
+        lgps_new({syllable, 2}),
+        lgps_new({ngram, 4, 1}),
+        lgps_new({syllable, 3}),
+        lgps_new({ngram, 6, 1}),
+        lgps_new({syllable, 4}),
+        lgps_new({ngram, 8, 1})
+        |Sugs__
+    ],
+    
 
     Sugs = lists:sort(
         fun(X, Y) ->
