@@ -269,7 +269,8 @@ fieldtuples_fieldvars(Fields, _default, Additions) ->
 %%% -----------------------------------------------------------------------
 
 sql_and(List)->
-    {Tlist, String} = sql_list(List),
+    {Tlist, String_} = sql_list(List),
+    String = lists:filter(fun([])-> false; (_)-> true end, String_),
     {   Tlist,
         [   <<"(">>,
                 string:join(String,[<<" and ">>]),
@@ -278,7 +279,9 @@ sql_and(List)->
     }.
 
 sql_or(List)->
-    {Tlist, String} = sql_list(List),
+    {Tlist, String_} = sql_list(List),
+    String = lists:filter(fun([])-> false; (_)-> true end, String_),
+    ?debug("String = ~p~n", [String]),
     {   Tlist,
         [   <<"(">>,
                 string:join(String,[<<" or ">>]),
@@ -330,6 +333,13 @@ sql_cond({Ff, {'or', Conds}})->
             )
         },
     sql_cond(X);
+
+
+% sql_cond({Ff, {between, [_left, undefined]}}) ->
+%     {[], []};
+% 
+% sql_cond({Ff, {between, [undefined, _right]}}) ->
+%     {[], []};
 
 sql_cond({Ff, {between, [Left, Right]}}) ->
     Bnleft   = convert:to_binary([
@@ -408,6 +418,8 @@ sql_cond({Ff, {ilike, Like}})
         ]
     };
 
+sql_cond({Ff, {eq, undefined}}) ->
+    {[], []};
 
 sql_cond({Ff, {eq, Val}}) ->
     {   [{cond_atom(Ff), Val}],
@@ -417,6 +429,8 @@ sql_cond({Ff, {eq, Val}}) ->
         ]
     };
 
+sql_cond({Ff, {neq, undefined}}) ->
+    {[], []};
 
 sql_cond({Ff, {neq, Val}}) ->
     {   [{cond_atom(Ff), Val}],
@@ -426,6 +440,9 @@ sql_cond({Ff, {neq, Val}}) ->
         ]
     };
 
+sql_cond({Ff, {lt, undefined}}) ->
+    {[], []};
+
 sql_cond({Ff, {lt, Val}}) ->
     {   [{cond_atom(Ff), Val}],
         [   convert:to_binary(Ff),
@@ -434,14 +451,35 @@ sql_cond({Ff, {lt, Val}}) ->
         ]
     };
 
+sql_cond({Ff, {lte, undefined}}) ->
+    {[], []};
+    
 sql_cond({Ff, {lte, Val}}) ->
-    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" <= $">>,convert:to_binary(cond_atom(Ff))]};
+    {   [{cond_atom(Ff), Val}],
+        [   convert:to_binary(Ff),
+            <<" <= $">>,
+            convert:to_binary(cond_atom(Ff))
+        ]
+    };
+
+sql_cond({Ff, {gt, undefined}}) ->
+    {[], []};
 
 sql_cond({Ff, {gt, Val}}) ->
-    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" > $">>,convert:to_binary(cond_atom(Ff))]};
+    {   [{cond_atom(Ff), Val}],
+        [   convert:to_binary(Ff),
+            <<" > $">>,
+            convert:to_binary(cond_atom(Ff))
+        ]
+    };
 
+sql_cond({Ff, {gte, undefined}}) ->
+    {[], []};
+    
 sql_cond({Ff, {gte, Val}}) ->
-    {[{cond_atom(Ff), Val}], [convert:to_binary(Ff),<<" >= $">>,convert:to_binary(cond_atom(Ff))]};
+    {   [{cond_atom(Ff), Val}],
+        [convert:to_binary(Ff),<<" >= $">>,convert:to_binary(cond_atom(Ff))]
+    };
 
 sql_cond({Ff, {in, []}}) ->
     {[], [<<" false ">>]};
@@ -458,7 +496,9 @@ sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
     ]};
 
 
-    
+sql_cond({Ff,undefined}) ->
+    {[], []};
+
 sql_cond({Ff, Val} = Tuple) ->
     ?debug("Tuple = ~p~n~n", [Tuple]),
     {[{cond_atom(Ff), Val}], [

@@ -1097,6 +1097,53 @@ jsonapi_map(Req, {List}) ->
                     pers_perm_names =   Pperm_names
                 };
 
+            %% ==================================================
+
+
+            <<"get_purchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_purchases">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_purchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_purchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_purchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            <<"buy_product">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_purchase,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
             _ -> []
         end,
 
