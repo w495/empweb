@@ -767,69 +767,135 @@ is_message_owner(Uid, Oid)->
         dao_message:is_owner(Con, Uid, Oid)
     end).
 
-get_message(Params)->
+mk_message_read(_con, undefined, _, _fields)->
+    ok;
+
+mk_message_read(_con, _, undefined, _fields)->
+    ok;
+
+mk_message_read(Con, Id, Reader_id, Fields) ->
+    case {Fields, lists:member(body, Fields)} of
+        {[], _ } ->
+            mk_message_read(Con, Id, Reader_id, [body]);
+        {_, true} ->
+            dao_message:update(Con, [
+                {filter, [
+                    {id,        Id},
+                    {reader_id, Reader_id}
+                ]},
+                {values, [
+                    {oktype_alias, ok}
+                ]}
+            ]);
+        _ ->
+            ok
+    end.
+
+get_message(Params)-> 
     dao:with_transaction(fun(Con)->
-        dao_message:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
+        mk_message_read(Con,
+            proplists:get_value(id,         Params),
+            proplists:get_value(reader_id,  Params),
+            proplists:get_value(fields,     Params, [])
+        ),
+        dao_message:get(Con, [
+            {order, {desc, created}},
+            {isdeleted, false}
+            |Params
+        ])
     end).
 
 get_message(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_message:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
+        mk_message_read(Con,
+            proplists:get_value(id,         Params),
+            proplists:get_value(reader_id,  Params),
+            Fileds
+        ),
+        dao_message:get(Con,
+            [   {order, {desc, created}},
+                {isdeleted, false}
+                |Params
+            ],
+            Fileds
+        )
     end).
 
 get_message_for_me(Params)->
+    Mparams =
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                Params;
+            Reader_id ->
+                [{reader_id, Reader_id}|Params]
+        end,
     dao:with_transaction(fun(Con)->
+        mk_message_read(Con,
+            proplists:get_value(id,         Mparams),
+            proplists:get_value(reader_id,  Mparams),
+            proplists:get_value(fields,     Mparams, [])
+        ),
         dao_message:get(Con, [
+            {order, {desc, created}},
             {isdfr,     false},
             {isdeleted, false}
-            |case proplists:get_value(pers_id, Params) of
-                undefined ->
-                    Params;
-                Reader_id ->
-                    [{reader_id, Reader_id}|Params]
-            end
+            |Mparams
         ])
     end).
 
 get_message_for_me(Params, Fields)->
+    Mparams =
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                Params;
+            Reader_id ->
+                [{reader_id, Reader_id}|Params]
+        end,
     dao:with_transaction(fun(Con)->
+        mk_message_read(Con,
+            proplists:get_value(id,         Mparams),
+            proplists:get_value(reader_id,  Mparams),
+            Fields
+        ),
         dao_message:get(Con, [
+            {order, {desc, created}},
             {isdfr,     false},
             {isdeleted, false}
-            |case proplists:get_value(pers_id, Params) of
-                undefined ->
-                    Params;
-                Reader_id ->
-                    [{reader_id, Reader_id}|Params]
-            end
+            |Mparams
         ], Fields)
     end).
 
 get_message_from_me(Params)->
+    Mparams =
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                Params;
+            Owner_id ->
+                [{owner_id, Owner_id}|Params]
+        end,
     dao:with_transaction(fun(Con)->
         dao_message:get(Con, [
+            {order, {desc, created}},
             {isdfo,     false},
             {isdeleted, false}
-            |case proplists:get_value(pers_id, Params) of
-                undefined ->
-                    Params;
-                Owner_id ->
-                    [{owner_id, Owner_id}|Params]
-            end
+            |Mparams
         ])
     end).
 
 get_message_from_me(Params, Fields)->
+    Mparams =
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                Params;
+            Owner_id ->
+                [{owner_id, Owner_id}|Params]
+        end,
     dao:with_transaction(fun(Con)->
         dao_message:get(Con, [
+            {order, {desc, created}},
             {isdfo,     false},
             {isdeleted, false}
-            |case proplists:get_value(pers_id, Params) of
-                undefined ->
-                    Params;
-                Owner_id ->
-                    [{owner_id, Owner_id}|Params]
-            end
+            |Mparams
         ], Fields)
     end).
 
