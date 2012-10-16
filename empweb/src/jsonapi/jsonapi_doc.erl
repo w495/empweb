@@ -1262,6 +1262,69 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   add_room_topic,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update room">>),
+    jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:add_room_topic(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_room_topic,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update room">>),
+    jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                jsonapi:resp(
+                    biz_doc:delete_room_topic(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   delete_room,

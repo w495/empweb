@@ -711,6 +711,20 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            <<"add_room_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   add_room_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_room_topic">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_doc,
+                    action          =   delete_room_topic,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
             %%
             %% Сообщества
             %%

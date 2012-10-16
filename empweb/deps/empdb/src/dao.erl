@@ -162,9 +162,46 @@ fields_(_, [], Default, _additions) ->
    Default;
 
 fields_(Table, Fields, _default, Additions) ->
-    [[_|First]|Res] = lists:map(fun(Field)->
-        [<<",">> ,[convert:to_binary(Table), convert:to_binary(Field)]]
-    end,lists:append(Fields, Additions)),
+    [[_|First]|Res] =
+    lists:map(
+        fun
+            ({as, {Field, Name}})->
+                [<<",">> ,
+                    [
+                        convert:to_binary(Table),
+                        convert:to_binary(Field),
+                        <<" as ">>,
+                        convert:to_binary(Name)
+                    ]
+                ];
+            ({as, Field, Name})->
+                [<<",">> ,
+                    [
+                        convert:to_binary(Table),
+                        convert:to_binary(Field),
+                        <<" as ">>,
+                        convert:to_binary(Name)
+                    ]
+                ];
+            ({Field, as, Name})->
+                [<<",">> ,
+                    [
+                        convert:to_binary(Table),
+                        convert:to_binary(Field),
+                        <<" as ">>,
+                        convert:to_binary(Name)
+                    ]
+                ];
+            (Field)->
+                [<<",">> ,
+                    [
+                        convert:to_binary(Table),
+                        convert:to_binary(Field)
+                    ]
+                ]
+        end,
+        lists:append(Fields, Additions)
+    ),
     [<<" ">>, [First|Res], <<" ">>].
 
 %%% -----------------------------------------------------------------------
@@ -705,7 +742,30 @@ sql_returning(Filter) ->
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
 
+table_options(Current) when erlang:is_atom(Current) ->
+    [
+        {   {table, name},
+            Current:table(name)
+        },
+        {   {table, fields, all},
+            Current:table({fields, all})
+        },
+        {   {table, fields, select},
+            Current:table({fields, select})
+        },
+        {   {table, fields, update},
+            Current:table({fields, update})
+        },
+        {   {table, fields, insert},
+            Current:table({fields, insert})
+        },
+        {   {table, fields, insert, required},
+            Current:table({fields, insert, required})
+        }
+    ];
 
+table_options(Current) ->
+    Current.
 
 table_options({table, fields, all},      Current) ->
     [   'and', 'or'
@@ -788,73 +848,282 @@ get(Current, Con, #queryobj{fields=Fields}=Obj)
     ?debug("Fields = ~p~n~n", [Fields]),
     get(Current, Con, Obj#queryobj{fields=[Fields]});
 
+% 
+% %%
+% %% TODO: только для двух таблиц
+% %%
+% get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
+%     filter  =   Filter,
+%     fields  =   Fields,
+%     order   =   Order,
+%     limit   =   Limit,
+%     offset  =   Offset
+% } = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
+%     {Query, Pfields} = memocashe({Op, Qo}, fun() ->
+%         Common_all_fields = lists:append(
+%             table_options({table, fields, all},      Parent),
+%             table_options({table, fields, all},      Current)
+%         ),
+%         Common_select_fields = lists:append(
+%             table_options({table, fields, select},   Parent),
+%             table_options({table, fields, select},   Current)
+%         ),
+%         Current_select_fields =
+%             lists:filter(
+%                 fun
+%                     (F)-> lists:member(F, Common_select_fields)
+%                 end,
+%                 Fields
+%             ),
+%         Current_all_fields =
+%             lists:filter(
+%                 fun({F, _})->
+%                     lists:member(F, Common_all_fields)
+%                 end,
+%                 Filter
+%             ),
+%         Current_order =
+%             lists:filter(
+%                 fun
+%                     ({desc, F})->
+%                         lists:member(F, Common_all_fields);
+%                     ({F, desc})->
+%                         lists:member(F, Common_all_fields);
+%                     ({asc, F})->
+%                         lists:member(F, Common_all_fields);
+%                     ({F, asc})->
+%                         lists:member(F, Common_all_fields);
+%                     (F)->
+%                         lists:member(F, Common_all_fields)
+%                 end,
+%                 Order
+%             ),
+% 
+%         ?debug("Order = ~p~n~n", [Current_order]),
+% 
+%         ?debug("Fields = ~p~n~n", [Fields]),
+%         ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
+% 
+%         Binary_parent_name =
+%             convert:to_binary(table_options({table, name},Parent)),
+%         Binary_table_name =
+%             convert:to_binary(table_options({table, name},Current)),
+%         Binary_select_fields =
+%             fields(
+%                 Current_select_fields,
+%                 Common_select_fields
+%             ),
+%         Binary_current_field =
+%             convert:to_binary(Current_field),
+%         Binary_parent_field =
+%             convert:to_binary(Parent_field),
+%         {Pfields, Where_string} =
+%             sql_where(Current_all_fields),
+%         Query = [
+%             %% поля обоих таблиц в перемешку
+%             <<" select ">>, Binary_select_fields,
+%             %% родительская таблиа
+%             <<" from ">>,   Binary_parent_name,
+%             %% дочерняя таблиа
+%             <<" join ">>,   Binary_table_name,
+%             %% сцепление таблиц
+%             <<" on ">>, [
+%                 Binary_table_name,  <<".">>,    Binary_current_field,
+%                 <<" =  ">>,
+%                 Binary_parent_name, <<".">>,    Binary_parent_field
+%             ],
+%             Where_string,
+%             [
+%                 sql_order(Current_order),
+%                 sql_limit(Limit),
+%                 sql_offset(Offset)
+%             ]
+%         ],
+%         {Query, Pfields}
+%     end),
+%     dao:pgret(dao:equery(Con, Query, Pfields));
+
 
 %%
 %% TODO: только для двух таблиц
 %%
-get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
-    filter  =   Filter,
+get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
+    filter  =   Afilter,
     fields  =   Fields,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
-} = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
-    {Query, Pfields} = memocashe({Op, Qo}, fun() ->
-        Common_all_fields = lists:append(
-            table_options({table, fields, all},      Parent),
-            table_options({table, fields, all},      Current)
+} = Qo ) when erlang:is_list(Afilter),erlang:is_list(Aparent) orelse erlang:is_atom(Aparent)->
+    {Query, Pfields} = memocashe({Aop, Qo}, fun() ->
+
+        Op = lists:map(
+            fun ({Current, Current_field}) when erlang:is_atom(Current) ->
+                    {table_options(Current), Current_field};
+                ({Current, Current_field}) ->
+                    {Current, Current_field}
+            end,
+            Aop
         ),
+
+        [{Parent, Parent_field}|Rest] = Op,
+
+        Filter = Afilter,
+        %io:format("Filter = ~p~n", [Filter]),
+        
+
+   
+        Common_all_fields_ = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    table_options({table, fields, all},Tab)
+                end,
+                Op
+            )
+        ),
+        Common_all_fields = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    lists:map(
+                        fun(Item)->
+                            convert:to_atom(
+                                convert:to_list(
+                                    table_options({table, name},Tab)
+                                )
+                                ++ "." ++
+                                convert:to_list(Item)
+                            )
+                        end,
+                        table_options({table, fields, all},Tab)
+                    )
+                end,
+                Op
+            )
+        ),
+
+        Common_select_fields_ = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    table_options({table, fields, select},Tab)
+                end,
+                Op
+            )
+        ),
+
         Common_select_fields = lists:append(
-            table_options({table, fields, select},   Parent),
-            table_options({table, fields, select},   Current)
+            lists:map(
+                fun({Tab,_})->
+                    lists:map(
+                        fun(Item)->
+                            convert:to_atom(
+                                convert:to_list(
+                                    table_options({table, name},Tab)
+                                )
+                                ++ "." ++
+                                convert:to_list(Item)
+                            )
+                        end,
+                        table_options({table, fields, select},Tab)
+                    )
+                end,
+                Op
+            )
         ),
         Current_select_fields =
             lists:filter(
-                fun
-                    (F)-> lists:member(F, Common_select_fields)
+                fun ({as, F, N})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    ({as, {F, N}})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    ({F, as, N})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    (F)->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_)
                 end,
                 Fields
             ),
-        Current_all_fields =
+
+
+
+        Current_all_fields_ =
             lists:filter(
                 fun({F, _})->
-                    lists:member(F, Common_all_fields)
+                    lists:member(F, Common_all_fields ++ Common_all_fields_)
                 end,
                 Filter
             ),
+
+        Current_all_fields = 
+            lists:map(
+                fun ({Filtername, Filterval}) when is_atom(Filtername) ->
+                        Filternamestr = convert:to_list(Filtername),
+                        case lists:member($., convert:to_list(Filtername)) of
+                            true ->
+                                {Filtername, Filterval};
+                            _ ->
+                                case lists:foldl(
+                                    fun ({Tab, _}, [])->
+                                            case
+                                                lists:member(
+                                                    Filtername,
+                                                    table_options(
+                                                        {table, fields, all},
+                                                        Tab
+                                                    )
+                                                )
+                                            of
+                                                true ->
+                                                    {   convert:to_atom(
+                                                            convert:to_list(
+                                                                table_options({table, name},Tab)
+                                                            )
+                                                            ++ "." ++
+                                                            Filternamestr
+                                                        ),
+                                                        Filterval
+                                                    };
+                                                _ ->
+                                                    []
+                                            end;
+                                        ({Tab, _}, Res) ->
+                                            Res
+                                    end, [], Op
+                                ) of
+                                    [] ->
+                                        {Filtername, Filterval};
+                                    {Newfiltername, Filterval} ->
+                                        {Newfiltername, Filterval}
+                                end
+                        end;
+                    ({Filtername, Filterval})  ->
+                        {Filtername, Filterval}
+                end,
+                Current_all_fields_
+            ),
+
         Current_order =
             lists:filter(
                 fun
                     ({desc, F})->
-                        lists:member(F, Common_all_fields);
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
                     ({F, desc})->
-                        lists:member(F, Common_all_fields);
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
                     ({asc, F})->
-                        lists:member(F, Common_all_fields);
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
                     ({F, asc})->
-                        lists:member(F, Common_all_fields);
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
                     (F)->
-                        lists:member(F, Common_all_fields)
+                        lists:member(F, Common_all_fields ++ Common_all_fields_)
                 end,
                 Order
             ),
-
-        ?debug("Order = ~p~n~n", [Current_order]),
-
-        ?debug("Fields = ~p~n~n", [Fields]),
-        ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
-
         Binary_parent_name =
             convert:to_binary(table_options({table, name},Parent)),
-        Binary_table_name =
-            convert:to_binary(table_options({table, name},Current)),
+
         Binary_select_fields =
             fields(
                 Current_select_fields,
                 Common_select_fields
             ),
-        Binary_current_field =
-            convert:to_binary(Current_field),
         Binary_parent_field =
             convert:to_binary(Parent_field),
         {Pfields, Where_string} =
@@ -864,14 +1133,69 @@ get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
             <<" select ">>, Binary_select_fields,
             %% родительская таблиа
             <<" from ">>,   Binary_parent_name,
-            %% дочерняя таблиа
-            <<" join ">>,   Binary_table_name,
-            %% сцепление таблиц
-            <<" on ">>, [
-                Binary_table_name,  <<".">>,    Binary_current_field,
-                <<" =  ">>,
-                Binary_parent_name, <<".">>,    Binary_parent_field
-            ],
+            begin
+                {_, Joinlist} = lists:foldl(
+                    fun
+                        ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
+                            {{Current1, Current_field1},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            };
+                        ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
+                            {{Current1, Current_field2},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            };
+                        ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
+                            {{Current1, Current_field1},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            }
+                    end,
+                    {{Parent, Parent_field}, []},
+                    Rest
+                ),
+                Joinlist
+            end,
             Where_string,
             [
                 sql_order(Current_order),
@@ -879,27 +1203,46 @@ get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
                 sql_offset(Offset)
             ]
         ],
+        io:format("~nQuery = ~p~n~n", [Query]),
         {Query, Pfields}
     end),
     dao:pgret(dao:equery(Con, Query, Pfields));
 
 
+% 
+% get([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)
+%     erlang:is_atom(Parent),     erlang:is_atom(Parent_field),
+%     erlang:is_atom(Current),    erlang:is_atom(Current_field) ->
+%     Oparent = [
+%         {{table, name},             Parent:table(name)},
+%         {{table, fields, all},      Parent:table({fields, all})},
+%         {{table, fields, select},   Parent:table({fields, select})}
+%     ],
+%     Ocurrent = [
+%         {{table, name},             Current:table(name)},
+%         {{table, fields, all},      Current:table({fields, all})},
+%         {{table, fields, select},   Current:table({fields, select})}
+%     ],
+%     ?debug("Oparent = ~p~n", [Oparent]),
+%     ?debug("Ocurrent = ~p~n", [Ocurrent]),
+%     get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
 
-get([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)->
-    Oparent = [
-        {{table, name},             Parent:table(name)},
-        {{table, fields, all},      Parent:table({fields, all})},
-        {{table, fields, select},   Parent:table({fields, select})}
-    ],
-    Ocurrent = [
-        {{table, name},             Current:table(name)},
-        {{table, fields, all},      Current:table({fields, all})},
-        {{table, fields, select},   Current:table({fields, select})}
-    ],
-    ?debug("Oparent = ~p~n", [Oparent]),
-    ?debug("Ocurrent = ~p~n", [Ocurrent]),
-    
-    get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
+
+% get([{Parent, Parent_field}|_] = Op,Con,#queryobj{}=Qo)
+%     when erlang:is_atom(Parent) ->
+%     Descop = lists:map(
+%         fun({Current, Current_field}) ->
+%             Ocurrent = [
+%                 {{table, name},             Current:table(name)},
+%                 {{table, fields, all},      Current:table({fields, all})},
+%                 {{table, fields, select},   Current:table({fields, select})}
+%             ],
+%             {Ocurrent, Current_field}
+%         end,
+%         Op
+%     ),
+%     get(Descop,Con,Qo);
+% 
 
 get(Current, Con, #queryobj{
     filter  =   Filter,
@@ -1017,6 +1360,9 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
         }
     ).
 
+
+
+    
 % get(    Current,
 %         Con,
 %         {Key, Value},

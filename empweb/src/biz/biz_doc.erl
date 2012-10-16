@@ -178,6 +178,8 @@
     get_room/1,
     get_room/2,
     create_room/1,
+    add_room_topic/1,
+    delete_room_topic/1,
     update_room/1,
     delete_room/1
 ]).
@@ -469,6 +471,13 @@ update_room(Params)->
 delete_room(Params)->
     domain_doc:delete_room(Params).
 
+add_room_topic(Params)->
+    domain_doc:add_room_topic(Params).
+
+delete_room_topic(Params)->
+    domain_doc:delete_room_topic(Params).
+
+    
 get_room(Params)->
     domain_doc:get_room(Params).
 

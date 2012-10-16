@@ -183,6 +183,8 @@
     get_room/1,
     get_room/2,
     create_room/1,
+    add_room_topic/1,
+    delete_room_topic/1,
     update_room/1,
     delete_room/1
 ]).
@@ -697,15 +699,61 @@ delete_room(Params)->
         dao_room:update(Con, [{isdeleted, true}|Params])
     end).
 
+add_room_topic(Params)->
+    dao:with_transaction(fun(Con)->
+        dao_room:add_room_topic(Con, Params)
+    end).
+
+delete_room_topic(Params)->
+    dao:with_transaction(fun(Con)->
+        dao_room:delete_room_topic(Con, Params)
+    end).
+    
 get_room(Params)->
     dao:with_transaction(fun(Con)->
-        dao_room:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
+        get_room_adds(Con, {
+            dao_room:get(Con, [
+                {order, {desc, created}},
+                {isdeleted, false}
+                |Params
+            ]),
+            proplists:get_value(id, Params)
+        })
     end).
 
 get_room(Params, Fileds)->
     dao:with_transaction(fun(Con)->
-        dao_room:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
+        get_room_adds(Con,{
+            dao_room:get(Con, [
+                {order, {desc, created}},
+                {isdeleted, false}
+                |Params
+            ], Fileds),
+            proplists:get_value(id, Params)
+        })
     end).
+
+get_room_adds(Con, {Res, undefined}) ->
+    Res;
+
+get_room_adds(Con,{{ok, Rooms}, Id}) ->
+    {ok,
+        lists:map(fun({Roompl})->
+            case dao_room:get_room_topic(Con, [
+                {isdeleted, false},
+                {room_id, Id}
+            ]) of
+                {ok, Topiclist} ->
+                    {[{topic_list, Topiclist}|Roompl]};
+                Error ->
+                    {Roompl}
+            end
+        end, Rooms)
+    };
+
+get_room_adds(Con, {Err, _}) ->
+    Err.
+
 
 is_room_owner(Uid, Oid)->
     dao:with_transaction(fun(Con)->

@@ -21,7 +21,11 @@
     create/2,
     update/2,
     get/2,
-    get/3
+    get/3,
+    delete_room_topic/2,
+    add_room_topic/2,
+    get_room_topic/2,
+    get_room_topic/3
 ]).
 
 %%
@@ -132,6 +136,64 @@ table(name)->
 table()->
     table(name).
 
+
+get_room_topic(Con, What) ->
+    dao:get([
+%         {dao_doc, id},
+%         {dao_room, doc_id},
+%         {room2topic(), {room_id, topic_id}},
+        {room2topic(), topic_id },
+        {topic(),      id       }
+     ], Con, What).
+
+get_room_topic(Con, What, Fields)->
+    dao:get([
+%         {dao_doc, id},
+%         {dao_room, doc_id},
+%         {room2topic(), {room_id, topic_id}},
+        {room2topic(),  topic_id},
+        {topic(),       id      }
+    ], Con, What, Fields).
+
+% add_room_topic(Con, What)->
+%     dao:insert(room2topic(), Con, What).
+% 
+% 
+% del_room_topic(Con, What)->
+%     dao:delete(room2topic(), Con, What).
+
+
+
+add_room_topic(Con, Proplist)->
+    case dao:pgret(
+        dao:equery(Con,
+            <<"insert into room2topic (topic_id, room_id) "
+                "values ($topic_id, $room_id) "
+                "returning id">>,
+            Proplist
+        )
+    ) of
+        {error,{not_unique,<<"topic_id_room_id_many">>}} ->
+            {error, {not_unique, [topic_id, room_id]}};
+        Res ->
+            Res
+    end.
+
+delete_room_topic(Con, Proplist)->
+    case dao:pgret(
+        dao:equery(Con,
+            <<"delete from room2topic where "
+            " topic_id=$topic_id and room_id=$room_id returning id">>,
+            Proplist
+        )
+    ) of
+        {ok, 0} ->
+            {error, not_exists};
+        Res ->
+            Res
+    end.
+
+    
 get(Con, What) ->
     dao_doc:get(?MODULE, Con, What).
 
@@ -327,5 +389,42 @@ topic() ->
         %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [
             name_ti, descr_ti, parent_id, alias
+        ]}
+    ].
+
+
+room2topic() ->
+   [
+        %% Имя таблицы.
+        {{table, name},                       room2topic},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            topic_id,
+            room_id,
+            isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            topic_id,
+            room_id,
+            isdeleted
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            topic_id,
+            room_id,
+            isdeleted
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            topic_id,
+            room_id,
+            isdeleted
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            topic_id,
+            room_id,
+            isdeleted
         ]}
     ].
