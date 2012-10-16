@@ -709,7 +709,7 @@ add_room_topic(Params)->
                 ]),
                 {ok, Res};
             Error ->
-                Error;
+                Error
         end
     end).
 
@@ -723,7 +723,7 @@ delete_room_topic(Params)->
                 ]),
                 {ok, Res};
             Error ->
-                Error;
+                Error
         end
     end).
     

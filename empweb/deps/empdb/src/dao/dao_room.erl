@@ -269,10 +269,10 @@ get_topic(Con, What, Fields)->
     dao:get(topic(), Con, What, Fields).
 
 create_topic(Con, Proplist)->
-    dao:get(topic(), Con, Proplist).
+    dao:create(topic(), Con, Proplist).
 
 update_topic(Con, Proplist)->
-    dao:get(topic(), Con, Proplist).
+    dao:update(topic(), Con, Proplist).
 
 %% ===========================================================================
 %% Внутренние функции
@@ -384,7 +384,7 @@ topic() ->
         ]},
         %% Список полей таблицы для обновления.
         {{table, fields, update},             [
-            name_ti, descr_ti, parent_id, alias
+            name_ti, descr_ti, parent_id, alias, nchildtargets
         ]},
         %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [
