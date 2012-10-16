@@ -701,12 +701,30 @@ delete_room(Params)->
 
 add_room_topic(Params)->
     dao:with_transaction(fun(Con)->
-        dao_room:add_room_topic(Con, Params)
+        case  dao_room:add_room_topic(Con, Params) of
+            {ok, Res} ->
+                dao_room:update_topic(Con, [
+                    {id, proplists:get_value(topic_id, Params)},
+                    {nchildtargets, {incr, 1}}
+                ]),
+                {ok, Res};
+            Error ->
+                Error;
+        end
     end).
 
 delete_room_topic(Params)->
     dao:with_transaction(fun(Con)->
-        dao_room:delete_room_topic(Con, Params)
+        case dao_room:delete_room_topic(Con, Params) of
+            {ok, Res} ->
+                dao_room:update_topic(Con, [
+                    {id, proplists:get_value(topic_id, Params)},
+                    {nchildtargets, {decr, 1}}
+                ]),
+                {ok, Res};
+            Error ->
+                Error;
+        end
     end).
     
 get_room(Params)->
