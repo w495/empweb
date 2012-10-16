@@ -812,95 +812,22 @@ get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
             ),
         Current_order =
             lists:filter(
-                fun(F)->
-                    lists:member(F, Common_all_fields)
-                end,
-                Order
-            ),
-
-        ?debug("Fields = ~p~n~n", [Fields]),
-        ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
-
-        Binary_parent_name =
-            convert:to_binary(table_options({table, name},Parent)),
-        Binary_table_name =
-            convert:to_binary(table_options({table, name},Current)),
-        Binary_select_fields =
-            fields(
-                Current_select_fields,
-                Common_select_fields
-            ),
-        Binary_current_field =
-            convert:to_binary(Current_field),
-        Binary_parent_field =
-            convert:to_binary(Parent_field),
-        {Pfields, Where_string} =
-            sql_where(Current_all_fields),
-        Query = [
-            %% поля обоих таблиц в перемешку
-            <<" select ">>, Binary_select_fields,
-            %% родительская таблиа
-            <<" from ">>,   Binary_parent_name,
-            %% дочерняя таблиа
-            <<" join ">>,   Binary_table_name,
-            %% сцепление таблиц
-            <<" on ">>, [
-                Binary_table_name,  <<".">>,    Binary_current_field,
-                <<" =  ">>,
-                Binary_parent_name, <<".">>,    Binary_parent_field
-            ],
-            Where_string,
-            [
-                sql_order(Current_order),
-                sql_limit(Limit),
-                sql_offset(Offset)
-            ]
-        ],
-        {Query, Pfields}
-    end),
-    dao:pgret(dao:equery(Con, Query, Pfields));
-
-    
-%%
-%% TODO: только для двух таблиц
-%%
-get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
-    filter  =   Filter,
-    fields  =   Fields,
-    order   =   Order,
-    limit   =   Limit,
-    offset  =   Offset
-} = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
-    {Query, Pfields} = memocashe({Op, Qo}, fun() ->
-        Common_all_fields = lists:append(
-            table_options({table, fields, all},      Parent),
-            table_options({table, fields, all},      Current)
-        ),
-        Common_select_fields = lists:append(
-            table_options({table, fields, select},   Parent),
-            table_options({table, fields, select},   Current)
-        ),
-        Current_select_fields =
-            lists:filter(
                 fun
-                    (F)-> lists:member(F, Common_select_fields)
-                end,
-                Fields
-            ),
-        Current_all_fields =
-            lists:filter(
-                fun({F, _})->
-                    lists:member(F, Common_all_fields)
-                end,
-                Filter
-            ),
-        Current_order =
-            lists:filter(
-                fun(F)->
-                    lists:member(F, Common_all_fields)
+                    ({desc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, desc})->
+                        lists:member(F, Common_all_fields);
+                    ({asc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, asc})->
+                        lists:member(F, Common_all_fields);
+                    (F)->
+                        lists:member(F, Common_all_fields)
                 end,
                 Order
             ),
+
+        ?debug("Order = ~p~n~n", [Current_order]),
 
         ?debug("Fields = ~p~n~n", [Fields]),
         ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
@@ -943,6 +870,7 @@ get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
         {Query, Pfields}
     end),
     dao:pgret(dao:equery(Con, Query, Pfields));
+
 
 
 get([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)->

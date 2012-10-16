@@ -111,7 +111,7 @@ table({fields, all})->
         chatlang_alias,
         regimen_id,
         regimen_alias,
-        topic_id,
+        % topic_id,
         slogan,
         weather,
         treasury

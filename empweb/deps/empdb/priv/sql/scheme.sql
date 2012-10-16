@@ -1168,4 +1168,15 @@ create table pers2pgroup (
     isdeleted           bool default false
 );
 
+/**
+ *  Многие ко многим для пользователей и групп
+**/
+create sequence seq_room2topic_id;
+create table room2topic (
+    room2topic_id       decimal primary key default     nextval('seq_room2topic_id'),
+    topic_id            decimal references topic(id)    not null,
+    room_id             decimal references room(doc_id) not null,
+    isdeleted           bool default false
+);
+
 
