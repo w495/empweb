@@ -584,28 +584,40 @@ sql_order(Order) when erlang:is_list(Order) ->
 sql_order_one({[{D, O}]}) ->
     sql_order_one({D, O});
 
-sql_order_one({D, O})
+sql_order_one({asc, O})
     when (
         erlang:is_atom(O)
         orelse erlang:is_binary(O)
-    ) andalso (
-        D =:= asc orelse D=:= desc
-    )->
+    ) ->
     [   convert:to_binary(O),
-        <<" ">>,
-        convert:to_binary(D)
+        <<" asc">>
     ];
 
-sql_order_one({O, D})
+sql_order_one({desc, O})
     when (
         erlang:is_atom(O)
         orelse erlang:is_binary(O)
-    ) andalso (
-        D =:= asc orelse D=:= desc
-    )->
+    ) ->
     [   convert:to_binary(O),
-        <<" ">>,
-        convert:to_binary(D)
+        <<" desc">>
+    ];
+
+sql_order_one({O, asc})
+    when (
+        erlang:is_atom(O)
+        orelse erlang:is_binary(O)
+    ) ->
+    [   convert:to_binary(O),
+        <<" asc">>
+    ];
+
+sql_order_one({O, desc})
+    when (
+        erlang:is_atom(O)
+        orelse erlang:is_binary(O)
+    ) ->
+    [   convert:to_binary(O),
+        <<" desc">>
     ];
 
 sql_order_one(O) ->
@@ -1837,7 +1849,7 @@ name_columns(C, [], Ret) ->
 make_proplist(Columns, [V|T], Ret) ->
     make_proplist(Columns, T, [name_columns(Columns, tuple_to_list(V), [])|Ret]);
 make_proplist(_C, [], Ret) ->
-    Ret.
+    lists:reverse(Ret).
 
 pgret(returning, {ok, Id}) ->
     
