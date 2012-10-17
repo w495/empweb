@@ -195,10 +195,29 @@ delete_room_topic(Con, Proplist)->
 
     
 get(Con, What) ->
-    dao_doc:get(?MODULE, Con, What).
+    case proplists:get_value(topic_id, What) of
+        undefined ->
+            dao_doc:get(?MODULE, Con, What);
+        Topic_id ->
+            dao:get([
+                {dao_doc, id},
+                {dao_room, doc_id},
+                {room2topic(), room_id}
+            ], Con, What)
+    end
+    .
 
 get(Con, What, Fields)->
-    dao_doc:get(?MODULE, Con, What, Fields).
+    case proplists:get_value(topic_id, What) of
+        undefined ->
+            dao_doc:get(?MODULE, Con, What, Fields);
+        Topic_id ->
+            dao:get([
+                {dao_doc, id},
+                {dao_room, doc_id},
+                {room2topic(), room_id}
+            ], Con, What, Fields)
+    end.
 
 create(Con, Proplist)->
     dao_doc:create(?MODULE, Con, Proplist).

@@ -1028,7 +1028,7 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-        Current_select_fields =
+        Current_select_fields_ =
             lists:filter(
                 fun ({as, F, N})->
                         lists:member(F, Common_select_fields ++ Common_select_fields_);
@@ -1100,6 +1100,26 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 Current_all_fields_
             ),
 
+        Current_select_fields =
+            lists:map(
+                fun ({as, {F, N}}) ->
+                        {as, {transform_current_select_fields(F, Op), N}};
+                    ({as, F, N}) ->
+                        {as, {transform_current_select_fields(F, Op), N}};
+                    ({F, as, N}) ->
+                        {as, {transform_current_select_fields(F, Op), N}};
+                    (F) ->
+                        transform_current_select_fields(F, Op);
+                    (Else)  ->
+                        Else
+                end,
+                Current_select_fields_
+            ),
+
+
+        io:format("Current_select_fields_  = ~p~n", [Current_select_fields_]),
+        io:format("Current_select_fields   = ~p~n", [Current_select_fields]),
+        
         Current_order =
             lists:filter(
                 fun
@@ -1360,6 +1380,46 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
         }
     ).
 
+
+
+transform_current_select_fields(Filtername, Op) ->
+    Filternamestr = convert:to_list(Filtername),
+    case lists:member($., convert:to_list(Filtername)) of
+        true ->
+            Filtername;
+        _ ->
+            case lists:foldl(
+                fun ({Tab, _}, [])->
+                        case
+                            lists:member(
+                                Filtername,
+                                table_options(
+                                    {table, fields, select},
+                                    Tab
+                                )
+                            )
+                        of
+                            true ->
+                                convert:to_atom(
+                                    convert:to_list(
+                                        table_options({table, name},Tab)
+                                    )
+                                    ++ "." ++
+                                    Filternamestr
+                                );
+                            _ ->
+                                []
+                        end;
+                    ({Tab, _}, Res) ->
+                        Res
+                end, [], Op
+            ) of
+                [] ->
+                    Filtername;
+                Newfiltername ->
+                    Newfiltername
+            end
+    end.
 
 
     
