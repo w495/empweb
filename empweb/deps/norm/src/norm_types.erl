@@ -17,6 +17,8 @@
     list/1,
     email/1,
     float/1,
+    positive/1,
+    pfloat/1,
     integer/1,
     date_unixtime/1,
     datetime_unixtime/1,
@@ -68,6 +70,13 @@ integer(Value) ->
 
 float(Value) ->
     norm_convert:to_float(Value).
+
+positive(Value) when (Value >= 0) ->
+    Value.
+
+pfloat(Value) ->
+    positive(norm_convert:to_float(Value)).
+
 
 date_unixtime(Value) ->
     {D, _} = norm_convert:to_local_datetime(norm_convert:to_integer(Value)),

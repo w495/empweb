@@ -66,8 +66,6 @@ create(Params)->
             ]),
         Price = proplists:get_value(price, Mbthingpl),
         Money = proplists:get_value(money, Mbbuyerpl),
-        io:format("Price = ~p~n", [Price]),
-        io:format("Money = ~p~n", [Money]),
         case Price =< Money of
             true ->
                 Newmoney = Money - Price,

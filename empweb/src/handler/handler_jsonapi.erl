@@ -1113,7 +1113,6 @@ jsonapi_map(Req, {List}) ->
 
             %% ==================================================
 
-
             <<"get_purchase">> ->
                 #empweb_hap{
                     handler         =   jsonapi_purchase,
@@ -1157,6 +1156,46 @@ jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+
+            %% ==================================================
+            
+            <<"get_experpurchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_experpurchase,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_experpurchases">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_experpurchase,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_experpurchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_experpurchase,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_experpurchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_experpurchase,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_experpurchase">> ->
+                #empweb_hap{
+                    handler         =   jsonapi_experpurchase,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+    
 
             _ -> []
         end,

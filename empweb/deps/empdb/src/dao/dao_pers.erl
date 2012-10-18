@@ -162,6 +162,10 @@ table({fields, all})->
         pstatus_alias,
         authority_id,
         authority_alias,
+        
+        exper,
+        experlack,
+        
         emotion_id,
         emotion_alias,
 

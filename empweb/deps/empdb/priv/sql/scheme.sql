@@ -189,6 +189,13 @@ create table authority(
     **/
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
+    
+--     next_id     decimal         references authority(id) default null,
+--     next_alias  varchar(1024)   references authority(alias) default null,
+-- 
+--     prev_id     decimal         references authority(id) default null,
+--     prev_alias  varchar(1024)   references authority(alias) default null,
+    
     level       decimal default 0,
     created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
@@ -352,7 +359,18 @@ create table pers(
     **/
     authority_id        decimal         references authority(id)        default null,
     authority_alias     varchar(1024)   references authority(alias)     default null,
-    experience          decimal         default 0,
+
+    /**
+        Опыт пользователя,
+        некоторая непрерывная велицина.
+    **/
+    exper               real         default 0,
+    /**
+        Недостаток опыта.
+        Сколько не хватает для перехода на следующий уровень.
+    **/
+    experlack           real         default null,
+    
     /**
         Эмоции пользователя
     **/
@@ -1132,7 +1150,7 @@ create table purchase (
     thing_id            decimal         references thing(id)    not null,
     thing_alias         varchar(1024)   references thing(alias) not null,
 
-    -- price               real    default null,
+    price               real    default null,
 
     created             timestamp without time zone not null default utcnow(),
     counter             timestamp without time zone not null default utcnow(),
@@ -1141,11 +1159,25 @@ create table purchase (
 
     isdeleted           bool default false
 );
+/*
+create sequence seq_experprise_id;
+
+create table experprise (
+    id                  decimal primary key default nextval('seq_experprise_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    exper               real default null,
+    price               real default null,
+    isdeleted           bool default false
+);*/
 
 
-create sequence seq_experiencepurchase_id;
-create table experiencepurchase (
-    id                  decimal primary key default nextval('seq_experiencepurchase_id'),
+
+create sequence seq_experpurchase_id;
+create table experpurchase (
+    id                  decimal primary key default nextval('seq_experpurchase_id'),
 
     /**
         Покупатель, тот кто платит
@@ -1160,18 +1192,13 @@ create table experiencepurchase (
     owner_nick          varchar(1024)   references pers(nick)   not null,
 
     /**
-        Вещь которую приобрели
+        Вещь которую приобрели --- опыт.
+        Нужно знать, какой количество
     **/
-    thing_id            decimal         references thing(id)    not null,
-    thing_alias         varchar(1024)   references thing(alias) not null,
-
-    -- price               real    default null,
+    exper               real    default null,
+    price               real    default null,
 
     created             timestamp without time zone not null default utcnow(),
-    counter             timestamp without time zone not null default utcnow(),
-
-    -- expired             timestamp without time zone          default null,
-
     isdeleted           bool default false
 );
 

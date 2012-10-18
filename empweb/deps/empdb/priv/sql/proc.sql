@@ -558,6 +558,28 @@ begin
     new.authority_alias = 'noob';
     new.authority_id    = 
         (select id from authority where alias = new.authority_alias);
+    /** 
+        Опыт пользователя
+    **/
+    new.exper    =
+        (select level from authority where alias = new.authority_alias);
+    /**
+        Сколько еще нужно опыта
+        для перехода на следующий уровень.
+    **/
+    new.experlack    =
+        (   select
+                min(cur.level)
+            from
+                authority as cur
+            join
+                authority as prev
+            on
+                prev.level < cur.level
+            where
+                prev.alias = new.authority_alias
+        ) - new.exper;
+
     /**
         Эмоции пользователя
     **/
@@ -617,23 +639,64 @@ begin
         new.pstatus_id = 
             (select pstatus.id from pstatus where pstatus.alias = new.pstatus_alias);
     end if;
+
+
+    if new.exper != old.exper then
+        /**
+            Авторитет пользователя,
+            Перевычисляем каждый раз 
+            на основе его опыта.
+        **/
+        new.authority_alias =
+            (   select
+                    alias
+                from
+                    authority
+                where
+                    level
+                in (    select
+                            max(level)
+                        from
+                            authority
+                        where
+                            level <= new.exper
+                )
+            );
+        /**
+            Сколько еще нужно опыта
+            для перехода на следующий уровень.
+        **/
+        new.experlack    =
+            (   select
+                    min(cur.level)
+                from
+                    authority as cur
+                join
+                    authority as prev
+                on
+                    prev.level < cur.level
+                where
+                    prev.alias = new.authority_alias
+            ) - new.exper;
+    end if;
+
     /**
         Авторитет пользователя
     **/
     if new.authority_id != old.authority_id then
-        new.authority_alias = 
-            (select authority.alias 
-                from 
-                    authority 
-                where 
+        new.authority_alias =
+            (select authority.alias
+                from
+                    authority
+                where
                     authority.id = new.authority_id);
     end if;
     if new.authority_alias != old.authority_alias then
-        new.authority_id = 
-            (select authority.id 
-                from 
-                    authority 
-                where 
+        new.authority_id =
+            (select authority.id
+                from
+                    authority
+                where
                     authority.alias = new.authority_alias);
     end if;
     /**
@@ -1619,6 +1682,89 @@ $$ language plpgsql;
 drop trigger if exists t1purchase_util_fields_on_update on purchase ;
 create trigger t1purchase_util_fields_on_update before update
 on purchase for each row execute procedure purchase_util_fields_on_update();
+
+
+--(2012.10.12 14:38:23:554386209)---------------------------------------------
+
+
+/**
+    @doc Обеспечивает совместное состояние покупок авторитетов (experpurchase)
+**/
+create or replace function experpurchase_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+        Плательщик покупки
+    **/
+    if (new.buyer_nick is null) then
+        if not (new.buyer_id is null) then
+            new.buyer_nick =
+                (select pers.nick from pers where pers.id = new.buyer_id);
+        else
+            new.buyer_nick        = null;
+        end if;
+    end if;
+    if (new.buyer_id is null) then
+        new.buyer_id           =
+            (select pers.id from pers where pers.nick = new.buyer_nick);
+    end if;
+    /**
+        Владелец покупки
+    **/
+    if (new.owner_nick is null) then
+        if not (new.owner_id is null) then
+            new.owner_nick =
+                (select pers.nick from pers where pers.id = new.owner_id);
+        else
+            /**
+                если владелец не указан, то им становится, тот кто покупает
+            **/
+            new.owner_nick        = new.buyer_nick;
+        end if;
+    end if;
+    if (new.owner_id is null) then
+        new.owner_id           =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1experpurchase_util_fields_on_insert on experpurchase ;
+create trigger t1experpurchase_util_fields_on_insert before insert
+on experpurchase for each row execute procedure experpurchase_util_fields_on_insert();
+
+create or replace function experpurchase_util_fields_on_update() returns "trigger" as $$
+begin
+    /**
+        Плательщик покупки
+    **/
+    if new.owner_id != old.owner_id then
+        new.owner_nick =
+            (select pers.nick from pers where pers.id = new.owner_id);
+    end if;
+    if new.owner_nick != old.owner_nick then
+        new.owner_id =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    /**
+        Владелец покупки
+    **/
+    if new.buyer_id != old.buyer_id then
+        new.buyer_nick =
+            (select pers.nick from pers where pers.id = new.buyer_id);
+    end if;
+    if new.buyer_nick != old.buyer_nick then
+        new.buyer_id =
+            (select pers.id from pers where pers.nick = new.buyer_nick);
+    end if;
+
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1experpurchase_util_fields_on_update on experpurchase ;
+create trigger t1experpurchase_util_fields_on_update before update
+on experpurchase for each row execute procedure experpurchase_util_fields_on_update();
 
 
 
