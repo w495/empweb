@@ -66,16 +66,30 @@ create(Params)->
             ]),
         Price = proplists:get_value(price, Mbthingpl),
         Money = proplists:get_value(money, Mbbuyerpl),
+        io:format("Price = ~p~n", [Price]),
+        io:format("Money = ~p~n", [Money]),
         case Price =< Money of
             true ->
+                Newmoney = Money - Price,
                 dao_pers:update(Con,[
                     {id,    proplists:get_value(id,   Mbbuyerpl)},
-                    {money, Money - Price}
+                    {money, Newmoney}
                 ]),
-                dao_purchase:create(Con,[
+                case dao_purchase:create(Con,[
                     {price, Price}
                     |Params
-                ]);
+                ]) of
+                    {ok, [{Respl}]} ->
+                        {ok, [
+                            {[
+                                {money, Newmoney},
+                                {price, Price}
+                                |Respl
+                            ]}
+                        ]};
+                    Else ->
+                        Else
+                end;
             false ->
                 {error, {not_enough_money, {[
                     {money, Money},

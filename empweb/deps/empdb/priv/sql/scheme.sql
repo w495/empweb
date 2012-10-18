@@ -350,8 +350,9 @@ create table pers(
     /**
         Авторитет пользователя
     **/
-    authority_id        decimal         references authority(id)   default null,
-    authority_alias     varchar(1024)   references authority(alias)   default null,
+    authority_id        decimal         references authority(id)        default null,
+    authority_alias     varchar(1024)   references authority(alias)     default null,
+    experience          decimal         default 0,
     /**
         Эмоции пользователя
     **/
@@ -361,7 +362,7 @@ create table pers(
         Семейное положения пользователя
     **/
     mstatus_id          decimal         references mstatus(id)     default null,
-    mstatus_alias       varchar(1024)   references mstatus(alias)     default null,
+    mstatus_alias       varchar(1024)   references mstatus(alias)  default null,
     /**
         язык пользователя
     **/
@@ -1140,6 +1141,41 @@ create table purchase (
 
     isdeleted           bool default false
 );
+
+
+create sequence seq_experiencepurchase_id;
+create table experiencepurchase (
+    id                  decimal primary key default nextval('seq_experiencepurchase_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    buyer_id            decimal         references pers(id)     not null,
+    buyer_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id            decimal         references pers(id)     not null,
+    owner_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Вещь которую приобрели
+    **/
+    thing_id            decimal         references thing(id)    not null,
+    thing_alias         varchar(1024)   references thing(alias) not null,
+
+    -- price               real    default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    counter             timestamp without time zone not null default utcnow(),
+
+    -- expired             timestamp without time zone          default null,
+
+    isdeleted           bool default false
+);
+
+
 
 -------------------------------------------------------------------------------
 -- СВЯЗКИ МНОГИЕ КО МНОГИМ
