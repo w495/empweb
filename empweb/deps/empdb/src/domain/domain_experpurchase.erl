@@ -49,21 +49,43 @@ create(Params)->
                 ]},
                 {fields, [
                     id,
+                    experlack,
                     money
                 ]},
                 {limit, 1}
             ]),
-        Exper = proplists:get_value(exper,   Params,    0),
+
+        Experlack =
+            case proplists:get_value(experlack,   Mbbuyerpl,    0) of
+                null ->
+                    0;
+                Val  ->
+                    Val
+            end,
+            
+        Exper = proplists:get_value(exper,   Params,    Experlack),
         Price = exper2price(Exper),
         Money = proplists:get_value(money, Mbbuyerpl,   0),
+
+
+        io:format("Experlack = ~p~n", [Experlack]),
+        io:format("Exper = ~p~n", [Exper]),
+        io:format("Price = ~p~n", [Price]),
+        io:format("Money = ~p~n", [Money]),
+         
         case Price =< Money of
             true ->
                 Newmoney = Money - Price,
-                dao_pers:update(Con,[
+ 
+                X = dao_pers:update(Con,[
                     {id,    proplists:get_value(id,   Mbbuyerpl)},
-                    {exper, {incr, proplists:get_value(exper,   Params)}},
+                    {exper, {incr, Exper}},
                     {money, Newmoney}
                 ]),
+
+                io:format("X = ~p~n", [X]),
+                
+         
                 case dao_experpurchase:create(Con,[
                     {price, Price}
                     |Params
