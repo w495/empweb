@@ -1,0 +1,374 @@
+%%% 
+%%% @file empdb_memo.erl  Простая мемоизация.
+%%%
+%%%     Функциям '[l|p]empdb_memoize'
+%%%         на вход подается
+%%%             функция от 0\1 аргумента;
+%%%         результатом тоже является функция от 0\1 аргументов.
+%%%     Функциям '[l|p]save'
+%%%         на вход подается
+%%%             функция от N аргументов,
+%%%             список аргуменитов;
+%%%         a результатом является результат вычисления
+%%%             функции на этих аргументах.
+%%%     Функции 'rempdb_memoize'
+%%%         на вход подается
+%%%             функция, с аргуметом функцией одного аргумента,
+%%%             и возвращающая функцию одного аргумента;
+%%%         a результатом тоже является функция от 1 аргументa.
+%%%     Примеры использования даны в конце файла.
+%%%
+%%%     Мы умышленно не используем apply/3 и Mod:Name(Args).
+%%%     Это позволяет нам не увеличивать время на вызов функции в 2 раза.
+%%%         http://www.erlang.org/doc/efficiency_guide/functions.html#id67124
+%%%
+
+-module (empdb_memo).
+
+-export ([
+    pempdb_memoize/1,
+    lempdb_memoize/1,
+    psave/2,
+    lsave/2,
+    lsave_free/2
+]).
+
+-export ([
+    rempdb_memoize/1,
+    test/0
+]).
+
+-export ([
+    ploop/2
+]).
+
+
+%%% ------------------------------------------------------------------------
+%%% Классическая рекурсивная мемоизация
+%%% Реализована через оператор неподвижной точки.
+%%% Крайне эффективна для рекурсивных функций.
+%%% ------------------------------------------------------------------------
+
+%%% 
+%%% @doc
+%%%     Оператор неподвижной точки
+%%%     Следует из определения рекурсии в λ-исчислении.
+%%%
+ry(Function) when erlang:is_function(Function, 1) ->
+    Function(
+        fun(X) ->
+            (ry(Function))(X)
+        end
+    ).
+
+%%%
+%%% @doc
+%%%     Вычисляет рекурсивную функцию.
+%%%     Запоминает промежуточные результаты.
+%%%     И при необходимости достает их из памяти.
+%%%
+rempdb_memoize(Tab, Function) when erlang:is_function(Function, 1) ->
+    fun (B) ->
+        Bfunction = Function(B),
+        fun (Args) ->
+            Hash = funhash(Bfunction, Args),
+            case get_value(Tab, Hash) of
+                undefined ->
+                    Result = Bfunction(Args),
+                    put_value(Tab, Hash, Result),
+                    Result;
+                Result ->
+                    Result
+            end
+        end
+    end.
+
+%%%
+%%% @doc
+%%%     Вычисляет рекурсивную функцию.
+%%%     Удаляет промежуточные результаты.
+%%%     Запоминает последний результат.
+%%%
+%%%     ВАЖНО:
+%%%         Function = fun( fun(Arg) ) -> fun(Arg)
+%%%     Или в стиле Ocaml:
+%%%         (fun (fun -> Arg ) -> (fun -> Arg)
+%%%
+rempdb_memoize(Function) when erlang:is_function(Function, 1) ->
+    fun (Args) ->
+        Anstab = new(empdb_memo_rempdb_memoize_ans),
+        Hash = funhash(Function, Args),
+        case get_value(Anstab, Hash) of
+            undefined ->
+                Tmptab = new(empdb_memo_rempdb_memoize_tmp),
+                Mfunction = rempdb_memoize(Tmptab, Function),
+                Yfunction = ry(Mfunction),
+                Ans = Yfunction(Args),
+                delete(Tmptab),
+                put_value(Anstab, Hash, Ans),
+                Ans;
+            Result ->
+                Result
+        end
+    end.
+
+
+%%% ------------------------------------------------------------------------
+%%%     Линейная мемоизация, по сути является
+%%%         обычным хешированием без определенного времени удаления
+%%%
+%%%     Сохраняется только конечный результат вычислений.
+%%%     Промежуточные варианты, для рекурсивной функции не сохраняются.
+%%%         но при соответсвуюущей мемоизация рекурсивнх вызовов
+%%%             --- это возможно.
+%%%
+%%% ------------------------------------------------------------------------
+
+%%%
+%%% @doc
+%%%     Вычисляет функцию.
+%%%     Запоминает последний результат.
+%%%
+%%%     ВАЖНО:
+%%%         Function = fun() 
+%%%         Function = fun(Arg)
+%%%
+lempdb_memoize(Function) when erlang:is_function(Function, 0) ->
+    fun (Args) ->
+        lempdb_memoize_inside(Function, 0, Args)
+    end;
+lempdb_memoize(Function) when erlang:is_function(Function, 1) ->
+    fun (Args) ->
+        lempdb_memoize_inside(Function, 1, Args)
+    end.
+
+lempdb_memoize_inside(Function, Arity, Args) ->
+    Anstab = new(empdb_memo_lempdb_memoize_ans),
+    Hash = funhash(Function, Args),
+    case get_value(Anstab, Hash) of
+        undefined ->
+            Ans = apply_one(Function, Arity, Args),
+            put_value(Anstab, Hash, Ans),
+            Ans;
+        Result ->
+            Result
+    end.
+
+%%%
+%%% @doc
+%%%     Вычисляет функцию.
+%%%     Запоминает последний результат.
+%%%     Для каждого вызова функции создается
+%%%         отдельный процесс.
+%%%     Последнее может быть полезно,
+%%%         если в качестве хранилища будем использовать
+%%%             локальную память процесса в виде состояния
+%%%                 (dict, gb_tree, proplist).
+%%%     ВАЖНО:
+%%%         Function = fun()
+%%%         Function = fun(Arg)
+%%%
+pempdb_memoize(Function) when erlang:is_function(Function, 0) ->
+    fun() ->
+        pcall(Function, 0, undefined)
+    end;
+
+pempdb_memoize(Function) when erlang:is_function(Function, 1) ->
+    fun(Args) ->
+        pcall(Function, 1, Args)
+    end.
+
+pspawn(Function) ->
+    spawn(?MODULE, ploop, [new(empdb_memo_pempdb_memoize_ans), Function]).
+
+pcall(Function, Arity, Args) ->
+    pspawn(Function) ! {empdb_memo, self(), Arity, Args},
+    receive
+        {_, {'EXIT', Reason}} -> erlang:error(Reason);
+        {fresh, Value}        -> Value;
+        {cache, Value}        -> Value
+    end.
+
+ploop(Tab, Fun) ->
+    receive
+        {empdb_memo, From, Arity, Args} ->
+            Hash = funhash(Fun, Args),
+            case get_value(Tab, Hash) of
+                undefined   ->
+                    Result = apply_one(Fun, Arity, Args),
+                    From ! {fresh, Result},
+                    put_value(Tab, Hash, Result),
+                    ploop(Tab, Fun);
+                Result ->
+                    From ! {cache, Result},
+                    ploop(Tab, Fun)
+            end
+    end.
+
+%%% ------------------------------------------------------------------------
+%%% 
+%%% ------------------------------------------------------------------------
+
+
+lsave(Function, Argslist)
+        when erlang:is_function(Function)
+                andalso erlang:is_list(Argslist) ->
+    Anstab = new(empdb_memo_lsave_ans),
+    Hash = funhash(Function, Argslist),
+    case get_value(Anstab, Hash) of
+        undefined ->
+            Ans =  erlang:apply(Function, Argslist),
+            put_value(Anstab, Hash, Ans),
+            Ans;
+        Result ->
+            Result
+    end.
+
+lsave_free(Function, Argslist)
+        when erlang:is_function(Function)
+                andalso erlang:is_list(Argslist) ->
+    Hash = funhash(Function, Argslist),
+    delete(empdb_memo_lsave_ans, Hash).
+
+
+psave(Function, Argslist)
+        when erlang:is_function(Function)
+                andalso erlang:is_list(Argslist) ->
+    erlang:error("Not implemementet").
+
+
+
+%%% ------------------------------------------------------------------------
+%%% Вспомогательные функции
+%%% ------------------------------------------------------------------------
+
+apply_one(Fun, Arity, Args)->
+    case Arity of
+        0 ->
+            Fun();
+        _ ->
+            Fun(Args)
+    end.
+%%% 
+%%% @doc 
+%%%     Вычисляет хеш для функции и аргументов.
+%%% 
+funhash(Fun, Args) ->
+    {module, Module}    = erlang:fun_info(Fun, module),
+    {name, Name}        = erlang:fun_info(Fun, name),
+    {arity, Arity}      = erlang:fun_info(Fun, arity),
+    {Module, Name, Arity, Args}.
+    %erlang:md5(erlang:term_to_binary({Module, Name, Arity, Args})).
+
+
+new() ->
+    new(?MODULE).
+
+new(Tab) ->
+    empdb_storage:newc(Tab).
+
+delete() ->
+    delete(?MODULE).
+
+delete(Tab) ->
+    empdb_storage:delete(Tab).
+
+delete(Tab, Key) ->
+    empdb_storage:delete(Tab, Key).
+
+get_value(Args) ->
+    get_value(?MODULE, Args).
+
+get_value(Tab, Args) ->
+    empdb_storage:value(Tab, Args).
+
+put_value(Args, Result) ->
+    put_value(?MODULE, Args, Result).
+
+put_value(Tab, Args, Result) ->
+    empdb_storage:insert(Tab, Args, Result).
+
+%%% ------------------------------------------------------------------------
+%%% Функции тектирования
+%%% ------------------------------------------------------------------------
+
+test_fibimpl_rempdb_memoize(Self) ->
+    fun
+        (0) -> 1;
+        (1) -> 1;
+        (N) when N > 1 ->
+            ((Self)(N - 1)) + ((Self)(N - 2))
+    end.
+
+test_fff_rempdb_memoize(Self) ->
+    fun(N)->
+         N
+    end.
+
+test_fib_rempdb_memoize(N) ->
+    Function1 = rempdb_memoize(fun test_fibimpl_rempdb_memoize/1),
+    io:format("test_fibimpl_rempdb_memoize(~p) = ~p ~n",
+        [N, Function1(N)]),
+    ok.
+
+
+%%% ------------------------------------------------------------------------
+
+test_simple_fibimpl_pempdb_memoize(0) -> 1;
+test_simple_fibimpl_pempdb_memoize(1) -> 1;
+test_simple_fibimpl_pempdb_memoize(N) when N > 1 ->
+    test_simple_fibimpl_pempdb_memoize(N-1) + test_simple_fibimpl_pempdb_memoize(N - 2).
+
+test_simple_fib_pempdb_memoize(N) ->
+    Function1 = pempdb_memoize(fun test_simple_fibimpl_pempdb_memoize/1),
+    io:format("test_simple_fibimpl_pempdb_memoize(~p) = ~p ~n",
+        [N, Function1(N)]),
+    ok.
+
+%%% ------------------------------------------------------------------------
+
+test_rec_fibimpl_pempdb_memoize(0) -> 1;
+test_rec_fibimpl_pempdb_memoize(1) -> 1;
+test_rec_fibimpl_pempdb_memoize(N) when N > 1 ->
+    Function = pempdb_memoize(fun test_rec_fibimpl_pempdb_memoize/1),
+    Function(N-1) + Function(N - 2).
+
+test_rec_fib_pempdb_memoize(N) ->
+    io:format("test_rec_fibimpl_pempdb_memoize(~p) = ~p ~n",
+        [N, test_rec_fibimpl_pempdb_memoize(N)]),
+    ok.
+
+%%% ------------------------------------------------------------------------
+
+test_simple_fibimpl_lempdb_memoize(0) -> 1;
+test_simple_fibimpl_lempdb_memoize(1) -> 1;
+test_simple_fibimpl_lempdb_memoize(N) when N > 1 ->
+    test_simple_fibimpl_lempdb_memoize(N-1) + test_simple_fibimpl_lempdb_memoize(N - 2).
+
+test_simple_fib_lempdb_memoize(N) ->
+    Function1 = lempdb_memoize(fun test_simple_fibimpl_lempdb_memoize/1),
+    io:format("test_simple_fibimpl_lempdb_memoize(~p) = ~p ~n",
+        [N, Function1(N)]),
+    ok.
+
+%%% ------------------------------------------------------------------------
+
+test_rec_fibimpl_lempdb_memoize(0) -> 1;
+test_rec_fibimpl_lempdb_memoize(1) -> 1;
+test_rec_fibimpl_lempdb_memoize(N) when N > 1 ->
+    Function = lempdb_memoize(fun test_rec_fibimpl_lempdb_memoize/1),
+    Function(N-1) + Function(N - 2).
+
+test_rec_fib_lempdb_memoize(N) ->
+    io:format("test_rec_fibimpl_lempdb_memoize(~p) = ~p ~n",
+        [N, test_rec_fibimpl_lempdb_memoize(N)]),
+    ok.
+
+%%% ------------------------------------------------------------------------
+
+test()->
+    io:format("test~n"),
+    test_fib_rempdb_memoize(10000).
+
+
+
