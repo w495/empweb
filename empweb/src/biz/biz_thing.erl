@@ -3,7 +3,7 @@
 %%          Бизнес логика по работе с системными настройками,
 %%          языками, и связанными с ними объектами.
 %%
-%%          Зависит от модуля domain_thing. Все внешние функуции принимают
+%%          Зависит от модуля empdb_biz_thing. Все внешние функуции принимают
 %%              proplist()
 %%          и возвращают:
 %%              {ok, [Obj::{proplist()}]}
@@ -37,13 +37,13 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create(Params)->
-    domain_thing:create(Params).
+    empdb_biz_thing:create(Params).
 
 update(Params)->
-    domain_thing:update(Params).
+    empdb_biz_thing:update(Params).
 
 get(Params)->
-    domain_thing:get(Params).
+    empdb_biz_thing:get(Params).
 
 get(Params, Fields)->
-    domain_thing:get(Params, Fields).
+    empdb_biz_thing:get(Params, Fields).

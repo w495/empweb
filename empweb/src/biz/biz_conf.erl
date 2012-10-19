@@ -3,7 +3,7 @@
 %%          Бизнес логика по работе с системными настройками,
 %%          языками, и связанными с ними объектами.
 %%
-%%          Зависит от модуля domain_lang. Все внешние функуции принимают
+%%          Зависит от модуля empdb_biz_lang. Все внешние функуции принимают
 %%              proplist()
 %%          и возвращают:
 %%              {ok, [Obj::{proplist()}]}
@@ -46,30 +46,30 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_lang(Params)->
-    domain_lang:create_lang(Params).
+    empdb_biz_lang:create_lang(Params).
 
 update_lang(Params)->
-    domain_lang:update_lang(Params).
+    empdb_biz_lang:update_lang(Params).
 
 get_lang(Params)->
-    domain_lang:get_lang(Params).
+    empdb_biz_lang:get_lang(Params).
 
 get_lang(Params, Fields)->
-    domain_lang:get_lang(Params, Fields).
+    empdb_biz_lang:get_lang(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Списки переводов
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_tr(Params)->
-    domain_lang:create_tr(Params).
+    empdb_biz_lang:create_tr(Params).
 
 update_tr(Params)->
-    domain_lang:update_tr(Params).
+    empdb_biz_lang:update_tr(Params).
 
 get_tr(Params)->
-    domain_lang:get_tr(Params).
+    empdb_biz_lang:get_tr(Params).
 
 get_tr(Params, Fields)->
-    domain_lang:get_tr(Params, Fields).
+    empdb_biz_lang:get_tr(Params, Fields).
 

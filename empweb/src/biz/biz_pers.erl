@@ -4,7 +4,7 @@
 %%          и связанными с ними объектами.
 %%
 %%          Зависит от модулей:
-%%              * domain_pers;
+%%              * empdb_biz_pers;
 %%              * biz_session.
 %%          Все внешние функуции принимают
 %%              proplist()
@@ -202,24 +202,19 @@ get_pers_nick({session_id, Session_id})->
 
 register(Params)->
     ?evman_args(Params, <<"pers try to register">>),
-    domain_pers:register(Params).
+    empdb_biz_pers:register(Params).
 
 update(Params)->
     ?evman_args(Params, <<"pers try to update him self">>),
-    domain_pers:update(Params).
+    empdb_biz_pers:update(Params).
 
 
 
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),
-    domain_pers:get(
+    empdb_biz_pers:get_opt(
         Params,
-        case proplists:get_value(fields, Params) of
-            undefined ->
-                dao_pers:table({fields, select}) -- [phash];
-            Fields ->
-                Fields
-        end
+        [without_phash]
     ).
 
 %%
@@ -228,7 +223,7 @@ get(Params) ->
 login(Params) ->
     ?evman_args(Params, <<"pers try to login">>),
 
-    case domain_pers:login(Params) of
+    case empdb_biz_pers:login(Params) of
         {ok, [{Userpl}]} ->
             Id          = proplists:get_value(id,           Userpl),
             Login       = proplists:get_value(login,        Userpl),
@@ -282,7 +277,7 @@ pass(Params) ->
 restore_pass(Params) ->
     Id = proplists:get_value(id,Params),
     Email = proplists:get_value(email,Params),
-    case domain_pers:get(Params, [email, phone]) of
+    case empdb_biz_pers:get(Params, [email, phone]) of
         {ok,[]} ->
             {error,{bad_pers,{[{id, Id}, {email,Email}]}}};
         {ok,[{Perspl}]} ->
@@ -303,7 +298,7 @@ restore_pass(Params) ->
                     end, {false, []}, [email, phone]),
                     case Status of
                         true ->
-                            case domain_pers:update([{id, Id}, {pass, Pass}]) of
+                            case empdb_biz_pers:update([{id, Id}, {pass, Pass}]) of
                                 {ok, [{Upl}]} ->
                                     {ok, [{[
                                         {errors, [{Reasons}]}
@@ -364,7 +359,7 @@ logout(Params)->
     io:format("Params = ~p~n ", [Params]),
     ?evman_args(Params, <<"pers try to logout">>),
     Id = proplists:get_value(id, Params),
-    case domain_pers:logout(Params) of
+    case empdb_biz_pers:logout(Params) of
         {ok, [{Userpl}]} ->
             case proplists:get_value(session_id, Params) of
                 undefined ->
@@ -389,13 +384,13 @@ logout(Params)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 get_friends(Params)->
-    domain_pers:get_friends(Params).
+    empdb_biz_pers:get_friends(Params).
 
 add_friend(Params)->
-    domain_pers:add_friend(Params).
+    empdb_biz_pers:add_friend(Params).
 
 delete_friend(Params)->
-    domain_pers:delete_friend(Params).
+    empdb_biz_pers:delete_friend(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Эмоции пользователя
@@ -403,19 +398,19 @@ delete_friend(Params)->
 
 get_emotion(Params) ->
     ?evman_args(Params, <<"get emotion">>),
-    domain_pers:get_emotion(Params).
+    empdb_biz_pers:get_emotion(Params).
 
 create_emotion(Params) ->
     ?evman_args(Params, <<"get create emotion">>),
-    domain_pers:create_emotion(Params).
+    empdb_biz_pers:create_emotion(Params).
 
 update_emotion(Params) ->
     ?evman_args(Params, <<"get update emotion">>),
-    domain_pers:update_emotion(Params).
+    empdb_biz_pers:update_emotion(Params).
 
 delete_emotion(Params) ->
     ?evman_args(Params, <<"get delete emotion">>),
-    domain_pers:delete_emotion(Params).
+    empdb_biz_pers:delete_emotion(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Группа пользователя
@@ -423,19 +418,19 @@ delete_emotion(Params) ->
 
 get_pgroup(Params) ->
     ?evman_args(Params, <<"get pgroup">>),
-    domain_pers:get_pgroup(Params).
+    empdb_biz_pers:get_pgroup(Params).
 
 create_pgroup(Params) ->
     ?evman_args(Params, <<"create pgroup">>),
-    domain_pers:create_pgroup(Params).
+    empdb_biz_pers:create_pgroup(Params).
 
 update_pgroup(Params) ->
     ?evman_args(Params, <<"update pgroup">>),
-    domain_pers:update_pgroup(Params).
+    empdb_biz_pers:update_pgroup(Params).
 
 delete_pgroup(Params) ->
     ?evman_args(Params, <<"update pgroup">>),
-    domain_pers:delete_pgroup(Params).
+    empdb_biz_pers:delete_pgroup(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Семейное положение пользователя
@@ -443,19 +438,19 @@ delete_pgroup(Params) ->
 
 get_mstatus(Params) ->
     ?evman_args(Params, <<"get mstatus">>),
-    domain_pers:get_mstatus(Params).
+    empdb_biz_pers:get_mstatus(Params).
 
 create_mstatus(Params) ->
     ?evman_args(Params, <<"create mstatus">>),
-    domain_pers:create_mstatus(Params).
+    empdb_biz_pers:create_mstatus(Params).
     
 update_mstatus(Params) ->
     ?evman_args(Params, <<"update mstatus">>),
-    domain_pers:update_mstatus(Params).
+    empdb_biz_pers:update_mstatus(Params).
 
 delete_mstatus(Params) ->
     ?evman_args(Params, <<"delete mstatus">>),
-    domain_pers:delete_mstatus(Params).
+    empdb_biz_pers:delete_mstatus(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Статус пользователя пользователя: в сети \ не в сети.
@@ -463,19 +458,19 @@ delete_mstatus(Params) ->
 
 get_pstatus(Params) ->
     ?evman_args(Params, <<"get pstatus">>),
-    domain_pers:get_pstatus(Params).
+    empdb_biz_pers:get_pstatus(Params).
 
 create_pstatus(Params) ->
     ?evman_args(Params, <<"create pstatus">>),
-    domain_pers:create_pstatus(Params).
+    empdb_biz_pers:create_pstatus(Params).
 
 update_pstatus(Params) ->
     ?evman_args(Params, <<"update pstatus">>),
-    domain_pers:update_pstatus(Params).
+    empdb_biz_pers:update_pstatus(Params).
 
 delete_pstatus(Params) ->
     ?evman_args(Params, <<"delete pstatus">>),
-    domain_pers:delete_pstatus(Params).
+    empdb_biz_pers:delete_pstatus(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Авторитет пользователя
@@ -483,19 +478,19 @@ delete_pstatus(Params) ->
 
 get_authority(Params) ->
     ?evman_args(Params, <<"get authority">>),
-    domain_pers:get_authority(Params).
+    empdb_biz_pers:get_authority(Params).
 
 create_authority(Params) ->
     ?evman_args(Params, <<"create authority">>),
-    domain_pers:create_authority(Params).
+    empdb_biz_pers:create_authority(Params).
 
 update_authority(Params) ->
     ?evman_args(Params, <<"update authority">>),
-    domain_pers:update_authority(Params).
+    empdb_biz_pers:update_authority(Params).
 
 delete_authority(Params) ->
     ?evman_args(Params, <<"delete authority">>),
-    domain_pers:delete_authority(Params).
+    empdb_biz_pers:delete_authority(Params).
 
 
 %% ---------------------------------------------------------------------------

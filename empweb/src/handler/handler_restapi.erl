@@ -85,7 +85,7 @@ is_authorized(Req, Hap) ->
     case cowboy_http_req:header('Authorization', Req) of
         {<<"Basic ", Binary/binary>>, _} ->
             [Login, Pass] = binary:split(base64:decode(Binary), <<":">>),
-            case domain_pers:login([{login, Login}, {pass, Pass}]) of
+            case empdb_bizpers:login([{login, Login}, {pass, Pass}]) of
                  {ok, [{Ppl}]} ->
                     io:format("Ppl = ~p~n~n", [Ppl]),
                     {true, Req, Hap#empweb_hap{

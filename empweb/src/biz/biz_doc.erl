@@ -3,7 +3,7 @@
 %%          Бизнес логика по работе с документами,
 %%          и связанными с ними объектами.
 %% 
-%%          Зависит от модуля domain_doc. Все внешние функуции принимают
+%%          Зависит от модуля empdb_biz_doc. Все внешние функуции принимают
 %%              proplist()
 %%          и возвращают:
 %%              {ok, [Obj::{proplist()}]}
@@ -233,16 +233,16 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_oktype(Params)->
-    domain_doc:create_oktype(Params).
+    empdb_biz_doc:create_oktype(Params).
 
 update_oktype(Params)->
-    domain_doc:update_oktype(Params).
+    empdb_biz_doc:update_oktype(Params).
 
 get_oktype(Params)->
     get_oktype(Params, []).
 
 get_oktype(Params, Fields)->
-    domain_doc:get_oktype(Params, Fields).
+    empdb_biz_doc:get_oktype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Тип документа: Блог, коммент к блогу, галерея,
@@ -250,32 +250,32 @@ get_oktype(Params, Fields)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_doctype(Params)->
-    domain_doc:create_doctype(Params).
+    empdb_biz_doc:create_doctype(Params).
 
 update_doctype(Params)->
-    domain_doc:update_doctype(Params).
+    empdb_biz_doc:update_doctype(Params).
 
 get_doctype(Params)->
     get_doctype(Params, []).
 
 get_doctype(Params, Fields)->
-    domain_doc:get_doctype(Params, Fields).
+    empdb_biz_doc:get_doctype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы контента: обычный, эротический
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_contype(Params)->
-    domain_doc:create_contype(Params).
+    empdb_biz_doc:create_contype(Params).
 
 update_contype(Params)->
-    domain_doc:update_contype(Params).
+    empdb_biz_doc:update_contype(Params).
 
 get_contype(Params)->
-    domain_doc:get_contype(Params).
+    empdb_biz_doc:get_contype(Params).
 
 get_contype(Params, Fields)->
-    domain_doc:get_contype(Params, Fields).
+    empdb_biz_doc:get_contype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Тип доступа к контенту контента (блога и галереи):
@@ -283,80 +283,80 @@ get_contype(Params, Fields)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_acctype(Params)->
-    domain_doc:create_acctype(Params).
+    empdb_biz_doc:create_acctype(Params).
 
 update_acctype(Params)->
-    domain_doc:update_acctype(Params).
+    empdb_biz_doc:update_acctype(Params).
 
 get_acctype(Params)->
-    domain_doc:get_acctype(Params).
+    empdb_biz_doc:get_acctype(Params).
 
 get_acctype(Params, Fields)->
-    domain_doc:get_acctype(Params, Fields).
+    empdb_biz_doc:get_acctype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы чат-комнат. (страна, тюрьма, ад, рай)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_roomtype(Params)->
-    domain_doc:create_roomtype(Params).
+    empdb_biz_doc:create_roomtype(Params).
 
 update_roomtype(Params)->
-    domain_doc:update_roomtype(Params).
+    empdb_biz_doc:update_roomtype(Params).
 
 get_roomtype(Params)->
-    domain_doc:get_roomtype(Params).
+    empdb_biz_doc:get_roomtype(Params).
 
 get_roomtype(Params, Fields)->
-    domain_doc:get_roomtype(Params, Fields).
+    empdb_biz_doc:get_roomtype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Список языков чата.
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_chatlang(Params)->
-    domain_doc:create_chatlang(Params).
+    empdb_biz_doc:create_chatlang(Params).
 
 update_chatlang(Params)->
-    domain_doc:update_chatlang(Params).
+    empdb_biz_doc:update_chatlang(Params).
 
 get_chatlang(Params)->
-    domain_doc:get_chatlang(Params).
+    empdb_biz_doc:get_chatlang(Params).
 
 get_chatlang(Params, Fields)->
-    domain_doc:get_chatlang(Params, Fields).
+    empdb_biz_doc:get_chatlang(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Список режимов комнаты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_regimen(Params)->
-    domain_doc:create_regimen(Params).
+    empdb_biz_doc:create_regimen(Params).
 
 update_regimen(Params)->
-    domain_doc:update_regimen(Params).
+    empdb_biz_doc:update_regimen(Params).
 
 get_regimen(Params)->
-    domain_doc:get_regimen(Params).
+    empdb_biz_doc:get_regimen(Params).
 
 get_regimen(Params, Fields)->
-    domain_doc:get_regimen(Params, Fields).
+    empdb_biz_doc:get_regimen(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Дерево тем комнаты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_topic(Params)->
-    domain_doc:create_topic(Params).
+    empdb_biz_doc:create_topic(Params).
 
 update_topic(Params)->
-    domain_doc:update_topic(Params).
+    empdb_biz_doc:update_topic(Params).
 
 get_topic(Params)->
-    domain_doc:get_topic(Params).
+    empdb_biz_doc:get_topic(Params).
 
 get_topic(Params, Fields)->
-    domain_doc:get_topic(Params, Fields).
+    empdb_biz_doc:get_topic(Params, Fields).
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -364,32 +364,32 @@ get_topic(Params, Fields)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_communitytype(Params)->
-    domain_doc:create_communitytype(Params).
+    empdb_biz_doc:create_communitytype(Params).
 
 update_communitytype(Params)->
-    domain_doc:update_communitytype(Params).
+    empdb_biz_doc:update_communitytype(Params).
 
 get_communitytype(Params)->
-    domain_doc:get_communitytype(Params).
+    empdb_biz_doc:get_communitytype(Params).
 
 get_communitytype(Params, Fields)->
-    domain_doc:get_communitytype(Params, Fields).
+    empdb_biz_doc:get_communitytype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы сообщений
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_messagetype(Params)->
-    domain_doc:create_messagetype(Params).
+    empdb_biz_doc:create_messagetype(Params).
 
 update_messagetype(Params)->
-    domain_doc:update_messagetype(Params).
+    empdb_biz_doc:update_messagetype(Params).
 
 get_messagetype(Params)->
-    domain_doc:get_messagetype(Params).
+    empdb_biz_doc:get_messagetype(Params).
 
 get_messagetype(Params, Fields)->
-    domain_doc:get_messagetype(Params, Fields).
+    empdb_biz_doc:get_messagetype(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -402,152 +402,152 @@ get_messagetype(Params, Fields)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_blog(Params)->
-    domain_doc:create_blog(Params).
+    empdb_biz_doc:create_blog(Params).
 
 update_blog(Params)->
-    domain_doc:update_blog(Params).
+    empdb_biz_doc:update_blog(Params).
 
 
 delete_blog(Params)->
-    domain_doc:delete_blog(Params).
+    empdb_biz_doc:delete_blog(Params).
 
     
 get_blog(Params)->
     get_blog(Params, []).
 
 get_blog(Params, Fields)->
-    domain_doc:get_blog(Params, Fields).
+    empdb_biz_doc:get_blog(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Посты \ коменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_post(Params)->
-    domain_doc:create_post(Params).
+    empdb_biz_doc:create_post(Params).
 
 update_post(Params)->
-    domain_doc:update_post(Params).
+    empdb_biz_doc:update_post(Params).
 
 
 delete_post(Params)->
-    domain_doc:delete_post(Params).
+    empdb_biz_doc:delete_post(Params).
 
 get_post(Params)->
-    domain_doc:get_post(Params).
+    empdb_biz_doc:get_post(Params).
 
 get_post(Params, Fields)->
-    domain_doc:get_post(Params, Fields).
+    empdb_biz_doc:get_post(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Посты \ коменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_comment(Params)->
-    domain_doc:create_comment(Params).
+    empdb_biz_doc:create_comment(Params).
 
 update_comment(Params)->
-    domain_doc:update_comment(Params).
+    empdb_biz_doc:update_comment(Params).
 
 
 delete_comment(Params)->
-    domain_doc:delete_comment(Params).
+    empdb_biz_doc:delete_comment(Params).
 
 get_comment(Params)->
-    domain_doc:get_comment(Params).
+    empdb_biz_doc:get_comment(Params).
 
 get_comment(Params, Fields)->
-    domain_doc:get_comment(Params, Fields).
+    empdb_biz_doc:get_comment(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_room(Params)->
-    domain_doc:create_room(Params).
+    empdb_biz_doc:create_room(Params).
 
 update_room(Params)->
-    domain_doc:update_room(Params).
+    empdb_biz_doc:update_room(Params).
 
 delete_room(Params)->
-    domain_doc:delete_room(Params).
+    empdb_biz_doc:delete_room(Params).
 
 add_room_topic(Params)->
-    domain_doc:add_room_topic(Params).
+    empdb_biz_doc:add_room_topic(Params).
 
 delete_room_topic(Params)->
-    domain_doc:delete_room_topic(Params).
+    empdb_biz_doc:delete_room_topic(Params).
 
     
 get_room(Params)->
-    domain_doc:get_room(Params).
+    empdb_biz_doc:get_room(Params).
 
 get_room(Params, Fields)->
-    domain_doc:get_room(Params, Fields).
+    empdb_biz_doc:get_room(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сообщества
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_community(Params)->
-    domain_doc:create_community(Params).
+    empdb_biz_doc:create_community(Params).
 
 update_community(Params)->
-    domain_doc:update_community(Params).
+    empdb_biz_doc:update_community(Params).
 
 delete_community(Params)->
-    domain_doc:update_room(Params).
+    empdb_biz_doc:update_room(Params).
 
 get_community(Params)->
-    domain_doc:get_community(Params).
+    empdb_biz_doc:get_community(Params).
 
 get_community(Params, Fields)->
-    domain_doc:get_community(Params, Fields).
+    empdb_biz_doc:get_community(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сообщения
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_message(Params)->
-    domain_doc:create_message(Params).
+    empdb_biz_doc:create_message(Params).
 
 update_message(Params)->
-    domain_doc:update_message(Params).
+    empdb_biz_doc:update_message(Params).
 
 get_message(Params)->
-    domain_doc:get_message(Params).
+    empdb_biz_doc:get_message(Params).
 
 get_message(Params, Fields)->    
-    domain_doc:get_message(Params, Fields).
+    empdb_biz_doc:get_message(Params, Fields).
 
 get_message_for_me(Params)->
-    domain_doc:get_message_for_me(Params).
+    empdb_biz_doc:get_message_for_me(Params).
 
 get_message_from_me(Params)->
-    domain_doc:get_message_from_me(Params).
+    empdb_biz_doc:get_message_from_me(Params).
 
 get_message_for_me(Params, Fields)->
-    domain_doc:get_message_for_me(Params, Fields).
+    empdb_biz_doc:get_message_for_me(Params, Fields).
 
 get_message_from_me(Params, Fields)->
-    domain_doc:get_message_from_me(Params, Fields).
+    empdb_biz_doc:get_message_from_me(Params, Fields).
 
 delete_message(Params)->
-    domain_doc:delete_message(Params).
+    empdb_biz_doc:delete_message(Params).
 
 delete_message_for_me(Params)->
-    domain_doc:delete_message_for_me(Params).
+    empdb_biz_doc:delete_message_for_me(Params).
 
 delete_message_from_me(Params)->
-    domain_doc:delete_message_from_me(Params).
+    empdb_biz_doc:delete_message_from_me(Params).
 
 count_message_for_me(Params)->
-    domain_doc:count_message_for_me(Params).
+    empdb_biz_doc:count_message_for_me(Params).
 
 count_message_from_me(Params)->
-    domain_doc:count_message_from_me(Params).
+    empdb_biz_doc:count_message_from_me(Params).
 
 count_message(Params) ->
-    domain_doc:count_message(Params).
+    empdb_biz_doc:count_message(Params).
 
 count_message_types(Params) ->
-    domain_doc:count_message_types(Params).
+    empdb_biz_doc:count_message_types(Params).

@@ -28,12 +28,12 @@ init([]) ->
     },
 
     Dao_static_cashe = {
-        dao_static_cashe,
-        {term_cache_ets, start_link, [[{'size', '40Mb'}, {name, dao_static_cashe}]]},
+        empdb_dao_static_cashe,
+        {term_cache_ets, start_link, [[{'size', '40Mb'}, {name, empdb_dao_static_cashe}]]},
         permanent,
         5000,
         supervisor,
-        [dao_static_cashe]
+        [empdb_dao_static_cashe]
     },
     %Psqlcp
     

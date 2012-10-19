@@ -3,7 +3,34 @@
 {application, empdb, [
     {description, "empdb"},
     {vsn, "0.1.0"},
-    {modules, []},
+    {modules, [
+        % --------------------
+        empdb_biz_doc.erl,
+        empdb_biz_experbuy,
+        empdb_biz_lang,
+        empdb_biz_pers,
+        empdb_biz_room,
+        empdb_biz_thingbuy,
+        empdb_biz_thing,
+        empdb_biz_thingtype,
+        % --------------------
+        empdb_dao_blog,
+        empdb_dao_comment,
+        empdb_dao_community,
+        empdb_dao_doc,
+        empdb_dao_event,
+        empdb_dao_experbuy,
+        empdb_dao_lang,
+        empdb_dao_message,
+        empdb_dao_pers,
+        empdb_dao_post,
+        empdb_dao_room,
+        empdb_dao_sysvar,
+        empdb_dao_thingbuy,
+        empdb_dao_thing,
+        empdb_dao_thingtype,
+        empdb_dao_tr
+    ]},
     {registered, [empdb_sup]},
     {applications, [
         kernel,
