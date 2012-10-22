@@ -366,9 +366,10 @@ ok(Body) ->
 
 ok(Code, {ok, Body}) ->
     #empweb_resp{
-        status  = Code,
-        format = json,
-        body = {[{ok, Body}]}
+        %status  = Code,
+        status  = 200,
+        format  = json,
+        body    = {[{ok, Body}]}
     };
 ok(Code, Body) ->
     ok(Code, {ok, Body}).
@@ -388,9 +389,10 @@ error(Error) ->
 error(Code, {error, Error}) ->
     ?evman_error({http,[{code, Code},{error, Error}]}),
     #empweb_resp{
-        status  = Code,
-        format = json,
-        body = {[{error, Error}]}
+        %status  = Code,
+        status  = 200,
+        format  = json,
+        body    = {[{error, Error}]}
     };
 error(Code, Error) ->
     ?MODULE:error(Code, {error, Error}).
