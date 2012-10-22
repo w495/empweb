@@ -570,7 +570,7 @@ begin
         (   select
                 min(cur.level)
             from
-                authority as curс
+                authority as cur
             join
                 authority as prev
             on
@@ -580,7 +580,9 @@ begin
         ) - new.exper;
 
     if not (new.experlack is null) then
-        new.experlackprice    = 0.5 * new.experlack;
+        new.experlackprice  = 0.5 * new.experlack;
+    else
+        new.experlackprice  = null;
     end if;
 
     /**
@@ -681,9 +683,12 @@ begin
                 where
                     prev.alias = new.authority_alias
             ) - new.exper;
-        if not (new.experlack is null) then
-            new.experlackprice    = 0.5 * new.experlack;
-        end if;
+    end if;
+
+    if not (new.experlack is null) then
+        new.experlackprice  = 0.5 * new.experlack;
+    else
+        new.experlackprice  = null
     end if;
 
     /**
