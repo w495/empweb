@@ -115,21 +115,29 @@ table({fields, insert, required})->
 %% @doc Возвращает список полей таблицы для выборки
 %%
 table({fields, select})->
-    [   'extract(epoch from birthday) as birthday'
-        |table({fields, all})
-    ] -- [birthday, isdeleted];
+    table({fields, all})  -- [isdeleted];
 
 %%
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    table({fields, all}) -- [id];
+    table({fields, all}) -- [
+        id,
+        exper,
+        experlack,
+        experlackprice
+    ];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
 %%
 table({fields, insert})->
-    table({fields, all}) -- [id];
+    table({fields, all}) -- [
+        id,
+        exper,
+        experlack,
+        experlackprice
+    ];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -165,6 +173,7 @@ table({fields, all})->
         
         exper,
         experlack,
+        experlackprice,
         
         emotion_id,
         emotion_alias,

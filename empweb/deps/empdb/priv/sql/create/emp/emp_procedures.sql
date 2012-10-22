@@ -570,7 +570,7 @@ begin
         (   select
                 min(cur.level)
             from
-                authority as cur
+                authority as curс
             join
                 authority as prev
             on
@@ -578,6 +578,10 @@ begin
             where
                 prev.alias = new.authority_alias
         ) - new.exper;
+
+    if not (new.experlack is null) then
+        new.experlackprice    = 0.5 * new.experlack;
+    end if;
 
     /**
         Эмоции пользователя
@@ -677,6 +681,9 @@ begin
                 where
                     prev.alias = new.authority_alias
             ) - new.exper;
+        if not (new.experlack is null) then
+            new.experlackprice    = 0.5 * new.experlack;
+        end if;
     end if;
 
     /**
