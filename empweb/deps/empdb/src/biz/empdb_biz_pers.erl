@@ -455,7 +455,7 @@ login({Uf, Uv}, Params) ->
                         %%
                         %% Получаем комнату пользователя
                         %%
-                        {ok, [Room]} =
+                        {ok, [Live_room]} =
                             empdb_dao_room:get(Con, [
                                 {id, proplists:get_value(live_room_id, Userpl)},
                                 {limit, 1}
@@ -478,7 +478,7 @@ login({Uf, Uv}, Params) ->
                         {ok, [{[
                             {perm_names, Perm_names},
                             {blog, Blog},
-                            {room, Room}
+                            {live_room, Live_room}
                             |Userpl
                         ]}]}
                 end;

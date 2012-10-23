@@ -44,6 +44,8 @@ now() ->
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
+        empdb_dao_roombet:create(Con, Params)
+    
 %         Roomlot_id  = proplists:get_value(roomlot_id, Params),
 %         Owner_id    = proplists:get_value(owner_id, Params),
 % 
@@ -93,12 +95,25 @@ create(Params)->
 %                     )
 %                 ) of
 %                     true ->
+%                         case empdb_dao_roombet:get(Con, [
+%                             {price, {lt, Price}},
+%                             {roomlot_id, Roomlot_id},
+%                             {limit, 1},
+%                             {order, [
+%                                 {desc, price},
+%                                 {asc, created}
+%                             ]}
+%                         ]) of
+%                             {ok, [{Maxprev}]} ->
+%                                 Maxprev
+
+
 %                         X = empdb_dao_pers:update(Con,[
 %                             {id,    proplists:get_value(id,   Userpl)},
 %                             {money, Newmoney}
 %                         ]),
-
-                empdb_dao_roombet:create(Con, Params)
+%                         empdb_dao_roombet:create(Con, Params)
+%                         
 %             Error ->
 %                 Error;
     end).
