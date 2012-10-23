@@ -37,85 +37,107 @@
 %% Блоги
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-now() ->
+nowsec() ->
     {Mgs,Sec, _mis} = erlang:now(),
     Now = Mgs * 1000000 + Sec,
     Now.
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_roombet:create(Con, Params)
-    
-%         Roomlot_id  = proplists:get_value(roomlot_id, Params),
-%         Owner_id    = proplists:get_value(owner_id, Params),
-% 
-%         Price       = proplists:get_value(price, Params, 0),
-%         Now         = now(),
-% 
-%         case {
-%             empdb_dao_roomlot:get(Con, [
-%                 {isdeleted, false},
-%                 {id, Roomlot_id},
-%                 {fields, [
-%                     dtstart,
-%                     dtstop,
-%                     betmin,
-%                     betmax
-%                 ]},
-%                 {limit, 1}
-%             ]),
-%             empdb_dao_pers:get(Con, [
-%                 {'or', [
-%                     {id,    proplists:get_value(buyer_id,   Params)},
-%                     {nick,  proplists:get_value(buyer_nick, Params)}
-%                 ]},
-%                 {fields, [
-%                     id,
-%                     money
-%                 ]},
-%                 {limit, 1}
-%             ]),
-%         } of
-%             {   {ok, [{Roomlotpl}]},
-%                 {ok, [{Userpl}]}
-%             } ->
-%                 Betmin      = proplists:get_value(betmin,   Roomlotpl),
-%                 Betmax      = proplists:get_value(betmax,   Roomlotpl),
-%                 Dtstart     = proplists:get_value(dtstart,  Roomlotpl),
-%                 Dtstop      = proplists:get_value(dtstop,   Roomlotpl),
-%                 Money       = proplists:get_value(money,    Userpl),
-%                 Newmoney    = Money - Price,
-%                 case (
-%                     (
-%                         Price =< Money
-%                     ) and (
-%                         (Betmin     =< Price) and (Price    =<  Betmax)
-%                     ) and (
-%                         (Dtstart    =< Now  ) and (Now      =<  Dtstop)
-%                     )
-%                 ) of
-%                     true ->
-%                         case empdb_dao_roombet:get(Con, [
-%                             {price, {lt, Price}},
-%                             {roomlot_id, Roomlot_id},
-%                             {limit, 1},
-%                             {order, [
-%                                 {desc, price},
-%                                 {asc, created}
-%                             ]}
-%                         ]) of
-%                             {ok, [{Maxprev}]} ->
-%                                 Maxprev
-
-
-%                         X = empdb_dao_pers:update(Con,[
-%                             {id,    proplists:get_value(id,   Userpl)},
-%                             {money, Newmoney}
-%                         ]),
-%                         empdb_dao_roombet:create(Con, Params)
-%                         
-%             Error ->
-%                 Error;
+        Roomlot_id  = proplists:get_value(roomlot_id, Params),
+        Owner_id    = proplists:get_value(owner_id, Params),
+        Price       = proplists:get_value(price, Params, 0),
+        Now         = nowsec(),
+        case {
+            empdb_dao_roomlot:get(Con, [
+                {isdeleted, false},
+                {id, Roomlot_id},
+                {fields, [
+                    dtstart,
+                    dtstop,
+                    betmin,
+                    betmax
+                ]},
+                {limit, 1}
+            ]),
+            empdb_dao_pers:get(Con, [
+                {'or', [
+                    {id,    proplists:get_value(owner_id,   Params)},
+                    {nick,  proplists:get_value(owner_nick, Params)}
+                ]},
+                {fields, [
+                    id,
+                    money
+                ]},
+                {limit, 1}
+            ])
+        } of
+            {   {ok, [{Roomlotpl}]},
+                {ok, [{Userpl}]}
+            } ->
+                Betmin      = proplists:get_value(betmin,   Roomlotpl),
+                Betmax      = proplists:get_value(betmax,   Roomlotpl),
+                Dtstart     = proplists:get_value(dtstart,  Roomlotpl),
+                Dtstop      = proplists:get_value(dtstop,   Roomlotpl),
+                Money       = proplists:get_value(money,    Userpl),
+                Newmoney    = Money - Price,
+                case (
+                    (
+                        Price =< Money
+                    ) and (
+                        (Betmin     =< Price) and (Price    =<  Betmax)
+                    ) and (
+                        (Dtstart    =< Now  ) and (Now      =<  Dtstop)
+                    )
+                ) of
+                    true ->
+                        %%
+                        %% Вычисляем, кто до этого, сделал ставку.
+                        %%
+                        case empdb_dao_roombet:get(Con, [
+                            {price, {lte, Price}},
+                            {roomlot_id, Roomlot_id},
+                            {limit, 1},
+                            {order, [
+                                {desc, price},
+                                {asc, created}
+                            ]}
+                        ]) of
+                            {ok, [{Maxprev}]} ->
+                                Maxprev_owner_id    =
+                                    proplists:get_value(owner_id, Maxprev),
+                                Maxprev_price       =
+                                    proplists:get_value(price, Maxprev),
+                                %%
+                                %% Возвращаем деньги пользователю.
+                                %%
+                                {ok, _} = empdb_dao_pers:update(Con,[
+                                    {id,    Maxprev_owner_id},
+                                    {money, {incr, Maxprev_price}}
+                                ]),
+                                ok;
+                            Some ->
+                                ok
+                        end,
+                        {ok, _} = empdb_dao_pers:update(Con,[
+                            {id,    proplists:get_value(id,   Userpl)},
+                            {money, {decr, Money}}
+                        ]),
+                        empdb_dao_roombet:create(Con, Params);
+                    _ ->
+                        {error, {something_wrong, {[
+                            {'now',     Now},
+                            {money,     Money},
+                            {price,     Price},
+                            {betmin,    Betmin},
+                            {betmax,    Betmax},
+                            {dtstart,   Dtstart},
+                            {dtstop,    Dtstop}
+                        ]}}}
+                end;
+            Error ->
+                Error
+        end
     end).
 
 update(Params)->
