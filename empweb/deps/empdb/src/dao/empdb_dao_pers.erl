@@ -122,10 +122,10 @@ table({fields, select})->
 %%
 table({fields, update})->
     table({fields, all}) -- [
-        id,
-        exper,
-        experlack,
-        experlackprice
+        id
+%       exper,
+%       experlack,
+%       experlackprice
     ];
 
 %%
@@ -133,10 +133,10 @@ table({fields, update})->
 %%
 table({fields, insert})->
     table({fields, all}) -- [
-        id,
-        exper,
-        experlack,
-        experlackprice
+        id
+%         exper,
+%         experlack,
+%         experlackprice
     ];
 
 %%
@@ -194,7 +194,7 @@ table({fields, all})->
         own_room_id,
         own_room_head,
         
-        allowauctionoffer,
+        % allowauctoffer,
         perspicbody_id,
         perspichead_id,
         isdeleted

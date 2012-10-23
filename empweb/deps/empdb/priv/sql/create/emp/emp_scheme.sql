@@ -412,7 +412,7 @@ create table pers(
     
     own_room_head       varchar(1024) /*references doc(head)*/ default null,
     
-    allowauctionoffer   bool default false,
+    -- allowauctoffer      bool default false,
     perspicbody_id      decimal references perspicbody(id)   default null,
     perspichead_id      decimal references perspichead(id)   default null,
     /**
@@ -1057,6 +1057,81 @@ create table message(
     **/
     isdfr               bool default false
 );
+
+------------------------------------------------------------------------------
+-- Лот аукциона
+-- Проводим аукцион только для страны.
+------------------------------------------------------------------------------
+
+create table roomlot(
+    doc_id          decimal unique references doc(id),
+    room_id         decimal references room(doc_id)        default null,
+    room_head       varchar(1024) /*references doc(head)*/ default null,
+    dtstart         timestamp without time zone not null default utcnow(),
+    dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+    betmin          real default 0,
+    betmax          real default 100
+);
+
+
+-- create table roomlot_log(
+--     doc_id          decimal unique references doc(id),
+--     room_id         decimal references room(doc_id)        default null,
+--     room_head       varchar(1024) /*references doc(head)*/ default null,
+--     dtstart         timestamp without time zone not null default utcnow(),
+--     dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+--     betmin          real default 0,
+--     betmax          real default 100,
+-- );
+
+------------------------------------------------------------------------------
+-- Ставки в аукционе.
+------------------------------------------------------------------------------
+
+create sequence seq_roombet_id;
+create table roombet(
+    id              decimal primary key default nextval('seq_roombet_id'),
+
+    roomlot_id      decimal         references roomlot(doc_id)      default null,
+    room_id         decimal        /*  references roomlot(room_id)  */ default null,
+    room_head       varchar(1024)  /* references roomlot(room_head) */ default null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id        decimal         references pers(id)     not null,
+    owner_nick      varchar(1024)   references pers(nick)   not null,
+    price           real default 0,
+
+    created         timestamp without time zone not null    default utcnow(),
+    isdeleted       bool    default false
+);
+
+
+
+/*
+create sequence seq_roomoffer_id;
+create table roomoffer(
+    id              decimal primary key default nextval('seq_roomoffer_id'),
+
+    roomlot_id      decimal references roomlot(doc_id)      default null,
+    room_id         decimal references room(doc_id)         default null,
+    room_head       varchar(1024) references doc(head) default nul
+
+    owner_id        decimal         references pers(id)     not null,
+    owner_nick      varchar(1024)   references pers(nick)   not null,
+
+    reader_id       decimal         references pers(id)     not null,
+    reader_nick     varchar(1024)   references pers(nick)   not null,
+
+    price           real default 0,
+
+    created         timestamp without time zone not null    default utcnow(),
+    isdeleted       bool    default false
+);
+
+*/
+
 
 
 

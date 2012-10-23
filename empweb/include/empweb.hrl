@@ -12,7 +12,6 @@
 }).
 
 
-
 %%
 %%
 %%
@@ -26,7 +25,6 @@
     pers_nick,
     pers_perm_names =[]
 }).
-
 
 
 %%
@@ -65,11 +63,6 @@
 
 -define(debug(S),       io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE])).
 -define(debug(S, P),    io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE|P])).
-
--define(d(S),       io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE])).
--define(d(S, P),    io:format("debug ~p (~p) ~p:~n" ++ S ++ "~n", [calendar:local_time(), ?MODULE, ?LINE|P])).
-
-
 
 
 %%

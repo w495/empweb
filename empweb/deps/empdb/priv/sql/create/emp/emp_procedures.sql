@@ -131,7 +131,15 @@ create trigger t1on_insert_subdoc_inst after insert
 drop trigger if exists t1on_insert_subdoc_inst on event;
 create trigger t1on_insert_subdoc_inst after insert
    on event for each row execute procedure on_insert_subdoc_inst('event');
- 
+
+/**
+    Тригер присвоения типа документа при создании сообщения
+**/
+drop trigger if exists t1on_insert_subdoc_inst on event;
+create trigger t1on_insert_subdoc_inst after insert
+   on event for each row execute procedure on_insert_subdoc_inst('roomlot');
+
+
 /**
     Aтомарное создание комнаты для новичков.
 **/
@@ -688,7 +696,7 @@ begin
     if not (new.experlack is null) then
         new.experlackprice  = 0.5 * new.experlack;
     else
-        new.experlackprice  = null
+        new.experlackprice  = null;
     end if;
 
     /**
@@ -1776,6 +1784,120 @@ $$ language plpgsql;
 drop trigger if exists t1experbuy_util_fields_on_update on experbuy ;
 create trigger t1experbuy_util_fields_on_update before update
 on experbuy for each row execute procedure experbuy_util_fields_on_update();
+
+
+--(2012.10.22 16:01:55:586728391)---------------------------------------------
+
+
+/**
+    @doc Обеспечивает совместное состояние лота аукциона
+**/
+create or replace function roomlot_util_fields_on_insert() returns "trigger" as $$
+begin
+    if not (new.room_id is null) then
+        new.room_head =
+            (select head from doc where doc.id = new.room_id);
+    end if;
+    
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roomlot_util_fields_on_insert on roomlot ;
+create trigger t1roomlot_util_fields_on_insert before insert
+on roomlot for each row execute procedure roomlot_util_fields_on_insert();
+
+create or replace function roomlot_util_fields_on_update() returns "trigger" as $$
+begin
+    /**
+        Плательщик покупки
+    **/
+    if new.room_id != old.room_id then
+        new.room_head =
+            (select head from doc where doc.id = new.room_id);
+    end if;
+
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roomlot_util_fields_on_update on roomlot ;
+create trigger t1roomlot_util_fields_on_update before update
+on roomlot for each row execute procedure roomlot_util_fields_on_update();
+
+
+/**
+    @doc Обеспечивает совместное состояние ставки аукциона
+**/
+create or replace function roombet_util_fields_on_insert() returns "trigger" as $$
+begin
+    /**
+        Аукцион и предмет аукциона
+    **/
+    if not (new.roomlot_id is null) then
+        new.room_id =
+            (select room_id from roomlot where roomlot.doc_id = new.roomlot_id);
+        new.room_head =
+            (select room_head from roomlot where roomlot.doc_id = new.roomlot_id);
+    end if;
+    /**
+        Владелец заявки
+    **/
+    if (new.owner_nick is null) then
+        if not (new.owner_id is null) then
+            new.owner_nick =
+                (select pers.nick from pers where pers.id = new.owner_id);
+        else
+            /**
+                если владелец не указан, то им становится, тот кто покупает
+            **/
+            new.owner_nick        = new.buyer_nick;
+        end if;
+    end if;
+    if (new.owner_id is null) then
+        new.owner_id           =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roombet_util_fields_on_insert on roombet ;
+create trigger t1roombet_util_fields_on_insert before insert
+on roombet for each row execute procedure roombet_util_fields_on_insert();
+
+create or replace function roombet_util_fields_on_update() returns "trigger" as $$
+begin
+    /**
+        Аукцион и предмет аукциона
+    **/
+    if new.roomlot_id != old.roomlot_id then
+        new.room_id =
+            (select room_id from roomlot where roomlot.doc_id = new.roomlot_id);
+        new.room_head =
+            (select room_head from roomlot where roomlot.doc_id = new.roomlot_id);
+    end if;
+    /**
+        Владелец заявки
+    **/
+    if new.owner_id != old.owner_id then
+        new.owner_nick =
+            (select pers.nick from pers where pers.id = new.owner_id);
+    end if;
+    if new.owner_nick != old.owner_nick then
+        new.owner_id =
+            (select pers.id from pers where pers.nick = new.owner_nick);
+    end if;
+    
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roombet_util_fields_on_update on roombet ;
+create trigger t1roombet_util_fields_on_update before update
+on roombet for each row execute procedure roombet_util_fields_on_update();
+
 
 
 

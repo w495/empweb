@@ -383,9 +383,9 @@ login({Uf, Uv}, Params) ->
                     empdb_convert:to_atom(proplists:get_value(alias, Permpl))
                 end, Perm_list),
                 Phash = proplists:get_value(phash, Userpl),
-                ?debug("Userpl   = ~p~n~n", [Userpl]),
-                ?debug("Phash   = ~p~n~n", [Phash]),
-                ?debug("Mbphash = ~p~n~n", [Mbphash]),
+                ?empdb_debug("Userpl   = ~p~n~n", [Userpl]),
+                ?empdb_debug("Phash   = ~p~n~n", [Phash]),
+                ?empdb_debug("Mbphash = ~p~n~n", [Mbphash]),
                 case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
                     {true, false} ->
                         %% Фиктиная ветка, в реалности не выполняется.
@@ -530,7 +530,7 @@ get_opt(Con, Params, [], Proplist)
     -> {ok, Proplist};
 
 get_opt(Con,Params, [Option|Options], [{Acc}])->
-    ?debug("Option = ~p~n", [Option]),
+    ?empdb_debug("Option = ~p~n", [Option]),
     case Option of
         without_phash ->
             Nacc = proplists:delete(phash,

@@ -9,3 +9,4 @@
 
     update pers set experlackprice = 0.5 * experlack;
 
+    insert into doctype(alias) values('roomlot');

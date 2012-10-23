@@ -748,7 +748,8 @@ insert into doctype(alias)
             ('room'),
             ('community'),
             ('message'),
-            ('event');
+            ('event'),
+            ('roomlot');
             
 insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values

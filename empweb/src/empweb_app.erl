@@ -30,7 +30,7 @@ start(_Type, _Args) ->
         % protocol
         cowboy_http_protocol,
         % protoopts
-        [{dispatch, dispatcher:dispatch()}]
+        [{dispatch, empweb_dispatcher:dispatch()}]
     ] end),
     start_listener(https, fun(Config)->[
         % nbacceptors
@@ -47,7 +47,7 @@ start(_Type, _Args) ->
         % protocol
         cowboy_http_protocol,
         % protoopts
-        [{dispatch, dispatcher:dispatch()}]
+        [{dispatch, empweb_dispatcher:dispatch()}]
     ] end),
 
     ensure_start_link(empweb_sup).

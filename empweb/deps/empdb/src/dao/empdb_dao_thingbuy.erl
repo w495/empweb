@@ -78,7 +78,7 @@ table(fields)->
 %% @doc Возвращает имя таблицы
 %%
 table(name)->
-    buy.
+    thingbuy.
 
 table()->
     table(name).

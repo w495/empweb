@@ -318,7 +318,7 @@ sql_and(List)->
 sql_or(List)->
     {Tlist, String_} = sql_list(List),
     String = lists:filter(fun([])-> false; (_)-> true end, String_),
-    ?debug("String = ~p~n", [String]),
+    ?empdb_debug("String = ~p~n", [String]),
     {   Tlist,
         [   <<"(">>,
                 string:join(String,[<<" or ">>]),
@@ -327,9 +327,9 @@ sql_or(List)->
     }.
 
 sql_list(List) ->
-    ?debug("List = ~p~n", [List]),
+    ?empdb_debug("List = ~p~n", [List]),
     {Tlist, String} = lists:unzip([sql_cond({Ff, Val})||{Ff, Val} <- List]),
-    ?debug("String = ~p~n", [String]),
+    ?empdb_debug("String = ~p~n", [String]),
     {lists:flatten(Tlist), String}.
 
 sql_cond({'and', List}) ->
@@ -339,11 +339,11 @@ sql_cond({'or', List}) ->
     sql_or(List);
 
 sql_cond({Ff, {[{X, C}]}})->
-    ?debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}}]),
+    ?empdb_debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}}]),
     sql_cond({Ff, {X, C}});
 
 sql_cond({Ff, {X, C}}) when erlang:is_list(X) orelse erlang:is_binary(X)->
-    ?debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
+    ?empdb_debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
     sql_cond({Ff, {empdb_convert:to_atom(X), C}});
     
 sql_cond({Ff, {'and', Conds}})->
@@ -359,7 +359,7 @@ sql_cond({Ff, {'and', Conds}})->
     sql_cond(X);
 
 sql_cond({Ff, {'or', Conds}})->
-    ?debug("Conds = ~p~n", [Conds]),
+    ?empdb_debug("Conds = ~p~n", [Conds]),
     X =
         {   'or',
             lists:map(
@@ -537,7 +537,7 @@ sql_cond({Ff,undefined}) ->
     {[], []};
 
 sql_cond({Ff, Val} = Tuple) ->
-    ?debug("Tuple = ~p~n~n", [Tuple]),
+    ?empdb_debug("Tuple = ~p~n~n", [Tuple]),
     {[{cond_atom(Ff), Val}], [
         empdb_convert:to_binary(Ff),
         <<" = $">>,
@@ -834,18 +834,18 @@ table_options(Oname,      Current) ->
 
 get(Current, Con, #queryobj{order=Order}=Obj)
     when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
-    ?debug("Order = ~p~n~n", [Order]),
+    ?empdb_debug("Order = ~p~n~n", [Order]),
     get(Current, Con, Obj#queryobj{order=[Order]});
 
 get(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    ?debug("Filter = ~p~n~n", [Filter]),
+    ?empdb_debug("Filter = ~p~n~n", [Filter]),
     get(Current, Con, Obj#queryobj{filter=[Filter]});
 
 
 get(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?debug("Fields = ~p~n~n", [Fields]),
+    ?empdb_debug("Fields = ~p~n~n", [Fields]),
     get(Current, Con, Obj#queryobj{fields=[Fields]});
 
 % 
@@ -899,10 +899,10 @@ get(Current, Con, #queryobj{fields=Fields}=Obj)
 %                 Order
 %             ),
 % 
-%         ?debug("Order = ~p~n~n", [Current_order]),
+%         ?empdb_debug("Order = ~p~n~n", [Current_order]),
 % 
-%         ?debug("Fields = ~p~n~n", [Fields]),
-%         ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
+%         ?empdb_debug("Fields = ~p~n~n", [Fields]),
+%         ?empdb_debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
 % 
 %         Binary_parent_name =
 %             empdb_convert:to_binary(table_options({table, name},Parent)),
@@ -1243,8 +1243,8 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
 %         {{table, fields, all},      Current:table({fields, all})},
 %         {{table, fields, select},   Current:table({fields, select})}
 %     ],
-%     ?debug("Oparent = ~p~n", [Oparent]),
-%     ?debug("Ocurrent = ~p~n", [Ocurrent]),
+%     ?empdb_debug("Oparent = ~p~n", [Oparent]),
+%     ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
 %     get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
 
 
@@ -1305,7 +1305,7 @@ get(Current, Con, #queryobj{
                 end,
                 Order
             ),
-        ?debug("Order = ~p~n~n", [Current_order]),
+        ?empdb_debug("Order = ~p~n~n", [Current_order]),
 
         Binary_table_name =
             empdb_convert:to_binary(table_options({table, name},  Current)),
@@ -1337,7 +1337,7 @@ get(Current,Con,#queryobj{}=Qo)  ->
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    ?debug("Ocurrent = ~p~n", [Ocurrent]),
+    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
     get(Ocurrent,Con,Qo);
 
 get(Current, Con, Opts) when erlang:is_list(Opts) ->
@@ -1346,7 +1346,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    ?debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
+    ?empdb_debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
     get(Current, Con,
         #queryobj{
                 filter  =   As_filter,
@@ -1363,7 +1363,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
     ).
 
 get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    ?debug("Current = ~p~n", [Current]),
+    ?empdb_debug("Current = ~p~n", [Current]),
     
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
@@ -1436,18 +1436,18 @@ transform_current_select_fields(Filtername, Op) ->
 
 count(Current, Con, #queryobj{order=Order}=Obj)
     when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
-    ?debug("Order = ~p~n~n", [Order]),
+    ?empdb_debug("Order = ~p~n~n", [Order]),
     count(Current, Con, Obj#queryobj{order=[Order]});
 
 count(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    ?debug("Filter = ~p~n~n", [Filter]),
+    ?empdb_debug("Filter = ~p~n~n", [Filter]),
     count(Current, Con, Obj#queryobj{filter=[Filter]});
 
 
 count(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?debug("Fields = ~p~n~n", [Fields]),
+    ?empdb_debug("Fields = ~p~n~n", [Fields]),
     count(Current, Con, Obj#queryobj{fields=[Fields]});
 
 %%
@@ -1491,8 +1491,8 @@ count([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
                 Order
             ),
 
-        ?debug("Fields = ~p~n~n", [Fields]),
-        ?debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
+        ?empdb_debug("Fields = ~p~n~n", [Fields]),
+        ?empdb_debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
 
         Binary_parent_name =
             empdb_convert:to_binary(table_options({table, name},Parent)),
@@ -1545,8 +1545,8 @@ count([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)-
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    ?debug("Oparent = ~p~n", [Oparent]),
-    ?debug("Ocurrent = ~p~n", [Ocurrent]),
+    ?empdb_debug("Oparent = ~p~n", [Oparent]),
+    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
 
     count([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
 
@@ -1582,7 +1582,7 @@ count(Current, Con, #queryobj{
                 end,
                 Order
             ),
-        ?debug("Order = ~p~n~n", [Current_order]),
+        ?empdb_debug("Order = ~p~n~n", [Current_order]),
 
         Binary_table_name =
             empdb_convert:to_binary(table_options({table, name},  Current)),
@@ -1614,7 +1614,7 @@ count(Current,Con,#queryobj{}=Qo)  ->
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    ?debug("Ocurrent = ~p~n", [Ocurrent]),
+    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
     count(Ocurrent,Con,Qo);
 
 count(Current, Con, Opts) when erlang:is_list(Opts) ->
@@ -1623,7 +1623,7 @@ count(Current, Con, Opts) when erlang:is_list(Opts) ->
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    ?debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
+    ?empdb_debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
     count(Current, Con,
         #queryobj{
                 filter  =   As_filter,
@@ -1640,7 +1640,7 @@ count(Current, Con, Opts) when erlang:is_list(Opts) ->
     ).
 
 count(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    ?debug("Current = ~p~n", [Current]),
+    ?empdb_debug("Current = ~p~n", [Current]),
 
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
@@ -1706,12 +1706,12 @@ count(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 
 create(Current, Con, #queryobj{values=Values}=Obj)
     when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
-    ?debug("Values = ~p~n~n", [Values]),
+    ?empdb_debug("Values = ~p~n~n", [Values]),
     create(Current, Con, Obj#queryobj{order=[Values]});
 
 create(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?debug("Fields = ~p~n~n", [Fields]),
+    ?empdb_debug("Fields = ~p~n~n", [Fields]),
     create(Current, Con, Obj#queryobj{fields=[Fields]});
     
     
@@ -1761,8 +1761,8 @@ create(Current, Con, #queryobj{
     Common_required_fields =
         table_options({table, fields, insert, required}, Current),
         
-    ?debug("Common_select_fields = ~p~n~n", [Common_select_fields]),
-    ?debug("Returning = ~p~n~n", [Returning]),
+    ?empdb_debug("Common_select_fields = ~p~n~n", [Common_select_fields]),
+    ?empdb_debug("Returning = ~p~n~n", [Returning]),
     
     Current_select_fields =
         lists:filter(
@@ -1798,8 +1798,8 @@ create(Current, Con, #queryobj{
             Common_required_fields
         ),
 
-    ?debug("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
-    ?debug("Common_required_fields = ~p~n~n", [Common_required_fields]),
+    ?empdb_debug("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
+    ?empdb_debug("Common_required_fields = ~p~n~n", [Common_required_fields]),
     
     case {Has_required, Current_insert_fields_keys} of
         {true, []} ->
@@ -1841,7 +1841,7 @@ create(Current, Con, #queryobj{}=Queryobj)->
     create(Ocurrent, Con, Queryobj);
 
 create(Current, Con, Opts) when erlang:is_list(Opts) ->
-    ?debug("Opts = ~p~n~n", [Opts]),
+    ?empdb_debug("Opts = ~p~n~n", [Opts]),
     As_values =
         case proplists:get_value(values, Opts, undefined) of
             undefined   ->    Opts;
@@ -1876,17 +1876,17 @@ create(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
 
 update(Current, Con, #queryobj{values=Values}=Obj)
     when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
-    ?debug("Values = ~p~n~n", [Values]),
+    ?empdb_debug("Values = ~p~n~n", [Values]),
     update(Current, Con, Obj#queryobj{order=[Values]});
 
 update(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    ?debug("Filter = ~p~n~n", [Filter]),
+    ?empdb_debug("Filter = ~p~n~n", [Filter]),
     update(Current, Con, Obj#queryobj{filter=[Filter]});
 
 update(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?debug("Fields = ~p~n~n", [Fields]),
+    ?empdb_debug("Fields = ~p~n~n", [Fields]),
     update(Current, Con, Obj#queryobj{fields=[Fields]});
     
     
@@ -1983,7 +1983,7 @@ update(Current, Con, #queryobj{
             fun(F)-> lists:member(F, Common_select_fields) end,
             Returning
         ),
-%     ?debug("Returning = ~p~n~n~n", [Returning]),
+%     ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
     
     Current_all_fields =
         lists:filter(
@@ -1999,22 +1999,22 @@ update(Current, Con, #queryobj{
         lists:filter(
             fun
                 ({incr, {F, _}})->
-%                     ?debug("F = ~p~n~n~n", [F]),
+%                     ?empdb_debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields);
                 ({decr, {F, _}})->
-%                     ?debug("F = ~p~n~n~n", [F]),
+%                     ?empdb_debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields);
                 ({F, _})->
-%                     ?debug("F = ~p~n~n~n", [F]),
+%                     ?empdb_debug("F = ~p~n~n~n", [F]),
                     lists:member(F, Common_update_fields)
             end,
             Values
         ),
 % 
-%     ?debug("Values = ~p~n~n~n", [Values]),
-%     ?debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
+%     ?empdb_debug("Values = ~p~n~n~n", [Values]),
+%     ?empdb_debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
 %     
-%     ?debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
+%     ?empdb_debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
     case Current_update_fields of
         [] ->
             %{ok, [{[]}]};
@@ -2058,7 +2058,7 @@ update(Current, Con, #queryobj{
                 Where_string,
                 sql_returning(Current_returning_fields)
             ],
-            ?debug("Q = ~p~n", [Query]),
+            ?empdb_debug("Q = ~p~n", [Query]),
             case empdb_dao:pgret(
                 empdb_dao:equery(
                     Con,Query,lists:append(Current_update_fields, Pfields)
@@ -2221,7 +2221,7 @@ to_type(V, varchar) ->
 to_type(V, text) ->
     V;
 to_type(V, Type) ->
-    ?debug("Type= ~p~n", [Type]),
+    ?empdb_debug("Type= ~p~n", [Type]),
     V.
 
 
@@ -2341,7 +2341,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_null, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?empdb_debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23503">> ->
@@ -2351,7 +2351,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 {error, {not_exists, erlang:list_to_binary(C)}}
             catch
                 E:R ->
-                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?empdb_debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         <<"23505">> ->
@@ -2370,11 +2370,11 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                 end
             catch
                 E:R ->
-                    ?debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    ?empdb_debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
                     {error, {unknown, Msg}}
             end;
         Code ->
-            ?debug("Code ~p ~n", [Code]),
+            ?empdb_debug("Code ~p ~n", [Code]),
             {error, {unknown, Msg}}
     end;
 pgreterr(E) ->
@@ -2472,9 +2472,9 @@ simple(Query, Params) ->
 %%%         Кроме запроса необходимо еще указать соединение.
 %%%
 eqret(Con, Query)->
-    ?debug("1 eqret(Con, Query)->~n"),
+    ?empdb_debug("1 eqret(Con, Query)->~n"),
     S = pgret(equery(Con, Query)),
-    ?debug("2 eqret(Con, Query)->~n"),
+    ?empdb_debug("2 eqret(Con, Query)->~n"),
     S.
 
 %%%
@@ -2497,9 +2497,9 @@ sqret(Con, Query)->
 %%%         Кроме запроса необходимо еще указать соединение.
 %%%
 eqret(Con, Query, Params)->
-    ?debug("1 eqret(Con, Query, Params)->~n"),
+    ?empdb_debug("1 eqret(Con, Query, Params)->~n"),
     X = pgret(equery(Con, Query, Params)),
-    ?debug("2 eqret(Con, Query, Params)->~n"),
+    ?empdb_debug("2 eqret(Con, Query, Params)->~n"),
     X.
 
 % ---------------------------------------------------------------------------
@@ -2569,15 +2569,15 @@ equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
     {Nq, Val} = empdb_memocashe({Query, Params}, fun()->
         case is_proplist(Params) of
             true ->
-                ?debug("FQ = ~p~n", [empdb_convert:to_binary(Query)]),
+                ?empdb_debug("FQ = ~p~n", [empdb_convert:to_binary(Query)]),
                 {Newquery, Values} = equery_pl(Query, Params),
-                ?debug("PQ = ~p~n", [empdb_convert:to_binary(Newquery)]),
-                ?debug("PP = ~p~n", [Params]),
-                ?debug("PV = ~p~n", [Values]),
+                ?empdb_debug("PQ = ~p~n", [empdb_convert:to_binary(Newquery)]),
+                ?empdb_debug("PP = ~p~n", [Params]),
+                ?empdb_debug("PV = ~p~n", [Values]),
                 {Newquery, Values};
             _ ->
-                ?debug("PQ = ~p~n", [empdb_convert:to_binary(Query)]),
-                ?debug("PP = ~p~n", [Params]),
+                ?empdb_debug("PQ = ~p~n", [empdb_convert:to_binary(Query)]),
+                ?empdb_debug("PP = ~p~n", [Params]),
                 {Query, Params}
         end
     end),
@@ -2610,7 +2610,7 @@ equery(Con, Function) when erlang:is_function(Function) ->
     equery(Con, fquery(Con, Function, []));
 
 equery(Con, Query) when erlang:is_list(Query); erlang:is_binary(Query) ->
-    ?debug("equery(Con, Query) when erlang:is_list(Query) "),
+    ?empdb_debug("equery(Con, Query) when erlang:is_list(Query) "),
     psqlcp:equery(Con, Query).
 
 
