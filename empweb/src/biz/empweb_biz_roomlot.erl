@@ -31,6 +31,9 @@ create(Params)->
 update(Params)->
     empdb_biz_roomlot:update(Params).
 
+delete(Params)->
+    empdb_biz_roomlot:delete(Params).
+
 get(Params)->
     empdb_biz_roomlot:get(Params).
 

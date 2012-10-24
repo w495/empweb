@@ -249,6 +249,60 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
+        action=delete, params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update roomlot">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = dtstart,
+                required    = false,
+                types       = [nullable, float]
+            },
+            #norm_rule{
+                key         = dtstop,
+                required    = false,
+                types       = [nullable, float]
+            },
+            #norm_rule{
+                key         = betmin,
+                required    = false,
+                types       = [nullable, money]
+            },
+            #norm_rule{
+                key         = betmax,
+                required    = false,
+                types       = [nullable, money]
+            }
+            |empweb_norm_doc:norm('update')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_roomlot:update([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+    
+handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
     } = Hap) ->
     ?evman_notice({hap, [
