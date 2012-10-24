@@ -75,17 +75,20 @@ create(Params)->
          
         case Price =< Money of
             true ->
-                Newmoney = Money - Price,
- 
-                X = empdb_dao_pers:update(Con,[
+                % Newmoney = Money - Price,
+                Newpers = empdb_dao_pers:update(Con,[
                     {id,    proplists:get_value(id,   Mbbuyerpl)},
                     {exper, {incr, Exper}},
-                    {money, Newmoney}
+                    {money, {decr, Price}},
+                    {fields, [
+                        money,
+                        exper,
+                        experlack,
+                        experlackprice,
+                        authority_id,
+                        authority_alias
+                    ]}
                 ]),
-
-                io:format("X = ~p~n", [X]),
-                
-         
                 case empdb_dao_experbuy:create(Con,[
                     {price, Price}
                     |Params
@@ -93,7 +96,42 @@ create(Params)->
                     {ok, [{Respl}]} ->
                         {ok, [
                             {[
-                                {money, Newmoney},
+                                {authority_alias,
+                                    proplists:get_value(
+                                        authority_alias,
+                                        Newpers
+                                    )
+                                },
+                                {authority_id,
+                                    proplists:get_value(
+                                        authority_id,
+                                        Newpers
+                                    )
+                                },
+                                {experlackprice,
+                                    proplists:get_value(
+                                        experlackprice,
+                                        Newpers
+                                    )
+                                },
+                                {experlack,
+                                    proplists:get_value(
+                                        experlack,
+                                        Newpers
+                                    )
+                                },
+                                {exper,
+                                    proplists:get_value(
+                                        exper,
+                                        Newpers
+                                    )
+                                },
+                                {money,
+                                    proplists:get_value(
+                                        money,
+                                        Newpers
+                                    )
+                                },
                                 {price, Price}
                                 |Respl
                             ]}
