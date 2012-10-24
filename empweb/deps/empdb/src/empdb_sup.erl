@@ -29,12 +29,27 @@ init([]) ->
 
     Dao_static_cashe = {
         empdb_dao_static_cashe,
-        {term_cache_ets, start_link, [[{'size', '40Mb'}, {name, empdb_dao_static_cashe}]]},
+        {term_cache_ets, start_link, [[
+            {'size', '40Mb'},
+            {name, empdb_dao_static_cashe}
+        ]]},
         permanent,
         5000,
-        supervisor,
+        worker,
         [empdb_dao_static_cashe]
     },
-    %Psqlcp
+
+    Empdb_timer =  {
+        empdb_timer,
+        {empdb_timer, start_link, []},
+        permanent,
+        5000,
+        worker,
+        [empdb_timer]
+    },
     
-	{ok, {{one_for_one, 10, 10}, [Psqlcp, Dao_static_cashe]}}.
+	{ok, {{one_for_one, 10, 10}, [
+        Psqlcp,
+        Dao_static_cashe,
+        Empdb_timer
+	]}}.

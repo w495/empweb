@@ -110,7 +110,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = exper,
                 required    = false,
-                types       = [nullable, pfloat]
+                types       = [nullable, integer]
             }
             |empweb_norm:norm('get')
         ]),
@@ -148,7 +148,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = exper,
                 required    = false,
-                types       = [nullable, pfloat]
+                types       = [nullable, integer]
             }
         ]),
         fun(Data)->
@@ -186,7 +186,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = exper,
                 required    = false,
-                types       = [nullable, pfloat]
+                types       = [nullable, integer]
             }
         ]),
         fun(Data)->

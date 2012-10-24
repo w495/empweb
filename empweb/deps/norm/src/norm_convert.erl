@@ -64,15 +64,20 @@ to_integer(Val) when erlang:is_integer(Val) -> Val;
 to_integer(Val) when erlang:is_float(Val) -> trunc(Val);
 to_integer(Val) when erlang:is_list(Val) ->
     case catch(erlang:list_to_integer(Val)) of
-        {'EXIT', _} -> erlang:throw({error, {to_integer, bad_arg, Val}});
-        Int -> Int
+        {'EXIT', _} ->
+            case catch(erlang:list_to_float(Val)) of
+                {'EXIT', _} ->
+                    erlang:throw({error, {to_integer, bad_arg, Val}});
+                Float ->
+                    trunc(Float)
+            end;
+        Int ->
+            Int
     end;
 
 to_integer(Val) when erlang:is_binary(Val) ->
-    case catch(erlang:list_to_integer(erlang:binary_to_list(Val))) of
-        {'EXIT', _} -> erlang:throw({error, {to_integer, bad_arg, Val}});
-        Int -> Int
-    end.
+    to_integer(erlang:binary_to_list(Val)).
+    
 
 
 % ---------------------------------------------------------------------------
@@ -89,7 +94,7 @@ to_atom(Val) when erlang:is_list(Val) ->
     end;
 
 to_atom(Val) when erlang:is_binary(Val) ->
-    erlang:list_to_atom(erlang:binary_to_list(Val)).
+     erlang:binary_to_atom(Val, utf8).
 
 % ---------------------------------------------------------------------------
 

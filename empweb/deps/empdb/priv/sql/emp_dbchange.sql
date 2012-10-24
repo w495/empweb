@@ -5,8 +5,22 @@
     Сколько стоит то, что не хватает для перехода на следующий уровень.
 **/
 
-    alter table pers add column experlackprice real default null;
+--     alter table pers add column experlackprice real default null;
+--     update pers set experlackprice = 0.5 * experlack;
+--     insert into doctype(alias) values('roomlot');
 
-    update pers set experlackprice = 0.5 * experlack;
 
-    insert into doctype(alias) values('roomlot');
+alter table pers        alter column money              type numeric(1000, 2);
+alter table pers        alter column exper              type numeric;
+alter table pers        alter column experlack          type numeric;
+alter table pers        alter column experlackprice     type numeric(1000, 2);
+alter table roomlot     alter column betmin             type numeric(1000, 2);
+alter table roomlot     alter column betmax             type numeric(1000, 2);
+alter table roombet     alter column price              type numeric(1000, 2);
+alter table thing       alter column price              type numeric(1000, 2);
+alter table thingbuy    alter column price              type numeric(1000, 2);
+alter table experbuy    alter column exper              type numeric;
+alter table experbuy    alter column price              type numeric(1000, 2);
+alter table pay         alter column price              type numeric(1000, 2);
+
+

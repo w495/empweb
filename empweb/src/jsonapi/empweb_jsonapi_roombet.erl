@@ -124,22 +124,23 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = [nullable, allable, integer]
             },
             #norm_rule{
                 key         = owner_nick,
                 required    = false,
-                types       = [nullable, string]
+                types       = [nullable, allable, string]
             }
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
+            io:format("~nData  = ~p~n", [Data]),
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_roombet:get(
@@ -180,7 +181,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = owner_id,
@@ -239,7 +240,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = owner_id,

@@ -349,7 +349,7 @@ create table pers(
             Информация о персоонаже
         ------------------------------------------------------------
     **/
-    money               real            default 300.0,
+    money               numeric(1000, 2)    default 300.0,
     /**
         Статус online \ offline
     **/
@@ -365,18 +365,18 @@ create table pers(
         Опыт пользователя,
         некоторая непрерывная велицина.
     **/
-    exper               real         default 0,
+    exper               numeric         default 0,
     /**
         Недостаток опыта.
         Сколько не хватает для перехода на следующий уровень.
     **/
-    experlack           real         default null,
+    experlack           numeric         default null,
 
     /**
         Стоймость недостатока опыта.
         Сколько стоит то, что не хватает для перехода на следующий уровень.
     **/
-    experlackprice      real         default null,
+    experlackprice      numeric(1000, 2)         default null,
     
     /**
         Эмоции пользователя
@@ -1069,8 +1069,8 @@ create table roomlot(
     room_head       varchar(1024) /*references doc(head)*/ default null,
     dtstart         timestamp without time zone not null default utcnow(),
     dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
-    betmin          real default 0,
-    betmax          real default 100
+    betmin          numeric(1000, 2) default 0,
+    betmax          numeric(1000, 2) default 100
 );
 
 
@@ -1080,8 +1080,8 @@ create table roomlot(
 --     room_head       varchar(1024) /*references doc(head)*/ default null,
 --     dtstart         timestamp without time zone not null default utcnow(),
 --     dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
---     betmin          real default 0,
---     betmax          real default 100,
+--     betmin          numeric(1000, 2) default 0,
+--     betmax          numeric(1000, 2) default 100,
 -- );
 
 ------------------------------------------------------------------------------
@@ -1099,9 +1099,9 @@ create table roombet(
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
-    owner_id        decimal         references pers(id)     not null,
-    owner_nick      varchar(1024)   references pers(nick)   not null,
-    price           real default 0,
+    owner_id        decimal             references pers(id)     not null,
+    owner_nick      varchar(1024)       references pers(nick)   not null,
+    price           numeric(1000, 2)    default 0,
 
     created         timestamp without time zone not null    default utcnow(),
     isdeleted       bool    default false
@@ -1124,7 +1124,7 @@ create table roomoffer(
     reader_id       decimal         references pers(id)     not null,
     reader_nick     varchar(1024)   references pers(nick)   not null,
 
-    price           real default 0,
+    price           numeric(1000, 2) default 0,
 
     created         timestamp without time zone not null    default utcnow(),
     isdeleted       bool    default false
@@ -1204,9 +1204,9 @@ create table thing(
     **/
     thingtype_id    decimal references thingtype(id) default null,
     
-    price           real    default null,
+    price           numeric(1000, 2)   default null,
     
-    created             timestamp without time zone not null default utcnow(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool    default false
 );
 
@@ -1250,7 +1250,7 @@ create table thingbuy (
     thing_id            decimal         references thing(id)    not null,
     thing_alias         varchar(1024)   references thing(alias) not null,
 
-    price               real    default null,
+    price               numeric(1000, 2) default null,
 
     counter             timestamp without time zone not null default utcnow(),
 
@@ -1282,8 +1282,8 @@ create table experbuy (
         Вещь которую приобрели --- опыт.
         Нужно знать, какой количество
     **/
-    exper               real    default null,
-    price               real    default null,
+    exper               numeric             default null,
+    price               numeric(1000, 2)    default null,
 
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
@@ -1311,8 +1311,8 @@ create table pay (
         Название сущности за которую платят
     **/
 
-    isincome        bool            default null,
-    price           real            default 0,
+    isincome        bool                default null,
+    price           numeric(1000, 2)    default 0,
 
     paytype_id      decimal         references paytype(id)      not null,
     paytype_alias   varchar(1024)   references paytype(alias)   not null,

@@ -115,12 +115,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = betmin,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = betmax,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -171,12 +171,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = betmin,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = betmax,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             }
             |empweb_norm_doc:norm('create')
         ]),
@@ -225,12 +225,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = betmin,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             },
             #norm_rule{
                 key         = betmax,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, money]
             }
             |empweb_norm_doc:norm('update')
         ]),

@@ -17,6 +17,8 @@
     list/1,
     email/1,
     float/1,
+    money/1,
+    money/2,
     positive/1,
     pfloat/1,
     integer/1,
@@ -77,6 +79,11 @@ positive(Value) when (Value >= 0) ->
 pfloat(Value) ->
     positive(norm_convert:to_float(Value)).
 
+money(Value) ->
+    money(Value, 100).
+
+money(Value, Scale) ->
+    trunc(norm_convert:to_float(Value) * Scale) / Scale.
 
 date_unixtime(Value) ->
     {D, _} = norm_convert:to_local_datetime(norm_convert:to_integer(Value)),

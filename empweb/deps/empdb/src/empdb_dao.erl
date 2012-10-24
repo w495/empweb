@@ -2209,7 +2209,7 @@ to_type(V, int4) ->
     empdb_convert:to_integer(V);
 
 to_type(V, numeric) ->
-    empdb_convert:to_integer(V);
+    empdb_convert:to_float(V);
 
 to_type(<<"f">>, bool) ->
     false;
@@ -2223,7 +2223,6 @@ to_type(V, text) ->
 to_type(V, Type) ->
     ?empdb_debug("Type= ~p~n", [Type]),
     V.
-
 
 % name_columns([{column, Name, Type, _P3, _P4, _P5}|Ct], [V|Vt], Ret) ->
 %     name_columns(Ct, Vt, [{binary_to_list(Name), to_type(V, Type)}|Ret]);
