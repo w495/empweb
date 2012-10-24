@@ -50,13 +50,13 @@ table({fields, select})->
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    [isdeleted|table({fields, all})] -- [id];
+    table({fields, all}) -- [id];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
 %%
 table({fields, insert})->
-    table({fields, all}) -- [id, isdfo, isdfr];
+    table({fields, all}) -- [id];
 
 %%
 %% @doc Возвращает полный список полей таблицы
@@ -103,6 +103,8 @@ create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
+    io:format("~n Proplist = ~p~n~n", [Proplist]),
+    
     empdb_dao_doc:update(?MODULE, Con, Proplist).
 
 is_owner(Con, Owner_id, Obj_id) ->

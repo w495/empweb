@@ -50,6 +50,6 @@ init([]) ->
     
 	{ok, {{one_for_one, 10, 10}, [
         Psqlcp,
-        Dao_static_cashe,
-        Empdb_timer
+        Dao_static_cashe
+        %Empdb_timer
 	]}}.

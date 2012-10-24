@@ -1798,7 +1798,6 @@ begin
         new.room_head =
             (select head from doc where doc.id = new.room_id);
     end if;
-    
     return new;
 end;
 $$ language plpgsql;
@@ -1806,6 +1805,29 @@ $$ language plpgsql;
 drop trigger if exists t1roomlot_util_fields_on_insert on roomlot ;
 create trigger t1roomlot_util_fields_on_insert before insert
 on roomlot for each row execute procedure roomlot_util_fields_on_insert();
+
+
+create or replace function roomlot_util_fields_after_insert() returns "trigger" as $$
+begin
+    if not (new.room_id is null) then
+        update room set
+            roomlot_id      = new.doc_id,
+            roomlot_betmin  = new.betmin,
+            roomlot_betmax  = new.betmax,
+            roomlot_dtstart = new.dtstart,
+            roomlot_dtstop  = new.dtstop
+        where
+            room.doc_id = new.room_id;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roomlot_util_fields_after_insert on roomlot ;
+create trigger t1roomlot_util_fields_after_insert after insert
+on roomlot for each row execute procedure roomlot_util_fields_after_insert();
+
+
 
 create or replace function roomlot_util_fields_on_update() returns "trigger" as $$
 begin
@@ -1816,7 +1838,7 @@ begin
         new.room_head =
             (select head from doc where doc.id = new.room_id);
     end if;
-
+    
     return new;
 end;
 $$ language plpgsql;
@@ -1866,6 +1888,27 @@ $$ language plpgsql;
 drop trigger if exists t1roombet_util_fields_on_insert on roombet ;
 create trigger t1roombet_util_fields_on_insert before insert
 on roombet for each row execute procedure roombet_util_fields_on_insert();
+
+
+create or replace function roombet_util_fields_after_insert() returns "trigger" as $$
+begin
+    if not (new.room_id is null) then
+        update room set
+            roombet_id          = new.id,
+            roombet_price       = new.price,
+            roombet_owner_id    = new.owner_id
+        where
+            room.doc_id = new.room_id;
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists t1roombet_util_fields_after_insert on roombet ;
+create trigger t1roombet_util_fields_after_insert after insert
+on roombet for each row execute procedure roombet_util_fields_after_insert();
+
+
 
 create or replace function roombet_util_fields_on_update() returns "trigger" as $$
 begin

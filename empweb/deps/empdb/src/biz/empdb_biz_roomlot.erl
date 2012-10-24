@@ -70,21 +70,23 @@ timeout()->
 remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
         Now = nowsec(),
-        {ok, Roomlots} = empdb_dao_roomlot:update(Con,[
-            {filter, [
-                {isdeleted, false},
-                {dtstop, {lt, Now}}
-            ]},
-            {fields, [
-                id,
-                room_id,    owner_id,
-                dtstart,    dtstop,
-                betmin,     betmax
-            ]},
-            {values, [
-                {isdeleted, true}
-            ]}
-        ]),
+        Nowdt = {date(), time()},
+        {ok, Roomlots} =
+            empdb_dao_roomlot:update(Con,[
+                {filter, [
+                    {isdeleted, false},
+                    {dtstop, {lt, Nowdt}}
+                ]},
+                {fields, [
+                    id,
+                    room_id,    owner_id,
+                    dtstart,    dtstop,
+                    betmin,     betmax
+                ]},
+                {values, [
+                    {isdeleted, true}
+                ]}
+            ]),
         lists:map(
             fun({Roomlotpl}) ->
                 Roomlot_owner_id    = proplists:get_value(owner_id, Roomlotpl),

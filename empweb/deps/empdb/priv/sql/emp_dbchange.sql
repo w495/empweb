@@ -24,3 +24,12 @@ alter table experbuy    alter column price              type numeric(1000, 2);
 alter table pay         alter column price              type numeric(1000, 2);
 
 
+
+alter table room add column roomlot_id          decimal         references roomlot(doc_id)  default null;
+alter table room add column roomlot_betmin      numeric(1000, 2)                            default null;
+alter table room add column roomlot_betmax      numeric(1000, 2)                            default null;
+alter table room add column roomlot_dtstart     timestamp without time zone not null default utcnow();
+alter table room add column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+alter table room add column roombet_id          decimal        references roombet(id)       default null;
+alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
+alter table room add column roombet_price       decimal                                     default null;

@@ -1895,76 +1895,101 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     filter  =   Filter,
     fields  =   Returning
 } = Queryobj)->
-    case update(Parent,Con,Queryobj#queryobj{
-        fields=[Parent_field|Returning]
-    }) of
-        {ok, [{[]}]} ->
-            Pid_pl =
-                case proplists:get_value(Parent_field, Filter) of
-                    undefined ->
-                        [];
-                    Pid ->
-                        [{Current_field, Pid}]
-                end,
-            case update(Current, Con, Queryobj#queryobj{
-                filter=lists:append(Pid_pl, Filter)
-            }) of
-                {ok, [{Child_pl}]} ->
-                    {ok, [{lists:append([], Child_pl)}]};
-                {Eclass, Error} ->
-                    {Eclass, Error}
-            end;
-        {ok, [{Parent_pl}]} ->
-            Pid = proplists:get_value(Parent_field, Parent_pl),
-            case update(Current, Con, Queryobj#queryobj{
-                filter=[{Current_field, Pid}|Filter],
-                fields=[Current_field|Returning]
-            }) of
-                {ok, [{Child_pl}]} ->
-                    {ok, [{lists:append(Parent_pl, Child_pl)}]};
-                {Eclass, Error} ->
-                    {Eclass, Error}
-            end;
-        {ok, Parent_pls} ->
-            Pids = lists:foldl(fun({Parent_pl}, Acc) ->
-                [proplists:get_value(Parent_field, Parent_pl)|Acc]
-            end, [], Parent_pls),
-            case update(Current, Con, Queryobj#queryobj{
-                filter=[{Current_field, {in, Pids}}|Filter],
-                fields=[Current_field|Returning]
-            }) of
-                {ok, Child_pls} ->
-                    {ok,
-                        lists:map(
-                            fun({Child_pl}) ->
-                                Child_pl_cf = proplists:get_value(Current_field, Child_pl, undefined1),
-                                Rparent_pls =
-                                    lists:foldl(
-                                        fun({Parent_pl}, Acc)->
-                                            case
-                                                proplists:get_value(Parent_field, Parent_pl, undefined2) == Child_pl_cf
-                                            of
-                                                true ->
-                                                    lists:append(Parent_pl, Acc);
-                                                _ ->
-                                                    Acc
-                                            end
-                                        end,
-                                        [],
-                                        Parent_pls
-                                    ),
-                                {lists:append(Child_pl, Rparent_pls)}
-                            end,
-                            Child_pls
-                        )
-                    };
-                {Eclass, Error} ->
-                    {Eclass, Error}
-            end;
+    io:format("~n [{Parent, Parent_field}, {Current, Current_field}] = ~p~n", [[{Parent, Parent_field}, {Current, Current_field}]]),
 
-        {Eclass, Error} ->
-            io:format("Eclass ~n~n~n"),
-            {Eclass, Error}
+    {ok, Glst} =
+        get(Current, Con,  #queryobj{
+            filter  =   Filter,
+            fields =[Current_field]
+        }),
+
+    Current_field_vals = lists:foldl(
+        fun ({[{Current_field, Current_field_val}]}, Acc)->
+                [Current_field_val|Acc];
+            (_, Acc)->
+                Acc
+        end,
+        [],
+        Glst
+    ),
+    case Current_field_vals of
+        [] ->
+            {ok,[]};
+        _ ->
+            case update(Parent,Con,Queryobj#queryobj{
+                fields=[Parent_field|lists:delete(Parent_field, Returning)],
+                filter=[{Parent_field, {in, Current_field_vals}}|Filter]
+            }) of
+                {ok, [{[]}]} ->
+                    Pid_pl =
+                        case proplists:get_value(Parent_field, Filter) of
+                            undefined ->
+                                [];
+                            Pid ->
+                                [{Current_field, Pid}]
+                        end,
+                    case update(Current, Con, Queryobj#queryobj{
+                        filter=lists:append(Pid_pl, Filter)
+                    }) of
+                        {ok, [{Child_pl}]} ->
+                            {ok, [{lists:append([], Child_pl)}]};
+                        {Eclass, Error} ->
+                            {Eclass, Error}
+                    end;
+                {ok, [{Parent_pl}]} ->
+                    Pid = proplists:get_value(Parent_field, Parent_pl),
+                    case update(Current, Con, Queryobj#queryobj{
+                        filter=[{Current_field, Pid}|Filter],
+                        fields=[Current_field|Returning]
+                    }) of
+                        {ok, [{Child_pl}]} ->
+                            {ok, [{lists:append(Parent_pl, Child_pl)}]};
+                        {Eclass, Error} ->
+                            {Eclass, Error}
+                    end;
+                {ok, Parent_pls} ->
+                    Pids = lists:foldl(fun({Parent_pl}, Acc) ->
+                        [proplists:get_value(Parent_field, Parent_pl)|Acc]
+                    end, [], Parent_pls),
+
+                    io:format("~nParent_pls = ~p~n", [Parent_pls]),
+
+                    case update(Current, Con, Queryobj#queryobj{
+                        filter=[{Current_field, {in, Pids}}|Filter],
+                        fields=[Current_field|Returning]
+                    }) of
+                        {ok, Child_pls} ->
+                            {ok,
+                                lists:map(
+                                    fun({Child_pl}) ->
+                                        Child_pl_cf = proplists:get_value(Current_field, Child_pl, undefined1),
+                                        Rparent_pls =
+                                            lists:foldl(
+                                                fun({Parent_pl}, Acc)->
+                                                    case
+                                                        proplists:get_value(Parent_field, Parent_pl, undefined2) == Child_pl_cf
+                                                    of
+                                                        true ->
+                                                            lists:append(Parent_pl, Acc);
+                                                        _ ->
+                                                            Acc
+                                                    end
+                                                end,
+                                                [],
+                                                Parent_pls
+                                            ),
+                                        {lists:append(Child_pl, Rparent_pls)}
+                                    end,
+                                    Child_pls
+                                )
+                            };
+                        {Eclass, Error} ->
+                            {Eclass, Error}
+                    end;
+                {Eclass, Error} ->
+                    io:format("Eclass ~n~n~n"),
+                    {Eclass, Error}
+            end
     end;
 
 update(Current, Con, #queryobj{
@@ -2013,8 +2038,11 @@ update(Current, Con, #queryobj{
 % 
 %     ?empdb_debug("Values = ~p~n~n~n", [Values]),
 %     ?empdb_debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
-%     
 %     ?empdb_debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
+%     io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+%     io:format("Returning = ~p~n~n~n", [Returning]),
+
+     
     case Current_update_fields of
         [] ->
             %{ok, [{[]}]};

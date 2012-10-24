@@ -59,7 +59,7 @@ table({fields, select})->
 %% @doc Возвращает список полей таблицы для обновления
 %%
 table({fields, update})->
-    [isdeleted|table({fields, all})] -- [id];
+    table({fields, all}) -- [id];
 
 %%
 %% @doc Возвращает список полей таблицы для создания
