@@ -62,33 +62,39 @@ create(Params)->
                 Val  ->
                     Val
             end,
-            
+
         Exper = proplists:get_value(exper,   Params,    Experlack),
         Price = exper2price(Exper),
         Money = proplists:get_value(money, Mbbuyerpl,   0),
 
+        ?empdb_debug("Experlack = ~p~n", [Experlack]),
+        ?empdb_debug("Exper = ~p~n", [Exper]),
+        ?empdb_debug("Price = ~p~n", [Price]),
+        ?empdb_debug("Money = ~p~n", [Money]),
 
-        io:format("Experlack = ~p~n", [Experlack]),
-        io:format("Exper = ~p~n", [Exper]),
-        io:format("Price = ~p~n", [Price]),
-        io:format("Money = ~p~n", [Money]),
-         
-        case Price =< Money of
-            true ->
+        case {Exper, Price =< Money} of
+            {0, _} ->
+                {error, {wrong_exper, {[
+                    {exper, Exper},
+                    {money, Money},
+                    {price, Price}
+                ]}}};
+            {_, true} ->
                 % Newmoney = Money - Price,
-                Newpers = empdb_dao_pers:update(Con,[
-                    {id,    proplists:get_value(id,   Mbbuyerpl)},
-                    {exper, {incr, Exper}},
-                    {money, {decr, Price}},
-                    {fields, [
-                        money,
-                        exper,
-                        experlack,
-                        experlackprice,
-                        authority_id,
-                        authority_alias
-                    ]}
-                ]),
+                {ok, [{Newpers}]} =
+                    empdb_dao_pers:update(Con,[
+                        {id,    proplists:get_value(id,   Mbbuyerpl)},
+                        {exper, {incr, Exper}},
+                        {money, {decr, Price}},
+                        {fields, [
+                            money,
+                            exper,
+                            experlack,
+                            experlackprice,
+                            authority_id,
+                            authority_alias
+                        ]}
+                    ]),
                 case empdb_dao_experbuy:create(Con,[
                     {price, Price}
                     |Params
@@ -139,8 +145,9 @@ create(Params)->
                     Else ->
                         Else
                 end;
-            false ->
+            {_, false} ->
                 {error, {not_enough_money, {[
+                    {exper, Exper},
                     {money, Money},
                     {price, Price}
                 ]}}}
