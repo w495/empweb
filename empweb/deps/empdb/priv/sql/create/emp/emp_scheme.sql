@@ -1070,6 +1070,7 @@ create table roomlot(
     dtstart         timestamp without time zone not null default utcnow(),
     dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
     betmin          numeric(1000, 2) default 0,
+    betcur          numeric(1000, 2) default 0,
     betmax          numeric(1000, 2) default 100
 );
 

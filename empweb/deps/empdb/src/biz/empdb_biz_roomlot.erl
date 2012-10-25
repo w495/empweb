@@ -81,6 +81,18 @@ delete(Filter)->
                 Roomlot_owner_id    = proplists:get_value(owner_id, Roomlotpl),
                 Roomlot_id          = proplists:get_value(id,       Roomlotpl),
                 Room_id             = proplists:get_value(room_id,  Roomlotpl),
+                {ok, _} = empdb_dao_room:update(Con, [
+                    {id,                Room_id},
+                    {roomlot_id,        null},
+                    {roomlot_betmin,    null},
+                    {roomlot_betmax,    null},
+                    {roomlot_dtstart,   null},
+                    {roomlot_dtstop,    null},
+                    {roombet_id,        null},
+                    {roombet_owner_id,  null},
+                    {roombet_owner_nick,null},
+                    {roombet_price,     null}
+                ]),
                 case empdb_dao_roombet:get(Con, [
                     {isdeleted, false},
                     {roomlot_id, Roomlot_id},
@@ -154,8 +166,17 @@ remove_expired()->
                             ]),
                         {ok, _} =
                             empdb_dao_room:update(Con, [
-                                {id,        Room_id},
-                                {owner_id,  Owner_id}
+                                {id,                Room_id},
+                                {roomlot_id,        null},
+                                {roomlot_betmin,    null},
+                                {roomlot_betmax,    null},
+                                {roomlot_dtstart,   null},
+                                {roomlot_dtstop,    null},
+                                {roombet_id,        null},
+                                {roombet_owner_id,  null},
+                                {roombet_owner_nick,null},
+                                {roombet_price,     null},
+                                {owner_id,          Owner_id}
                             ]);
                     _ ->
                         ok

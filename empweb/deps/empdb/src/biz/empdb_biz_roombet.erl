@@ -47,9 +47,9 @@ nowsec() ->
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
         Roomlot_id  = proplists:get_value(roomlot_id, Params),
-        Owner_id    = proplists:get_value(owner_id, Params),
-        Price       = proplists:get_value(price, Params, 0),
-        Now         = nowsec(),
+        Roombet_owner_id   = proplists:get_value(owner_id, Params),
+        Price              = proplists:get_value(price, Params, 0),
+        Now                = nowsec(),
         case {
             %%
             %% Выясним информацию о покупателе и о лоте.
@@ -119,6 +119,8 @@ create(Params)->
                     end,
                 case (
                     (
+                        Roombet_owner_id =/= Roomlot_owner_id
+                    ) and (
                         Price =< Money
                     ) and (
                         (Betminc    =< Price) and (Price    =<  Betmax)
@@ -170,8 +172,17 @@ create(Params)->
                                     {money,     {incr, Price}}
                                 ]),
                                 {ok, _} = empdb_dao_room:update(Con, [
-                                    {id,        Room_id},
-                                    {owner_id,  Owner_id}
+                                    {id,                Room_id},
+                                    {roomlot_id,        null},
+                                    {roomlot_betmin,    null},
+                                    {roomlot_betmax,    null},
+                                    {roomlot_dtstart,   null},
+                                    {roomlot_dtstop,    null},
+                                    {roombet_id,        null},
+                                    {roombet_owner_id,  null},
+                                    {roombet_owner_nick,null},
+                                    {roombet_price,     null},
+                                    {owner_id,          Roombet_owner_id}
                                 ]),
                                 Roombet;
                             false -> 
@@ -183,13 +194,15 @@ create(Params)->
                         end;
                     _ ->
                         {error, {something_wrong, {[
-                            {'now',     Now},
-                            {money,     Money},
-                            {price,     Price},
-                            {betmin,    Betmin},
-                            {betmax,    Betmax},
-                            {dtstart,   Dtstart},
-                            {dtstop,    Dtstop}
+                            {'now',             Now},
+                            {roombet_owner_id,  Roombet_owner_id},
+                            {roomlot_owner_id,  Roomlot_owner_id},
+                            {money,             Money},
+                            {price,             Price},
+                            {betmin,            Betmin},
+                            {betmax,            Betmax},
+                            {dtstart,           Dtstart},
+                            {dtstop,            Dtstop}
                         ]}}}
                 end;
             {_, _} ->

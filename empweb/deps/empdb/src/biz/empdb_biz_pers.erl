@@ -505,12 +505,56 @@ logout(Params)->
 
 get(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get(Con, [{isdeleted, false}|Params])
+        Res = empdb_dao_pers:get(Con, [{isdeleted, false}|Params]),
+        case proplists:get_value(id, Params) of
+            undefined ->
+                Res;
+            Id ->
+                {ok, [{Pespl}]} = Res,
+                {ok, [Blog]} = empdb_dao_blog:get(Con, [
+                    {owner_id, Id},
+                    {fields, [
+                        nposts,
+                        npublicposts,
+                        nprotectedposts,
+                        ncomments,
+                        id,
+                        read_acctype_id,
+                        read_acctype_alias,
+                        comm_acctype_id,
+                        comm_acctype_alias,
+                        vcounter
+                    ]}
+                ]),
+                {ok, [{blog, Blog}|Pespl]}
+        end
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get(Con, [{isdeleted, false}|Params], Fileds)
+        Res = empdb_dao_pers:get(Con, [{isdeleted, false}|Params], Fileds),
+        case proplists:get_value(id, Params) of
+            undefined ->
+                Res;
+            Id ->
+                {ok, [{Pespl}]} = Res,
+                {ok, [Blog]} = empdb_dao_blog:get(Con, [
+                    {owner_id, Id},
+                    {fields, [
+                        nposts,
+                        npublicposts,
+                        nprotectedposts,
+                        ncomments,
+                        id,
+                        read_acctype_id,
+                        read_acctype_alias,
+                        comm_acctype_id,
+                        comm_acctype_alias,
+                        vcounter
+                    ]}
+                ]),
+                {ok, [{blog, Blog}|Pespl]}
+        end
     end).
 
 

@@ -69,6 +69,7 @@ table({fields, all})->
         dtstart,
         dtstop,
         betmin,
+        betcur,
         betmax
     ];
 

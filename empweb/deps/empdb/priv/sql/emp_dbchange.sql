@@ -9,7 +9,7 @@
 --     update pers set experlackprice = 0.5 * experlack;
 --     insert into doctype(alias) values('roomlot');
 
-
+/*
 alter table pers        alter column money              type numeric(1000, 2);
 alter table pers        alter column exper              type numeric;
 alter table pers        alter column experlack          type numeric;
@@ -32,4 +32,10 @@ alter table room add column roomlot_dtstart     timestamp without time zone not 
 alter table room add column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
 alter table room add column roombet_id          decimal        references roombet(id)       default null;
 alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
-alter table room add column roombet_price       decimal                                     default null;
+alter table room add column roombet_price       decimal                                     default null;*/
+
+
+
+-- alter table roomlot add column betcur               numeric(1000, 2)                            default 0;
+alter table room    add column roombet_owner_nick   varchar(1024)       references pers(nick)   default null;
+
