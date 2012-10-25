@@ -1273,7 +1273,80 @@ empweb_jsonapi_map(Req, {List}) ->
                     params          =   Params
                 };
 
+            %% ==================================================
+            <<"get_paytype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_paytype,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_paytypes">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_paytype,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_paytype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_paytype,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_paytype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_paytype,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_paytype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_paytype,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
 
+            %% ==================================================
+            <<"get_pay">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pay,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_pays">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pay,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_pay">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pay,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_pay">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pay,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_pay">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pay,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+                
             _ -> []
         end,
 

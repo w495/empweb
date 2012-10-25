@@ -2143,6 +2143,12 @@ insert into pers2pgroup (pers_id, group_id)
         ((select id from pers where login='admin'),
             (select id from pgroup where alias='contman'));
 
+insert into paytype(alias, isincome)
+    values  ('roombet_out',     false),
+            ('roombet_in',      true ),
+            ('roomlot_in',      true ),
+            ('thing_out',       false),
+            ('exper_out',       false);
 
 /**
     При создании пользователя помещаем его в комнату для новичков

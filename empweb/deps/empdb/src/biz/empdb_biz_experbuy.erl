@@ -100,6 +100,12 @@ create(Params)->
                     |Params
                 ]) of
                     {ok, [{Respl}]} ->
+                        {ok, _} = empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(buyer_id,   Params)},
+                            {paytype_alias,     exper_out},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
                         {ok, [
                             {[
                                 {authority_alias,

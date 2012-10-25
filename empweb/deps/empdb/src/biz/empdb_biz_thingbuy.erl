@@ -71,13 +71,19 @@ create(Params)->
                 Newmoney = Money - Price,
                 empdb_dao_pers:update(Con,[
                     {id,    proplists:get_value(id,   Mbbuyerpl)},
-                    {money, Newmoney}
+                    {money, {decr, Price}}
                 ]),
                 case empdb_dao_thingbuy:create(Con,[
                     {price, Price}
                     |Params
                 ]) of
                     {ok, [{Respl}]} ->
+                        {ok, _} = empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(buyer_id,   Params)},
+                            {paytype_alias,     thing_out},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
                         {ok, [
                             {[
                                 {money, Newmoney},

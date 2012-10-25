@@ -81,18 +81,19 @@ delete(Filter)->
                 Roomlot_owner_id    = proplists:get_value(owner_id, Roomlotpl),
                 Roomlot_id          = proplists:get_value(id,       Roomlotpl),
                 Room_id             = proplists:get_value(room_id,  Roomlotpl),
-                {ok, _} = empdb_dao_room:update(Con, [
-                    {id,                Room_id},
-                    {roomlot_id,        null},
-                    {roomlot_betmin,    null},
-                    {roomlot_betmax,    null},
-                    {roomlot_dtstart,   null},
-                    {roomlot_dtstop,    null},
-                    {roombet_id,        null},
-                    {roombet_owner_id,  null},
-                    {roombet_owner_nick,null},
-                    {roombet_price,     null}
-                ]),
+                {ok, _} =
+                    empdb_dao_room:update(Con, [
+                        {id,                Room_id},
+                        {roomlot_id,        null},
+                        {roomlot_betmin,    null},
+                        {roomlot_betmax,    null},
+                        {roomlot_dtstart,   null},
+                        {roomlot_dtstop,    null},
+                        {roombet_id,        null},
+                        {roombet_owner_id,  null},
+                        {roombet_owner_nick,null},
+                        {roombet_price,     null}
+                    ]),
                 case empdb_dao_roombet:get(Con, [
                     {isdeleted, false},
                     {roomlot_id, Roomlot_id},
@@ -109,6 +110,13 @@ delete(Filter)->
                             empdb_dao_pers:update(Con, [
                                 {id,        Owner_id},
                                 {money,     {incr, Price}}
+                            ]),
+                        {ok, _} =
+                            empdb_dao_pay:create(Con, [
+                                {pers_id,           Owner_id},
+                                {paytype_alias,     roombet_in},
+                                {isincome,          true},
+                                {price,             Price}
                             ]);
                     _ ->
                         ok
@@ -163,6 +171,13 @@ remove_expired()->
                             empdb_dao_pers:update(Con, [
                                 {id,        Roomlot_owner_id},
                                 {money,     {incr, Price}}
+                            ]),
+                        {ok, _} =
+                            empdb_dao_pay:create(Con, [
+                                {pers_id,           Roomlot_owner_id},
+                                {paytype_alias,     roomlot_in},
+                                {isincome,          true},
+                                {price,             Price}
                             ]),
                         {ok, _} =
                             empdb_dao_room:update(Con, [

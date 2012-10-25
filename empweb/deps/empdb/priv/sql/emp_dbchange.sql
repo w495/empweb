@@ -35,7 +35,14 @@ alter table room add column roombet_owner_id    decimal        references pers(i
 alter table room add column roombet_price       decimal                                     default null;*/
 
 
+/*
+alter table roomlot add column betcur               numeric(1000, 2)                            default 0;
+alter table room    add column roombet_owner_nick   varchar(1024)       references pers(nick)   default null;*/
 
--- alter table roomlot add column betcur               numeric(1000, 2)                            default 0;
-alter table room    add column roombet_owner_nick   varchar(1024)       references pers(nick)   default null;
 
+insert into paytype(alias, isincome)
+    values  ('roombet_out',     false),
+            ('roombet_in',      true ),
+            ('roomlot_in',      true ),
+            ('thing_out',       false),
+            ('exper_out',       false);

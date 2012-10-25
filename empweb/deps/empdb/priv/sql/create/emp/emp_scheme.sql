@@ -1318,21 +1318,13 @@ create table paytype (
 create sequence seq_pay_id;
 create table pay (
     id              decimal primary key default nextval('seq_pay_id'),
-    /**
-        Название сущности за которую платят
-    **/
-
     isincome        bool                default null,
     price           numeric(1000, 2)    default 0,
-
     paytype_id      decimal         references paytype(id)      not null,
     paytype_alias   varchar(1024)   references paytype(alias)   not null,
-
     pers_id         decimal         references pers(id)         not null,
     pers_nick       varchar(1024)   references pers(nick)       not null,
-
     info            varchar(1024)   default null,
-
     created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );

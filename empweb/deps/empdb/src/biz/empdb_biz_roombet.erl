@@ -142,6 +142,12 @@ create(Params)->
                                     {id,    Maxprev_owner_id},
                                     {money, {incr, Maxprev_price}}
                                 ]),
+                                {ok, _} = empdb_dao_pay:create(Con, [
+                                    {pers_id,           Maxprev_owner_id},
+                                    {paytype_alias,     roombet_in},
+                                    {isincome,          true},
+                                    {price,             Maxprev_price}
+                                ]),
                                 ok;
                             Some ->
                                 ok
@@ -157,6 +163,12 @@ create(Params)->
                             {id,    proplists:get_value(id,   Userpl)},
                             {money, {decr, Price}}
                         ]),
+                        {ok, _} = empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(id,   Userpl)},
+                            {paytype_alias,     roombet_out},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
                         Roombet = empdb_dao_roombet:create(Con, Params),
                         case Price =:= Betmax of
                             true ->
@@ -170,6 +182,12 @@ create(Params)->
                                 {ok, _} = empdb_dao_pers:update(Con, [
                                     {id,        Roomlot_owner_id},
                                     {money,     {incr, Price}}
+                                ]),
+                                {ok, _} = empdb_dao_pay:create(Con, [
+                                    {pers_id,           Roomlot_owner_id},
+                                    {paytype_alias,     roomlot_in},
+                                    {isincome,          true},
+                                    {price,             Price}
                                 ]),
                                 {ok, _} = empdb_dao_room:update(Con, [
                                     {id,                Room_id},
