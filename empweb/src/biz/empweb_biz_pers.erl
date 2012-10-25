@@ -214,7 +214,7 @@ get(Params) ->
     ?evman_args(Params, <<"get pers">>),
     empdb_biz_pers:get_opt(
         Params,
-        [without_phash]
+        [without_phash, blog]
     ).
 
 %%

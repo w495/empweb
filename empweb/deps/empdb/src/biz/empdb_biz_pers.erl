@@ -505,56 +505,12 @@ logout(Params)->
 
 get(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        Res = empdb_dao_pers:get(Con, [{isdeleted, false}|Params]),
-        case proplists:get_value(id, Params) of
-            undefined ->
-                Res;
-            Id ->
-                {ok, [{Pespl}]} = Res,
-                {ok, [Blog]} = empdb_dao_blog:get(Con, [
-                    {owner_id, Id},
-                    {fields, [
-                        nposts,
-                        npublicposts,
-                        nprotectedposts,
-                        ncomments,
-                        id,
-                        read_acctype_id,
-                        read_acctype_alias,
-                        comm_acctype_id,
-                        comm_acctype_alias,
-                        vcounter
-                    ]}
-                ]),
-                {ok, [{blog, Blog}|Pespl]}
-        end
+        empdb_dao_pers:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(emp, fun(Con)->
-        Res = empdb_dao_pers:get(Con, [{isdeleted, false}|Params], Fileds),
-        case proplists:get_value(id, Params) of
-            undefined ->
-                Res;
-            Id ->
-                {ok, [{Pespl}]} = Res,
-                {ok, [Blog]} = empdb_dao_blog:get(Con, [
-                    {owner_id, Id},
-                    {fields, [
-                        nposts,
-                        npublicposts,
-                        nprotectedposts,
-                        ncomments,
-                        id,
-                        read_acctype_id,
-                        read_acctype_alias,
-                        comm_acctype_id,
-                        comm_acctype_alias,
-                        vcounter
-                    ]}
-                ]),
-                {ok, [{blog, Blog}|Pespl]}
-        end
+        empdb_dao_pers:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 
@@ -576,6 +532,29 @@ get_opt(Con, Params, [], Proplist)
 get_opt(Con,Params, [Option|Options], [{Acc}])->
     ?empdb_debug("Option = ~p~n", [Option]),
     case Option of
+        blog ->
+            case proplists:get_value(id, Params) of
+                undefined ->
+                    get_opt(Con, Params, Options, [{Acc}]);
+                Id ->
+                    {ok, [Blog]} = empdb_dao_blog:get(Con, [
+                        {owner_id, Id},
+                        {limit, 1},
+                        {fields, [
+                            nposts,
+                            npublicposts,
+                            nprotectedposts,
+                            ncomments,
+                            id,
+                            read_acctype_id,
+                            read_acctype_alias,
+                            comm_acctype_id,
+                            comm_acctype_alias,
+                            vcounter
+                        ]}
+                    ]),
+                    get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}])
+            end;
         without_phash ->
             Nacc = proplists:delete(phash,
                 proplists:delete(pass, Acc)
