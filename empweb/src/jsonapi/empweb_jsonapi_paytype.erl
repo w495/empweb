@@ -113,7 +113,7 @@ handle(_req, #empweb_hap{
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_paytype:get(
-                        empweb_norm_opt:filter_owner([
+                        empweb_norm:filter_owner([
                             {pers_id, Pers_id}
                             |Data#norm.return
                         ]),
