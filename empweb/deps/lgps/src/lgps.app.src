@@ -1,0 +1,15 @@
+{application,lgps,
+[{description,"lgps"},
+{vsn,
+    "0.1.0"
+},
+{modules,[
+    lgps
+]},
+{registered,[]},
+{applications,[
+    kernel,
+    stdlib
+]},
+{mod,{lgps_app,[]}},
+{env,[]}]}.
