@@ -537,7 +537,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                 undefined ->
                     get_opt(Con, Params, Options, [{Acc}]);
                 Id ->
-                    {ok, [Blog]} = empdb_dao_blog:get(Con, [
+                    {ok, [Blog]} = empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
                         {owner_id, Id},
                         {limit, 1},
                         {fields, [
@@ -552,7 +552,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             comm_acctype_alias,
                             vcounter
                         ]}
-                    ]),
+                    ])),
                     get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}])
             end;
         without_phash ->
