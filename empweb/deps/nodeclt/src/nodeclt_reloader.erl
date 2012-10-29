@@ -80,7 +80,21 @@ code_change(_Vsn, State, _Extra) ->
 %% @doc code:purge/1 and code:load_file/1 the given list of modules in order,
 %%      return the results of code:load_file/1.
 reload_modules(Modules) ->
-    [begin code:purge(M), code:load_file(M) end || M <- Modules].
+    [reload_module(M) || M <- Modules].
+
+reload_module(Module) ->
+    case catch sys:suspend(Module) of
+        {'EXIT',{noproc,{sys,suspend,[Module]}}} ->
+            false = code:purge(Module),
+            {module,Module} = code:load_file(Module);
+        ok ->
+            ok = sys:suspend(Module),
+            false = code:purge(Module),
+            {module,Module} = code:load_file(Module),
+            ok = sys:change_code(Module,Module, [],[]),
+            ok = sys:resume(Module),
+            {module,Module}
+    end.
 
 %% @spec all_changed() -> [atom()]
 %% @doc Return a list of beam modules that have changed.
@@ -125,6 +139,20 @@ doit(From, To) ->
      end || {Module, Filename} <- code:all_loaded(), is_list(Filename)].
 
 reload(Module) ->
+    case catch sys:suspend(Module) of
+        {'EXIT',{noproc,{sys,suspend,[Module]}}} ->
+            reload_(Module);
+        {'EXIT',{timeout,{sys,suspend,[Module]}}} ->
+            reload_(Module);
+        ok ->
+            ok = sys:suspend(Module),
+            X = reload_(Module),
+            ok = sys:change_code(Module,Module, [],[]),
+            ok = sys:resume(Module),
+            X
+    end.
+
+reload_(Module) ->
     io:format("Reloading ~p ...", [Module]),
     code:purge(Module),
     case code:load_file(Module) of

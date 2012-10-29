@@ -15,7 +15,7 @@ start() ->
     ensure_application_start(ssl),
     ensure_application_start(cowboy),
     ensure_application_start(mnesia),
-    ensure_application_start(amnesia),
+    % ensure_application_start(amnesia),
     ensure_application_start(empdb),
     ensure_application_start(empweb).
 

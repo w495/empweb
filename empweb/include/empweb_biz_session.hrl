@@ -5,11 +5,8 @@
 %%% НАСТРОЙКИ СЕСИИ
 %%% ---------------------------------------------------------------------------
 
--define(EMPWEB_BIZ_SESSION_TABLENAME,
-    list_to_atom(atom_to_list(node()) ++ "_session")
-).
 
--record(biz_session, {
+-record(empweb_biz_session, {
     uid,
     id,
     login,
@@ -18,7 +15,6 @@
     phash
 }).
 
--define(EMPWEB_BIZ_SESSION_EXPIRETIMEOUT, 18000).
 
 % -define(AUTHCOOKIE, config:get(cookiename, "MCHS")).
 % -define(EXPCOOKIE, config:get(expcookie, 18000)).

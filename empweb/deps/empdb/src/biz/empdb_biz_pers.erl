@@ -125,7 +125,7 @@ register(Params)->
     end.
 
 lgps_new(X) ->
-    {ok, Res} = empdb_lgps:new(X),
+    {ok, Res} = lgps:new(X),
     Res.
 
 suggest_nick(Con, Orgnick, Pass)->

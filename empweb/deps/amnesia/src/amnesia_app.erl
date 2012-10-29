@@ -8,7 +8,6 @@ start() ->
     application:start(amnesia).
 
 start(_Type, _Args) ->
-    amnesia:init(),
     amnesia_sup:start_link().
 
 stop(_State) ->

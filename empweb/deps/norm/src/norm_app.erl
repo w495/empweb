@@ -5,10 +5,10 @@
 -export([start/0, start/2, stop/1]).
 
 start() ->
-    application:start(nodeclt).
+    application:start(norm).
 
 start(_Type, _Args) ->
-    nodeclt_sup:start_link().
+    norm_sup:start_link().
 
 stop(_State) ->
     ok.

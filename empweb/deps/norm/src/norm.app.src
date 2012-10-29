@@ -13,5 +13,5 @@
     kernel,
     stdlib
 ]},
-{mod,{nodeclt_app,[]}},
+{mod,{norm_app,[]}},
 {env,[]}]}.

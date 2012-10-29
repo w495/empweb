@@ -49,6 +49,11 @@ empweb_mailutils
 	find -type f -name \* -exec sed -i -r s/empweb_api/empweb_jsonapi/g {} \;
 
 
+	find -type f -name \* -exec sed -i -r s/lpgs/lgps/g {} \;
+
+
+	find -type f -name \* -exec sed -i -r s/empdb_lgps/lgps/g {} \;
+
 	find -type f -name \* -exec sed -i -r s/empweb_jsonapi:norm/empweb_norm:norm/g {} \;
 
 	

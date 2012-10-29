@@ -146,7 +146,7 @@ is_auth({session_id, Session_id})->
     case empweb_biz_session:get(Session_id) of
         [] ->
             false;
-        [_H=#biz_session{perm_names=Plist}|_] when erlang:is_list(Plist) ->
+        [_H=#empweb_biz_session{perm_names=Plist}|_] when erlang:is_list(Plist) ->
             true;
         _ ->
             []
@@ -159,7 +159,7 @@ get_perm_names({session_id, Session_id})->
     case empweb_biz_session:get(Session_id) of
         [] ->
             [];
-        [_H=#biz_session{perm_names=Plist}|_] when erlang:is_list(Plist)->
+        [_H=#empweb_biz_session{perm_names=Plist}|_] when erlang:is_list(Plist)->
             lists:map(fun empweb_convert:to_atom/1, Plist);
         _ ->
             []
@@ -186,7 +186,7 @@ get_pers_id({session_id, Session_id})->
     case empweb_biz_session:get(Session_id) of
         [] ->
             undefined;
-        [_H=#biz_session{id=Id}|_] ->
+        [_H=#empweb_biz_session{id=Id}|_] ->
             Id
     end.
 
@@ -194,7 +194,7 @@ get_pers_nick({session_id, Session_id})->
     case empweb_biz_session:get(Session_id) of
         [] ->
             undefined;
-        [_H=#biz_session{id=Id}|_] ->
+        [_H=#empweb_biz_session{id=Id}|_] ->
             Id
     end.
 
@@ -228,7 +228,7 @@ login(Params) ->
             Id          = proplists:get_value(id,           Userpl),
             Login       = proplists:get_value(login,        Userpl),
             Perm_names  = proplists:get_value(perm_names,   Userpl),
-            Session_id  = empweb_biz_session:new(#biz_session{
+            Session_id  = empweb_biz_session:new(#empweb_biz_session{
                 id          =   Id,
                 login       =   Login,
                 perm_names  =   Perm_names
@@ -286,7 +286,7 @@ restore_pass(Params) ->
         {ok,[{Perspl}]} ->
             case Email == proplists:get_value(email, Perspl) of
                 true ->
-                    {ok, Pass} = empweb_lgps:new(),
+                    {ok, Pass} = lgps:new(),
                     {Status, Reasons} = lists:foldl(fun(Type, {Status, Reasons})->
                         case restore_pass_send_guarded(#send{
                             type        =   Type,
@@ -369,7 +369,7 @@ logout(Params)->
                     {error,{bad_session,{[{id, Id}]}}};
                 Session_id ->
                     case empweb_biz_session:get({uid, Session_id}) of
-                        [#biz_session{id=Id}] ->
+                        [#empweb_biz_session{id=Id}] ->
                             empweb_biz_session:remove(Session_id),
                             {ok, [{[{session_id, Session_id}|Userpl]}]};
                         _ ->
