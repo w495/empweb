@@ -1109,12 +1109,21 @@ empweb_jsonapi_map(Req, {List}) ->
                 };
 
             %%
-            %% {"fname": "get_friends", "params":{"pers_id":1}}
+            %% {"fname": "get_friend", "params":{"pers_id":1}}
             %%
+            <<"get_friend">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_pers,
+                    action          =   get_friend,
+                    params          =   Params,
+                    is_auth         =   Is_auth,
+                    pers_id         =   Pid,
+                    pers_perm_names =   Pperm_names
+                };
             <<"get_friends">> ->
                 #empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_friends,
+                    action          =   get_friend,
                     params          =   Params,
                     is_auth         =   Is_auth,
                     pers_id         =   Pid,

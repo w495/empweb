@@ -31,7 +31,7 @@
 %% Друзья пользователя
 %%
 -export([
-    get_friends/1,
+    get_friend/1,
     add_friend/1,
     delete_friend/1
 ]).
@@ -668,42 +668,11 @@ delete_friend(Params)->
         empdb_dao_pers:delete_friend(Con, Params)
     end).
 
-get_friends(Params)->
+get_friend(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        %empdb_dao_pers:get_friends(Con, Params)
-        empdb_dao_friend:get(Con, Params, [
-            id,
-            nick,
-            email,
-            phone,
-            fname,
-            sname,
-            empl,
-            hobby,
-            descr,
-            pregion_id,
-            birthday,    % 'extract(epoch from birthday) as birthday',
-            lang_id,
-            lang_alias,
-            ismale,
-            money,
-            pstatus_id,
-            pstatus_alias,
-            authority_id,
-            authority_alias,
-            exper,
-            emotion_id,
-            emotion_alias,
-            mstatus_id,
-            mstatus_alias,
-            married_id,
-            mother_id,
-            father_id,
-            community_id,
-            community_head,
-            live_room_id,
-            live_room_head,
-            isdeleted
+        empdb_dao_friend:get(Con, [
+            {order, {nick, asc}}
+            |Params
         ])
     end).
 

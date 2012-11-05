@@ -812,6 +812,7 @@ create table comment(
 **/
 create table album(
     doc_id              decimal unique references doc(id),
+    ncomments           decimal default 0,
     /**
         Разрешение на перепост
     **/

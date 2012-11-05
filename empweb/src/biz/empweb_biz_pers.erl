@@ -76,7 +76,7 @@
 %% Друзья пользователя
 %%
 -export([
-    get_friends/1,
+    get_friend/1,
     add_friend/1,
     delete_friend/1
 ]).
@@ -387,8 +387,8 @@ logout(Params)->
 %% Друзья пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-get_friends(Params)->
-    empdb_biz_pers:get_friends(Params).
+get_friend(Params)->
+    empdb_biz_pers:get_friend(Params).
 
 add_friend(Params)->
     empdb_biz_pers:add_friend(Params).

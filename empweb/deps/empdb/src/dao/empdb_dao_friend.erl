@@ -62,7 +62,6 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        id          ,
         pers_id     ,
         friend_id   ,
         created     
@@ -84,6 +83,41 @@ table()->
     table(name).
 
 
+empdb_dao_pers({fields, select})->
+    [
+        nick,
+        email,
+        phone,
+        fname,
+        sname,
+        empl,
+        hobby,
+        descr,
+        pregion_id,
+        birthday,
+        lang_id,
+        lang_alias,
+        ismale,
+        money,
+        pstatus_id,
+        pstatus_alias,
+        authority_id,
+        authority_alias,
+        exper,
+        emotion_id,
+        emotion_alias,
+        mstatus_id,
+        mstatus_alias,
+        married_id,
+        mother_id,
+        father_id,
+        community_id,
+        community_head,
+        live_room_id,
+        live_room_head,
+        isdeleted
+    ].
+
 count(Con, Proplist) ->
     empdb_dao:count(
         ?MODULE,
@@ -93,15 +127,31 @@ count(Con, Proplist) ->
 
 
 get(Con, Proplist) ->
+    Empdb_dao_pers = [
+        {{table, name},             empdb_dao_pers:table(name)},
+        {{table, fields, all},      empdb_dao_pers:table({fields, all})},
+        {{table, fields, select},   empdb_dao_pers({fields, select})}
+    ],
+    
     empdb_dao:get(
-        [{empdb_dao_pers, id}, {?MODULE, friend_id}],
+        [{Empdb_dao_pers, id},
+        {?MODULE, friend_id}],
         Con,
         Proplist
     ).
 
 get(Con, Proplist, Fields) ->
+    Empdb_dao_pers = [
+        {{table, name},             empdb_dao_pers:table(name)},
+        {{table, fields, all},      empdb_dao_pers:table({fields, all})},
+        {{table, fields, select},   empdb_dao_pers({fields, select})}
+    ],
+
     empdb_dao:get(
-         [{empdb_dao_pers, id}, {?MODULE, friend_id}],
+        [
+            {Empdb_dao_pers, id},
+            {?MODULE, friend_id}
+        ],
         Con,
         Proplist,
         Fields

@@ -212,7 +212,7 @@ handle(Req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=get_friends, params=Params, is_auth=true
+        action=get_friend, params=Params, is_auth=true, pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = get friends">>),
 
@@ -221,12 +221,27 @@ handle(_req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key = pers_id,
+                required = false,
                 types = [integer]
             }
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
-            {ok,empweb_jsonapi:resp(empweb_biz_pers:get_friends(Data#norm.return)),Hap}
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:get_friend([
+                        {pers_id,
+                            case proplists:get_value(pers_id, Data#norm.return) of
+                                undefined ->
+                                    Pers_id;
+                                Pers_id ->
+                                    Pers_id
+                            end
+                        } |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
         end
     );
 
@@ -234,23 +249,27 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=add_friend, params=Params, is_auth=true
+        action=add_friend, params=Params, is_auth=true, pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = add friend">>),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = pers_id,
-                types = [integer]
-            },
-            #norm_rule{
                 key = friend_id,
                 types = [integer]
             }
         ]),
         fun(Data)->
-            {ok,empweb_jsonapi:resp(empweb_biz_pers:add_friend(Data#norm.return)),Hap}
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:add_friend(
+                        {pers_id, Pers_id},
+                        Data#norm.return
+                    )
+                ),
+                Hap
+            }
         end
     );
 
@@ -258,23 +277,27 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=delete_friend, params=Params, is_auth=true
+        action=delete_friend, params=Params, is_auth=true, pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = delete friend">>),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key     = pers_id,
-                types   = [integer]
-            },
-            #norm_rule{
                 key = friend_id,
                 types = [integer]
             }
         ]),
         fun(Data)->
-            {ok,empweb_jsonapi:resp(empweb_biz_pers:delete_friend(Data#norm.return)),Hap}
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:delete_friend([
+                        {pers_id, Pers_id},
+                        Data#norm.return
+                    ])
+                ),
+                Hap
+            }
         end
     );
 

@@ -2,7 +2,7 @@
 
 REBAR=./rebar
 
-all: app ria
+all: app
 app: get-deps
 	@$(REBAR) compile
 test:
