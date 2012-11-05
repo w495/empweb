@@ -2152,6 +2152,11 @@ insert into paytype(alias, isincome)
             ('room_out',        false),
             ('room_in',         true );
 
+
+insert into treastype (alias, isincome)
+    values  ('transfer_in',     true),
+            ('transfer_out',    false);
+
 /**
     При создании пользователя помещаем его в комнату для новичков
     @depricated перенесено в триггеры

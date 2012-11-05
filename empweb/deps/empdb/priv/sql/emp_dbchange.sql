@@ -55,6 +55,11 @@ insert into paytype(alias, isincome)
     values  ('treas_out',     false),
             ('treas_in',      true );*/
 
-insert into paytype(alias, isincome)
-    values  ('room_out',     false),
-            ('room_in',      true );
+-- insert into paytype(alias, isincome)
+--     values  ('room_out',     false),
+--             ('room_in',      true );
+
+
+nsert into treasoptype (alias, isincome)
+    values  ('transfer_in',     true),
+            ('transfer_out',    false);

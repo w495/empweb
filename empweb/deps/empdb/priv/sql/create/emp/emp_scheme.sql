@@ -1375,50 +1375,61 @@ create table experbuy (
 );
 
 
-create sequence seq_treasoptype_id;
-create table treasoptype (
+-- create sequence seq_incometype_id;
+-- create table incometype (
+--     id          decimal primary key default nextval('seq_eventtype_id'),
+--     /**
+--         Номер языковой сущности
+--     **/
+--     name_ti     decimal unique      default nextval('seq_any_ti'),
+--     alias       varchar(1024)   unique,
+--     isdeleted   bool default false
+-- );
+
+
+
+create sequence seq_treastype_id;
+create table treastype (
     id          decimal primary key default nextval('seq_eventtype_id'),
     /**
         Номер языковой сущности
     **/
-    name_ti     decimal unique      default nextval('seq_any_ti'),
-    isincome    bool                default null,
-    alias       varchar(1024)   unique,
-    isdeleted   bool default false
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    isincome        bool                default null,
+    alias           varchar(1024)   unique,
+    created                 timestamp without time zone not null default utcnow(),
+    isdeleted       bool default false
 );
 
+/**
+    roomtreas --- treasury room log
+**/
 
-create sequence seq_treasop_id;
-create table treasop (
-    id                  decimal primary key default nextval('seq_treasop_id'),
+create sequence seq_roomtreas_id;
+create table roomtreas (
+    id                  decimal primary key default nextval('seq_roomtreas_id'),
 
     /**
         Покупатель, тот кто платит
     **/
-    transer_id            decimal         references pers(id)     not null,
-    transer_nick          varchar(1024)   references pers(nick)   not null,
+    pers_id            decimal         references pers(id)     not null,
+    pers_nick          varchar(1024)   references pers(nick)   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
-    room_id                 decimal         references room(doc_id)     not null,
+    room_id            decimal         references room(doc_id)       not null,
 
-    treasoptype_id          decimal         references treasoptype(id)      not null,
-    treasoptype_alias       varchar(1024)   references treasoptype(alias)   not null,
-    isincome                bool            default null,
+    treastype_id       decimal         references treastype(id)      not null,
+    treastype_alias    varchar(1024)   references treastype(alias)   not null,
+    isincome           bool            default null,
 
-    /**
-        Вещь которую приобрели --- опыт.
-        Нужно знать, какой количество
-    **/
-    treas               numeric(1000, 2)    default null,
-    price               numeric(1000, 2)    default null,
+    treas              numeric(1000, 2)    default null,
+    price              numeric(1000, 2)    default null,
 
-    created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    created            timestamp without time zone not null default utcnow(),
+    isdeleted          bool default false
 );
-
-
 
 create sequence seq_paytype_id;
 create table paytype (
@@ -1426,18 +1437,21 @@ create table paytype (
     /**
         Номер языковой сущности
     **/
-    name_ti         decimal unique default nextval('seq_any_ti'),
-    alias           varchar(1024)   unique,
-    isincome        bool default null,
-    created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    name_ti                 decimal unique default nextval('seq_any_ti'),
+    alias                   varchar(1024)   unique,
+
+    isincome                bool default null,
+
+    created                 timestamp without time zone not null default utcnow(),
+    isdeleted               bool default false
 );
 
 
 create sequence seq_pay_id;
 create table pay (
     id              decimal primary key default nextval('seq_pay_id'),
-    isincome        bool                default null,
+
+    isincome                bool default null,
     price           numeric(1000, 2)    default 0,
     paytype_id      decimal         references paytype(id)      not null,
     paytype_alias   varchar(1024)   references paytype(alias)   not null,
