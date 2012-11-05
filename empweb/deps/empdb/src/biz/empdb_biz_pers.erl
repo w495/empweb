@@ -473,7 +473,7 @@ login({Uf, Uv}, Params) ->
                                 topic_id,
                                 slogan,
                                 weather,
-                                treasury
+                                treas
                             ]),
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
