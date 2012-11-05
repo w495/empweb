@@ -691,24 +691,24 @@ create_room(Params)->
 
 update_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
-
-    Id = proplists:get_value(id, Params,
-        proplists:get_value(id,
-            proplists:get_value(filter, Params, [])
-        )
-    ),
-
-    Owner_id =  proplists:get_value(owner_id, Params,
-        proplists:get_value(owner_id,
-            proplists:get_value(filter, Params, [])
-        )
-    ),
-
-    Tres = proplists:get_value(tres, Params,
-        proplists:get_value(tres,
-            proplists:get_value(values, Params, [])
-        )
-    ),
+% 
+%     Id = proplists:get_value(id, Params,
+%         proplists:get_value(id,
+%             proplists:get_value(filter, Params, [])
+%         )
+%     ),
+% 
+%     Owner_id =  proplists:get_value(owner_id, Params,
+%         proplists:get_value(owner_id,
+%             proplists:get_value(filter, Params, [])
+%         )
+%     ),
+% 
+%     Tres = proplists:get_value(tres, Params,
+%         proplists:get_value(tres,
+%             proplists:get_value(values, Params, [])
+%         )
+%     ),
 
 %         case proplists:get_value(filter, Params, []) of
 %         end
