@@ -479,7 +479,17 @@ login({Uf, Uv}, Params) ->
                             empdb_dao_friend:count(Con, [
                                 {pers_id, proplists:get_value(id, Userpl)}
                             ]),
+                        {ok,[{[{count,Nnewmessages}]}]} =
+                            empdb_dao_message:count(Con,[
+                                {filter, [
+                                    {isdfr,         false},
+                                    {isdeleted,     false},
+                                    {oktype_alias,  null},
+                                    {reader_id, proplists:get_value(id, Userpl)}
+                                ]}
+                            ]),
                         {ok, [{[
+                            {nnewmessages,  Nnewmessages},
                             {nfriends,      Nfriends},
                             {perm_names,    Perm_names},
                             {blog,          Blog},
