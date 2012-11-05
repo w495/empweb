@@ -686,7 +686,51 @@ is_comment_owner(Uid, Oid)->
 
 create_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_room:create(Con, Params)
+        {ok, [{Mbownerpl}]} =
+            empdb_dao_pers:get(Con, [
+                {'or', [
+                    {id,    proplists:get_value(owner_id,   Params)},
+                    {nick,  proplists:get_value(owner_nick, Params)}
+                ]},
+                {fields, [
+                    id,
+                    money
+                ]},
+                {limit, 1}
+            ]),
+        Price = 1.0,
+        Money = proplists:get_value(money, Mbownerpl),
+        case Price =< Money of
+            true ->
+                Newmoney = Money - Price,
+                empdb_dao_pers:update(Con,[
+                    {id,    proplists:get_value(id,   Mbownerpl)},
+                    {money, {decr, Price}}
+                ]),
+                case empdb_dao_room:create(Con, Params) of
+                    {ok, [{Respl}]} ->
+                        {ok, _} = empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(owner_id,   Params)},
+                            {paytype_alias,     room_out},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
+                        {ok, [
+                            {[
+                                {money, Newmoney},
+                                {price, Price}
+                                |Respl
+                            ]}
+                        ]};
+                    Else ->
+                        Else
+                end;
+            false ->
+                {error, {not_enough_money, {[
+                    {money, Money},
+                    {price, Price}
+                ]}}}
+        end
     end).
 
 update_room(Params)->

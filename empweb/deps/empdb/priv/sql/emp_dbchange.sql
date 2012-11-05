@@ -47,12 +47,14 @@ insert into paytype(alias, isincome)
             ('thing_out',       false),
             ('exper_out',       false);*/
 
-
+/*
 alter table room         add column treas numeric(1000, 2) default 1;
 
 
 insert into paytype(alias, isincome)
     values  ('treas_out',     false),
-            ('treas_in',      true );
+            ('treas_in',      true );*/
 
-            
+insert into paytype(alias, isincome)
+    values  ('room_out',     false),
+            ('room_in',      true );

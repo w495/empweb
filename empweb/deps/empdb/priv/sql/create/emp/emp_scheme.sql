@@ -946,7 +946,7 @@ create table room(
     
     slogan              text default null,
     weather             text default null,
-    treas               numeric(1000, 2) default 1,
+    treas               numeric(1000, 2) default 1
     
 --     bearing - герб
 --     flag - ссылка на картинку флага
@@ -1388,8 +1388,6 @@ create table treasbuy (
         Владелец, тот кто обладает товаром после покупки
     **/
     room_id            decimal         references room(doc_id)     not null,
-    /* room_head          varchar(1024)   references /* pers(nick)  not null,*/
-
     /**
         Вещь которую приобрели --- опыт.
         Нужно знать, какой количество

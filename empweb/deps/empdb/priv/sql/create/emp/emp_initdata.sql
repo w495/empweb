@@ -2148,7 +2148,9 @@ insert into paytype(alias, isincome)
             ('roombet_in',      true ),
             ('roomlot_in',      true ),
             ('thing_out',       false),
-            ('exper_out',       false);
+            ('exper_out',       false),
+            ('room_out',        false),
+            ('room_in',         true );
 
 /**
     При создании пользователя помещаем его в комнату для новичков
