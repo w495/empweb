@@ -304,6 +304,8 @@ nth(X, Y) ->
 uniform(0)->
     1;
 uniform(X)->
+    {A1,A2,A3} = now(),
+    random:seed(A1,A2,A3),
     random:uniform(X).
 
 %%

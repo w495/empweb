@@ -1346,7 +1346,6 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    ?empdb_debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
     get(Current, Con,
         #queryobj{
                 filter  =   As_filter,

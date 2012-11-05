@@ -223,6 +223,7 @@ handle(_req, #empweb_hap{
                 key = pers_id,
                 types = [integer]
             }
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             {ok,empweb_jsonapi:resp(empweb_biz_pers:get_friends(Data#norm.return)),Hap}

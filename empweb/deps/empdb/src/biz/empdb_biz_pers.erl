@@ -475,10 +475,15 @@ login({Uf, Uv}, Params) ->
                                 weather,
                                 treasury
                             ]),
+                        {ok,[{[{count,Nfriends}]}]} =
+                            empdb_dao_friend:count(Con, [
+                                {pers_id, proplists:get_value(id, Userpl)}
+                            ]),
                         {ok, [{[
-                            {perm_names, Perm_names},
-                            {blog, Blog},
-                            {live_room, Live_room}
+                            {nfriends,      Nfriends},
+                            {perm_names,    Perm_names},
+                            {blog,          Blog},
+                            {live_room,     Live_room}
                             |Userpl
                         ]}]}
                 end;
@@ -532,6 +537,16 @@ get_opt(Con, Params, [], Proplist)
 get_opt(Con,Params, [Option|Options], [{Acc}])->
     ?empdb_debug("Option = ~p~n", [Option]),
     case Option of
+        nfriends ->
+            case proplists:get_value(id, Params) of
+                undefined ->
+                    get_opt(Con, Params, Options, [{Acc}]);
+                Id ->
+                    {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                        {pers_id, Id}
+                    ]),
+                    get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}])
+            end;
         blog ->
             case proplists:get_value(id, Params) of
                 undefined ->
@@ -645,7 +660,41 @@ delete_friend(Params)->
 
 get_friends(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_friends(Con, Params)
+        %empdb_dao_pers:get_friends(Con, Params)
+        empdb_dao_friend:get(Con, Params, [
+            id,
+            nick,
+            email,
+            phone,
+            fname,
+            sname,
+            empl,
+            hobby,
+            descr,
+            pregion_id,
+            birthday,    % 'extract(epoch from birthday) as birthday',
+            lang_id,
+            lang_alias,
+            ismale,
+            money,
+            pstatus_id,
+            pstatus_alias,
+            authority_id,
+            authority_alias,
+            exper,
+            emotion_id,
+            emotion_alias,
+            mstatus_id,
+            mstatus_alias,
+            married_id,
+            mother_id,
+            father_id,
+            community_id,
+            community_head,
+            live_room_id,
+            live_room_head,
+            isdeleted
+        ])
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

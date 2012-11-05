@@ -208,13 +208,14 @@ update(Params)->
     ?evman_args(Params, <<"pers try to update him self">>),
     empdb_biz_pers:update(Params).
 
-
-
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),
     empdb_biz_pers:get_opt(
         Params,
-        [without_phash, blog]
+        [   without_phash,
+            blog,
+            nfriends
+        ]
     ).
 
 %%

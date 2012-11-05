@@ -128,7 +128,7 @@ table({fields, all})->
         roombet_price,
         slogan,
         weather,
-        treasury
+        treas
     ];
 
 %%

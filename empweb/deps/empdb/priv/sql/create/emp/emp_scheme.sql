@@ -946,7 +946,8 @@ create table room(
     
     slogan              text default null,
     weather             text default null,
-    treasury            decimal default null
+    treas               numeric(1000, 2) default 1,
+    
 --     bearing - герб
 --     flag - ссылка на картинку флага
 --     wallpaper - ссылка на картинку фона ?????? не закончено
@@ -1222,6 +1223,78 @@ create table thing(
 );
 
 
+
+
+create sequence seq_renttype_id;
+create table renttype(
+    id              decimal primary key default nextval('seq_renttype_id'),
+    alias           varchar(1024)   unique,
+    /**
+        Номер языковой сущности
+    **/
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    /**
+        Номер языковой сущности
+    **/
+    descr_ti        decimal unique      default nextval('seq_any_ti'),
+    /**
+        Родительский элемент
+    **/
+    parent_id       decimal references renttype(id) default null,
+
+    /**
+        целевых ссылок на эту сущность
+    **/
+    nchildtargets   decimal default 0,
+    /**
+        целевых ссылок на эту сущность и ее детей
+    **/
+    nnodetargets    decimal default 0,
+    /**
+        количество детей (дочерних элементов)
+    **/
+    nchildren           decimal default 0,
+    /**
+        количество вершин в кусте
+    **/
+    nnodes              decimal default 0,
+
+    created         timestamp without time zone not null default utcnow(),
+    isdeleted       bool    default false
+);
+
+
+create sequence seq_rent_id;
+create sequence seq_rent_alias;
+create table rent(
+    id              decimal primary key default nextval('seq_rent_id'),
+    alias           varchar(1024) default '_'
+                        || CAST (nextval('seq_rent_alias')
+                            as varchar(1024))
+                        || '_'
+                        || extract(epoch from now())
+                        || '_' not null unique,
+    /**
+        Номер языковой сущности
+    **/
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    /**
+        Номер языковой сущности
+    **/
+    descr_ti        decimal unique      default nextval('seq_any_ti'),
+
+    /**
+        Ccылка на вершину дерева типов вещей
+    **/
+    renttype_id    decimal references renttype(id) default null,
+
+    price           numeric(1000, 2)   default null,
+
+    created         timestamp without time zone not null default utcnow(),
+    isdeleted       bool    default false
+);
+
+
 /**
  *  Многие ко многим для пользователей и вещей
 **/
@@ -1294,6 +1367,34 @@ create table experbuy (
         Нужно знать, какой количество
     **/
     exper               numeric             default null,
+    price               numeric(1000, 2)    default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+
+create sequence seq_treasbuy_id;
+create table treasbuy (
+    id                  decimal primary key default nextval('seq_treasbuy_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    buyer_id            decimal         references pers(id)     not null,
+    buyer_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    room_id            decimal         references room(doc_id)     not null,
+    /* room_head          varchar(1024)   references /* pers(nick)  not null,*/
+
+    /**
+        Вещь которую приобрели --- опыт.
+        Нужно знать, какой количество
+    **/
+    treas               numeric(1000, 2)    default null,
     price               numeric(1000, 2)    default null,
 
     created             timestamp without time zone not null default utcnow(),

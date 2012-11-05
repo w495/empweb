@@ -52,6 +52,10 @@ empweb_mailutils
 	find -type f -name \* -exec sed -i -r s/lpgs/lgps/g {} \;
 
 
+
+	find -type f -name \* -exec sed -i -r s/lpgs/empfuntest/g {} \;
+
+	
 	find -type f -name \* -exec sed -i -r s/empdb_lgps/lgps/g {} \;
 
 	find -type f -name \* -exec sed -i -r s/empweb_jsonapi:norm/empweb_norm:norm/g {} \;
@@ -63,6 +67,7 @@ BIZ_SESSION_EXPIRE_TIMEOUT
 
 	find -type f -name \* -exec sed -i -r s/empdb_empweb_biz_/empdb_biz_/g {} \;
 
+	
 	find . -type f -name "*.erl" | awk 'FS=\.{print $1}' | xargs -t -i mv {} {}.old
 
 	find -type f -name \* -exec sed -i -r s/empdb_biz/empdb_biz/g {} \;

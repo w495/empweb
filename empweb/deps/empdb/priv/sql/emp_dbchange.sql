@@ -24,7 +24,6 @@ alter table experbuy    alter column price              type numeric(1000, 2);
 alter table pay         alter column price              type numeric(1000, 2);
 
 
-
 alter table room add column roomlot_id          decimal         references roomlot(doc_id)  default null;
 alter table room add column roomlot_betmin      numeric(1000, 2)                            default null;
 alter table room add column roomlot_betmax      numeric(1000, 2)                            default null;
@@ -40,9 +39,20 @@ alter table roomlot add column betcur               numeric(1000, 2)            
 alter table room    add column roombet_owner_nick   varchar(1024)       references pers(nick)   default null;*/
 
 
+/*
 insert into paytype(alias, isincome)
     values  ('roombet_out',     false),
             ('roombet_in',      true ),
             ('roomlot_in',      true ),
             ('thing_out',       false),
-            ('exper_out',       false);
+            ('exper_out',       false);*/
+
+
+alter table room         add column treas numeric(1000, 2) default 1;
+
+
+insert into paytype(alias, isincome)
+    values  ('treas_out',     false),
+            ('treas_in',      true );
+
+            
