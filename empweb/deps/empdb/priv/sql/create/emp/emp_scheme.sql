@@ -810,7 +810,7 @@ create table comment(
 /**
  *  Галерея
 **/
-create table gallery(
+create table album(
     doc_id              decimal unique references doc(id),
     /**
         Разрешение на перепост
@@ -818,12 +818,12 @@ create table gallery(
     repost              bool default false
 );
 
-/**
- *  Картинка галереи
-**/
-create table gpic(
-    att_id              decimal unique references attach(doc_id)
-);
+
+
+
+-- create table gpic(
+--     att_id              decimal unique references attach(doc_id)
+-- );
 
 -- ...
 
@@ -1374,20 +1374,38 @@ create table experbuy (
 );
 
 
-create sequence seq_treasbuy_id;
-create table treasbuy (
-    id                  decimal primary key default nextval('seq_treasbuy_id'),
+create sequence seq_treasoptype_id;
+create table treasoptype (
+    id          decimal primary key default nextval('seq_eventtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    isincome    bool                default null,
+    alias       varchar(1024)   unique,
+    isdeleted   bool default false
+);
+
+
+create sequence seq_treasop_id;
+create table treasop (
+    id                  decimal primary key default nextval('seq_treasop_id'),
 
     /**
         Покупатель, тот кто платит
     **/
-    buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   references pers(nick)   not null,
+    transer_id            decimal         references pers(id)     not null,
+    transer_nick          varchar(1024)   references pers(nick)   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
-    room_id            decimal         references room(doc_id)     not null,
+    room_id                 decimal         references room(doc_id)     not null,
+
+    treasoptype_id          decimal         references treasoptype(id)      not null,
+    treasoptype_alias       varchar(1024)   references treasoptype(alias)   not null,
+    isincome                bool            default null,
+
     /**
         Вещь которую приобрели --- опыт.
         Нужно знать, какой количество
@@ -1398,6 +1416,7 @@ create table treasbuy (
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
 );
+
 
 
 create sequence seq_paytype_id;

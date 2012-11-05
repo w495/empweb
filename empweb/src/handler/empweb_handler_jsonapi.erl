@@ -848,6 +848,44 @@ empweb_jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
+            %%
+            %% Альбомы
+            %%
+            <<"get_album">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_album,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_albums">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_album,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_album">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_album,
+                    action          =   'create',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_album">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_album,
+                    action          =   'update',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_album">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_album,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
         %% ----------------------------------------------------------------
         %% Функции системы
         %% ----------------------------------------------------------------

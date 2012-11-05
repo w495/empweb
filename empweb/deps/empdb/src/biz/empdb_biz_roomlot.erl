@@ -26,6 +26,7 @@
     create/1,
     delete/1,
     update/1,
+    is_owner/2,
     timeout/0
 ]).
 
@@ -59,7 +60,7 @@ get(Params, Fileds)->
         empdb_dao_roomlot:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-is_blog_owner(Uid, Oid)->
+is_owner(Uid, Oid)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_roomlot:is_owner(Con, Uid, Oid)
     end).
