@@ -17,6 +17,7 @@
     table/0,
     create/2,
     update/2,
+    count_comments/2,
     get/2,
     get/3
 ]).
