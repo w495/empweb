@@ -1383,7 +1383,25 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
                 offset  =   proplists:get_value(offset,  Opts)
         }
     ).
-
+% 
+% proplist2queryobj(Opts)
+%     As_filter =
+%         case proplists:get_value(filter, Opts, undefined) of
+%             undefined   ->    Opts;
+%             Filter      ->    Filter
+%         end,
+%     #queryobj{
+%             filter  =   As_filter,
+%             fields  =
+%                 proplists:get_value(fields,  Opts,
+%                     proplists:get_value(returning,  Opts,
+%                         proplists:get_value(return,  Opts, [])
+%                     )
+%                 ),
+%             order   =   proplists:get_value(order,   Opts, []),
+%             limit   =   proplists:get_value(limit,   Opts),
+%             offset  =   proplists:get_value(offset,  Opts)
+%     }.
 
 
 transform_current_select_fields(Filtername, Op) ->

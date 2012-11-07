@@ -1387,6 +1387,33 @@ create table experbuy (
 -- );
 
 
+create sequence seq_transtype_id;
+create table transtype (
+    id              decimal primary key default nextval('seq_eventtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti         decimal unique      default nextval('seq_any_ti'),
+    isincome        bool                default null,
+    alias           varchar(1024)   unique,
+    created         timestamp without time zone not null default utcnow(),
+    isdeleted       bool default false
+);
+
+create sequence seq_rptrans_id;
+create table rptrans (
+    id                  decimal primary key default nextval('seq_rptrans_id'),
+    pers_id            decimal         references pers(id)     not null,
+    pers_nick          varchar(1024)   references pers(nick)   not null,
+    room_id            decimal         references room(doc_id)       not null,
+    transtype_id       decimal         references transtype(id)      not null,
+    transtype_alias    varchar(1024)   references transtype(alias)   not null,
+    price              numeric(1000, 2)    default null,
+    created            timestamp without time zone not null default utcnow(),
+    isdeleted          bool default false
+);
+
+
 
 create sequence seq_treastype_id;
 create table treastype (
@@ -1397,13 +1424,9 @@ create table treastype (
     name_ti         decimal unique      default nextval('seq_any_ti'),
     isincome        bool                default null,
     alias           varchar(1024)   unique,
-    created                 timestamp without time zone not null default utcnow(),
+    created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
-
-/**
-    roomtreas --- treasury room log
-**/
 
 create sequence seq_roomtreas_id;
 create table roomtreas (
@@ -1419,14 +1442,11 @@ create table roomtreas (
         Владелец, тот кто обладает товаром после покупки
     **/
     room_id            decimal         references room(doc_id)       not null,
-
     treastype_id       decimal         references treastype(id)      not null,
     treastype_alias    varchar(1024)   references treastype(alias)   not null,
     isincome           bool            default null,
-
-    treas              numeric(1000, 2)    default null,
     price              numeric(1000, 2)    default null,
-
+    info               varchar(1024)   default null,
     created            timestamp without time zone not null default utcnow(),
     isdeleted          bool default false
 );

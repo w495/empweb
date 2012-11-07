@@ -1393,7 +1393,81 @@ empweb_jsonapi_map(Req, {List}) ->
                     pers_id         =   Pid,
                     params          =   Params
                 };
-                
+
+            %% ==================================================
+            <<"get_treastype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_treastype,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_treastypes">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_treastype,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_treastype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_treastype,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_treastype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_treastype,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_treastype">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_treastype,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
+            %% ==================================================
+            <<"get_roomtreas">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_roomtreas,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"get_all_roomtreass">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_roomtreas,
+                    action          =   'get',
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"create_roomtreas">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_roomtreas,
+                    action          =   create,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"update_roomtreas">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_roomtreas,
+                    action          =   update,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+            <<"delete_roomtreas">> ->
+                #empweb_hap{
+                    handler         =   empweb_jsonapi_roomtreas,
+                    action          =   delete,
+                    pers_id         =   Pid,
+                    params          =   Params
+                };
+
             _ -> []
         end,
 

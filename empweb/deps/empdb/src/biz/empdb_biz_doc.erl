@@ -13,6 +13,9 @@
 -include("empdb.hrl").
 
 
+-define(CREATE_ROOM_PRICE, 1.0).
+
+
 %% ==========================================================================
 %% Экспортируемые функции
 %% ==========================================================================
@@ -698,7 +701,7 @@ create_room(Params)->
                 ]},
                 {limit, 1}
             ]),
-        Price = 1.0,
+        Price = ?CREATE_ROOM_PRICE,
         Money = proplists:get_value(money, Mbownerpl),
         case Price =< Money of
             true ->
@@ -735,7 +738,7 @@ create_room(Params)->
 
 update_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
-% 
+
 %     Id = proplists:get_value(id, Params,
 %         proplists:get_value(id,
 %             proplists:get_value(filter, Params, [])
@@ -748,14 +751,37 @@ update_room(Params)->
 %         )
 %     ),
 % 
-%     Tres = proplists:get_value(tres, Params,
-%         proplists:get_value(tres,
-%             proplists:get_value(values, Params, [])
+%     Owner_nick =  proplists:get_value(owner_nick, Params,
+%         proplists:get_value(owner_nick,
+%             proplists:get_value(filter, Params, [])
 %         )
 %     ),
+%     
+%     case proplists:get_value(treas, Params,
+%         proplists:get_value(treas,
+%             proplists:get_value(values, Params, [])
+%         )
+%     ) of
+%         undefined ->
+%             empdb_dao_room:update(Con, Params)
+%         Treas ->
+% 
+%     
+% 
+%     {ok, [{Mbownerpl}]} =
+%         empdb_dao_pers:get(Con, [
+%             {'or', [
+%                 {id,    Owner_id},
+%                 {nick,  Owner_nick}
+%             ]},
+%             {fields, [
+%                 id,
+%                 money
+%             ]},
+%             {limit, 1}
+%         ]),
+% 
 
-%         case proplists:get_value(filter, Params, []) of
-%         end
         empdb_dao_room:update(Con, Params)
     end).
 

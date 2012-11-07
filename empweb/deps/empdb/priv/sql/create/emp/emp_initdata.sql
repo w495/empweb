@@ -2157,6 +2157,12 @@ insert into treastype (alias, isincome)
     values  ('transfer_in',     true),
             ('transfer_out',    false);
 
+
+insert into transtype (alias, isincome)
+    values  ('to',     true),
+            ('form',   false);
+
+
 /**
     При создании пользователя помещаем его в комнату для новичков
     @depricated перенесено в триггеры
