@@ -957,20 +957,20 @@ begin
     **/
     if new.comm_acctype_id != old.comm_acctype_id then
         new.comm_acctype_alias = 
-            (select comm_acctype.alias 
+            (select acctype.alias
                 from 
                     acctype
                 where 
-                    comm_acctype.id = new.comm_acctype_id
+                    acctype.id = new.comm_acctype_id
             );
     end if;
     if new.comm_acctype_alias != old.comm_acctype_alias then
         new.comm_acctype_id = 
-            (select comm_acctype.id 
+            (select acctype.id
                 from 
                     acctype
                 where 
-                    comm_acctype.alias = new.comm_acctype_alias
+                    acctype.alias = new.comm_acctype_alias
             );
     end if;
     /**
