@@ -959,7 +959,7 @@ begin
         new.comm_acctype_alias = 
             (select comm_acctype.alias 
                 from 
-                    comm_acctype 
+                    acctype
                 where 
                     comm_acctype.id = new.comm_acctype_id
             );
@@ -968,7 +968,7 @@ begin
         new.comm_acctype_id = 
             (select comm_acctype.id 
                 from 
-                    comm_acctype 
+                    acctype
                 where 
                     comm_acctype.alias = new.comm_acctype_alias
             );
