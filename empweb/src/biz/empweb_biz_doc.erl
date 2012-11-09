@@ -178,6 +178,7 @@
     get_room/1,
     get_room/2,
     create_room/1,
+    join_room/1,
     add_room_topic/1,
     delete_room_topic/1,
     update_room/1,
@@ -468,10 +469,13 @@ create_room(Params)->
 update_room(Params)->
     empdb_biz_doc:update_room(Params).
 
+join_room(Params)->
+    empdb_biz_doc:join_room(Params).
 % 
 % update_room(Params)->
 %     empdb_biz_doc:update_room(Params).
-%     
+%
+
 delete_room(Params)->
     empdb_biz_doc:delete_room(Params).
 

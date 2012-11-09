@@ -1134,6 +1134,36 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
+        action  =   join_room,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = join room">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:join_room([
+                        {pers_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
         action  =   create_room,
         params  =   Params,
         pers_id =   Pers_id

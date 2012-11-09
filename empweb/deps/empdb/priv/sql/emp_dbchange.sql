@@ -59,7 +59,11 @@ insert into paytype(alias, isincome)
 --     values  ('room_out',     false),
 --             ('room_in',      true );
 
-
+/*
 nsert into treasoptype (alias, isincome)
     values  ('transfer_in',     true),
-            ('transfer_out',    false);
+            ('transfer_out',    false);*/
+
+
+
+alter table room         alter column  ulimit SET DEFAULT expression

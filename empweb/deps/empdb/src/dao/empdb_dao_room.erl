@@ -124,7 +124,7 @@ table({fields, all})->
         roomlot_dtstop,
         roombet_id,
         roombet_owner_id,
-        roombet_owner_nick,
+        %roombet_owner_nick,
         roombet_price,
         slogan,
         weather,

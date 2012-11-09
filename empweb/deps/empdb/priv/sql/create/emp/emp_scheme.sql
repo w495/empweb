@@ -923,7 +923,7 @@ create table regimen(
 
 create table room(
     doc_id              decimal unique references doc(id),
-    ulimit              decimal default null,
+    ulimit              decimal default 5000,
     
     /**
         Тип комнаты

@@ -185,6 +185,7 @@
 -export([
     get_room/1,
     get_room/2,
+    join_room/1,
     create_room/1,
     add_room_topic/1,
     delete_room_topic/1,
@@ -785,6 +786,48 @@ update_room(Params)->
         empdb_dao_room:update(Con, Params)
     end).
 
+
+join_room(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        Pers_id = proplists:get_value(pers_id, Params),
+        Room_id = proplists:get_value(id, Params),
+        {ok, [{[{ulimit, Ulimit}]}]} = empdb_dao_room:get(Con, [
+            {filter, [
+                {id, Room_id}
+            ]},
+            {fields, [ulimit]},
+            {limit, 1}
+        ]),
+        {ok, [{[{count, Count}]}]} = empdb_dao_pers:count(Con, [
+            {filter, [
+                {live_room_id, Room_id}
+            ]}
+        ]),
+        case ((Count + 1) =< (Ulimit)) of
+            false ->
+                {error, {user_overflow, {[
+                    {count, Count},
+                    {ulimit, Ulimit}
+                ]}}};
+            true ->
+                {ok, _} = empdb_dao_pers:update(Con, [
+                    {filter, [
+                        {id, Pers_id}
+                    ]},
+                    {values, [
+                        {live_room_id, Room_id}
+                    ]}
+                ]),
+                empdb_dao_pers:get(Con, [
+                    {filter, [
+                        {live_room_id, Room_id}
+                    ]},
+                    {fields, [id]}
+                ])
+        end
+    end).
+
+    
 delete_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_room:update(Con, [{isdeleted, true}|Params])
