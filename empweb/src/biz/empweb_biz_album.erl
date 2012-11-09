@@ -12,6 +12,7 @@
 -export([
     update/1,
     create/1,
+    delete/1,
     get/1,
     get/2
 ]).

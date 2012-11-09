@@ -468,6 +468,10 @@ create_room(Params)->
 update_room(Params)->
     empdb_biz_doc:update_room(Params).
 
+% 
+% update_room(Params)->
+%     empdb_biz_doc:update_room(Params).
+%     
 delete_room(Params)->
     empdb_biz_doc:delete_room(Params).
 

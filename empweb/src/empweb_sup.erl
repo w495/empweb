@@ -6,8 +6,14 @@
 -export([start_link/0]). %% API.
 -export([init/1]). %% supervisor.
 
+-export([system_code_change/4]).
+
+
 -define(SUPERVISOR, ?MODULE).
 
+system_code_change(Misc, Module, OldVsn, Extra)->
+    io:format("--==|--|--|===-->"),
+    {ok, Misc}.
 
 %% API.
 

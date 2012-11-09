@@ -140,117 +140,96 @@ empweb_jsonapi_map(Req, {List}) ->
         {is_auth,   Is_auth}
     ]}),
 
+
+    Eh = #empweb_hap{
+        params          =   Params,
+        auth            =   Auth,
+        is_auth         =   Is_auth,
+        pers_id         =   Pid,
+        pers_perm_names =   Pperm_names
+    },
+    
     Action =
         case Fname of
             %%
             %% Тип разрешения: не рассмотрен, запрещена, разрешена
             %%
             <<"get_oktype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_oktype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_oktype
                 };
             <<"get_all_oktypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_oktype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_oktype
                 };
             <<"create_oktype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_oktype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_oktype
                 };
             <<"update_oktype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_oktype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_oktype
                 };
             <<"delete_oktype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_oktype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_oktype
                 };
         %% ----------------------------------------------------------------
             <<"get_thingtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingtype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_thingtypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingtype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_thingtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingtype,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_thingtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingtype,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_thingtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingtype,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
                 
             <<"get_thing">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_things">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_thing">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_thing">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_thing">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
         %% ----------------------------------------------------------------
         %% Функции документов
@@ -261,630 +240,469 @@ empweb_jsonapi_map(Req, {List}) ->
             %%      фото, коммент к фото, attach descr.
             %%
             <<"get_doctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_doctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_doctype
                 };
             <<"get_all_doctypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_doctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_doctype
                 };
             <<"create_doctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_doctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_doctype
                 };
             <<"update_doctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_doctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_doctype
                 };
             <<"delete_doctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_doctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_doctype
                 };
             %%
             %% Типы контента: обычный, эротический
             %%
             <<"get_contype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_contype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_contype
                 };
             <<"get_all_contypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_contype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_contype
                 };
             <<"create_contype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_contype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_contype
                 };
             <<"update_contype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_contype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_contype
                 };
             <<"delete_contype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_contype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_contype
                 };
             %%
             %% Тип доступа к контенту контента (блога и галереи):
             %%  приватный, дружеский, открытый.
             %%
             <<"get_acctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_acctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_acctype
                 };
             <<"get_all_acctypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_acctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_acctype
                 };
             <<"create_acctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_acctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_acctype
                 };
             <<"update_acctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_acctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_acctype
                 };
             <<"delete_acctype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_acctype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_acctype
                 };
 
             %%
             %% Типы чат-комнат. (страна, тюрьма, ад, рай)
             %%
             <<"get_roomtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_roomtype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_roomtype
                 };
             <<"get_all_roomtypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_roomtype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_roomtype
                 };
             <<"create_roomtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_roomtype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_roomtype
                 };
             <<"update_roomtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_roomtype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_roomtype
                 };
             <<"delete_roomtype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_roomtype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_roomtype
                 };
             %%
             %% Список языков чата.
             %%
             <<"get_chatlang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_chatlang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_chatlang
                 };
             <<"get_all_chatlangs">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_chatlang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_chatlang
                 };
             <<"create_chatlang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_chatlang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_chatlang
                 };
             <<"update_chatlang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_chatlang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_chatlang
                 };
             <<"delete_chatlang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_chatlang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_chatlang
                 };
             %%
             %% Список режимов страны
             %%
             <<"get_regimen">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_regimen,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_regimen
                 };
             <<"get_all_regimens">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_regimen,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_regimen
                 };
             <<"create_regimen">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_regimen,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_regimen
                 };
             <<"update_regimen">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_regimen,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_regimen
                 };
             <<"delete_regimen">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_regimen,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_regimen
                 };
             %%
             %% Дерево тем страны
             %%
             <<"get_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_topic
                 };
             <<"get_all_topics">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_topic
                 };
             <<"create_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_topic
                 };
             <<"update_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_topic
                 };
             <<"delete_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_topic
                 };
             %%
             %% Типы сообществ (обычные, тайные)
             %%
             <<"get_communitytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_communitytype
                 };
             <<"get_all_communitytypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_communitytype
                 };
             <<"create_communitytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_communitytype
                 };
             <<"update_communitytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_communitytype
                 };
             <<"delete_communitytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_communitytype,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_communitytype
                 };
             %%
             %% Блоги
             %%
             <<"get_blog">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_blog,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_blog
                 };
             <<"get_all_blogs">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_blog,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_blog
                 };
             <<"create_blog">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_blog,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_blog
                 };
             <<"update_blog">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_blog,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_blog
                 };
             <<"delete_blog">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_blog,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_blog
                 };
             %%
             %% Посты 
             %%
             <<"get_post">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_post,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_post
                 };
             <<"get_all_posts">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_post,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_post
                 };
             <<"create_post">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_post,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_post
                 };
             <<"update_post">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_post,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_post
                 };
             <<"delete_post">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_post,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_post
                 };
             %%
             %% Kоменты
             %%
             <<"get_comment">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_comment,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_comment
                 };
             <<"get_all_comments">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_comment,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_comment
                 };
             <<"create_comment">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_comment,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_comment
                 };
             <<"update_comment">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_comment,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_comment
                 };
             <<"delete_comment">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_comment,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_comment
                 };  
             %%
             %% Чат-комнаты (страны)
             %%
             <<"get_room">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_room,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_room
+                };
+            <<"join_room">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   join_room
                 };
             <<"get_all_rooms">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_room,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_room
                 };
             <<"create_room">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_room,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_room
                 };
             <<"update_room">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_room,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_room
                 };
             <<"delete_room">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_room,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_room
                 };
             <<"add_room_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   add_room_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   add_room_topic
                 };
             <<"delete_room_topic">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_room_topic,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_room_topic
                 };
             %%
             %% Сообщества
             %%
             <<"get_community">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_community,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_community
                 };
             <<"get_all_communities">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_community,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_community
                 };
             <<"create_community">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_community,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_community
                 };
             <<"update_community">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_community,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_community
                 };
             <<"delete_community">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_community,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_community
                 };
 
             %%
             %% Сообщения
             %%
             <<"count_message">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   count_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   count_message
                 };
             <<"count_message_types">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   count_message_types,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   count_message_types
                 };
             <<"get_message">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_message
                 };
             <<"get_message_for_me">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_message_for_me,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_message_for_me
                 };
             <<"get_message_from_me">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_message_from_me,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_message_from_me
                 };
             <<"get_all_messages">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   get_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_message
                 };
             <<"create_message">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   create_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_message
                 };
             <<"update_message">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   update_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_message
                 };
             <<"delete_message_for_me">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_message_for_me,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_message_for_me
                 };
             <<"delete_message_from_me">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_message_from_me,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_message_from_me
                 };
             <<"delete_message">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
-                    action          =   delete_message,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_message
                 };
             %%
             %% Альбомы
             %%
             <<"get_album">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_album,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_albums">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_album,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_album">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_album,
-                    action          =   'create',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'create'
                 };
             <<"update_album">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_album,
-                    action          =   'update',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'update'
                 };
             <<"delete_album">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_album,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
         %% ----------------------------------------------------------------
         %% Функции системы
@@ -894,77 +712,57 @@ empweb_jsonapi_map(Req, {List}) ->
             %% Список языков системы.
             %%
             <<"get_lang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   get_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_lang
                 };
             <<"get_all_langs">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   get_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_lang
                 };
             <<"create_lang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   create_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_lang
                 };
             <<"update_lang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   update_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_lang
                 };
             <<"delete_lang">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   delete_lang,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_lang
                 };
             %%
             %% Список переводов системы.
             %%
             <<"get_tr">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   get_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_tr
                 };
             <<"get_all_trs">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   get_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   get_tr
                 };
             <<"create_tr">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   create_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create_tr
                 };
             <<"update_tr">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   update_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update_tr
                 };
             <<"delete_tr">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_conf,
-                    action          =   delete_tr,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete_tr
                 };
 
         %% ----------------------------------------------------------------
@@ -972,162 +770,119 @@ empweb_jsonapi_map(Req, {List}) ->
         %% ----------------------------------------------------------------
 
             <<"get_all_authorities">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_authority,
-                    params          =   Params
+                    action          =   get_authority
                 };
             <<"get_authority">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_authority,
-                    params          =   Params
+                    action          =   get_authority
                 };
 
             <<"get_all_mstatuses">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_mstatus',
-                    params          =   Params
+                    action          =   'get_mstatus'
                 };
             <<"get_mstatus">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_mstatus',
-                    params          =   Params
+                    action          =   'get_mstatus'
                 };
 
             <<"get_all_pstatuses">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_pstatus',
-                    params          =   Params
+                    action          =   'get_pstatus'
                 };
             <<"get_pstatus">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_pstatus',
-                    params          =   Params
+                    action          =   'get_pstatus'
                 };
 
             <<"get_all_emotions">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_emotion',
-                    params          =   Params
+                    action          =   'get_emotion'
                 };
             <<"get_emotion">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'get_emotion',
-                    params          =   Params
+                    action          =   'get_emotion'
                 };
 
             <<"register">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   'register',
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   'register'
                 };
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
             %%
             <<"login">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   login,
-                    params          =   Params
+                    action          =   login
                 };
             %%
             %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
             %%
             <<"pass">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   pass,
-                    params          =   Params,
-                    auth            =   Auth,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   pass
                 };
 
             %%
             %% {"fname": "logout", "params":{"nick":"admin"}}
             %%
             <<"logout">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   logout,
-                    params          =   Params,
-                    auth            =   Auth,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   logout
                 };
 
             %%
             %% {"fname": "update_pers", "params":{"id":1,"hobby":"some a"}}
             %%
             <<"update_pers">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   update_pers,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   update_pers
                 };
 
             %%
             %% {"fname": "get_pers", "params":{"nick":"admin"}}
             %%
             <<"get_pers">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_pers,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   get_pers
                 };
 
             %%
             %% {"fname": "get_all_perss", "params":{}}
             %%
             <<"get_all_perss">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_pers,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   get_pers
                 };
 
             %%
             %% {"fname": "get_friend", "params":{"pers_id":1}}
             %%
             <<"get_friend">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_friend,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   get_friend
                 };
             <<"get_friends">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_friend,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   get_friend
                 };
 
             %%
@@ -1137,13 +892,9 @@ empweb_jsonapi_map(Req, {List}) ->
             %%  }
             %%
             <<"add_friend">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   add_friend,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   add_friend
                 };
 
             %%
@@ -1153,93 +904,69 @@ empweb_jsonapi_map(Req, {List}) ->
             %%  } 
             %%
             <<"delete_friend">> ->  
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   delete_friend,
-                    params          =   Params,
-                    is_auth         =   Is_auth,
-                    pers_id         =   Pid,
-                    pers_perm_names =   Pperm_names
+                    action          =   delete_friend
                 };
 
             %% ==================================================
 
             <<"get_thingbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_thingbuys">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_thingbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_thingbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_thingbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             <<"buy_product">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
 
             %% ==================================================
             
             <<"get_experbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_experbuys">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_experbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_experbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_experbuy">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1248,35 +975,35 @@ empweb_jsonapi_map(Req, {List}) ->
             
             %% ==================================================
             <<"get_roomlot">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_roomlots">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_roomlot">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_roomlot">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_roomlot">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1285,35 +1012,35 @@ empweb_jsonapi_map(Req, {List}) ->
 
             %% ==================================================
             <<"get_roombet">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_roombets">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_roombet">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_roombet">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_roombet">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1322,35 +1049,35 @@ empweb_jsonapi_map(Req, {List}) ->
 
             %% ==================================================
             <<"get_paytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_paytypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_paytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_paytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_paytype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1359,35 +1086,35 @@ empweb_jsonapi_map(Req, {List}) ->
 
             %% ==================================================
             <<"get_pay">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_pays">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_pay">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_pay">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_pay">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1396,35 +1123,35 @@ empweb_jsonapi_map(Req, {List}) ->
 
             %% ==================================================
             <<"get_treastype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_treastypes">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_treastype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_treastype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_treastype">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
                     action          =   delete,
                     pers_id         =   Pid,
@@ -1433,35 +1160,35 @@ empweb_jsonapi_map(Req, {List}) ->
 
             %% ==================================================
             <<"get_roomtreas">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"get_all_roomtreass">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
                     action          =   'get',
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"create_roomtreas">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
                     action          =   create,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"update_roomtreas">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
                     action          =   update,
                     pers_id         =   Pid,
                     params          =   Params
                 };
             <<"delete_roomtreas">> ->
-                #empweb_hap{
+                Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
                     action          =   delete,
                     pers_id         =   Pid,
