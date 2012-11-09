@@ -66,4 +66,4 @@ nsert into treasoptype (alias, isincome)
 
 
 
-alter table room         alter column  ulimit SET DEFAULT expression
+alter table room         alter column  ulimit SET DEFAULT 5000;

@@ -1798,6 +1798,7 @@ begin
         new.room_head =
             (select head from doc where doc.id = new.room_id);
     end if;
+    new.betcur = new.betmin;
     return new;
 end;
 $$ language plpgsql;
