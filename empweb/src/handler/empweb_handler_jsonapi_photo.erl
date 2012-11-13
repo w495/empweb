@@ -93,20 +93,25 @@ handle_post(Req, State) ->
     end.
 
 handle_body(Req, Pbody, State) ->
-    {Partstates, Req1} = acc_part(Req, [], Pbody, State),
-    {
-        empweb_jsonapi:fname(empweb_jsonapi:resp(
-            {ok,
-                lists:map(
-                    fun(#partstate{fileinfo=Fileinfo})->
-                        Fileinfo#empweb_resp.body
-                    end,
-                    Partstates
-                )
+    case acc_part(Req, [], Pbody, State) of
+        {[#partstate{fileinfo=Empweb_resp}], Req1} ->
+            {Empweb_resp, Req1};
+        {Partstates, Req1} ->
+            {
+                empweb_jsonapi:fname(empweb_jsonapi:resp(
+                    {ok,
+                        lists:foldl(
+                            fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
+                                [proplists:delete(fname, Bpl)|Acc]
+                            end,
+                            [],
+                            Partstates
+                        )
+                    }
+                ), <<"upload_file">>),
+                Req1
             }
-        ), <<"upload_file">>),
-        Req1
-    }.
+    end.
 
 handle_part(Req, Acc, State) ->
     {Result, Req2} = empweb_http:multipart_data(Req),
@@ -193,7 +198,7 @@ acc_part(
             {fileextension, Fileextension}
         ]
     },
-    {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap),
+    {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
     io:format("Fileinfo = ~p~n", [Fileinfo]),
     handle_part(
         Req1,
