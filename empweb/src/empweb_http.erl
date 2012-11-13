@@ -11,8 +11,25 @@
     resp/1
 ]).
 
+-export([
+    reply/2,
+    method/1,
+    body_qs/1,
+    multipart_data/1
+]).
 
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
+
+
+multipart_data(Req) ->
+    cowboy_http_req:multipart_data(Req).
+
+body_qs(Req) ->
+    cowboy_http_req:body_qs(Req).
+
+method(Req) ->
+    cowboy_http_req:method(Req).
+    
 
 auth(Req)->
     {Res, Req1} = auth_cookie(Req),
@@ -136,6 +153,16 @@ call_handle(Req, #empweb_hap{handler=Handler,action=Action}=Hap, State) ->
             {error, Error}
     end.
 
+
+reply(#http_resp{} = Http_resp, Req) ->
+    {ok, Reply} =
+        cowboy_http_req:reply(
+            Http_resp#http_resp.status,
+            Http_resp#http_resp.headers,
+            Http_resp#http_resp.body,
+            Req
+        ),
+    Reply.
 
 resp(#empweb_resp{cookies=Cookies} = Empweb_resp)
     when erlang:is_tuple(Cookies) ->

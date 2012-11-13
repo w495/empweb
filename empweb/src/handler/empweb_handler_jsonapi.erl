@@ -26,15 +26,32 @@
 %% =========================================================================
 %%
 
+-record(state, {
+    empweb_hap
+}).
+
 
 init(_, Req, _Opts) ->
     ?evman_warning({erlang:time(), Req}),
-    {ok, Req, undefined_state}.
+    {Auth, Req1}    =   empweb_http:auth(Req),
+    Is_auth         =   empweb_biz_pers:is_auth(Auth),
+    Pid             =   empweb_biz_pers:get_pers_id(Auth),
+    Pperm_names     =   empweb_biz_pers:get_perm_names(Auth),
+    {ok, Req1, #state{
+        empweb_hap  =
+            #empweb_hap {
+                auth            =   Auth,
+                is_auth         =   Is_auth,
+                pers_id         =   Pid,
+                pers_perm_names =   Pperm_names
+            }
+            
+    }}.
 
 handle(Req, State) ->
     ?evman_args([Req, State]),
     {Empweb_resp, Reqres}  =
-        case cowboy_http_req:method(Req) of
+        case empweb_http:method(Req) of
             {'POST', Req1} ->
                 handle_post(Req1, State);
             {_, Req1} ->
@@ -45,44 +62,40 @@ handle(Req, State) ->
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
-    {ok, Reply} = cowboy_http_req:reply(
-        Http_resp#http_resp.status,
-        Http_resp#http_resp.headers,
-        %[{<<"Connection">>,<<"close">>}|Http_resp#http_resp.headers],
-        Http_resp_json,
-        Reqres
-    ),
-
+    Reply =
+        empweb_http:reply(
+            Http_resp#http_resp{body = Http_resp_json},
+            Reqres
+        ),
     ?evman_debug({reply, Reply}, <<"server reply">>),
-
     {ok,Reply,State}.
 
 handle_post(Req, State)->
     ?evman_args([Req, State]),
-    case cowboy_http_req:body_qs(Req) of
+    case empweb_http:body_qs(Req) of
         {Pbody, Req1} ->
-            handle_post_body(Req1, State, Pbody);
+            handle_body(Req1, Pbody, State);
         _ ->
             {empweb_jsonapi:not_extended(no_post_body), Req}
     end.
 
-handle_post_body(Req, State, Pbody)->
-    ?evman_args([Req, State, Pbody]),
+handle_body(Req, Pbody, State)->
+    ?evman_args([Req, Pbody, State]),
 
     case proplists:get_value(<<"data">>, Pbody) of
         undefined ->
             {empweb_jsonapi:not_extended(no_data), Req};
         Bobject ->
-            handle_data(Req, State, Bobject)
+            handle_data(Req, Bobject, State)
     end.
 
-handle_data(Req, State, Bobject)->
-    ?evman_args([Req, State, Bobject]),
+handle_data(Req, Bobject, State)->
+    ?evman_args([Req, Bobject, State]),
 %     try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
         ?evman_debug({object, Object},          <<"native object">>),
-        {Res, Reqres}  =  empweb_jsonapi_map(Req, Object),
+        {Res, Reqres}  =  empweb_jsonapi_map(Req, Object, State),
         ?evman_debug({empweb_jsonapi_result, Res},  <<"empweb_jsonapi result">>),
         {Res, Reqres}
 %     catch
@@ -108,48 +121,25 @@ terminate(Req, State) ->
     ?evman_warning(Req),
     ok.
 
-empweb_jsonapi_map(Req, {List}) ->
+empweb_jsonapi_map(Req, {List}, State) ->
     ?evman_args([Req, List]),
 
     Fname   =  proplists:get_value(<<"fname">>, List),
-    Params  =  case proplists:get_value(<<"params">>, List, []) of
-        null ->
-            [];
-        Res ->
-            Res
-    end,
+    Params  =
+        case proplists:get_value(<<"params">>, List, []) of
+            null ->
+                [];
+            Res ->
+                Res
+        end,
     ?evman_debug({empweb_jsonapi_params, Params},  <<"empweb_jsonapi params">>),
-    {Auth, Req1} = empweb_http:auth(Req),
-
-    io:format("Auth = ~p~n", [Auth]),
-
-    ?evman_debug({empweb_jsonapi_aobj, Auth},  <<"empweb_jsonapi aobj">>),
-
-    Is_auth=            empweb_biz_pers:is_auth(Auth),
-
-    io:format("Is_auth = ~p~n", [Is_auth]),
-
-    ?evman_debug({empweb_jsonapi_aobj, Auth},  <<"empweb_jsonapi aobj">>),
-
-    Pid         =   empweb_biz_pers:get_pers_id(Auth),
-    Pperm_names =   empweb_biz_pers:get_perm_names(Auth),
-
-    ?evman_debug({empweb_jsonapi_call, [
-        {fname,     Fname},
-        {params,    Params},
-        {is_auth,   Is_auth}
-    ]}),
 
 
-    Eh = #empweb_hap{
-        params          =   Params,
-        auth            =   Auth,
-        is_auth         =   Is_auth,
-        pers_id         =   Pid,
-        pers_perm_names =   Pperm_names
+    Eh =  State#state.empweb_hap#empweb_hap{
+        params          =   Params
     },
-    
-    Action =
+
+    Hap =
         case Fname of
             %%
             %% Тип разрешения: не рассмотрен, запрещена, разрешена
@@ -968,272 +958,177 @@ empweb_jsonapi_map(Req, {List}) ->
             <<"delete_experbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
             
             %% ==================================================
             <<"get_roomlot">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_roomlots">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_roomlot">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_roomlot">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_roomlot">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             %% ==================================================
             <<"get_roombet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_roombets">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_roombet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_roombet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_roombet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             %% ==================================================
             <<"get_paytype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_paytypes">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_paytype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_paytype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_paytype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_paytype,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             %% ==================================================
             <<"get_pay">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_pays">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_pay">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_pay">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_pay">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pay,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             %% ==================================================
             <<"get_treastype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_treastypes">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_treastype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_treastype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_treastype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_treastype,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             %% ==================================================
             <<"get_roomtreas">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"get_all_roomtreass">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
-                    action          =   'get',
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   'get'
                 };
             <<"create_roomtreas">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
-                    action          =   create,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   create
                 };
             <<"update_roomtreas">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
-                    action          =   update,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   update
                 };
             <<"delete_roomtreas">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomtreas,
-                    action          =   delete,
-                    pers_id         =   Pid,
-                    params          =   Params
+                    action          =   delete
                 };
 
             _ -> []
         end,
+    ?evman_debug({empweb_jsonapi_action, Hap}),
+    empweb_jsonapi:call(Req, Hap, Fname);
 
-    ?evman_debug({empweb_jsonapi_action, Action}),
-
-%     ?debug("01-=-----------------------------------------------~n"),
-%     case empweb_http:call(Req1, Action) of
-%         {ok, Reply} ->
-%             ?debug("00-=-----------------------------------------------~n"),
-%             {Reply, Req1};
-%         {error, unknown_function} ->
-%             ?debug("000-=-----------------------------------------------~n"),
-%             {empweb_jsonapi:not_extended(unknown_function), Req1};
-%         {error, Error} ->
-%             ?debug("0000-=-----------------------------------------------~n"),
-%             {empweb_jsonapi:internal_server_error(
-%                 {[{unknown_error1, empweb_jsonapi:format(Error)}]}
-%             ), Req1};
-%         X ->
-%             ?debug("0000000-=-----------------------------------------------~n")
-%     end;
-
-    empweb_jsonapi_call(Req1, Action, Fname);
-
-empweb_jsonapi_map(Req, List) ->
+empweb_jsonapi_map(Req, List, State) ->
     ?evman_args([List]),
     {empweb_jsonapi:not_extended(wrong_format), Req}.
 
-empweb_jsonapi_call(Req1, Action, Fname) ->
-    {Res, Req} = case empweb_http:call(Req1, Action) of
-        {ok, Reply} ->
-            {Reply, Req1};
-        {error, unknown_function} ->
-            {empweb_jsonapi:not_extended(unknown_function), Req1};
-        {error, Error} ->
-            {empweb_jsonapi:internal_server_error(
-                {[{unknown_error1, empweb_jsonapi:format(Error)}]}
-            ), Req1}
-    end,
-    {Rpl} = Res#empweb_resp.body,
-    %{Res#empweb_resp{body = {[{fname, Action#empweb_hap.action}|Rpl]}}, Req}.
-    {Res#empweb_resp{body = {[{fname, Fname}|Rpl]}}, Req}.

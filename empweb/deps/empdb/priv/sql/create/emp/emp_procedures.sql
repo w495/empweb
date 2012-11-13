@@ -133,13 +133,28 @@ create trigger t1on_insert_subdoc_inst after insert
    on event for each row execute procedure on_insert_subdoc_inst('event');
 
 /**
-    Тригер присвоения типа документа при создании сообщения
+    Тригер присвоения типа документа при создании лота
 **/
-drop trigger if exists t1on_insert_subdoc_inst on event;
+drop trigger if exists t1on_insert_subdoc_inst on roomlot;
 create trigger t1on_insert_subdoc_inst after insert
-   on event for each row execute procedure on_insert_subdoc_inst('roomlot');
+   on roomlot for each row execute procedure on_insert_subdoc_inst('roomlot');
 
 
+/**
+    Тригер присвоения типа документа при создании альбома
+**/
+drop trigger if exists t1on_insert_subdoc_inst on album;
+create trigger t1on_insert_subdoc_inst after insert
+   on album for each row execute procedure on_insert_subdoc_inst('album');
+
+/**
+    Тригер присвоения типа документа при создании фотографии
+**/
+drop trigger if exists t1on_insert_subdoc_inst on photo;
+create trigger t1on_insert_subdoc_inst after insert
+   on photo for each row execute procedure on_insert_subdoc_inst('photo');
+
+   
 /**
     Aтомарное создание комнаты для новичков.
 **/

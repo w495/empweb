@@ -19,6 +19,9 @@
 
 
 -export([
+    fname/2,
+    call/2,
+    call/3,
     norm/1,
     normlist/1,
     ok/0,
@@ -112,7 +115,28 @@
 ]).
 
 
+call(Req1, Hap) ->
+    {Res, Req} = case empweb_http:call(Req1, Hap) of
+        {ok, Reply} ->
+            {Reply, Req1};
+        {error, unknown_function} ->
+            {empweb_jsonapi:not_extended(unknown_function), Req1};
+        {error, Error} ->
+            {empweb_jsonapi:internal_server_error(
+                {[{unknown_error1, empweb_jsonapi:format(Error)}]}
+            ), Req1}
+    end.
 
+call(Req1, Hap, Fname) ->
+    {Res, Req} = call(Req1, Hap),
+    {fname(Res, Fname), Req}.
+
+fname(Res, Fname) ->
+    {Rpl} = Res#empweb_resp.body,
+    Res#empweb_resp{body = {[{fname, Fname}|Rpl]}}.
+
+
+    
 bad_request()->
     bad_request(bad_request).
 

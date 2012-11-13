@@ -749,7 +749,9 @@ insert into doctype(alias)
             ('community'),
             ('message'),
             ('event'),
-            ('roomlot');
+            ('roomlot'),
+            ('album'),
+            ('photo');
             
 insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values

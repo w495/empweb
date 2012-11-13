@@ -8,8 +8,31 @@
 %% cowboy_http_handler api
 -export([init/3, handle/2, terminate/2]).
 
--record(state, {path=undefined, method=undefined, exists=undefined,
-        filepath=undefined}).
+%%
+%% Определения общие для всего приложения
+%%
+-include("empweb.hrl").
+
+%%
+%% Описание записей событий и макросов
+%%
+-include_lib("evman/include/events.hrl").
+
+
+%%
+%% Трансформация для получения имени функции.
+%%
+-include_lib("evman/include/evman_transform.hrl").
+
+
+
+-record(state, {
+    path=undefined,
+    method=undefined,
+    exists=undefined,
+    is_auth=undefined,
+    filepath=undefined
+}).
 
 %% ----------------------------------------------------------------------------
 %% cowboy_http_handler api
@@ -20,9 +43,17 @@ init({_Transport, http}, Req, Opts) ->
     io:format("Req = ~p ~n", [Req]),
     erlang:append(erlang:tuple_to_list(Req), [some]),
     io:format("</init>~n"),
+
+    
+    {Auth, Req1}    =   empweb_http:auth(Req),
+    Is_auth = proplists:get_value(is_auth, Opts, empweb_biz_pers:is_auth(Auth)),
+
     case lists:keyfind(path, 1, Opts) of
         {path, Path} ->
-            {ok, Req, #state{path=Path}};
+            {ok, Req1, #state{
+                path    =   Path,
+                is_auth =   Is_auth
+            }};
         false ->
             {error, "No Path Given"}
     end.
@@ -62,12 +93,17 @@ filename_join(Tokens) ->
                 <<Path/binary, "/", Token/binary>>
         end, <<>>, Tokens).
 
-method_allowed(Req, State=#state{method='GET'}) ->
+method_allowed(Req, State=#state{method='GET', is_auth=true}) ->
     resource_exists(Req, State);
-method_allowed(Req, State=#state{method='HEAD'}) ->
+method_allowed(Req, State=#state{method='HEAD', is_auth=true}) ->
     resource_exists(Req, State);
-method_allowed(Req, State) ->
-    {ok, Req2} = cowboy_http_req:reply(405, [], <<>>, Req),
+
+method_allowed(Req, State=#state{is_auth=true}) ->
+    {ok, Req2} = cowboy_http_req:reply(405, [], <<"405">>, Req),
+    {ok, Req2, State};
+
+method_allowed(Req, State=#state{is_auth=false}) ->
+    {ok, Req2} = cowboy_http_req:reply(403, [], <<"403">>, Req),
     {ok, Req2, State}.
 
 resource_exists(Req, State) ->

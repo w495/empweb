@@ -13,6 +13,17 @@ dispatch()->
                 empweb_handler_jsonapi_test,
                 []
             },
+
+            {   [<<"jsonapi">>, <<"photo">>, <<"upload">>],
+                empweb_handler_jsonapi_photo,
+                [   {action, upload},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
+            {   [<<"jsonapi">>, <<"photo">>, '...'],
+                empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}]
+            },
+            
             {   [<<"jsonapi">>],
                 empweb_handler_jsonapi,
                 []
@@ -36,7 +47,7 @@ dispatch()->
                 empweb_handler_debug_tests, Options},
 
             {[<<"static">>, '...'],
-                empweb_handler_static, [{path, <<"priv/static">>}]},
+                empweb_handler_static, [{path, <<"priv/static">>}, {is_auth, true}]},
             
             {[<<"logs">>, '...'],
                 empweb_handler_static, [{path, <<"priv/logs">>}]},
