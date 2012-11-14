@@ -308,24 +308,104 @@ handle(_req, #empweb_hap{
         action=get_pers, params=Params, is_auth=true
     } = Hap) ->
     ?evman_args(Hap, <<" = get pers">>),
+    io:format("Params = ~p~n~n", [Params]),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
-                key         = room_id,
+                key         = nick,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([string])
             },
+        %% ----------------------------------------------------
+        %% Имя
+            #norm_rule{
+                key         = fname,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Фамилия
+            #norm_rule{
+                key         = sname,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Род занятий
+            #norm_rule{
+                key         = empl,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Xобби
+            #norm_rule{
+                key         = hobby,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Oписание
+            #norm_rule{
+                key         = descr,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Регион pregion_id
+            #norm_rule{
+                key         = pregion_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Дата рождения
+            #norm_rule{
+                key         = birthday,
+                required    = false,
+                types       = empweb_norm:filter([nullable, 'float'])
+            },
+        %% Флаг пола
+            #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+        %% Комната
+            #norm_rule{
+                key         = live_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Сообщество
             #norm_rule{
                 key         = community_id,
                 required    = false,
-                types       = [integer]
-            }|empweb_norm:norm('get')
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Эмоции пользователя.
+            #norm_rule{
+                key         = emotion_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = emotion_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Язык пользователя.
+            #norm_rule{
+                key         = lang_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = lang_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             {ok,empweb_jsonapi:resp(empweb_biz_pers:get(Data#norm.return)),Hap}
@@ -409,7 +489,7 @@ handle(_req, #empweb_hap{
                 %% Дата рождения
                     #norm_rule{
                         key = birthday,
-                        types = [nullable, datetime_unixtime]
+                        types = [nullable, 'float']
                     },
                 %% Флаг пола
                     #norm_rule{

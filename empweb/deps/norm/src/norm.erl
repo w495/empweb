@@ -256,12 +256,15 @@ to_rule_type(_converter, Value, [[]|_rest]) ->
     {ok, Value};
 
 to_rule_type(Converter, Value, [Type|Restrules]) ->
+    io:format("1)  = ~p ~n", [{Type, Value, Restrules}]),
     try
         rule_type_done(Converter, Value, Type)
     catch
         throw : {type_error, Error} ->
             throw({type_error, Error});
         _t : _e ->
+            io:format("2) _t : _e = ~p ~n~n", [{_t,  _e, Type, Value, Restrules}]),
+            
             to_rule_type(Converter, Value, Restrules)
     end.
 

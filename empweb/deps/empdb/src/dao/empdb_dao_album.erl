@@ -18,6 +18,7 @@
     create/2,
     update/2,
     count_comments/2,
+    get_adds/2,
     get/2,
     get/3
 ]).
@@ -102,6 +103,8 @@ count_comments(Con, Params)->
         Params
     ).
 
+get_adds(Con, Getresult) ->
+    Getresult.
 %%
 %% Local Functions
 %%

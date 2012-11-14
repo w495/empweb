@@ -102,7 +102,7 @@ handle_body(Req, Pbody, State) ->
                     {ok,
                         lists:foldl(
                             fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
-                                [proplists:delete(fname, Bpl)|Acc]
+                                [{proplists:delete(fname, Bpl)}|Acc]
                             end,
                             [],
                             Partstates

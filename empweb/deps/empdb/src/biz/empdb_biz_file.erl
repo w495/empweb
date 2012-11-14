@@ -51,12 +51,13 @@ create(Params)->
     Fsdir = <<"deps/empdb/priv/data/">>,
     Retdir = <<"/jsonapi/photo/">>,
 
-    
     Ufname  = proplists:get_value(filename, Params, []),
     Ufbody  = proplists:get_value(filebody, Params, []),
     Ufext   = proplists:get_value(fileextension, Params, []),
     Md5seed = erlang:md5(Ufbody),
 
+
+    io:format("Ufname = ~p", [Ufname]),
 
     Md5string =  erlang:list_to_binary(
         [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Md5seed]

@@ -19,6 +19,10 @@
 -export([
     norm/1,
     normlist/1,
+    normpair/1,
+    normpair/2,
+    normfilter/1,
+    filter/1,
     filter_owner/1
 ]).
 
@@ -115,78 +119,101 @@ normpair(Types)->
             {Fres, Sres}
     end.
 
+normpair(Types1, Types2)->
+    fun
+        (null) ->
+            {null, null};
+        ({[{Fitem,Sitem}]}) ->
+            {ok, Fres} = norm:to_rule_type(Fitem, Types1),
+            {ok, Sres} = norm:to_rule_type(Sitem, Types2),
+            {Fres, Sres}
+    end.
+
+normfilter(Types)->
+    fun
+        (null) ->
+            {null, null};
+        ({[{Fitem,Sitem}]}) ->
+            {ok, Fres} = norm:to_rule_type(Fitem, [atom]),
+            {ok, Sres} = norm:to_rule_type(Sitem, [normlist(Types)|Types]),
+            {Fres, Sres}
+    end.
+
+filter(Types)->
+    [normfilter(Types)|Types].
+
 normcond(Types)->
     fun(Params) ->
         norm:norm(Params, [
             #norm_rule{
                 key         = iregex,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = regex,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = contains,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = icontains,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = startswith,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = istartswith,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = endswith,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = iendswith,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = lt,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = gt,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = lte,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = gte,
                 required    = false,
-                types       = [Types]
+                types       = Types
             },
             #norm_rule{
                 key         = in,
                 required    = false,
-                types       = [normlist([Types])]
+                types       = [normlist(Types)]
             },
             #norm_rule{
                 key         = between,
                 required    = false,
-                types       = [normlist([Types])]
+                types       = [normlist(Types)]
             }
         ])
     end.

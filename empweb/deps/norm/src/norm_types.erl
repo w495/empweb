@@ -59,6 +59,10 @@ nullable(<<"nil">>) ->
 nullable(<<"null">>) ->
     null.
 
+boolean(true) ->
+    true;
+boolean(false) ->
+    false;
 boolean(<<"true">>) ->
     true;
 boolean(<<"false">>) ->

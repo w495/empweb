@@ -295,10 +295,29 @@ create__(Pass, Params)->
         case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, nick]}|Params]) of
             {ok, Persobj}->
                 [{Perspl}|_] = Persobj,
-                case empdb_dao_blog:create(Con, [{owner_id,  proplists:get_value(id, Perspl)}, {head, null}, {body, null}]) of
-                    {ok, [{Docpl}]} ->
-                        {ok, [{[{blog_id, proplists:get_value(id, Docpl)}|Perspl]}]};
-                    {Eclass, Error} ->
+                case {
+                    empdb_dao_blog:create(Con, [
+                        {owner_id,  proplists:get_value(id, Perspl)},
+                        {head, null},
+                        {body, null}
+                    ]),
+                    empdb_dao_album:create(Con, [
+                        {owner_id,  proplists:get_value(id, Perspl)},
+                        {head, null},
+                        {body, null}
+                    ])
+                } of
+                    {   {ok, [{Docpl}]},
+                        {ok, [{Albpl}]}
+                    } ->
+                        {ok, [{[
+                            {blog_id,   proplists:get_value(id, Docpl)},
+                            {album_id,  proplists:get_value(id, Albpl)}
+                            |Perspl
+                        ]}]};
+                    {{Eclass, Error}, _} ->
+                        {Eclass, Error};
+                    {_, {Eclass, Error}} ->
                         {Eclass, Error}
                 end;
             {error,{not_unique,<<"nick">>}}->
@@ -414,11 +433,11 @@ login({Uf, Uv}, Params) ->
                             %% он выполняется независимо.
                             case proplists:get_value(pstatus_alias, Userpl) of
                                 <<"offline">> ->
-                                    empdb_dao:with_transaction(emp, fun(Con) ->
+                                    empdb_dao:with_transaction(emp, fun(Con1) ->
                                         %%
                                         %% Ставим пользователю статус online
                                         %%
-                                        empdb_dao_pers:update(Con, [
+                                        empdb_dao_pers:update(Con1, [
                                             {pstatus_alias, <<"online">>}
                                             |Params
                                         ])
@@ -450,7 +469,30 @@ login({Uf, Uv}, Params) ->
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
-                                Res -> Res
+                                Res1 -> Res1
+                            end,
+                            
+                        {ok, [Album]} =
+                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                                {owner_id, proplists:get_value(id, Userpl)},
+                                {limit, 1}
+                            ], [
+                                vcounter,
+                                nprotectedposts,
+                                nprivateposts,
+                                npublicposts,
+                                ncomments,
+                                nposts,
+                                contype_alias,
+                                contype_id,
+                                comm_acctype_alias,
+                                comm_acctype_id,
+                                read_acctype_alias,
+                                read_acctype_id,
+                                id
+                            ])) of
+                                {ok, []} -> {ok, [null]};
+                                Res2 -> Res2
                             end,
                         %%
                         %% Получаем комнату пользователя
@@ -493,6 +535,7 @@ login({Uf, Uv}, Params) ->
                             {nfriends,      Nfriends},
                             {perm_names,    Perm_names},
                             {blog,          Blog},
+                            {album,         Album},
                             {live_room,     Live_room}
                             |Userpl
                         ]}]}

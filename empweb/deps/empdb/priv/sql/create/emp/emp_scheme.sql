@@ -819,6 +819,15 @@ create table album(
     repost              bool default false
 );
 
+create table pic(
+    doc_id              decimal unique references doc(id),
+    ncomments           decimal default 0,
+    /**
+        Разрешение на перепост
+    **/
+    is_cover            bool default false
+);
+
 
 
 
