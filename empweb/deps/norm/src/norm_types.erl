@@ -22,8 +22,8 @@
     positive/1,
     pfloat/1,
     integer/1,
-    date_unixtime/1,
-    datetime_unixtime/1,
+    unixtime/1,
+    unixdatetime/1,
     test/0,
     test/1
 ]).
@@ -89,12 +89,12 @@ money(Value) ->
 money(Value, Scale) ->
     trunc(norm_convert:to_float(Value) * Scale) / Scale.
 
-date_unixtime(Value) ->
-    {D, _} = norm_convert:to_local_datetime(norm_convert:to_integer(Value)),
+unixtime(Value) ->
+    {D, _} = norm_convert:to_universal_datetime(norm_convert:to_integer(Value)),
     D.
 
-datetime_unixtime(Value) ->
-    norm_convert:to_local_datetime(norm_convert:to_integer(Value)).
+unixdatetime(Value) ->
+    norm_convert:to_universal_datetime(norm_convert:to_integer(Value)).
 
 %% Email проверка
 email(Value) ->

@@ -363,7 +363,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = birthday,
                 required    = false,
-                types       = empweb_norm:filter([nullable, 'float'])
+                types       = empweb_norm:filter([nullable, unixdatetime])
             },
         %% Флаг пола
             #norm_rule{
@@ -489,7 +489,7 @@ handle(_req, #empweb_hap{
                 %% Дата рождения
                     #norm_rule{
                         key = birthday,
-                        types = [nullable, 'float']
+                        types = [nullable, unixdatetime]
                     },
                 %% Флаг пола
                     #norm_rule{

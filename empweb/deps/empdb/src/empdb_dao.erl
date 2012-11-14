@@ -2244,6 +2244,7 @@ collect_where_params(_, _, []) ->
     {";", []}.
 
 
+
 to_type(null, _Type) ->
     null;
 
@@ -2255,6 +2256,7 @@ to_type(V,  timestamp) ->
     Cur = calendar:datetime_to_gregorian_seconds({X, {H, M, Ts}}),
     trunc((Cur - Bas));
 
+    
 to_type(V, int4) ->
     empdb_convert:to_integer(V);
 

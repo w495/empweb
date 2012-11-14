@@ -23,18 +23,20 @@
 
 
 to_local_datetime(Int) ->
-    X = Int div 1000,
-    calendar:now_to_local_time({X div 1000000,X rem 1000000,0}).
+    calendar:now_to_local_time({Int div 1000000, Int rem 1000000,0}).
 
 to_local_date(Int) ->
     {Date, _Time} = to_local_datetime(Int),
     Date.
 
 to_universal_datetime(Int) ->
-    X = Int div 1000,
-    calendar:now_to_universal_time({X div 1000000,X rem 1000000,0}).
+    calendar:now_to_universal_time({Int div 1000000,Int rem 1000000,0}).
 
 
+
+from_type(Cur,  timestamp) ->
+    Bas = calendar:datetime_to_gregorian_seconds({{1970,1,1},{0,0,0}}),
+    calendar:gregorian_seconds_to_datetime(Cur + Bas).
 
 % ---------------------------------------------------------------------------
 
