@@ -377,6 +377,12 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
+        %% Положение в комнате
+            #norm_rule{
+                key         = live_room_pos,
+                 required   = false,
+                types       = empweb_norm:filter([nullable, 'float']) 
+            },
         %% Сообщество
             #norm_rule{
                 key         = community_id,
@@ -500,6 +506,11 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = live_room_id,
                         types = [nullable, integer]
+                    },
+                %% Положение в комнате
+                    #norm_rule{
+                        key = live_room_pos,
+                        types = [nullable, 'float']
                     },
                 %% Сообщество
                     #norm_rule{

@@ -404,8 +404,12 @@ create table pers(
     /** Страна \ рай \ aд
         [см далее]: live_room_id decimal references room(id) default null,
     **/
-    live_room_head           varchar(1024) /*references doc(head)*/ default null,
-
+    live_room_head      varchar(1024) /*references doc(head)*/ default null,
+    /**
+        позиция в списке
+    **/
+    live_room_pos       numeric default 0,
+    
     /** Страна \ рай \ aд
         [см далее]: own_room_id decimal references room(id) default null,
     **/

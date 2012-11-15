@@ -170,6 +170,7 @@ table({fields, all})->
         pstatus_alias,
         authority_id,
         authority_alias,
+        position,
         
         exper,
         experlack,
@@ -190,6 +191,8 @@ table({fields, all})->
 
         live_room_id,
         live_room_head,
+        live_room_pos,
+
 
         % own_room_id,
         % own_room_head,

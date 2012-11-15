@@ -628,6 +628,23 @@ begin
         (select id from lang      where alias = new.lang_alias);
     new.live_room_id         = (select noobsroom());
     new.live_room_head       = (select doc.head from doc where doc.id = new.live_room_id and doc.doctype_alias = 'room');
+
+    /**
+        Положение пользователя в стране
+    **/
+    if (new.live_room_pos  is null) then
+        new.live_room_pos = cast(
+            cast (new.live_room_id as varchar(1024))
+            || '.'
+            ||  cast ((
+                    select count(id)
+                    from pers
+                    where pers.live_room_id = new.live_room_id
+                ) as varchar(1024)
+            ) as numeric
+        );
+    end if;
+    
     return new;
 end;
 $$ language plpgsql;
@@ -792,7 +809,23 @@ begin
                 where 
                     lang.alias = new.lang_alias);
     end if;
-    
+
+    if new.live_room_pos != old.live_room_pos then
+        if (new.live_room_pos  is null) then
+            new.live_room_pos = 100
+            cast(
+                cast (new.live_room_id as varchar(1024))
+                || '.'
+                ||  cast ((
+                        select count(id)
+                        from pers
+                        where pers.live_room_id = new.live_room_id
+                    ) as varchar(1024)
+                ) as numeric
+            );
+        end if;
+    end if;
+
     return new;
 end;
 $$ language plpgsql;
