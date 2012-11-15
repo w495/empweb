@@ -21,7 +21,7 @@ dispatch()->
                 ]
             },
             {   [<<"jsonapi">>, <<"photo">>, '...'],
-                empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}]
+                empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}, {is_auth, true}]
             },
             
             {   [<<"jsonapi">>],

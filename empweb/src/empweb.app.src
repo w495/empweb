@@ -3,7 +3,7 @@
 {application, empweb, [
     {description, "empweb"},
     {vsn, "0.1.0"},
-    {modules, []},
+    {modules, [empweb_http_controller]},
     {registered, [empweb_sup]},
     {applications, [
         kernel,
