@@ -979,7 +979,7 @@ alter table pers add  column own_room_id
 ------------------------------------------------------------------------------
 
 /**
- *  Типы сообществ (обычные, тайные)
+ *  Типы сообществ (обычные, тайные, элитные)
 **/
 create sequence seq_communitytype_id;
 create table communitytype(
@@ -993,8 +993,9 @@ create table communitytype(
     isdeleted   bool default false
 );
 
-
-
+/**
+ *  Сообщество
+**/
 create table community(
     doc_id                  decimal unique references doc(id),
     /**
@@ -1006,9 +1007,32 @@ create table community(
     treasury                decimal default null
 );
 
+/**
+ *  Кандидат в сообщество
+**/
+create sequence seq_communitycand_id;
+create table communitycand (
+    id                  decimal primary key default nextval('seq_communitycand_id'),
+    pers_id             decimal references pers(id) not null,
+    community_id        decimal references community(id) not null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+/**
+ *  Член сообщетва
+**/
+create sequence seq_communitymemb_id;
+create table communitymemb (
+    id                  decimal primary key default nextval('seq_communitymemb_id'),
+    pers_id             decimal references pers(id) not null,
+    community_id        decimal references community(id) not null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
 alter table pers add column community_id
     decimal references community(doc_id) default null;
-
 
 ------------------------------------------------------------------------------
 -- События
@@ -1526,6 +1550,7 @@ create table pers2pgroup (
     created         timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
 );
+
 
 /**
  *  Многие ко многим для комнат и тем

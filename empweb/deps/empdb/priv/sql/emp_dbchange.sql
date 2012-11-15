@@ -13,8 +13,6 @@
     alter table experbuy    alter column exper              type numeric;
     alter table experbuy    alter column price              type numeric(1000, 2);
     alter table pay         alter column price              type numeric(1000, 2);
-
-
     alter table room add column roomlot_id          decimal         references roomlot(doc_id)  default null;
     alter table room add column roomlot_betmin      numeric(1000, 2)                            default null;
     alter table room add column roomlot_betmax      numeric(1000, 2)                            default null;
@@ -23,41 +21,39 @@
     alter table room add column roombet_id          decimal        references roombet(id)       default null;
     alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
     alter table room add column roombet_price       decimal                                     default null;
-
-
     alter table roomlot add column betcur               numeric(1000, 2)                            default 0;
     alter table room    add column roombet_owner_nick   varchar(1024)       references pers(nick)   default null;
-
     insert into paytype(alias, isincome)
         values  ('roombet_out',     false),
                 ('roombet_in',      true ),
                 ('roomlot_in',      true ),
                 ('thing_out',       false),
                 ('exper_out',       false);
-
     alter table room         add column treas numeric(1000, 2) default 1;
-
     insert into paytype(alias, isincome)
         values  ('treas_out',     false),
                 ('treas_in',      true );
-
     insert into paytype(alias, isincome)
         values  ('room_out',     false),
                 ('room_in',      true );
-
     insert into treasoptype (alias, isincome)
         values  ('transfer_in',     true),
                 ('transfer_out',    false);
-
     alter table room         alter column  ulimit SET DEFAULT 5000;
 */
 
 
 -- 2012-11-14_13-21-56-591819368 --------------------------------------------
- 
-insert into doctype(alias)
-    values  ('album'),
-            ('photo');
-);
 
-alter table pers add column live_room_pos   numeric default null;
+/*
+    insert into doctype(alias) values  ('album');
+    insert into doctype(alias) values  ('photo');
+*/
+
+-- 2012-11-15_17-49-02-997410202 --------------------------------------------
+
+/*
+    insert into communitytype(alias) values ('elite');
+    alter table pers add column live_room_pos   numeric default null;
+*/
+

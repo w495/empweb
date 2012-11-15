@@ -436,12 +436,30 @@ update_topic(Params)->
 
 get_topic(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_room:get_topic(Con, [{isdeleted, false}|Params])
+        empdb_dao_room:get_topic(Con, [
+            {isdeleted, false}
+            | lists:reverse([
+                {order, [
+                    {desc, nnodes},
+                    {desc, nchildtargets}
+                ]}
+                |Params
+            ])
+        ])
     end).
 
 get_topic(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_room:get_topic(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_room:get_topic(Con, [
+            {isdeleted, false}
+            | lists:reverse([
+                {order, [
+                    {desc, nnodes},
+                    {desc, nchildtargets}
+                ]}
+                |Params
+            ])
+        ], Fileds)
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

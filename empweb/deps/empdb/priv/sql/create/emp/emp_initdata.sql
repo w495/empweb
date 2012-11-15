@@ -1630,7 +1630,8 @@ select 'log:communitytype' as log;
 insert into communitytype(alias)
     values
         ('common'), -- обычное
-        ('secret') -- секретное
+        ('secret'), -- секретное
+        ('elite')   -- элитное
         ;
 
 insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
