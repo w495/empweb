@@ -58,6 +58,6 @@
 insert into doctype(alias)
     values  ('album'),
             ('photo');
-
+);
 
 alter table pers add column live_room_pos   numeric default null;
