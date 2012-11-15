@@ -93,9 +93,9 @@ filename_join(Tokens) ->
                 <<Path/binary, "/", Token/binary>>
         end, <<>>, Tokens).
 
-method_allowed(Req, State=#state{method='GET', is_auth=true}) ->
+method_allowed(Req, State=#state{method='GET'}) ->
     resource_exists(Req, State);
-method_allowed(Req, State=#state{method='HEAD', is_auth=true}) ->
+method_allowed(Req, State=#state{method='HEAD'}) ->
     resource_exists(Req, State);
 
 method_allowed(Req, State=#state{is_auth=true}) ->
