@@ -812,8 +812,7 @@ begin
 
     if new.live_room_pos != old.live_room_pos then
         if (new.live_room_pos  is null) then
-            new.live_room_pos = 100
-            cast(
+            new.live_room_pos = cast(
                 cast (new.live_room_id as varchar(1024))
                 || '.'
                 ||  cast ((
