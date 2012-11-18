@@ -80,7 +80,7 @@ init(_, Req, #empweb_hap{
     }.
 
 handle(_req, #empweb_hap{
-        action=create, params=Params, pers_id=Pers_id
+        action=create, params=Params, pers_id=Pers_id, is_auth=true
     } = Hap) ->
     ?evman_args([Hap], <<" = create file">>),
     {ok,
