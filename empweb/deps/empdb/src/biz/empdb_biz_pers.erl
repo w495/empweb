@@ -605,7 +605,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                 undefined ->
                     get_opt(Con, Params, Options, [{Acc}]);
                 Id ->
-                    {ok, [Blog]} = empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+                    case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
                         {owner_id, Id},
                         {limit, 1},
                         {fields, [
@@ -620,8 +620,39 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             comm_acctype_alias,
                             vcounter
                         ]}
-                    ])),
-                    get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}])
+                    ])) of
+                        {ok, [Blog]} ->
+                            get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}]);
+                        _ ->
+                            get_opt(Con, Params, Options, [{[{blog, null}|Acc]}])
+                    end
+            end;
+        album ->
+            case proplists:get_value(id, Params) of
+                undefined ->
+                    get_opt(Con, Params, Options, [{Acc}]);
+                Id ->
+                    case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                        {owner_id, Id},
+                        {limit, 1},
+                        {fields, [
+                            nposts,
+                            npublicposts,
+                            nprotectedposts,
+                            ncomments,
+                            id,
+                            read_acctype_id,
+                            read_acctype_alias,
+                            comm_acctype_id,
+                            comm_acctype_alias,
+                            vcounter
+                        ]}
+                    ])) of
+                        {ok, [Album]} ->
+                            get_opt(Con, Params, Options, [{[{album, Album}|Acc]}]);
+                        _ ->
+                            get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
+                    end
             end;
         without_phash ->
             Nacc = proplists:delete(phash,

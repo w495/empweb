@@ -2146,6 +2146,9 @@ insert into pers2pgroup (pers_id, group_id)
         ((select id from pers where login='admin'),
             (select id from pgroup where alias='contman'));
 
+
+select 'log:paytype' as log;
+
 insert into paytype(alias, isincome)
     values  ('roombet_out',     false),
             ('roombet_in',      true ),
@@ -2155,15 +2158,25 @@ insert into paytype(alias, isincome)
             ('room_out',        false),
             ('room_in',         true );
 
+select 'log:treastype' as log;
 
 insert into treastype (alias, isincome)
     values  ('transfer_in',     true),
             ('transfer_out',    false);
 
+select 'log:transtype' as log;
 
 insert into transtype (alias, isincome)
     values  ('to',     true),
             ('form',   false);
+
+select 'log:filetype' as log;
+
+insert into filetype (alias, mime, ext) values
+    ('image/gif *.gif',   'image/gif', 'gif'),
+    ('image/jpeg *.jpeg',  'image/jpeg', 'jpeg'),
+    ('image/jpeg *.jpg',  'image/jpeg', 'jpg'),
+    ('image/png *.png',   'image/png', 'png');
 
 
 /**

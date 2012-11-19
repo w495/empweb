@@ -18,6 +18,7 @@
     create/2,
     update/2,
     count_comments/2,
+    get_adds/2,
     get/2,
     get/3
 ]).
@@ -104,6 +105,25 @@ count_comments(Con, Params)->
         Params
     ).
 
+
+get_adds(Con, Getresult) ->
+    case Getresult of
+        {ok, List} ->
+            {ok, lists:map(fun({Itempl})->
+                case proplists:get_value(id, Itempl) of
+                    undefined ->
+                        {Itempl};
+                    Id ->
+                        {ok, Comments}     = ?MODULE:count_comments(Con, [{id, Id}]),
+                        Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
+                            [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
+                        end, [], Comments),
+                        {lists:append([Ncommentspl, Itempl])}
+                end
+            end, List)};
+        {Eclass, Error} ->
+            {Eclass, Error}
+    end.
 %%
 %% Local Functions
 %%

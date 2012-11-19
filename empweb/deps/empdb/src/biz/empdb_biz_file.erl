@@ -51,44 +51,97 @@ create(Params)->
     Fsdir = <<"deps/empdb/priv/data/">>,
     Retdir = <<"/jsonapi/photo/">>,
 
+    Con = emp,
+    
     Ufname  = proplists:get_value(filename, Params, []),
     Ufbody  = proplists:get_value(filebody, Params, []),
     Ufext   = proplists:get_value(fileextension, Params, []),
+    Ufsize  = erlang:byte_size(Ufbody),
+
     Md5seed = erlang:md5(Ufbody),
-
-
-    io:format("Ufname = ~p", [Ufname]),
-
     Md5string =  erlang:list_to_binary(
         [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Md5seed]
     ),
-    
+
     Pathseed  =
         <<  (crypto:rand_bytes(crypto:rand_uniform(1, 4)))/binary,
             Md5seed/binary,
             (crypto:rand_bytes(crypto:rand_uniform(1, 4)))/binary
         >>,
 
+    Pathstring =  erlang:list_to_binary(
+        [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Pathseed]
+    ),
+
+    {ok, [{Filetypepl}]} = empdb_dao_filetype:get(Con, [
+        {ext, Ufext},
+        {limit, 1}
+    ]),
+
+    Filetype_id = proplists:get_value(id, Filetypepl),
+
+    {ok, [{Ulfileinfo}]} = empdb_dao_fileinfo:create(Con, [
+        {filetype_id,   Filetype_id},
+        {'size',        Ufsize},
+        {token,         Pathstring},
+        {md5,           Md5string},
+        {name,          Ufname}
+    ]),
+
+    Ulfileinfo_id = proplists:get_value(id, Ulfileinfo),
+
+ 
+
     Fspath = erlang:list_to_binary(
         filename:join([[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Pathseed])
     ),
-
-    Retpath = erlang:list_to_binary(
-        string:join([[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Pathseed], [<<"/">>])
-    ),
-
     Fspathext = << Fspath/binary, $., Ufext/binary  >>,
-
-    Retpathext = << Retpath/binary, $., Ufext/binary  >>,
-
-    Fullretpath =  << Retdir/binary, Retpathext/binary >>,
-
     Fullfspath =  << Fsdir/binary, Fspathext/binary >>,
+
 
     filelib:ensure_dir(Fullfspath),
     file:write_file(Fullfspath, Ufbody),
+
     
+    {ok, [{Fsfileinfo}]} = empdb_dao_fileinfo:create(Con, [
+        {filetype_id,   Filetype_id},
+        {'size',        Ufsize},
+        {token,         Pathstring},
+        {md5,           Md5string},
+        {dir,           Fsdir},
+        {path,          Fspathext}
+    ]),
+
+    Fsfileinfo_id = proplists:get_value(id, Fsfileinfo),
+
+    
+    Retpath = erlang:list_to_binary(
+        string:join([[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Pathseed], [<<"/">>])
+    ),
+    Retpathext = << Retpath/binary, $., Ufext/binary  >>,
+    Fullretpath =  << Retdir/binary, Retpathext/binary >>,
+
+    {ok, [{Dlfileinfo}]} = empdb_dao_fileinfo:create(Con, [
+        {filetype_id,   Filetype_id},
+        {'size',        Ufsize},
+        {token,         Pathstring},
+        {md5,           Md5string},
+        {dir,           Retdir},
+        {path,          Retpathext}
+    ]),
+
+    Dlfileinfo_id = proplists:get_value(id, Dlfileinfo),
+    
+    {ok, [{File}]} = empdb_dao_file:create(Con, [
+        {dlfileinfo_id,   Dlfileinfo_id},
+        {fsfileinfo_id,   Fsfileinfo_id},
+        {ulfileinfo_id,   Ulfileinfo_id}
+    ]),
+
+    File_id = proplists:get_value(id, File),
+   
     {ok, [{[
+        {file_id,       File_id},
         {originalname,  Ufname},
         {path,          Fullretpath},
         {md5sum,        Md5string}

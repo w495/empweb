@@ -118,19 +118,22 @@ create table filetype(
     isdeleted   bool default false
 );
 
+
 /**
  *  Информация о файле
 **/
 create sequence seq_fileinfo_id;
 create table fileinfo(
-    id         decimal primary key default nextval('seq_fileinfo_id'),
-    size       numeric                          default null,
-    path       varchar(1024)                    default null,
-    name       varchar(1024)                    default null,
-    dir        varchar(1024)                    default null,
-    type_id    decimal references filetype(id)      default null,
-    created    timestamp without time zone not null default utcnow(),
-    isdeleted  bool default false
+    id              decimal primary key default nextval('seq_fileinfo_id'),
+    size            numeric                             default null,
+    token           varchar(1024)                       default null,
+    path            varchar(1024)                       default null,
+    name            varchar(1024)                       default null,
+    dir             varchar(1024)                       default null,
+    md5             char(32)                                not null,
+    filetype_id     decimal references filetype(id)         default null,
+    created         timestamp without time zone not null    default utcnow(),
+    isdeleted       bool default false
 );
 
 /**
@@ -138,22 +141,22 @@ create table fileinfo(
 **/
 create sequence seq_file_id;
 create table file(
-    id          decimal primary key default nextval('seq_file_id'),
+    id              decimal primary key default nextval('seq_file_id'),
     /**
         Информация о загрузке
     **/
-    ulfileinfo    decimal references fileinfo(id)    default null,
+    ulfileinfo_id   decimal references fileinfo(id)    default null,
     /**
         Информация о скачивании
     **/
-    dlfileinfo    decimal references fileinfo(id)    default null,
+    dlfileinfo_id   decimal references fileinfo(id)    default null,
     /**
         Информация о файле на файловой системе
     **/
-    fileinfo      decimal references fileinfo(id)    default null,
-    issystem      bool default false,
-    created       timestamp without time zone not null default utcnow(),
-    isdeleted     bool default false
+    fsfileinfo_id   decimal references fileinfo(id)    default null,
+    issystem        bool default false,
+    created         timestamp without time zone not null default utcnow(),
+    isdeleted       bool default false
 );
 
 
@@ -823,9 +826,11 @@ create table album(
     repost              bool default false
 );
 
-create table pic(
+create table photo(
     doc_id              decimal unique references doc(id),
     ncomments           decimal default 0,
+    file_id             decimal references pers(id)     default null,
+    path                varchar(1024)   default null,
     /**
         Разрешение на перепост
     **/

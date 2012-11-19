@@ -57,3 +57,35 @@
     alter table pers add column live_room_pos   numeric default null;
 */
 
+
+create table photo(
+    doc_id              decimal unique references doc(id),
+    ncomments           decimal default 0,
+    file_id             decimal references pers(id)     default null,
+    path                varchar(1024)   default null,
+    /**
+        Разрешение на перепост
+    **/
+    is_cover            bool default false
+);
+
+
+
+    alter table fileinfo add column md5         char(32)                        not null;
+    alter table fileinfo add column filetype_id decimal references filetype(id) default null;
+    alter table fileinfo add column token       varchar(1024)                   default null;
+    
+    alter table file add column ulfileinfo_id   decimal references fileinfo(id)    default null;
+    alter table file add column dlfileinfo_id   decimal references fileinfo(id)    default null;
+    alter table file add column fsfileinfo_id   decimal references fileinfo(id)    default null;
+
+
+
+    insert into filetype (alias, mime, ext) values
+        ('undefined',         'application/octet-stream',   'undefined'),
+        ('image/gif *.gif',   'image/gif',                  'gif'),
+        ('image/jpeg *.jpeg', 'image/jpeg',                 'jpeg'),
+        ('image/jpeg *.jpg',  'image/jpeg',                 'jpg'),
+        ('image/png *.png',   'image/png',                  'png');
+
+        

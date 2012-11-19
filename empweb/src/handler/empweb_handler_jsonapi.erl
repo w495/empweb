@@ -694,6 +694,34 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_album,
                     action          =   delete
                 };
+            %%
+            %% фото
+            %%
+            <<"get_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   'get'
+                };
+            <<"get_all_photos">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   'get'
+                };
+            <<"create_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   'create'
+                };
+            <<"update_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   'update'
+                };
+            <<"delete_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   delete
+                };
         %% ----------------------------------------------------------------
         %% Функции системы
         %% ----------------------------------------------------------------
@@ -1123,6 +1151,62 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+            %% ==================================================
+            <<"get_communitymemb">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitymemb,
+                    action          =   'get'
+                };
+            <<"get_all_communitymembs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitymemb,
+                    action          =   'get'
+                };
+            <<"create_communitymemb">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitymemb,
+                    action          =   create
+                };
+            <<"update_communitymemb">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitymemb,
+                    action          =   update
+                };
+            <<"delete_communitymemb">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitymemb,
+                    action          =   delete
+                };
+
+            %% ==================================================
+            <<"get_communitycand">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitycand,
+                    action          =   'get'
+                };
+            <<"get_all_communitycands">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitycand,
+                    action          =   'get'
+                };
+            <<"create_communitycand">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitycand,
+                    action          =   create
+                };
+            <<"update_communitycand">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitycand,
+                    action          =   update
+                };
+            <<"delete_communitycand">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitycand,
+                    action          =   delete
+                };
+
+
+                
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),
