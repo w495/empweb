@@ -195,9 +195,9 @@ get_adds(Con, Getresult) ->
                         Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
                             [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
                         end, [], Comments),
-                        Nphotospl = lists:foldl(fun({Commentspl}, Acc)->
-                            [{nphotos, proplists:get_value(count, Commentspl)}|Acc]
-                        end, [], Comments),
+                        Nphotospl = lists:foldl(fun({Photospl}, Acc)->
+                            [{nphotos, proplists:get_value(count, Photospl)}|Acc]
+                        end, [], Photos),
                         {lists:append([
                             Nalbumspl,
                             Ncommentspl,

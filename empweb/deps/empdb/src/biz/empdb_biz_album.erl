@@ -50,12 +50,12 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        get_album_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params]))
+        empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params]))
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        get_album_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params], Fileds))
+        empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params], Fileds))
     end).
 
 get_album_adds(Con, Getresult) ->
