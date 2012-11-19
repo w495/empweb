@@ -18,6 +18,8 @@
     create/2,
     update/2,
     count_comments/2,
+    count_photos/2,
+    count_albums/2,
     get_adds/2,
     get/2,
     get/3
@@ -160,9 +162,9 @@ get_adds(Con, Getresult) ->
                     undefined ->
                         {Itempl};
                     Id ->
-                        {ok, Albuncnts}     = empdb_dao_blog:count_albums(Con, [{id, Id}]),
-                        {ok, Photos}        = empdb_dao_blog:count_photos(Con, [{id, Id}]),
-                        {ok, Comments}     = empdb_dao_blog:count_comments(Con, [{id, Id}]),
+                        {ok, Albuncnts}     = empdb_dao_album:count_albums(Con, [{id, Id}]),
+                        {ok, Photos}        = empdb_dao_album:count_photos(Con, [{id, Id}]),
+                        {ok, Comments}     = empdb_dao_album:count_comments(Con, [{id, Id}]),
                         Nalbumspl = lists:foldl(fun({Albunpl}, Acc)->
                             case proplists:get_value(read_acctype_alias, Albunpl) of
                                 all ->
