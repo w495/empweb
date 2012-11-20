@@ -724,7 +724,7 @@ add_friend(Params)->
                     {limit, 1}
                 ], [id]
             ) of
-                {ok, {[{id, Id1}]}} ->
+                {ok, [{[{id, Id1}]}]} ->
                     Id1;
                 Error1 ->
                     Error1
@@ -768,6 +768,7 @@ add_friend(Params)->
     end).
 
 delete_friend(Params)->
+    io:format("~n~n~n~nParams = ~p~n~n~n~n", [Params]),
     empdb_dao:with_connection(emp, fun(Con)->
         Pers_id = proplists:get_value(pers_id, Params,
             case empdb_dao_pers:get(Con,
@@ -776,7 +777,7 @@ delete_friend(Params)->
                     {limit, 1}
                 ], [id]
             ) of
-                {ok, {[{id, Id1}]}} ->
+                {ok, [{[{id, Id1}]}]} ->
                     Id1;
                 Error ->
                     Error

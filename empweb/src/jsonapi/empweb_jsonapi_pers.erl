@@ -269,10 +269,10 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_pers:add_friend(
-                        {pers_id, Pers_id},
-                        Data#norm.return
-                    )
+                    empweb_biz_pers:add_friend([
+                        {pers_id, Pers_id}
+                        |Data#norm.return
+                    ])
                 ),
                 Hap
             }
@@ -304,8 +304,8 @@ handle(_req, #empweb_hap{
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_pers:delete_friend([
-                        {pers_id, Pers_id},
-                        Data#norm.return
+                        {pers_id, Pers_id}
+                        |Data#norm.return
                     ])
                 ),
                 Hap

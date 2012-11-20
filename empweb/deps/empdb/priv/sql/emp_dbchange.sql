@@ -120,5 +120,6 @@ alter table fileinfo add column filetype_alias      varchar(1024)  default null;
 
 alter table fileinfo add column file_id decimal references file(id) default null;
 
-alter table photo rename column path to filepath;
+
+-- alter table photo rename column path to filepath;
 
