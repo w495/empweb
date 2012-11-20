@@ -58,7 +58,7 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
-        %path,
+        path,
         file_id,
         is_cover
     ];
@@ -86,51 +86,52 @@ get(Con, What) ->
     %         "   where (fileinfo.fileinfotype_alias "
     %         "       = $`fileinfo.fileinfotype_alias@filter`)"   >>
 
-%     Fields =
-%         proplists:get_value(
-%             fields,
-%             What,
-%             empdb_dao_photo:table({fields, select}
-%         ),
-% 
-%     case empdb_dao:get([
-%         {empdb_dao_doc, id},
-%         {empdb_dao_photo, {doc_id, file_id}},
-%         {empdb_dao_file, id},
-%         {empdb_dao_fileinfo, file_id}
-%     ],Con,[
-%         {fileinfotype_alias, download},
-%         {fields, [
-%             fileinfo.path,
-%             fileinfo.dir
-%             | Fields
-%         ]}
-%         |proplists:delete(fields, What)
-%     ]) of
-%         {ok,Phobjs} ->
-%             {ok, 
-%                 lists:map(fun({Phpl})->
-%                     case lists:member(path, Fields) of
-%                         true ->
-%                             {[
-%                                 {path,
-%                                     <<  (proplists:get_value(dir, Phpl))/binary,
-%                                         $/,
-%                                         (proplists:get_value(path, Phpl))/binary
-%                                     >>
-%                                 }
-%                                 | Phpl
-%                             ]};
-%                         _ ->
-%                             {Phpl}
-%                     end
-%                 end, Phobjs)
-%             };
-%         Error ->
-%             Error
-%     end.
-%
-    empdb_dao_doc:get(?MODULE, Con, What).
+    Fields =
+        proplists:get_value(
+            fields,
+            What,
+            empdb_dao_photo:table({fields, select})
+        ),
+
+    case empdb_dao:get([
+        {empdb_dao_doc, id},
+        {empdb_dao_photo, {doc_id, file_id}},
+        {empdb_dao_file, id},
+        {empdb_dao_fileinfo, file_id}
+    ],Con,[
+        {fileinfotype_alias, download},
+        {fields, [
+            {as, {fileinfo.path, fileinfopath}},
+            {as, {fileinfo.dir,  fileinfodir}}
+            | Fields
+        ]}
+        |proplists:delete(fields, What)
+    ]) of
+        {ok,Phobjs} ->
+            {ok,
+                lists:map(fun({Phpl})->
+                    case lists:member(path, Fields) of
+                        true ->
+                            {[
+                                {path,
+                                    <<  (proplists:get_value(fileinfodir, Phpl))/binary,
+                                        (proplists:get_value(fileinfopath, Phpl))/binary
+                                    >>
+                                }
+                                | proplists:delete(fileinfodir,
+                                    proplists:delete(fileinfopath,
+                                        proplists:delete(path, Phpl)))
+                            ]};
+                        _ ->
+                            {proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))}
+                    end
+                end, Phobjs)
+            };
+        Error ->
+            Error
+    end.
+
+    %empdb_dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     empdb_dao_doc:get(?MODULE, Con, What, Fields).

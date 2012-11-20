@@ -169,7 +169,6 @@ create(Params)->
         {ok, [{[
             {file_id,       File_id},
             {originalname,  Ul_name},
-            {path,          Dl_path_full},
             {md5sum,        Md5_string}
         ]}]}
     end).
