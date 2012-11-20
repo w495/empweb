@@ -1,6 +1,7 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add description to biz_user
+%% @file    empdb_dao_album.erl
+%%          Описание доступа к базе данных для альбомамов.
+%%          Альбом это просто документ.
+%% 
 -module(empdb_dao_album).
 -behaviour(empdb_dao).
 
@@ -92,6 +93,9 @@ update(Con, Proplist)->
 is_owner(Con, Owner_id, Obj_id) ->
     empdb_dao_doc:is_owner(Con, Owner_id, Obj_id).
 
+%%
+%% @doc Подсчет количества комментариев к даному альбому.
+%%
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
@@ -104,7 +108,9 @@ count_comments(Con, Params)->
             " and   doc_comment.parent_id      = $id ",
         Params
     ).
-
+%%
+%% @doc Подсчет количества фотографий даного альбома.
+%%
 count_photos(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
@@ -117,7 +123,9 @@ count_photos(Con, Params)->
             " and   doc_comment.parent_id      = $id ",
         Params
     ).
-    
+%%
+%% @doc Подсчет количества вложенных альбомов даного альбома.
+%%
 count_albums(Con, Params)->
     case empdb_dao:eqret(Con,
         " select "

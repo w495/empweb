@@ -119,6 +119,20 @@ create table filetype(
 );
 
 
+
+/**
+ *  Тип информации о файле
+**/
+create sequence seq_fileinfotype_id;
+create table fileinfotype(
+    id          decimal primary key default nextval('seq_fileinfotype_id'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   bool default false
+);
+
+
 /**
  *  Информация о файле
 **/
@@ -126,14 +140,22 @@ create sequence seq_fileinfo_id;
 create table fileinfo(
     id              decimal primary key default nextval('seq_fileinfo_id'),
     size            numeric                             default null,
-    token           varchar(1024)                       default null,
     path            varchar(1024)                       default null,
     name            varchar(1024)                       default null,
     dir             varchar(1024)                       default null,
-    md5             char(32)                                not null,
-    filetype_id     decimal references filetype(id)         default null,
-    created         timestamp without time zone not null    default utcnow(),
-    isdeleted       bool default false
+
+    tokenlong       decimal                             default null,
+    tokenstring     char(128)                           default null,
+    md5long         decimal                             default null,
+    md5string       char(32)                            default null,
+
+    fileinfotype_id     decimal references fileinfotype(id)     default null,
+    fileinfotype_alias  decimal varchar(1024)                   default null,
+    filetype_id         decimal references filetype(id)         default null,
+    filetype_alias      decimal varchar(1024)                   default null,
+
+    created             timestamp without time zone not null    default utcnow(),
+    isdeleted           bool default false
 );
 
 /**
@@ -155,9 +177,17 @@ create table file(
     **/
     fsfileinfo_id   decimal references fileinfo(id)    default null,
     issystem        bool default false,
+
+    tokenlong       decimal                             default null,
+    tokenstring     char(128)                           default null,
+
     created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false
 );
+
+
+alter table fileinfo add column
+    file_id decimal references file(id) default null;
 
 
 /****************************************************************************
@@ -457,6 +487,9 @@ create table pers(
 alter table file add column owner_id
     decimal references pers(id) default null;
 
+alter table fileinfo add owner_id
+    decimal references pers(id) default null;
+
 /**
  *  Группа пользователей
 **/
@@ -731,6 +764,11 @@ create table doc(
 );
 
 
+alter table fileinfo add column doc_id
+    decimal references doc(id) default null;
+alter table file add column doc_id
+    decimal references doc(id) default null;
+
 ------------------------------------------------------------------------------
 -- Аттачи
 ------------------------------------------------------------------------------
@@ -830,7 +868,7 @@ create table photo(
     doc_id              decimal unique references doc(id),
     ncomments           decimal default 0,
     file_id             decimal references pers(id)     default null,
-    path                varchar(1024)   default null,
+    file_path                varchar(1024)   default null,
     /**
         Разрешение на перепост
     **/

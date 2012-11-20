@@ -58,13 +58,26 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
+        file_id,
         'size',
         path,
         name,
         dir,
-        token,
-        md5,
+
+        owner_id,
+        owner_nick,
+        doc_id,
+
+        fileinfotype_id,
+        fileinfotype_alias,
+
         filetype_id,
+        filetype_alias,
+        
+        tokenlong,
+        tokenstring,
+        md5long,
+        md5string,
         created,
         isdeleted
     ];

@@ -255,10 +255,16 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = friend_id,
-                types = [integer]
-            }
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key     = friend_id,
+                    types   = [integer]
+                },
+                #norm_rule{
+                    key     = friend_nick,
+                    types   = [string]
+                }
+            ]}
         ]),
         fun(Data)->
             {ok,
@@ -283,10 +289,16 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = friend_id,
-                types = [integer]
-            }
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key     = friend_id,
+                    types   = [integer]
+                },
+                #norm_rule{
+                    key     = friend_nick,
+                    types   = [string]
+                }
+            ]}
         ]),
         fun(Data)->
             {ok,

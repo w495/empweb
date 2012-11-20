@@ -61,6 +61,11 @@ table({fields, all})->
         ulfileinfo_id,
         dlfileinfo_id,
         fsfileinfo_id,
+        owner_id,
+        owner_nick,
+        doc_id,
+        tokenlong,
+        tokenstring,
         issystem,
         created,
         isdeleted

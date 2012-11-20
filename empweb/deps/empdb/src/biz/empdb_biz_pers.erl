@@ -716,7 +716,37 @@ get_opt(Con,Params, [Option|Options], Accs)->
 
 add_friend(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        case empdb_dao_pers:add_friend(Con, Params) of
+    
+        Pers_id = proplists:get_value(pers_id, Params,
+            case empdb_dao_pers:get(Con,
+                [   {isdeleted, false},
+                    {nick, proplists:get_value(pers_nick, Params, [])},
+                    {limit, 1}
+                ], [id]
+            ) of
+                {ok, {[{id, Id1}]}} ->
+                    Id1;
+                Error1 ->
+                    Error1
+            end
+        ),
+        Friend_id = proplists:get_value(friend_id, Params,
+            case empdb_dao_pers:get(Con,
+                [   {isdeleted, false},
+                    {nick, proplists:get_value(friend_nick, Params, [])},
+                    {limit, 1}
+                ], [id]
+            ) of
+                {ok, {[{id, Id2}]}} ->
+                    Id2;
+                Error2 ->
+                    Error2
+            end
+        ),
+        case empdb_dao_pers:add_friend(Con, [
+            {pers_id,   Pers_id},
+            {friend_id, Friend_id}
+        ]) of
             {ok, _frndpls} ->
                 %% TODO: костыль
                 %% Возможно, иммет смысл получать 
@@ -739,7 +769,36 @@ add_friend(Params)->
 
 delete_friend(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:delete_friend(Con, Params)
+        Pers_id = proplists:get_value(pers_id, Params,
+            case empdb_dao_pers:get(Con,
+                [   {isdeleted, false},
+                    {nick, proplists:get_value(pers_nick, Params, [])},
+                    {limit, 1}
+                ], [id]
+            ) of
+                {ok, {[{id, Id1}]}} ->
+                    Id1;
+                Error ->
+                    Error
+            end
+        ),
+        Friend_id = proplists:get_value(friend_id, Params,
+            case empdb_dao_pers:get(Con,
+                [   {isdeleted, false},
+                    {nick, proplists:get_value(friend_nick, Params, [])},
+                    {limit, 1}
+                ], [id]
+            ) of
+                {ok, {[{id, Id2}]}} ->
+                    Id2;
+                Error2 ->
+                    Error2
+            end
+        ),
+        empdb_dao_pers:delete_friend(Con, [
+            {pers_id,   Pers_id},
+            {friend_id, Friend_id}
+        ])
     end).
 
 get_friend(Params)->

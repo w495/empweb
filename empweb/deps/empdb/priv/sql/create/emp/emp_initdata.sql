@@ -2179,6 +2179,11 @@ insert into filetype (alias, mime, ext) values
     ('image/png *.png',   'image/png', 'png');
 
 
+insert into fileinfotype(alias) values
+    ('upload'),
+    ('download'),
+    ('filesystem');
+
 /**
     При создании пользователя помещаем его в комнату для новичков
     @depricated перенесено в триггеры

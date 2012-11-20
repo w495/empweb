@@ -1,6 +1,7 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add description to biz_user
+%% @file    empdb_biz_album.erl
+%%          Описание бизнес логики работы с альбомами.
+%%          Альбом это просто документ.
+%% 
 -module(empdb_biz_album).
 
 %% ===========================================================================
@@ -17,9 +18,6 @@
 %% Экспортируемые функции
 %% ==========================================================================
 
-%%
-%% Блоги
-%%
 -export([
     get/1,
     get/2,
@@ -27,16 +25,6 @@
     delete/1,
     update/1
 ]).
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%%                          ЗНАЧИМЫЕ ОБЪЕКТЫ
-%%
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Блоги
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
@@ -50,39 +38,21 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params]))
+        empdb_dao_album:get_adds(Con,
+            empdb_dao_album:get(Con, [{isdeleted, false}|Params])
+        )
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [{isdeleted, false}|Params], Fileds))
+        empdb_dao_album:get_adds(Con,
+            empdb_dao_album:get(Con, [{isdeleted, false}|Params], Fileds)
+        )
     end).
 
-get_album_adds(Con, Getresult) ->
-    case Getresult of
-        {ok, List} ->
-            {ok, lists:map(fun({Itempl})->
-                case proplists:get_value(id, Itempl) of
-                    undefined ->
-                        {Itempl};
-                    Id ->
-                        {ok, Comments}     = empdb_dao_album:count_comments(Con, [{id, Id}]),
-                        Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
-                            [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
-                        end, [], Comments),
-                        {lists:append([Ncommentspl, Itempl])}
-                end
-            end, List)};
-        {Eclass, Error} ->
-            {Eclass, Error}
-    end.
-    
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_album:update(Con, [{isdeleted, true}|Params])
     end).
 
-is_owner(Uid, Oid)->
-    empdb_dao:with_connection(fun(Con)->
-        empdb_dao_album:is_owner(Con, Uid, Oid)
-    end).
+

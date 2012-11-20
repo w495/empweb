@@ -57,35 +57,68 @@
     alter table pers add column live_room_pos   numeric default null;
 */
 
-
-create table photo(
-    doc_id              decimal unique references doc(id),
-    ncomments           decimal default 0,
-    file_id             decimal references pers(id)     default null,
-    path                varchar(1024)   default null,
-    /**
-        Разрешение на перепост
-    **/
-    is_cover            bool default false
-);
-
-
+/*
+    create table photo(
+        doc_id              decimal unique references doc(id),
+        ncomments           decimal default 0,
+        file_id             decimal references pers(id)     default null,
+        filepath           varchar(1024)   default null,
+        is_cover            bool default false
+    );
 
     alter table fileinfo add column md5         char(32)                        not null;
     alter table fileinfo add column filetype_id decimal references filetype(id) default null;
     alter table fileinfo add column token       varchar(1024)                   default null;
-    
-    alter table file add column ulfileinfo_id   decimal references fileinfo(id)    default null;
-    alter table file add column dlfileinfo_id   decimal references fileinfo(id)    default null;
-    alter table file add column fsfileinfo_id   decimal references fileinfo(id)    default null;
-
-
-
+    alter table file add column ulfileinfo_id   decimal references fileinfo(id) default null;
+    alter table file add column dlfileinfo_id   decimal references fileinfo(id) default null;
+    alter table file add column fsfileinfo_id   decimal references fileinfo(id) default null;
     insert into filetype (alias, mime, ext) values
         ('undefined',         'application/octet-stream',   'undefined'),
         ('image/gif *.gif',   'image/gif',                  'gif'),
         ('image/jpeg *.jpeg', 'image/jpeg',                 'jpeg'),
         ('image/jpeg *.jpg',  'image/jpeg',                 'jpg'),
         ('image/png *.png',   'image/png',                  'png');
+*/
 
-        
+-- 2012.11.20 13:55:45:041000861  --------------------------------------------
+
+
+alter table fileinfo add tokenlong       decimal    default null;
+alter table fileinfo add tokenstring     char(128)  default null;
+alter table fileinfo add md5long         decimal    default null;
+alter table fileinfo add md5string       char(32)   default null;
+
+alter table file add tokenlong           decimal        default null;
+alter table file add tokenstring         char(128)      default null;
+
+alter table file add owner_id decimal    references pers(id) default null;
+alter table fileinfo add owner_id decimal    references pers(id) default null;
+
+alter table file     add owner_nick varchar(1024)   references pers(nick) default null;
+alter table fileinfo add owner_nick varchar(1024)   references pers(nick) default null;
+
+alter table fileinfo add column doc_id decimal references doc(id) default null;
+alter table file add column doc_id decimal references doc(id) default null;
+
+create sequence seq_fileinfotype_id;
+create table fileinfotype(
+    id          decimal primary key default nextval('seq_fileinfotype_id'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   bool default false
+);
+
+insert into fileinfotype(alias) values
+    ('upload'),
+    ('download'),
+    ('filesystem');
+
+alter table fileinfo add column fileinfotype_id     decimal references fileinfotype(id)         default null;
+alter table fileinfo add column fileinfotype_alias  varchar(1024)  default null;
+alter table fileinfo add column filetype_alias      varchar(1024)  default null;
+
+alter table fileinfo add column file_id decimal references file(id) default null;
+
+alter table photo rename column path to filepath;
+

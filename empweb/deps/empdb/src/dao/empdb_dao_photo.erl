@@ -58,7 +58,8 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
-        path,
+        %path,
+        file_id,
         is_cover
     ];
 
@@ -78,6 +79,57 @@ table()->
     table(name).
 
 get(Con, What) ->
+    %     <<  "   select  fileinfo.path,fileinfo.dir from doc "
+    %         "   join photo on photo.doc_id = doc.id "
+    %         "   join file on file.id = photo.file_id "
+    %         "   join fileinfo on fileinfo.file_id = file.id "
+    %         "   where (fileinfo.fileinfotype_alias "
+    %         "       = $`fileinfo.fileinfotype_alias@filter`)"   >>
+
+%     Fields =
+%         proplists:get_value(
+%             fields,
+%             What,
+%             empdb_dao_photo:table({fields, select}
+%         ),
+% 
+%     case empdb_dao:get([
+%         {empdb_dao_doc, id},
+%         {empdb_dao_photo, {doc_id, file_id}},
+%         {empdb_dao_file, id},
+%         {empdb_dao_fileinfo, file_id}
+%     ],Con,[
+%         {fileinfotype_alias, download},
+%         {fields, [
+%             fileinfo.path,
+%             fileinfo.dir
+%             | Fields
+%         ]}
+%         |proplists:delete(fields, What)
+%     ]) of
+%         {ok,Phobjs} ->
+%             {ok, 
+%                 lists:map(fun({Phpl})->
+%                     case lists:member(path, Fields) of
+%                         true ->
+%                             {[
+%                                 {path,
+%                                     <<  (proplists:get_value(dir, Phpl))/binary,
+%                                         $/,
+%                                         (proplists:get_value(path, Phpl))/binary
+%                                     >>
+%                                 }
+%                                 | Phpl
+%                             ]};
+%                         _ ->
+%                             {Phpl}
+%                     end
+%                 end, Phobjs)
+%             };
+%         Error ->
+%             Error
+%     end.
+%
     empdb_dao_doc:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
@@ -104,7 +156,6 @@ count_comments(Con, Params)->
             " and   doc_comment.parent_id      = $id ",
         Params
     ).
-
 
 get_adds(Con, Getresult) ->
     case Getresult of

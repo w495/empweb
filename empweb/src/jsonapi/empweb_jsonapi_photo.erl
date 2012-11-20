@@ -98,6 +98,11 @@ handle(_req, #empweb_hap{
                 types       = [string]
             },
             #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
                 key         = is_cover,
                 required    = false,
                 types       = [boolean]
@@ -134,6 +139,11 @@ handle(_req, #empweb_hap{
                 types       = [string]
             },
             #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
                 key         = is_cover,
                 required    = false,
                 types       = [boolean]
@@ -168,6 +178,11 @@ handle(_req, #empweb_hap{
                 types       = [string]
             },
             #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
                 key         = is_cover,
                 required    = false,
                 types       = [boolean]
@@ -200,6 +215,11 @@ handle(_req, #empweb_hap{
                 key         = path,
                 required    = false,
                 types       = [string]
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
             },
             #norm_rule{
                 key         = is_cover,
