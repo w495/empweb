@@ -124,142 +124,9 @@ register(Params)->
             {Eclass, Error}
     end.
 
-lgps_new(X) ->
-    {ok, Res} = lgps:new(X),
-    Res.
 
-suggest_nick(Con, Orgnick, Pass)->
-    {Year,Month,Day} = erlang:date(),
-
-    Seps = lists:usort([
-        <<"">>,
-        <<"-">>,
-%         <<"+">>,
-%         <<"$">>,
-%         <<"%">>,
-%         <<"!">>,
-%         <<"*">>,
-%         <<"#">>,
-%         <<"@">>,
-%         <<"&">>,
-        <<"_">>,
-        <<".">>
-    ]),
-
-
-    Prewords = lists:usort([
-        <<"re">>,
-        <<"my">>,
-        <<"true">>,
-        <<"super">>,
-        <<"cool">>
-    ]),
-
-
-    Postwords = lists:usort([
-        empdb_convert:to_binary(empdb_convert:to_list(Day)),
-        empdb_convert:to_binary(empdb_convert:to_list(Month)),
-        empdb_convert:to_binary(empdb_convert:to_list(Year)),
-        empdb_convert:to_binary(empdb_convert:to_list(Year - 2000)),
-        <<"s">>,
-        <<"us">>,
-        <<"er">>,
-        <<"me">>,
-        <<"man">>,
-        <<"nick">>,
-        <<"user">>
-    ]),
-
-    Stoppunkts = lists:append([
-        [
-            <<" ">>,
-            <<"(">>,
-            <<")">>,
-            <<"<">>,
-            <<">">>,
-            <<"[">>,
-            <<"]">>,
-            <<"{">>,
-            <<"}">>,
-            <<"-">>,
-            <<"+">>,
-            <<"$">>,
-            <<"%">>,
-            <<"^">>,
-            <<"!">>,
-            <<"*">>,
-            <<"~">>,
-            <<"`">>,
-            <<"'">>,
-            <<"\"">>,
-            <<"#">>,
-            <<"@">>,
-            <<"&">>,
-            <<"_">>,
-            <<".">>,
-            <<",">>,
-            <<"?">>
-        ],
-        Seps -- [<<"">>],
-        [empdb_convert:to_binary(empdb_convert:to_list(X)) || X <- lists:seq(0, 9)]
-    ]),
-
-    Stopwords = lists:append([
-        Prewords,
-        [
-            <<"man">>,
-            <<"nick">>,
-            <<"user">>
-        ]
-    ]),
-
-    Norgnick = Orgnick,
-
-    Nickparts__ = binary:split(Norgnick, Stoppunkts, [global, trim]),
-
-    Nickparts_ = lists:foldl(fun(Nn, Acc) -> lists:append(binary:split(
-        Nn,
-        Stopwords ,
-        [trim]
-    ), Acc) end, [], Nickparts__),
-
-    Nickparts =
-        case lists:filter(fun(<<>>)-> false; (_)-> true end,  Nickparts_) of
-            [] ->
-                [Norgnick];
-            Nres ->
-                Nres
-        end,
-
-    Sugs__ = lists:append([
-        [ empdb_convert:to_binary([Preword, Sep, Nick]) ||
-            Nick <- Nickparts,
-            Preword <- Prewords,
-            Sep <- Seps,
-            not nick_match(Nick, [Preword, Sep]) and
-            (Nick =/= <<>>)
-        ] -- [Orgnick],
-        [ empdb_convert:to_binary([Nick, Sep, Postword]) ||
-            Nick <- Nickparts,
-            Sep <- Seps,
-            Postword <- Postwords,
-            not nick_match(Nick, [Sep, Postword])and
-            (Nick =/= <<>>)
-        ] -- [Orgnick]
-    ]),
-
-    Sugs_ = [
-        lgps_new({syllable, 2}),
-        lgps_new({ngram, 4, 1}),
-        lgps_new({syllable, 3}),
-        lgps_new({ngram, 6, 1}),
-        lgps_new({syllable, 4}),
-        lgps_new({ngram, 8, 1})
-        |Sugs__
-    ],
-    
-
-    Sugs = lists:sort(
+suggest_nick(Con, Orgnick)->
+    lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
         end,
@@ -273,21 +140,25 @@ suggest_nick(Con, Orgnick, Pass)->
                             false
                     end
                 end,
-                Sugs_
+                empdb_suggest:string(Orgnick, [
+                    {postwords, [
+                        <<"s">>,
+                        <<"us">>,
+                        <<"er">>,
+                        <<"me">>,
+                        <<"man">>,
+                        <<"nick">>,
+                        <<"user">>
+                    ]},
+                    {stopwords, [
+                        <<"man">>,
+                        <<"nick">>,
+                        <<"user">>
+                    ]}
+                ])
             )
         )
-    ),
-
-    Sugs.
-
-
-nick_match(Nick, Patterns) ->
-    case binary:match(Nick, Patterns -- [<<"">>],[]) of
-        nomatch ->
-            false;
-        _ ->
-            true
-    end.
+    ).
 
 
 create__(Pass, Params)->
@@ -322,7 +193,7 @@ create__(Pass, Params)->
                 end;
             {error,{not_unique,<<"nick">>}}->
                     Nick = proplists:get_value(nick, Params),
-                    Sugs = suggest_nick(Con, Nick, Pass),
+                    Sugs = suggest_nick(Con, Nick),
                 {error,{not_unique_nick,Sugs}};
             {Eclass, Error} ->
                 {Eclass, Error}

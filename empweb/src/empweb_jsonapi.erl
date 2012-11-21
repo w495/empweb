@@ -433,10 +433,10 @@ format(Format, Trem) ->
     format(Format, [Trem]).
     
 %%% -------------------------------------------------------------------------
-
-resp({error, {not_unique_nick, Object}}) ->
-    ok({[{not_unique_nick, Object}]});
-    
+% 
+% resp({error, {not_unique_nick, Object}}) ->
+%     gone({[{not_unique_nick, Object}]});
+%     
 resp({error, {not_exists, Object}}) ->
     gone({[{not_exists, Object}]});
     

@@ -716,19 +716,26 @@ create_room(Params)->
                 ]},
                 {fields, [
                     id,
+                    nick,
+                    money
+                ]},
+                {limit, 1}
+            ]),
+
+        Head = proplists:get_value(head, Params),
+        {ok, Mbroomobjs} =
+            empdb_dao_room:get(Con, [
+                {head, Head},
+                {fields, [
+                    id,
                     money
                 ]},
                 {limit, 1}
             ]),
         Price = ?CREATE_ROOM_PRICE,
         Money = proplists:get_value(money, Mbownerpl),
-        case Price =< Money of
-            true ->
-                Newmoney = Money - Price,
-                empdb_dao_pers:update(Con,[
-                    {id,    proplists:get_value(id,   Mbownerpl)},
-                    {money, {decr, Price}}
-                ]),
+        case {Price =< Money, Mbroomobjs} of
+            {true, []} ->
                 case empdb_dao_room:create(Con, Params) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
@@ -736,6 +743,11 @@ create_room(Params)->
                             {paytype_alias,     room_out},
                             {isincome,          false},
                             {price,             Price}
+                        ]),
+                        Newmoney = Money - Price,
+                        empdb_dao_pers:update(Con,[
+                            {id,    proplists:get_value(id,   Mbownerpl)},
+                            {money, {decr, Price}}
                         ]),
                         {ok, [
                             {[
@@ -747,7 +759,10 @@ create_room(Params)->
                     Else ->
                         Else
                 end;
-            false ->
+            {true, _} ->
+                Sugs = suggest_room_head(Con, Head, [{owner, Mbownerpl}]),
+                {error,{not_unique_head,Sugs}};
+            _ ->
                 {error, {not_enough_money, {[
                     {money, Money},
                     {price, Price}
@@ -755,6 +770,49 @@ create_room(Params)->
         end
     end).
 
+
+suggest_room_head(Con, Orghead, Opts)->
+    Owner = proplists:get_value(owner, Opts),
+    Owner_nick = proplists:get_value(nick, Owner),
+    
+    lists:sort(
+        fun(X, Y) ->
+            erlang:byte_size(X) < erlang:byte_size(Y)
+        end,
+        lists:sort(
+            lists:filter(
+                fun(Head)->
+                    case empdb_dao_room:get(Con, [{head, Head}]) of
+                        {ok, []} ->
+                            true;
+                        _ ->
+                            false
+                    end
+                end,
+                empdb_suggest:string(Orghead, [
+                    {prewords, [
+                        Owner_nick,
+                        <<"room">>,
+                        <<"country">>,
+                        <<"place">>
+                    ]},
+                    {postwords, [
+                        Owner_nick,
+                        <<"room">>,
+                        <<"country">>,
+                        <<"place">>
+                    ]},
+                    {stopwords, [
+                        Owner_nick,
+                        <<"room">>,
+                        <<"country">>,
+                        <<"place">>
+                    ]}
+                ])
+            )
+        )
+    ).
+    
 update_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
 
