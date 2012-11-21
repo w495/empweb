@@ -67,7 +67,7 @@ norm('delete') ->
     %%
     %% | empweb_norm:norm('delete')
     %%
-    [];
+    norm('update');
 
 norm([]) ->
     %%

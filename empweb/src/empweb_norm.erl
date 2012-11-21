@@ -87,7 +87,7 @@ norm('update') ->
     norm('create');
 
 norm('delete') ->
-    [];
+    norm('update');
 
 norm([]) ->
     [];

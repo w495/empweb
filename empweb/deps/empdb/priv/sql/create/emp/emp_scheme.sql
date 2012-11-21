@@ -313,22 +313,65 @@ create table perspicbody(
     isdeleted   bool default false
 );
 
+
+
+
+------------------------------------------------------------------------------
+-- Географические страны
+------------------------------------------------------------------------------
+
+-- create sequence seq_pregion_id;
+-- create table pregion(
+--     id          decimal primary key default nextval('seq_perspicbody_id'),
+--     name_ti     decimal unique default nextval('seq_any_ti'),
+--     alias       varchar(1024),
+--     pregion_id  decimal references pregion(id)     default null,
+--     created     timestamp without time zone not null default utcnow(),
+--     isdeleted   bool default false,
+--     constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
+-- );
+
 /**
  *  Города реального мира
 **/
 
-create sequence seq_pregion_id;
-create table pregion(
-    id          decimal primary key default nextval('seq_perspicbody_id'),
+create sequence seq_geo_id;
+create table geo(
+    id          decimal primary key default nextval('seq_geo_id'),
+    alias       varchar(1024)   unique,
     /**
         Номер языковой сущности
     **/
-    name_ti     decimal unique default nextval('seq_any_ti'),
-    alias       varchar(1024),
-    pregion_id  decimal references pregion(id)     default null,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false,
-    constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    /**
+        Номер языковой сущности
+    **/
+    descr_ti    decimal unique      default nextval('seq_any_ti'),
+    -- alias       varchar(1024)   unique,
+    /**
+        Родительский элемент
+    **/
+    parent_id    decimal references geo(id) default null,
+
+    /**
+        целевых ссылок на эту сущность
+    **/
+    nchildtargets   decimal default 0,
+
+    /**
+        целевых ссылок на эту сущность и ее детей
+    **/
+    nnodetargets    decimal default 0,
+    /**
+        количество детей (дочерних элементов)
+    **/
+    nchildren       decimal default 0,
+    /**
+        количество вершин в кусте
+    **/
+    nnodes          decimal default 0,
+    created         timestamp without time zone not null default utcnow(),
+    isdeleted   bool default false
 );
 
 
@@ -371,8 +414,10 @@ create table pers(
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
     
-    pregion_id  decimal references  pregion(id)     default null,
+    -- pregion_id  decimal references  pregion(id)     default null,
     
+    geo_id  decimal references  geo(id)     default null,
+
     
     birthday    timestamp       without time zone not null default utcnow(),
     -- gender_id           decimal references gender(id)      default null,
@@ -867,8 +912,8 @@ create table album(
 create table photo(
     doc_id              decimal unique references doc(id),
     ncomments           decimal default 0,
-    file_id             decimal references pers(id)     default null,
-    file_path                varchar(1024)   default null,
+    file_id             decimal references file(id)     default null,
+    file_path           varchar(1024)   default null,
     /**
         Разрешение на перепост
     **/
@@ -877,12 +922,6 @@ create table photo(
 
 
 
-
--- create table gpic(
---     att_id              decimal unique references attach(doc_id)
--- );
-
--- ...
 
 ------------------------------------------------------------------------------
 -- Чат комнаты \ страны
@@ -958,6 +997,7 @@ create table topic(
         количество вершин в кусте
     **/
     nnodes          decimal default 0,
+    created         timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
 

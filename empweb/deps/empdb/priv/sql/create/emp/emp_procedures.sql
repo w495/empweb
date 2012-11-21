@@ -472,7 +472,8 @@ select count_children_on('topic');
     --- тригеры для подсчета дочерних элементов дерева тем.
 select count_children_on('thingtype');
     --- тригеры для подсчета дочерних элементов дерева типов вещей.
-    
+select count_children_on('geo');
+    --- тригеры для подсчета дочерних элементов дерева типов вещей.
 
 /**
     @doc Возвращает начальное состояние документа
@@ -644,6 +645,13 @@ begin
             ) as numeric
         );
     end if;
+
+    if not (new.geo_id is null) then
+        update geo set
+            nchildtargets   = nchildtargets + 1
+        where
+            geo.id = new.geo_id;
+    end if;
     
     return new;
 end;
@@ -657,7 +665,7 @@ create trigger t1pers_util_fields_on_insert before insert
 on pers for each row execute procedure pers_util_fields_on_insert();
 
 /**
-    @doc Обеспечивает совместное состояние документа
+    @doc Обеспечивает совместное состояние пользователя
 **/
 create or replace function pers_util_fields_on_update() returns "trigger" as $$
 begin
@@ -825,6 +833,30 @@ begin
         end if;
     end if;
 
+
+    if new.geo_id != old.geo_id then
+        update geo set
+            nchildtargets   = nchildtargets + 1
+        where
+            geo.id = new.geo_id;
+        update geo set
+            nchildtargets   = nchildtargets - 1
+        where
+            geo.id = new.geo_id;
+    end if;
+    if (new.isdeleted = true) and (old.isdeleted = false) then
+        update geo set
+            nchildtargets   = nchildtargets - 1
+        where
+            geo.id = new.geo_id;
+    end if;
+    if (new.isdeleted = false) and (old.isdeleted = true) then
+        update geo set
+            nchildtargets   = nchildtargets + 1
+        where
+            geo.id = new.geo_id;
+    end if;
+
     return new;
 end;
 $$ language plpgsql;
@@ -832,6 +864,23 @@ $$ language plpgsql;
 drop trigger if exists t1pers_util_fields_on_update on pers ;
 create trigger t1pers_util_fields_on_update before update
 on pers for each row execute procedure pers_util_fields_on_update();
+
+create or replace function pers_util_fields_on_delete() returns "trigger" as $$
+begin
+    if not (old.geo_id is null) then
+        update geo set
+            nchildtargets   = nchildtargets - 1
+        where
+            geo.id = old.geo_id;
+    end if;
+    return old;
+end;
+$$ language plpgsql;
+
+
+drop trigger if exists t1pers_util_fields_on_delete on pers ;
+create trigger t1pers_util_fields_on_delete before delete
+on pers for each row execute procedure pers_util_fields_on_delete();
 
 /**
     @doc Возвращает начальное состояние документа

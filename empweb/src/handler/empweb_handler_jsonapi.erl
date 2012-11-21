@@ -1205,6 +1205,32 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+            %% ==================================================
+            <<"get_geo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_geo,
+                    action          =   'get'
+                };
+            <<"get_all_geos">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_geo,
+                    action          =   'get'
+                };
+            <<"create_geo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_geo,
+                    action          =   create
+                };
+            <<"update_geo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_geo,
+                    action          =   update
+                };
+            <<"delete_geo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_geo,
+                    action          =   delete
+                };
 
                 
             _ -> []
