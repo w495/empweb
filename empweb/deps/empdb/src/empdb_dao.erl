@@ -536,6 +536,13 @@ sql_cond({Ff, {in, List}}) when erlang:is_list(List) ->
 sql_cond({Ff,undefined}) ->
     {[], []};
 
+sql_cond({Ff, null} = Tuple) ->
+    ?empdb_debug("Tuple = ~p~n~n", [Tuple]),
+    {[{cond_atom(Ff), null}], [
+        empdb_convert:to_binary(Ff),
+        <<" is null">>
+    ]};
+
 sql_cond({Ff, Val} = Tuple) ->
     ?empdb_debug("Tuple = ~p~n~n", [Tuple]),
     {[{cond_atom(Ff), Val}], [

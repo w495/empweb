@@ -26,27 +26,27 @@ norm('get') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = nchildtargets,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = nnodetargets,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = nchildren,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = nnodes,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         }
         |empweb_norm_opt:norm('get')
     ];
@@ -56,7 +56,7 @@ norm('create') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         }
         |empweb_norm_opt:norm('create')
     ];
@@ -66,7 +66,7 @@ norm('update') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         }
         |empweb_norm_opt:norm('update')
     ];
@@ -76,7 +76,7 @@ norm('delete') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer]
+            types       = [nullable, integer]
         }
         |empweb_norm_opt:norm('delete')
     ];

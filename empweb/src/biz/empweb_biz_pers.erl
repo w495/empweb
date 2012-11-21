@@ -227,7 +227,7 @@ login(Params) ->
     case empdb_biz_pers:login(Params) of
         {ok, [{Userpl}]} ->
             Id          = proplists:get_value(id,           Userpl),
-            Nick        = proplists:get_value(nick,         Userpl),
+            Nick        = proplists:get_value(nick,        Userpl),
             Login       = proplists:get_value(login,        Userpl),
             Perm_names  = proplists:get_value(perm_names,   Userpl),
             Session_id  = empweb_biz_session:new(#empweb_biz_session{
