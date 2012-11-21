@@ -157,6 +157,7 @@ table({fields, all})->
         sname,
         empl,
         hobby,
+        interest,
         descr,
         pregion_id,
         birthday,    % 'extract(epoch from birthday) as birthday',

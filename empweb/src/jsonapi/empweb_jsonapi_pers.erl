@@ -359,6 +359,12 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
+        %% Интерес
+            #norm_rule{
+                key         = interest,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
         %% Oписание
             #norm_rule{
                 key         = descr,
@@ -493,6 +499,11 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = hobby,
                         types = [nullable, string]
+                    },
+                %% Интерес
+                    #norm_rule{
+                        key         = interest,
+                        types       = [nullable, string]
                     },
                 %% Oписание
                     #norm_rule{

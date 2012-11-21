@@ -170,9 +170,7 @@ create table geo(
 alter table pers add column geo_id decimal references geo(id) default null;
 
 
-alter table geo add column alias       varchar(1024)   default null;
-
-
+alter table pers add column interest varchar(1024) default null;
 
 
 insert into geo(alias) values
