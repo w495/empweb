@@ -61,7 +61,7 @@
     create table photo(
         doc_id              decimal unique references doc(id),
         ncomments           decimal default 0,
-        file_id             decimal references pers(id)     default null,
+        file_id             decimal references file(id)     default null,
         filepath           varchar(1024)   default null,
         is_cover            bool default false
     );

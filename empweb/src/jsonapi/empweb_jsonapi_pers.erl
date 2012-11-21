@@ -153,10 +153,20 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-            #norm_rule{
-                key = id,
-                types = [integer]
-            },
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key = id,
+                    types = [integer]
+                },
+                #norm_rule{
+                    key = login,
+                    types = [string]
+                },
+                #norm_rule{
+                    key = nick,
+                    types = [string]
+                }
+            ]},
             #norm_rule{
                 key = pass,
                 types = [string]
@@ -459,6 +469,7 @@ handle(_req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key = id,
+                required = false,
                 types = [integer]
             },
             #norm_at_least_one{

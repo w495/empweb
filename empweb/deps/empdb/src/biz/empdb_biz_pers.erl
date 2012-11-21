@@ -292,7 +292,7 @@ nick_match(Nick, Patterns) ->
 
 create__(Pass, Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, nick]}|Params]) of
+        case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
             {ok, Persobj}->
                 [{Perspl}|_] = Persobj,
                 case {
@@ -370,13 +370,19 @@ update(Params)->
 %% и логинит пользователя по этому параметру.
 %%
 login(Params) ->
+    io:format("Params = ~p ~n~n~n~n", [Params]),
+
+    
     Id      = proplists:get_value(id,       Params),
     Login   = proplists:get_value(login,    Params),
+    Nick    = proplists:get_value(nick,    Params),
     if
         Id =/= undefined ->
             login({id, Id}, Params);
         Login =/= undefined ->
             login({login, Login}, Params);
+        Nick =/= undefined ->
+            login({nick, Nick}, Params);
         true ->
             {error,{bad_pers,{Params}}}
     end.
@@ -395,6 +401,7 @@ login({Uf, Uv}, Params) ->
     Max_auth_error = 10,    
     EC = 0,
     empdb_dao:with_transaction(emp, fun(Con)->
+        io:format("Params = ~p ~n~n~n~n", [Params]),
         case empdb_dao_pers:get(Con, [{isdeleted, false}|Params]) of
             {ok, [{Userpl}]} ->
                 {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),

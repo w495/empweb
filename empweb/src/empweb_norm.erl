@@ -23,7 +23,8 @@
     normpair/2,
     normfilter/1,
     filter/1,
-    filter_owner/1
+    filter_owner/1,
+    filter_self/1
 ]).
 
 
@@ -48,7 +49,19 @@ filter_owner(Params) ->
         {_owner_id, _      } ->
             proplists:delete(pers_id, Params)
     end.
-    
+
+filter_self(Params) ->
+    case {
+        proplists:get_value(id, Params),
+        proplists:get_value(pers_id, Params)
+    } of
+        {all     , _      } ->
+            proplists:delete(pers_id, proplists:delete(id, Params));
+        {undefined, Pers_id} ->
+            [{id, Pers_id}|proplists:delete(pers_id, Params)];
+        {_owner_id, _      } ->
+            proplists:delete(pers_id, Params)
+    end.
 %%
 %%
 %%
