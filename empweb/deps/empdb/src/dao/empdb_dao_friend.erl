@@ -64,6 +64,8 @@ table({fields, all})->
     [
         pers_id     ,
         friend_id   ,
+        pers_nick   ,
+        friend_nick ,
         created     
     ];
 

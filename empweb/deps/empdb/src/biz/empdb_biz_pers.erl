@@ -469,22 +469,30 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
     ?empdb_debug("Option = ~p~n", [Option]),
     case Option of
         nfriends ->
-            case proplists:get_value(id, Params) of
-                undefined ->
+            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                {undefined, undefined} ->
                     get_opt(Con, Params, Options, [{Acc}]);
-                Id ->
+                {undefined, Nick} ->
+                    {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                        {pers_nick, Nick}
+                    ]),
+                    get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}]);
+                {Id, _} ->
                     {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
                         {pers_id, Id}
                     ]),
                     get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}])
             end;
         blog ->
-            case proplists:get_value(id, Params) of
-                undefined ->
+            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                {undefined, undefined} ->
                     get_opt(Con, Params, Options, [{Acc}]);
-                Id ->
+                {Id, Nick} ->
                     case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                        {owner_id, Id},
+                        {'or', [
+                            {owner_id, Id},
+                            {owner_nick, Nick}
+                        ]},
                         {limit, 1},
                         {fields, [
                             nposts,
@@ -506,12 +514,15 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                     end
             end;
         album ->
-            case proplists:get_value(id, Params) of
-                undefined ->
+            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                {undefined, undefined} ->
                     get_opt(Con, Params, Options, [{Acc}]);
-                Id ->
+                {Id, Nick} ->
                     case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                        {owner_id, Id},
+                        {'or', [
+                            {owner_id, Id},
+                            {owner_nick, Nick}
+                        ]},
                         {limit, 1},
                         {fields, [
                             nposts,

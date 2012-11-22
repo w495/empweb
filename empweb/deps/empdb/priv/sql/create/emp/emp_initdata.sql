@@ -2184,6 +2184,29 @@ insert into fileinfotype(alias) values
     ('download'),
     ('filesystem');
 
+
+insert into geo(alias) values
+    ('ru'),
+    ('kz'),
+    ('uk'),
+    ('by'),
+    ('ua'),
+    ('jp'),
+    ('cn');
+
+insert into geo(alias, parent_id) values
+    ('moscow',      (select id from geo where alias = 'ru')),
+    ('rudnyj',      (select id from geo where alias = 'ru')),
+    ('kazan',       (select id from geo where alias = 'ru')),
+    ('anadyr',      (select id from geo where alias = 'ru')),
+    ('astana',      (select id from geo where alias = 'kz')),
+    ('alma-ata',    (select id from geo where alias = 'kz')),
+    ('rudnyj',      (select id from geo where alias = 'kz')),
+    ('misk',        (select id from geo where alias = 'by')),
+    ('brest',       (select id from geo where alias = 'by')),
+    ('kiev',        (select id from geo where alias = 'ua')),
+    ('odessa',      (select id from geo where alias = 'ua'));
+
 /**
     При создании пользователя помещаем его в комнату для новичков
     @depricated перенесено в триггеры

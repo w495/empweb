@@ -193,6 +193,7 @@ table({fields, all})->
         live_room_id,
         live_room_head,
         live_room_pos,
+        geo_id,
 
 
         % own_room_id,

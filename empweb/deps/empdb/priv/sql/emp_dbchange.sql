@@ -127,70 +127,51 @@ alter table fileinfo add column file_id decimal references file(id) default null
 
 -- 2012.11.20 19:22:23:726564884 --------------------------------------------
 
+/*
+    create sequence seq_geo_id;
+    create table geo(
+        id          decimal primary key default nextval('seq_geo_id'),
+        alias       varchar(1024)   default null,
+        name_ti     decimal unique      default nextval('seq_any_ti'),
+        descr_ti    decimal unique      default nextval('seq_any_ti'),
+        parent_id    decimal references geo(id) default null,
+        nchildtargets   decimal default 0,
+        nnodetargets    decimal default 0,
+        nchildren       decimal default 0,
+        nnodes          decimal default 0,
+        created         timestamp without time zone not null default utcnow(),
+        isdeleted       bool default false
+    );
 
-create sequence seq_geo_id;
-create table geo(
-    id          decimal primary key default nextval('seq_geo_id'),
-    alias       varchar(1024)   default null,
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique      default nextval('seq_any_ti'),
-    /**
-        Номер языковой сущности
-    **/
-    descr_ti    decimal unique      default nextval('seq_any_ti'),
-    /**
-        Родительский элемент
-    **/
-    parent_id    decimal references geo(id) default null,
-
-    /**
-        целевых ссылок на эту сущность
-    **/
-    nchildtargets   decimal default 0,
-
-    /**
-        целевых ссылок на эту сущность и ее детей
-    **/
-    nnodetargets    decimal default 0,
+    alter table pers add column geo_id decimal references geo(id) default null;
+    alter table pers add column interest varchar(1024) default null;
     
-    /**
-        количество детей (дочерних элементов)
-    **/
-    nchildren       decimal default 0,
-    /**
-        количество вершин в кусте
-    **/
-    nnodes          decimal default 0,
-    created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
-);
+    insert into geo(alias) values
+        ('ru'),
+        ('kz'),
+        ('uk'),
+        ('by'),
+        ('ua'),
+        ('jp'),
+        ('cn');
 
-alter table pers add column geo_id decimal references geo(id) default null;
+    insert into geo(alias, parent_id) values
+        ('moscow',      (select id from geo where alias = 'ru')),
+        ('rudnyj',      (select id from geo where alias = 'ru')),
+        ('kazan',       (select id from geo where alias = 'ru')),
+        ('anadyr',      (select id from geo where alias = 'ru')),
+        ('astana',      (select id from geo where alias = 'kz')),
+        ('alma-ata',    (select id from geo where alias = 'kz')),
+        ('rudnyj',      (select id from geo where alias = 'kz')),
+        ('misk',        (select id from geo where alias = 'by')),
+        ('brest',       (select id from geo where alias = 'by')),
+        ('kiev',        (select id from geo where alias = 'ua')),
+        ('odessa',      (select id from geo where alias = 'ua'));
+
+*/
 
 
-alter table pers add column interest varchar(1024) default null;
 
+alter table pers add column pers_nick   varchar(1024) default null;
+alter table pers add column friend_nick varchar(1024) default null;
 
-insert into geo(alias) values
-    ('ru'),
-    ('kz'),
-    ('uk'),
-    ('by'),
-    ('ua'),
-    ('jp'),
-    ('cn');
-
-insert into geo(alias, parent_id) values
-    ('moscow',      (select id from geo where alias = 'ru')),
-    ('rudnyj',      (select id from geo where alias = 'ru')),
-    ('kazan',       (select id from geo where alias = 'ru')),
-    ('anadyr',      (select id from geo where alias = 'ru')),
-    ('astana',      (select id from geo where alias = 'kz')),
-    ('alma-ata',    (select id from geo where alias = 'kz')),
-    ('rudnyj',      (select id from geo where alias = 'kz')),
-    ('misk',        (select id from geo where alias = 'by')),
-    ('brest',       (select id from geo where alias = 'by')),
-    ('kiev',        (select id from geo where alias = 'ua')),
-    ('odessa',      (select id from geo where alias = 'ua'));

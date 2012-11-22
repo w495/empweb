@@ -610,7 +610,9 @@ create table friend(
     **/
     /*name_ti     decimal unique default nextval('seq_any_ti'),*/
     pers_id     decimal references pers(id)    default null,
+    pers_nick   varchar(1024)                  default null,
     friend_id   decimal references pers(id)    default null,
+    friend_nick varchar(1024)                  default null,
     created     timestamp without time zone not null default utcnow(),
     constraint  friend_pers_id_friend_id_many_key unique (pers_id, friend_id)
 );

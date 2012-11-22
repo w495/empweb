@@ -202,6 +202,15 @@ create(Params)->
                                     {roombet_price,     null},
                                     {owner_id,          Roombet_owner_id}
                                 ]),
+                                {ok, _} = empdb_dao_roomlot:update(Con,[
+                                    {filter, [
+                                        {isdeleted, false},
+                                        {id, Roomlot_id}
+                                    ]},
+                                    {values, [
+                                        {isdeleted, true}
+                                    ]}
+                                ]),
                                 Roombet;
                             false -> 
                                 %%
