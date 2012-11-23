@@ -72,6 +72,8 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
+        nmembs,
+        ncands,
         communitytype_id,
         communitytype_alias,
         slogan,

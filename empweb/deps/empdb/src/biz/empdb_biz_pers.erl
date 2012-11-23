@@ -403,6 +403,30 @@ login({Uf, Uv}, Params) ->
                                 weather,
                                 treas
                             ]),
+                        Live_community =
+                            case empdb_dao_community:get(Con, [
+                                {id, proplists:get_value(live_community_id, Userpl)},
+                                {limit, 1},
+                                {fields, [
+                                    ncands,
+                                    nmembs,
+                                    id,
+                                    communitytype_id,
+                                    communitytype_alias,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ]) of
+                                {ok, [Community1]} ->
+                                    Community1;
+                                {ok, []} ->
+                                    null
+                            end,
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
                                 {pers_id, proplists:get_value(id, Userpl)}
@@ -417,12 +441,13 @@ login({Uf, Uv}, Params) ->
                                 ]}
                             ]),
                         {ok, [{[
-                            {nnewmessages,  Nnewmessages},
-                            {nfriends,      Nfriends},
-                            {perm_names,    Perm_names},
-                            {blog,          Blog},
-                            {album,         Album},
-                            {live_room,     Live_room}
+                            {nnewmessages,      Nnewmessages},
+                            {nfriends,          Nfriends},
+                            {perm_names,        Perm_names},
+                            {blog,              Blog},
+                            {album,             Album},
+                            {live_community,    Live_community},
+                            {live_room,         Live_room}
                             |Userpl
                         ]}]}
                 end;
@@ -555,6 +580,38 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
                     end
             end;
+%         community ->
+%             case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+%                 {undefined, undefined} ->
+%                     get_opt(Con, Params, Options, [{Acc}]);
+%                 {Id, Nick} ->
+%                     case empdb_dao_community:get(Con, [
+%                         {'or', [
+%                             {owner_id,      Id},
+%                             {owner_nick,    Nick}
+%                         ]},
+%                         {limit, 1},
+%                         {fields, [
+%                             ncands,
+%                             nmembs,
+%                             id,
+%                             communitytype_id,
+%                             communitytype_alias,
+%                             read_acctype_id,
+%                             read_acctype_alias,
+%                             comm_acctype_id,
+%                             comm_acctype_alias,
+%                             contype_id,
+%                             contype_alias,
+%                             vcounter
+%                         ]}
+%                     ]) of
+%                         {ok, [Community|_]} ->
+%                             get_opt(Con, Params, Options, [{[{community, Community}|Acc]}]);
+%                         _ ->
+%                             get_opt(Con, Params, Options, [{[{community, null}|Acc]}])
+%                     end
+%             end;
         without_phash ->
             Nacc = proplists:delete(phash,
                 proplists:delete(pass, Acc)

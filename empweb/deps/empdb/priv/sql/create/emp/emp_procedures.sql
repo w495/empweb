@@ -688,11 +688,39 @@ begin
         (not (new.live_community_id is null))
     ) then
         raise exception 'exists_live_community';
+    else
+        update community set ncands = ncands + 1
+            where community.doc_id = new.live_community_id;
     end if;
 
+    if (new.live_community_approved != old.live_community_approved) then
+        if(new.live_community_approved == null) then
+            update community set ncands = ncands + 1
+                where community.doc_id = new.live_community_id;
+            update community set nmembs = nmembs - 1
+                where community.doc_id = new.live_community_id;
+        end if;
+        if(new.live_community_approved == true) then
+            update community set ncands = ncands - 1
+                where community.doc_id = new.live_community_id;
+            update community set nmembs = nmembs + 1
+                where community.doc_id = new.live_community_id;
+        end if;
+        if(new.live_community_approved == false) then
+            update community set ncands = ncands - 1
+                where community.doc_id = new.live_community_id;
+            update community set nmembs = nmembs - 1
+                where community.doc_id = new.live_community_id;
+        end if;
+    end if;
+    
     if (new.live_community_id is null) then
         new.live_community_approved = null;
+        update community set ncands = ncands - 1
+            where community.doc_id = new.live_community_id;
     end if;
+
+    
 
 --     if (
 --         (new.own_community_id != old.own_community_id)

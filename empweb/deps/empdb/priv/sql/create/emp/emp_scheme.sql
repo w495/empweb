@@ -1095,6 +1095,8 @@ create table community(
     **/
     communitytype_id        decimal         references communitytype(id)    default null,
     communitytype_alias     varchar(1024)   references communitytype(alias) default null,
+    ncands                  decimal default 0,
+    nmembs                  decimal default 0,
     slogan                  text default null,
     treasury                decimal default null
 );
