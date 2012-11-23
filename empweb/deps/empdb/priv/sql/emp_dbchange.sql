@@ -190,5 +190,5 @@ alter table pers add column own_community_head  varchar(1024) default null;
 
 alter table pers add column live_community_approved     boolean  default null;
 
-alter table pers add column ncands decimal default 0;
-alter table pers add column nmembs decimal default 0;
+alter table community add column ncands decimal default 0;
+alter table community add column nmembs decimal default 0;
