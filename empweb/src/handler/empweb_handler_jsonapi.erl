@@ -63,7 +63,7 @@ handle(Req, State) ->
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
 
-    io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
+    % io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
     
     Reply =
         empweb_http:reply(
@@ -1252,7 +1252,7 @@ empweb_jsonapi_map(Req, [{_}|_] = List, State) ->
             {[], Req},
             List
         ),
-    io:format("Res = ~p~n~n~n", [Res]),
+    %io:format("Res = ~p~n~n~n", [Res]),
     {lists:reverse(Res), Reqres};
 
 empweb_jsonapi_map(Req, List, State) ->

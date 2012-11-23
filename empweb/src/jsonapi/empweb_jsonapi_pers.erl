@@ -330,7 +330,7 @@ handle(_req, #empweb_hap{
         action=get_pers, params=Params, is_auth=true
     } = Hap) ->
     ?evman_args(Hap, <<" = get pers">>),
-    io:format("Params = ~p~n~n", [Params]),
+    % io:format("Params = ~p~n~n", [Params]),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [

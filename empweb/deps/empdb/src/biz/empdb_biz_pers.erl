@@ -491,9 +491,12 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
             case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
                 {undefined, undefined} ->
                     get_opt(Con, Params, Options, [{Acc}]);
-                {undefined, Nick} ->
+                {Id, Nick} ->
                     case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                        {owner_nick, Nick},
+                        {'or', [
+                            {owner_id,      Id},
+                            {owner_nick,    Nick}
+                        ]},
                         {limit, 1},
                         {fields, [
                             nposts,

@@ -1059,58 +1059,11 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 Filter
             ),
 
-        Current_all_fields = 
-            lists:map(
-                fun ({Filtername, Filterval}) when is_atom(Filtername) ->
-                        Filternamestr = empdb_convert:to_list(Filtername),
-                        case lists:member($., empdb_convert:to_list(Filtername)) of
-                            true ->
-                                {Filtername, Filterval};
-                            _ ->
-                                case lists:foldl(
-                                    fun ({Tab, _}, [])->
-                                            case
-                                                lists:member(
-                                                    Filtername,
-                                                    table_options(
-                                                        {table, fields, all},
-                                                        Tab
-                                                    )
-                                                )
-                                            of
-                                                true ->
-                                                    case Filternamestr of
-                                                        'or' ->
-                                                            {Filternamestr, Filterval};
-                                                        _ ->
-                                                            {   empdb_convert:to_atom(
-                                                                    empdb_convert:to_list(
-                                                                        table_options({table, name},Tab)
-                                                                    )
-                                                                    ++ "." ++
-                                                                    Filternamestr
-                                                                ),
-                                                                Filterval
-                                                            }
-                                                    end;
-                                                _ ->
-                                                    []
-                                            end;
-                                        ({Tab, _}, Res) ->
-                                            Res
-                                    end, [], Op
-                                ) of
-                                    [] ->
-                                        {Filtername, Filterval};
-                                    {Newfiltername, Filterval} ->
-                                        {Newfiltername, Filterval}
-                                end
-                        end;
-                    ({Filtername, Filterval})  ->
-                        {Filtername, Filterval}
-                end,
-                Current_all_fields_
-            ),
+        io:format("Current_all_fields_ = ~p~n~n~n~n~n", [Current_all_fields_]),
+
+        % Tab
+        
+        Current_all_fields =  empdb_orm_util:current_all_fields(Current_all_fields_, Op),
 
         Current_select_fields =
             lists:map(
