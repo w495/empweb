@@ -214,6 +214,7 @@ get(Params) ->
         Params,
         [   without_phash,
             blog,
+            album,
             nfriends
         ]
     ).
