@@ -849,120 +849,21 @@ get(Current, Con, #queryobj{filter=Filter}=Obj)
     ?empdb_debug("Filter = ~p~n~n", [Filter]),
     get(Current, Con, Obj#queryobj{filter=[Filter]});
 
-
 get(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
     ?empdb_debug("Fields = ~p~n~n", [Fields]),
     get(Current, Con, Obj#queryobj{fields=[Fields]});
 
-% 
-% %%
-% %% TODO: только для двух таблиц
-% %%
-% get([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
-%     filter  =   Filter,
-%     fields  =   Fields,
-%     order   =   Order,
-%     limit   =   Limit,
-%     offset  =   Offset
-% } = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
-%     {Query, Pfields} = empdb_memocashe({Op, Qo}, fun() ->
-%         Common_all_fields = lists:append(
-%             table_options({table, fields, all},      Parent),
-%             table_options({table, fields, all},      Current)
-%         ),
-%         Common_select_fields = lists:append(
-%             table_options({table, fields, select},   Parent),
-%             table_options({table, fields, select},   Current)
-%         ),
-%         Current_select_fields =
-%             lists:filter(
-%                 fun
-%                     (F)-> lists:member(F, Common_select_fields)
-%                 end,
-%                 Fields
-%             ),
-%         Current_all_fields =
-%             lists:filter(
-%                 fun({F, _})->
-%                     lists:member(F, Common_all_fields)
-%                 end,
-%                 Filter
-%             ),
-%         Current_order =
-%             lists:filter(
-%                 fun
-%                     ({desc, F})->
-%                         lists:member(F, Common_all_fields);
-%                     ({F, desc})->
-%                         lists:member(F, Common_all_fields);
-%                     ({asc, F})->
-%                         lists:member(F, Common_all_fields);
-%                     ({F, asc})->
-%                         lists:member(F, Common_all_fields);
-%                     (F)->
-%                         lists:member(F, Common_all_fields)
-%                 end,
-%                 Order
-%             ),
-% 
-%         ?empdb_debug("Order = ~p~n~n", [Current_order]),
-% 
-%         ?empdb_debug("Fields = ~p~n~n", [Fields]),
-%         ?empdb_debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
-% 
-%         Binary_parent_name =
-%             empdb_convert:to_binary(table_options({table, name},Parent)),
-%         Binary_table_name =
-%             empdb_convert:to_binary(table_options({table, name},Current)),
-%         Binary_select_fields =
-%             fields(
-%                 Current_select_fields,
-%                 Common_select_fields
-%             ),
-%         Binary_current_field =
-%             empdb_convert:to_binary(Current_field),
-%         Binary_parent_field =
-%             empdb_convert:to_binary(Parent_field),
-%         {Pfields, Where_string} =
-%             sql_where(Current_all_fields),
-%         Query = [
-%             %% поля обоих таблиц в перемешку
-%             <<" select ">>, Binary_select_fields,
-%             %% родительская таблиа
-%             <<" from ">>,   Binary_parent_name,
-%             %% дочерняя таблиа
-%             <<" join ">>,   Binary_table_name,
-%             %% сцепление таблиц
-%             <<" on ">>, [
-%                 Binary_table_name,  <<".">>,    Binary_current_field,
-%                 <<" =  ">>,
-%                 Binary_parent_name, <<".">>,    Binary_parent_field
-%             ],
-%             Where_string,
-%             [
-%                 sql_order(Current_order),
-%                 sql_limit(Limit),
-%                 sql_offset(Offset)
-%             ]
-%         ],
-%         {Query, Pfields}
-%     end),
-%     empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
-
-
-%%
-%% TODO: только для двух таблиц
-%%
-get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
+get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     filter  =   Afilter,
     fields  =   Fields,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
-} = Qo ) when erlang:is_list(Afilter),erlang:is_list(Aparent) orelse erlang:is_atom(Aparent)->
+} = Qo ) when
+    erlang:is_list(Afilter),erlang:is_list(Aparent)
+    orelse erlang:is_atom(Aparent)->
     {Query, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
-
         Op = lists:map(
             fun ({Current, Current_field}) when erlang:is_atom(Current) ->
                     {table_options(Current), Current_field};
@@ -975,10 +876,8 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
         [{Parent, Parent_field}|Rest] = Op,
 
         Filter = Afilter,
-        %io:format("Filter = ~p~n", [Filter]),
-        
+        %% ?empdb_debug("Filter = ~p~n", [Filter]),
 
-   
         Common_all_fields_ = lists:append(
             lists:map(
                 fun({Tab,_})->
@@ -1006,7 +905,6 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-
         Common_select_fields_ = lists:append(
             lists:map(
                 fun({Tab,_})->
@@ -1015,7 +913,6 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-
         Common_select_fields = lists:append(
             lists:map(
                 fun({Tab,_})->
@@ -1038,19 +935,20 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
         Current_select_fields_ =
             lists:filter(
                 fun ({as, F, N})->
-                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
                     ({as, {F, N}})->
-                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
                     ({F, as, N})->
-                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
                     (F)->
-                        lists:member(F, Common_select_fields ++ Common_select_fields_)
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_)
                 end,
                 Fields
             ),
-
-
-
         Current_all_fields_ =
             lists:filter(
                 fun({F, _})->
@@ -1060,23 +958,21 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
             ),
         Current_all_fields =
             empdb_orm_util:current_all_fields(Current_all_fields_, Op),
-
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
-                        {as, {transform_current_select_fields(F, Op), N}};
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     ({as, F, N}) ->
-                        {as, {transform_current_select_fields(F, Op), N}};
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     ({F, as, N}) ->
-                        {as, {transform_current_select_fields(F, Op), N}};
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     (F) ->
-                        transform_current_select_fields(F, Op);
+                        empdb_orm_util:current_select_fields(F, Op);
                     (Else)  ->
                         Else
                 end,
                 Current_select_fields_
             ),
-
         Current_order =
             lists:filter(
                 fun
@@ -1180,46 +1076,9 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 sql_offset(Offset)
             ]
         ],
-        io:format("~nQuery = ~p~n~n", [Query]),
         {Query, Pfields}
     end),
     empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
-
-
-% 
-% get([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)
-%     erlang:is_atom(Parent),     erlang:is_atom(Parent_field),
-%     erlang:is_atom(Current),    erlang:is_atom(Current_field) ->
-%     Oparent = [
-%         {{table, name},             Parent:table(name)},
-%         {{table, fields, all},      Parent:table({fields, all})},
-%         {{table, fields, select},   Parent:table({fields, select})}
-%     ],
-%     Ocurrent = [
-%         {{table, name},             Current:table(name)},
-%         {{table, fields, all},      Current:table({fields, all})},
-%         {{table, fields, select},   Current:table({fields, select})}
-%     ],
-%     ?empdb_debug("Oparent = ~p~n", [Oparent]),
-%     ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
-%     get([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
-
-
-% get([{Parent, Parent_field}|_] = Op,Con,#queryobj{}=Qo)
-%     when erlang:is_atom(Parent) ->
-%     Descop = lists:map(
-%         fun({Current, Current_field}) ->
-%             Ocurrent = [
-%                 {{table, name},             Current:table(name)},
-%                 {{table, fields, all},      Current:table({fields, all})},
-%                 {{table, fields, select},   Current:table({fields, select})}
-%             ],
-%             {Ocurrent, Current_field}
-%         end,
-%         Op
-%     ),
-%     get(Descop,Con,Qo);
-% 
 
 get(Current, Con, #queryobj{
     filter  =   Filter,
@@ -1228,7 +1087,64 @@ get(Current, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
-%     io:format("Qo = ~p~n~n", [Qo]),
+    %%% depricated___get__(Current, Con, Qo);
+    get([{Current, null}], Con, Qo);
+
+get(Current,Con,#queryobj{}=Qo)  ->
+    Ocurrent = [
+        {{table, name},             Current:table(name)},
+        {{table, fields, all},      Current:table({fields, all})},
+        {{table, fields, select},   Current:table({fields, select})}
+    ],
+    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
+    get(Ocurrent,Con,Qo);
+
+get(Current, Con, Opts) when erlang:is_list(Opts) ->
+    As_filter =
+        case proplists:get_value(filter, Opts, undefined) of
+            undefined   ->    Opts;
+            Filter      ->    Filter
+        end,
+    get(Current, Con,
+        #queryobj{
+                filter  =   As_filter,
+                fields  =
+                    proplists:get_value(fields,  Opts,
+                        proplists:get_value(returning,  Opts,
+                            proplists:get_value(return,  Opts, [])
+                        )
+                    ),
+                order   =   proplists:get_value(order,   Opts, []),
+                limit   =   proplists:get_value(limit,   Opts),
+                offset  =   proplists:get_value(offset,  Opts)
+        }
+    ).
+
+get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
+    ?empdb_debug("Current = ~p~n", [Current]),
+    As_filter =
+        case proplists:get_value(filter, Opts, undefined) of
+            undefined   ->    Opts;
+            Filter      ->    Filter
+        end,
+    get(Current, Con,
+        #queryobj{
+                filter  =   As_filter,
+                fields  =   Fields,
+                order   =   proplists:get_value(order,   Opts, []),
+                limit   =   proplists:get_value(limit,   Opts),
+                offset  =   proplists:get_value(offset,  Opts)
+        }
+    ).
+
+depricated___get__(Current, Con, #queryobj{
+    filter  =   Filter,
+    fields  =   Fields,
+    order   =   Order,
+    limit   =   Limit,
+    offset  =   Offset
+} = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
+
     {Query, Pfields} = empdb_memocashe({Current, Qo}, fun() ->
         Common_all_fields =
             table_options({table, fields, all}, Current),
@@ -1285,25 +1201,281 @@ get(Current, Con, #queryobj{
         ],
         {Query, Pfields}
     end),
+    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)).
+
+%% ===========================================================================
+%% ===========================================================================
+%% ===========================================================================
+
+
+
+count(Current, Con, #queryobj{order=Order}=Obj)
+    when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
+    ?empdb_debug("Order = ~p~n~n", [Order]),
+    count(Current, Con, Obj#queryobj{order=[Order]});
+
+count(Current, Con, #queryobj{filter=Filter}=Obj)
+    when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
+    ?empdb_debug("Filter = ~p~n~n", [Filter]),
+    count(Current, Con, Obj#queryobj{filter=[Filter]});
+
+count(Current, Con, #queryobj{fields=Fields}=Obj)
+    when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
+    ?empdb_debug("Fields = ~p~n~n", [Fields]),
+    count(Current, Con, Obj#queryobj{fields=[Fields]});
+
+count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
+    filter  =   Afilter,
+    fields  =   Fields,
+    order   =   Order,
+    limit   =   Limit,
+    offset  =   Offset
+} = Qo ) when
+    erlang:is_list(Afilter),erlang:is_list(Aparent)
+    orelse erlang:is_atom(Aparent)->
+    {Query, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
+        Op = lists:map(
+            fun ({Current, Current_field}) when erlang:is_atom(Current) ->
+                    {table_options(Current), Current_field};
+                ({Current, Current_field}) ->
+                    {Current, Current_field}
+            end,
+            Aop
+        ),
+
+        [{Parent, Parent_field}|Rest] = Op,
+
+        Filter = Afilter,
+        %% ?empdb_debug("Filter = ~p~n", [Filter]),
+
+        Common_all_fields_ = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    table_options({table, fields, all},Tab)
+                end,
+                Op
+            )
+        ),
+        Common_all_fields = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    lists:map(
+                        fun(Item)->
+                            empdb_convert:to_atom(
+                                empdb_convert:to_list(
+                                    table_options({table, name},Tab)
+                                )
+                                ++ "." ++
+                                empdb_convert:to_list(Item)
+                            )
+                        end,
+                        table_options({table, fields, all},Tab)
+                    )
+                end,
+                Op
+            )
+        ),
+        Common_select_fields_ = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    table_options({table, fields, select},Tab)
+                end,
+                Op
+            )
+        ),
+        Common_select_fields = lists:append(
+            lists:map(
+                fun({Tab,_})->
+                    lists:map(
+                        fun(Item)->
+                            empdb_convert:to_atom(
+                                empdb_convert:to_list(
+                                    table_options({table, name},Tab)
+                                )
+                                ++ "." ++
+                                empdb_convert:to_list(Item)
+                            )
+                        end,
+                        table_options({table, fields, select},Tab)
+                    )
+                end,
+                Op
+            )
+        ),
+        Current_select_fields_ =
+            lists:filter(
+                fun ({as, F, N})->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
+                    ({as, {F, N}})->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
+                    ({F, as, N})->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
+                    (F)->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_)
+                end,
+                Fields
+            ),
+        Current_all_fields_ =
+            lists:filter(
+                fun({F, _})->
+                    lists:member(F, Common_all_fields ++ Common_all_fields_)
+                end,
+                Filter
+            ),
+        Current_all_fields =
+            empdb_orm_util:current_all_fields(Current_all_fields_, Op),
+        Current_select_fields =
+            lists:map(
+                fun ({as, {F, N}}) ->
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    ({as, F, N}) ->
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    ({F, as, N}) ->
+                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    (F) ->
+                        empdb_orm_util:current_select_fields(F, Op);
+                    (Else)  ->
+                        Else
+                end,
+                Current_select_fields_
+            ),
+        Current_order =
+            lists:filter(
+                fun
+                    ({desc, F})->
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
+                    ({F, desc})->
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
+                    ({asc, F})->
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
+                    ({F, asc})->
+                        lists:member(F, Common_all_fields ++ Common_all_fields_);
+                    (F)->
+                        lists:member(F, Common_all_fields ++ Common_all_fields_)
+                end,
+                Order
+            ),
+        Binary_parent_name =
+            empdb_convert:to_binary(table_options({table, name},Parent)),
+
+        Binary_select_fields =
+            fields(
+                Current_select_fields,
+                Common_select_fields
+            ),
+        Binary_parent_field =
+            empdb_convert:to_binary(Parent_field),
+        {Pfields, Where_string} =
+            sql_where(Current_all_fields),
+        Query = [
+            %% поля обоих таблиц в перемешку
+            <<" select count(*) ">>,
+            %% родительская таблиа
+            <<" from ">>,   Binary_parent_name,
+            begin
+                {_, Joinlist} = lists:foldl(
+                    fun
+                        ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
+                            {{Current1, Current_field1},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            };
+                        ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
+                            {{Current1, Current_field2},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            };
+                        ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
+                            {{Current1, Current_field1},
+                                Prev ++ [
+                                    %% дочерняя таблиц
+                                    <<" join ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                    %% сцепление таблиц
+                                    <<" on ">>, [
+                                        empdb_convert:to_binary(table_options({table, name},Current1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Current_field1),
+                                        <<" = ">>,
+                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                        <<".">>,
+                                        empdb_convert:to_binary(Parent_field1)
+                                    ]
+                                ]
+                            }
+                    end,
+                    {{Parent, Parent_field}, []},
+                    Rest
+                ),
+                Joinlist
+            end,
+            Where_string,
+            [
+                sql_order(Current_order),
+                sql_limit(Limit),
+                sql_offset(Offset)
+            ]
+        ],
+        {Query, Pfields}
+    end),
     empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
 
+count(Current, Con, #queryobj{
+    filter  =   Filter,
+    fields  =   Fields,
+    order   =   Order,
+    limit   =   Limit,
+    offset  =   Offset
+} = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
+    %%% depricated___count__(Current, Con, Qo);
+    count([{Current, null}], Con, Qo);
 
-get(Current,Con,#queryobj{}=Qo)  ->
+count(Current,Con,#queryobj{}=Qo)  ->
     Ocurrent = [
         {{table, name},             Current:table(name)},
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
     ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
-    get(Ocurrent,Con,Qo);
+    count(Ocurrent,Con,Qo);
 
-get(Current, Con, Opts) when erlang:is_list(Opts) ->
+count(Current, Con, Opts) when erlang:is_list(Opts) ->
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    get(Current, Con,
+    count(Current, Con,
         #queryobj{
                 filter  =   As_filter,
                 fields  =
@@ -1318,15 +1490,14 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
         }
     ).
 
-get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
+count(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
     ?empdb_debug("Current = ~p~n", [Current]),
-    
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
             Filter      ->    Filter
         end,
-    get(Current, Con,
+    count(Current, Con,
         #queryobj{
                 filter  =   As_filter,
                 fields  =   Fields,
@@ -1335,202 +1506,15 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
                 offset  =   proplists:get_value(offset,  Opts)
         }
     ).
-% 
-% proplist2queryobj(Opts)
-%     As_filter =
-%         case proplists:get_value(filter, Opts, undefined) of
-%             undefined   ->    Opts;
-%             Filter      ->    Filter
-%         end,
-%     #queryobj{
-%             filter  =   As_filter,
-%             fields  =
-%                 proplists:get_value(fields,  Opts,
-%                     proplists:get_value(returning,  Opts,
-%                         proplists:get_value(return,  Opts, [])
-%                     )
-%                 ),
-%             order   =   proplists:get_value(order,   Opts, []),
-%             limit   =   proplists:get_value(limit,   Opts),
-%             offset  =   proplists:get_value(offset,  Opts)
-%     }.
 
-
-transform_current_select_fields(Filtername, Op) ->
-    Filternamestr = empdb_convert:to_list(Filtername),
-    case lists:member($., empdb_convert:to_list(Filtername)) of
-        true ->
-            Filtername;
-        _ ->
-            case lists:foldl(
-                fun ({Tab, _}, [])->
-                        case
-                            lists:member(
-                                Filtername,
-                                table_options(
-                                    {table, fields, select},
-                                    Tab
-                                )
-                            )
-                        of
-                            true ->
-                                empdb_convert:to_atom(
-                                    empdb_convert:to_list(
-                                        table_options({table, name},Tab)
-                                    )
-                                    ++ "." ++
-                                    Filternamestr
-                                );
-                            _ ->
-                                []
-                        end;
-                    ({Tab, _}, Res) ->
-                        Res
-                end, [], Op
-            ) of
-                [] ->
-                    Filtername;
-                Newfiltername ->
-                    Newfiltername
-            end
-    end.
-
-
-    
-% get(    Current,
-%         Con,
-%         {Key, Value},
-%         Fields,
-%         Limit,
-%         Offset
-% )->
-%     get(Current, Con, [{Key, Value}], Fields);
-
-
-
-count(Current, Con, #queryobj{order=Order}=Obj)
-    when erlang:is_atom(Order) orelse erlang:is_tuple(Order) ->
-    ?empdb_debug("Order = ~p~n~n", [Order]),
-    count(Current, Con, Obj#queryobj{order=[Order]});
-
-count(Current, Con, #queryobj{filter=Filter}=Obj)
-    when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    ?empdb_debug("Filter = ~p~n~n", [Filter]),
-    count(Current, Con, Obj#queryobj{filter=[Filter]});
-
-
-count(Current, Con, #queryobj{fields=Fields}=Obj)
-    when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?empdb_debug("Fields = ~p~n~n", [Fields]),
-    count(Current, Con, Obj#queryobj{fields=[Fields]});
-
-%%
-%% TODO: только для двух таблиц
-%%
-count([{Parent, Parent_field}, {Current, Current_field}] = Op, Con, #queryobj{
-    filter  =   Filter,
-    fields  =   Fields,
-    order   =   Order,
-    limit   =   Limit,
-    offset  =   Offset
-} = Qo ) when erlang:is_list(Filter), erlang:is_list(Current),erlang:is_list(Parent)->
-    {Query, Pfields} = empdb_memocashe({Op, Qo}, fun() ->
-        Common_all_fields = lists:append(
-            table_options({table, fields, all},      Parent),
-            table_options({table, fields, all},      Current)
-        ),
-        Common_select_fields = lists:append(
-            table_options({table, fields, select},   Parent),
-            table_options({table, fields, select},   Current)
-        ),
-        Current_select_fields =
-            lists:filter(
-                fun
-                    (F)-> lists:member(F, Common_select_fields)
-                end,
-                Fields
-            ),
-        Current_all_fields =
-            lists:filter(
-                fun({F, _})->
-                    lists:member(F, Common_all_fields)
-                end,
-                Filter
-            ),
-        Current_order =
-            lists:filter(
-                fun(F)->
-                    lists:member(F, Common_all_fields)
-                end,
-                Order
-            ),
-
-        ?empdb_debug("Fields = ~p~n~n", [Fields]),
-        ?empdb_debug("Current_select_fields = ~p~n~n", [Current_select_fields]),
-
-        Binary_parent_name =
-            empdb_convert:to_binary(table_options({table, name},Parent)),
-        Binary_table_name =
-            empdb_convert:to_binary(table_options({table, name},Current)),
-        Binary_select_fields =
-            fields(
-                Current_select_fields,
-                Common_select_fields
-            ),
-        Binary_current_field =
-            empdb_convert:to_binary(Current_field),
-        Binary_parent_field =
-            empdb_convert:to_binary(Parent_field),
-        {Pfields, Where_string} =
-            sql_where(Current_all_fields),
-        Query = [
-            %% поля обоих таблиц в перемешку
-            <<" select count(*) ">>,
-            %% родительская таблиа
-            <<" from ">>,   Binary_parent_name,
-            %% дочерняя таблиа
-            <<" join ">>,   Binary_table_name,
-            %% сцепление таблиц
-            <<" on ">>, [
-                Binary_table_name,  <<".">>,    Binary_current_field,
-                <<" =  ">>,
-                Binary_parent_name, <<".">>,    Binary_parent_field
-            ],
-            Where_string,
-            [
-                sql_order(Current_order),
-                sql_limit(Limit),
-                sql_offset(Offset)
-            ]
-        ],
-        {Query, Pfields}
-    end),
-    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
-
-
-count([{Parent, Parent_field}, {Current, Current_field}]=Op,Con,#queryobj{}=Qo)->
-    Oparent = [
-        {{table, name},             Parent:table(name)},
-        {{table, fields, all},      Parent:table({fields, all})},
-        {{table, fields, select},   Parent:table({fields, select})}
-    ],
-    Ocurrent = [
-        {{table, name},             Current:table(name)},
-        {{table, fields, all},      Current:table({fields, all})},
-        {{table, fields, select},   Current:table({fields, select})}
-    ],
-    ?empdb_debug("Oparent = ~p~n", [Oparent]),
-    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
-
-    count([{Oparent, Parent_field}, {Ocurrent, Current_field}],Con,Qo);
-
-count(Current, Con, #queryobj{
+depricated___count__(Current, Con, #queryobj{
     filter  =   Filter,
     fields  =   Fields,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
+
     {Query, Pfields} = empdb_memocashe({Current, Qo}, fun() ->
         Common_all_fields =
             table_options({table, fields, all}, Current),
@@ -1551,6 +1535,14 @@ count(Current, Con, #queryobj{
         Current_order =
             lists:filter(
                 fun
+                    ({desc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, desc})->
+                        lists:member(F, Common_all_fields);
+                    ({asc, F})->
+                        lists:member(F, Common_all_fields);
+                    ({F, asc})->
+                        lists:member(F, Common_all_fields);
                     (F)->
                         lists:member(F, Common_all_fields)
                 end,
@@ -1579,57 +1571,7 @@ count(Current, Con, #queryobj{
         ],
         {Query, Pfields}
     end),
-    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
-
-
-count(Current,Con,#queryobj{}=Qo)  ->
-    Ocurrent = [
-        {{table, name},             Current:table(name)},
-        {{table, fields, all},      Current:table({fields, all})},
-        {{table, fields, select},   Current:table({fields, select})}
-    ],
-    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
-    count(Ocurrent,Con,Qo);
-
-count(Current, Con, Opts) when erlang:is_list(Opts) ->
-    As_filter =
-        case proplists:get_value(filter, Opts, undefined) of
-            undefined   ->    Opts;
-            Filter      ->    Filter
-        end,
-    ?empdb_debug("proplists:get_value(fields,  Opts) = ~p ~n~n", [proplists:get_value(fields,  Opts)]),
-    count(Current, Con,
-        #queryobj{
-                filter  =   As_filter,
-                fields  =
-                    proplists:get_value(fields,  Opts,
-                        proplists:get_value(returning,  Opts,
-                            proplists:get_value(return,  Opts, [])
-                        )
-                    ),
-                order   =   proplists:get_value(order,   Opts, []),
-                limit   =   proplists:get_value(limit,   Opts),
-                offset  =   proplists:get_value(offset,  Opts)
-        }
-    ).
-
-count(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    ?empdb_debug("Current = ~p~n", [Current]),
-
-    As_filter =
-        case proplists:get_value(filter, Opts, undefined) of
-            undefined   ->    Opts;
-            Filter      ->    Filter
-        end,
-    count(Current, Con,
-        #queryobj{
-                filter  =   As_filter,
-                fields  =   Fields,
-                order   =   proplists:get_value(order,   Opts, []),
-                limit   =   proplists:get_value(limit,   Opts),
-                offset  =   proplists:get_value(offset,  Opts)
-        }
-    ).
+    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)).
 
 
 % 
@@ -1862,15 +1804,12 @@ update(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
     ?empdb_debug("Fields = ~p~n~n", [Fields]),
     update(Current, Con, Obj#queryobj{fields=[Fields]});
-    
-    
+
 update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     values  =   Values,
     filter  =   Filter,
     fields  =   Returning
 } = Queryobj)->
-    io:format("~n [{Parent, Parent_field}, {Current, Current_field}] = ~p~n", [[{Parent, Parent_field}, {Current, Current_field}]]),
-
     {ok, Glst} =
         get(Current, Con,  #queryobj{
             filter  =   Filter,
@@ -1926,7 +1865,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                         [proplists:get_value(Parent_field, Parent_pl)|Acc]
                     end, [], Parent_pls),
 
-                    io:format("~nParent_pls = ~p~n", [Parent_pls]),
+                    % ?empdb_debug("~nParent_pls = ~p~n", [Parent_pls]),
 
                     case update(Current, Con, Queryobj#queryobj{
                         filter=[{Current_field, {in, Pids}}|Filter],
@@ -1961,7 +1900,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {Eclass, Error} ->
-                    io:format("Eclass ~n~n~n"),
+                    % ?empdb_debug("Eclass ~n~n~n"),
                     {Eclass, Error}
             end
     end;
@@ -1992,7 +1931,7 @@ update(Current, Con, #queryobj{
             Filter
         ),
 
-    io:format("Current_all_fields = ~p~n~n~n", [Current_all_fields]),
+    % ?empdb_debug("Current_all_fields = ~p~n~n~n", [Current_all_fields]),
     
     Current_update_fields =
         lists:filter(
@@ -2013,8 +1952,8 @@ update(Current, Con, #queryobj{
 %     ?empdb_debug("Values = ~p~n~n~n", [Values]),
 %     ?empdb_debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
 %     ?empdb_debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
-%     io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
-%     io:format("Returning = ~p~n~n~n", [Returning]),
+%     % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+%     % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
 
      
     case Current_update_fields of
@@ -2025,8 +1964,8 @@ update(Current, Con, #queryobj{
                     {ok, [{[]}]};
                 _ ->
 
-                    io:format("Returning = ~p~n~n~n", [Returning]),
-                    io:format("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+                    % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
+                    % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
     
                     get(Current, Con, #queryobj{
                         filter=Filter, 
@@ -2098,7 +2037,7 @@ update(Current, Con, #queryobj{}=Queryobj)->
     update(Ocurrent, Con, Queryobj);
 
 update(Current, Con, Opts) when erlang:is_list(Opts) ->
-    io:format("Opts ~p~n", [Opts]),
+    % ?empdb_debug("Opts ~p~n", [Opts]),
     As_values =
         case proplists:get_value(values, Opts, undefined) of
             undefined ->

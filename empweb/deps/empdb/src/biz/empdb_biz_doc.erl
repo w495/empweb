@@ -199,6 +199,7 @@
 -export([
     get_community/1,
     get_community/2,
+    count_community/1,
     create_community/1,
     update_community/1,
     delete_community/1
@@ -1051,6 +1052,11 @@ get_community(Params)->
 get_community(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_community:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
+    end).
+
+count_community(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao_community:count(Con, [{isdeleted, false}|Params])
     end).
 
 is_community_owner(Uid, Oid)->

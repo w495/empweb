@@ -585,6 +585,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% Сообщества
             %%
+            <<"count_community">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   count_community
+                };
             <<"get_community">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,

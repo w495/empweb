@@ -757,30 +757,6 @@ handle(_req, #empweb_hap{
         end
     );
 
-
-handle(_req, #empweb_hap{
-        is_auth =   true,
-        action  =   update_blog,
-        params  =   Params,
-        pers_id =   Pers_id
-    } = Hap) ->
-    ?evman_args([Hap], <<" = update blog">>),
-    empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('update')),
-        fun(Data)->
-            ?evman_debug(Data, <<" = Data">>),
-            {ok,
-                empweb_jsonapi:resp(
-                    empweb_biz_doc:update_blog([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])
-                ),
-                Hap
-            }
-        end
-    );
-
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   delete_blog,
@@ -1418,6 +1394,56 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   count_community,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = count community">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = communitytype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communitytype_alias,
+                required    = false,
+                types       = [nullable, atom]
+            },
+            #norm_rule{
+                key         = treasury,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = slogan,
+                required    = false,
+                types       = [string]
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:count_community(
+                        empweb_norm:filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+    
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create_community,

@@ -191,6 +191,7 @@
 -export([
     get_community/1,
     get_community/2,
+    count_community/1,
     create_community/1,
     update_community/1,
     delete_community/1
@@ -504,6 +505,9 @@ update_community(Params)->
 
 delete_community(Params)->
     empdb_biz_doc:update_room(Params).
+
+count_community(Params)->
+    empdb_biz_doc:count_community(Params).
 
 get_community(Params)->
     empdb_biz_doc:get_community(Params).

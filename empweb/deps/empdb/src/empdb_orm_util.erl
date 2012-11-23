@@ -2,10 +2,51 @@
 
 
 -export([
-    current_all_fields/2
+    current_all_fields/2,
+    current_select_fields/2
 ]).
 
 
+current_select_fields(Filtername, Op) ->
+    Filternamestr = empdb_convert:to_list(Filtername),
+    case lists:member($., empdb_convert:to_list(Filtername)) of
+        true ->
+            Filtername;
+        _ ->
+            case lists:foldl(
+                fun ({Tab, _}, [])->
+                        case
+                            lists:member(
+                                Filtername,
+                                table_options(
+                                    {table, fields, select},
+                                    Tab
+                                )
+                            )
+                        of
+                            true ->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(
+                                        table_options({table, name},Tab)
+                                    )
+                                    ++ "." ++
+                                    Filternamestr
+                                );
+                            _ ->
+                                []
+                        end;
+                    ({Tab, _}, Res) ->
+                        Res
+                end, [], Op
+            ) of
+                [] ->
+                    Filtername;
+                Newfiltername ->
+                    Newfiltername
+            end
+    end.
+
+    
 current_all_fields(Current_all_fields_, Op) ->
     lists:map(
         fun ({Filtername, Filterval}) when is_atom(Filtername) ->

@@ -17,6 +17,7 @@
     table/0,
     create/2,
     update/2,
+    count/2,
     get/2,
     get/3
 ]).
@@ -92,8 +93,11 @@ table(name)->
 table()->
     table(name).
 
+count(Con, Some) ->
+    empdb_dao_doc:count(?MODULE, Con, Some).
+
 get(Con, Some) ->
-    get(Con, Some, []).
+    empdb_dao_doc:get(?MODULE, Con, Some).
 
 get(Con, What, Fields)->
     empdb_dao_doc:get(?MODULE, Con, What, Fields).
