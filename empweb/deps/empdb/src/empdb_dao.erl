@@ -1058,12 +1058,8 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 end,
                 Filter
             ),
-
-        io:format("Current_all_fields_ = ~p~n~n~n~n~n", [Current_all_fields_]),
-
-        % Tab
-        
-        Current_all_fields =  empdb_orm_util:current_all_fields(Current_all_fields_, Op),
+        Current_all_fields =
+            empdb_orm_util:current_all_fields(Current_all_fields_, Op),
 
         Current_select_fields =
             lists:map(
@@ -1080,16 +1076,7 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                 end,
                 Current_select_fields_
             ),
-% 
-% 
-%         io:format("Current_select_fields_  = ~p~n", [Current_select_fields_]),
-%         io:format("Current_select_fields   = ~p~n", [Current_select_fields]),
-% 
-% 
-%         io:format("Common_all_fields_  = ~p~n", [Common_all_fields_]),
-%         io:format("Common_all_fields   = ~p~n", [Common_all_fields]),
 
-        
         Current_order =
             lists:filter(
                 fun
