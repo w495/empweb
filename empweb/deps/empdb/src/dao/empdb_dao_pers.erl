@@ -159,7 +159,6 @@ table({fields, all})->
         hobby,
         interest,
         descr,
-        pregion_id,
         birthday,    % 'extract(epoch from birthday) as birthday',
         lang_id,
         lang_alias,

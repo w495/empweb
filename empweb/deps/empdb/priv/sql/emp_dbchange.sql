@@ -145,6 +145,9 @@ alter table fileinfo add column file_id decimal references file(id) default null
 
     alter table pers add column geo_id decimal references geo(id) default null;
     alter table pers add column interest varchar(1024) default null;
+
+    alter table pers add column pregion_id numeric default null;
+
     
     insert into geo(alias) values
         ('ru'),

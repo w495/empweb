@@ -113,8 +113,6 @@ empdb_dao_pers({fields, select})->
         married_id,
         mother_id,
         father_id,
-        community_id,
-        community_head,
         live_room_id,
         live_room_head,
         isdeleted
