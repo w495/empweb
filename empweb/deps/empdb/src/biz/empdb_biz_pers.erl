@@ -348,6 +348,8 @@ login({Uf, Uv}, Params) ->
                                 comm_acctype_id,
                                 read_acctype_alias,
                                 read_acctype_id,
+                                contype_id,
+                                contype_alias,
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
@@ -371,6 +373,8 @@ login({Uf, Uv}, Params) ->
                                 comm_acctype_id,
                                 read_acctype_alias,
                                 read_acctype_id,
+                                contype_id,
+                                contype_alias,
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
@@ -508,6 +512,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             read_acctype_alias,
                             comm_acctype_id,
                             comm_acctype_alias,
+                            contype_id,
+                            contype_alias,
                             vcounter
                         ]}
                     ])) of
@@ -538,6 +544,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             read_acctype_alias,
                             comm_acctype_id,
                             comm_acctype_alias,
+                            contype_id,
+                            contype_alias,
                             vcounter
                         ]}
                     ])) of
