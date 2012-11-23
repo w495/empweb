@@ -1079,15 +1079,20 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                                                 )
                                             of
                                                 true ->
-                                                    {   empdb_convert:to_atom(
-                                                            empdb_convert:to_list(
-                                                                table_options({table, name},Tab)
-                                                            )
-                                                            ++ "." ++
-                                                            Filternamestr
-                                                        ),
-                                                        Filterval
-                                                    };
+                                                    case Filternamestr of
+                                                        "or" ->
+                                                            {Filternamestr, Filterval};
+                                                        _ ->
+                                                            {   empdb_convert:to_atom(
+                                                                    empdb_convert:to_list(
+                                                                        table_options({table, name},Tab)
+                                                                    )
+                                                                    ++ "." ++
+                                                                    Filternamestr
+                                                                ),
+                                                                Filterval
+                                                            }
+                                                    end;
                                                 _ ->
                                                     []
                                             end;
