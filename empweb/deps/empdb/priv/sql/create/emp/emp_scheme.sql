@@ -478,7 +478,9 @@ create table pers(
     /** Общество в котором он состоит
         [см далее]: live_community_id decimal references community(id) default null,
     **/
-    live_community_head     varchar(1024) /*references doc(head)*/ default null,
+    live_community_head         varchar(1024) /*references doc(head)*/ default null,
+    live_community_approved     boolean  default null,
+    
     /** Общество которое он создал
         [см далее]: own_community_id decimal references community(id) default null,
     **/

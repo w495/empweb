@@ -690,6 +690,10 @@ begin
         raise exception 'exists_live_community';
     end if;
 
+    if (new.live_community_id is null) then
+        new.live_community_approved = null;
+    end if;
+
 --     if (
 --         (new.own_community_id != old.own_community_id)
 --     and

@@ -187,3 +187,6 @@ alter table pers add column own_community_id
 alter table pers add column live_community_head varchar(1024) default null;
 alter table pers add column own_community_head  varchar(1024) default null;
 
+
+alter table pers add column live_community_approved     boolean  default null;
+    
