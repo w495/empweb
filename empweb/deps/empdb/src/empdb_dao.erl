@@ -1080,7 +1080,7 @@ get([{Aparent, Aparent_field}|Arest] = Aop, Con, #queryobj{
                                             of
                                                 true ->
                                                     case Filternamestr of
-                                                        "or" ->
+                                                        'or' ->
                                                             {Filternamestr, Filterval};
                                                         _ ->
                                                             {   empdb_convert:to_atom(
