@@ -476,9 +476,14 @@ create table pers(
     mother_id           decimal references pers(id)        default null,
     father_id           decimal references pers(id)        default null,
     /** Общество в котором он состоит
-        [см далее]: community_id decimal references community(id) default null,
+        [см далее]: live_community_id decimal references community(id) default null,
     **/
-    community_head      varchar(1024) /*references doc(head)*/ default null,
+    live_community_head     varchar(1024) /*references doc(head)*/ default null,
+    /** Общество которое он создал
+        [см далее]: own_community_id decimal references community(id) default null,
+    **/
+    own_community_head      varchar(1024) /*references doc(head)*/ default null,
+    
     /** Страна \ рай \ aд
         [см далее]: live_room_id decimal references room(id) default null,
     **/
@@ -1116,7 +1121,10 @@ create table communitymemb (
     isdeleted           bool default false
 );
 
-alter table pers add column community_id
+alter table pers add column live_community_id
+    decimal references community(doc_id) default null;
+
+alter table pers add column own_community_id
     decimal references community(doc_id) default null;
 
 ------------------------------------------------------------------------------

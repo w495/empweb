@@ -187,8 +187,11 @@ table({fields, all})->
         mother_id,
         father_id,
         
-        community_id,
-        community_head,
+        live_community_id,
+        live_community_head,
+
+        own_community_id,
+        own_community_head,
 
         live_room_id,
         live_room_head,

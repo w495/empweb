@@ -62,6 +62,9 @@ handle(Req, State) ->
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
+
+    io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
+    
     Reply =
         empweb_http:reply(
             Http_resp#http_resp{body = Http_resp_json},
@@ -1238,7 +1241,20 @@ empweb_jsonapi_map(Req, {List}, State) ->
     ?evman_debug({empweb_jsonapi_action, Hap}),
     empweb_jsonapi:call(Req, Hap, Fname);
 
+empweb_jsonapi_map(Req, [{_}|_] = List, State) ->
+    ?evman_args([List]),
+    {Res, Reqres} =
+        lists:foldl(
+            fun(Item, {Acc, Reqi})->
+                {Resi, Reqresi} = empweb_jsonapi_map(Reqi, Item, State),
+                {[Resi|Acc], Reqresi}
+            end,
+            {[], Req},
+            List
+        ),
+    io:format("Res = ~p~n~n~n", [Res]),
+    {lists:reverse(Res), Reqres};
+
 empweb_jsonapi_map(Req, List, State) ->
     ?evman_args([List]),
     {empweb_jsonapi:not_extended(wrong_format), Req}.
-

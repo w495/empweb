@@ -168,10 +168,19 @@ alter table fileinfo add column file_id decimal references file(id) default null
         ('kiev',        (select id from geo where alias = 'ua')),
         ('odessa',      (select id from geo where alias = 'ua'));
 
+    alter table friend add column pers_nick     varchar(1024) default null;
+    alter table friend  add column friend_nick  varchar(1024) default null;
 */
 
 
+-- 2012.11.23 00:27:16:733548113 --------------------------------------------
 
-alter table pers add column pers_nick   varchar(1024) default null;
-alter table pers add column friend_nick varchar(1024) default null;
+
+alter table pers add column live_community_id
+    decimal references community(doc_id) default null;
+alter table pers add column own_community_id
+    decimal references community(doc_id) default null;
+
+alter table pers add column live_community_head varchar(1024) default null;
+alter table pers add column own_community_head  varchar(1024) default null;
 

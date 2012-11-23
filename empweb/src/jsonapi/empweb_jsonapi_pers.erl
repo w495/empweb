@@ -413,7 +413,7 @@ handle(_req, #empweb_hap{
             },
         %% Сообщество
             #norm_rule{
-                key         = community_id,
+                key         = live_community_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
@@ -548,7 +548,7 @@ handle(_req, #empweb_hap{
                     },
                 %% Сообщество
                     #norm_rule{
-                        key = community_id,
+                        key = live_community_id,
                         types = [nullable, integer]
                     },
                 %% Эмоции пользователя.

@@ -1004,8 +1004,33 @@ is_room_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create_community(Params)->
+    Owner_id = proplists:get_value(owner_id, Params, []),
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:create(Con, Params)
+        case empdb_dao_community:get(Con, [
+            {owner_id, Owner_id},
+            {limit, 1},
+            {isdeleted, false}
+        ]) of
+            {ok, []} ->
+                case empdb_dao_community:create(Con, Params) of
+                    {ok, [{Respl}]} ->
+                        {ok, _} = empdb_dao_pers:update(Con, [
+                            {filter, [
+                                {id, Owner_id}
+                            ]},
+                            {values, [
+                                {own_community_id, proplists:get_value(id, Respl)}
+                            ]}
+                        ]),
+                        {ok, [{Respl}]};
+                    Error ->
+                        Error
+                end;
+            {ok, _} -> 
+                {error,{not_unique_owner,Owner_id}};
+            Error ->
+                Error
+        end
     end).
 
 update_community(Params)->

@@ -210,10 +210,10 @@ update(Params)->
     case proplists:get_value(pass, Params) of
         undefined ->
             %% не пытаемся поменять пароль
-            empdb_dao_pers:update(emp, Params);
+            update_(emp, Params);
         Mbpass ->
             %% пытаемся поменять пароль
-            case empdb_dao_pers:update(emp, [
+            case update_(emp, [
                 {phash, phash(Mbpass)}
                 |Params
             ])  of
@@ -234,6 +234,10 @@ update(Params)->
                     {Eclass, Error}
             end
     end.
+
+update_(Con, Params)->
+    empdb_dao_pers:update(Con, Params).
+
 
 %%
 %% @doc Вход пользователя. Создание сессии.
@@ -507,7 +511,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             vcounter
                         ]}
                     ])) of
-                        {ok, [Blog]} ->
+                        {ok, [Blog|_]} ->
                             get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}]);
                         _ ->
                             get_opt(Con, Params, Options, [{[{blog, null}|Acc]}])
@@ -537,7 +541,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             vcounter
                         ]}
                     ])) of
-                        {ok, [Album]} ->
+                        {ok, [Album|_]} ->
                             get_opt(Con, Params, Options, [{[{album, Album}|Acc]}]);
                         _ ->
                             get_opt(Con, Params, Options, [{[{album, null}|Acc]}])

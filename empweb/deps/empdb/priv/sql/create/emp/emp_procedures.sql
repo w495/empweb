@@ -671,16 +671,44 @@ create or replace function pers_util_fields_on_update() returns "trigger" as $$
 begin
     if new.own_room_id != old.own_room_id then
         new.own_room_head =
-            (select doc.head from doc where doc.id = new.own_room_id and doc.doctype_alias = 'room');
+            (select doc.head from doc
+                where doc.id = new.own_room_id
+                    and doc.doctype_alias = 'room');
     end if;
     if new.live_room_id != old.live_room_id then
         new.live_room_head =
-            (select doc.head from doc where doc.id = new.live_room_id and doc.doctype_alias = 'room');
+            (select doc.head from doc
+                where doc.id = new.live_room_id
+                    and doc.doctype_alias = 'room');
     end if;
-    if new.community_id != old.community_id then
-        new.community_head =
-            (select doc.head from doc where doc.id = new.community_id and doc.doctype_alias = 'community');
+    
+    if (new.live_community_id != old.live_community_id) then
+        if (new.own_community_id is null) then
+            new.live_community_head =
+                (select doc.head from doc
+                    where doc.id = new.live_community_id
+                        and doc.doctype_alias = 'community');
+        else
+            raise exception 'exists_own_community';
+        end if;
     end if;
+
+    if new.own_community_id != old.own_community_id then
+        if (new.live_community_id is null) then
+            new.own_community_head =
+                (select doc.head from doc
+                    where doc.id = new.own_community_id
+                        and doc.doctype_alias = 'community');
+            new.live_community_id = new.own_community_head;
+            new.live_community_head =
+                (select doc.head from doc
+                    where doc.id = new.live_community_id
+                        and doc.doctype_alias = 'community');
+        else
+            raise exception 'exists_live_community';
+        end if;
+    end if;
+
     /**
         Статус online \ offline
     **/
