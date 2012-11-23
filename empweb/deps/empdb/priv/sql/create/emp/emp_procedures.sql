@@ -681,33 +681,40 @@ begin
                 where doc.id = new.live_room_id
                     and doc.doctype_alias = 'room');
     end if;
-    
-    if (new.live_community_id != old.live_community_id) then
-        if (new.own_community_id is null) then
-            new.live_community_head =
-                (select doc.head from doc
-                    where doc.id = new.live_community_id
-                        and doc.doctype_alias = 'community');
-        else
-            raise exception 'exists_own_community';
-        end if;
+
+    if (
+        (new.live_community_id != old.live_community_id)
+    and
+        (not (new.live_community_id is null))
+    ) then
+        raise exception 'exists_live_community';
     end if;
 
-    if new.own_community_id != old.own_community_id then
-        if (new.live_community_id is null) then
-            new.own_community_head =
-                (select doc.head from doc
-                    where doc.id = new.own_community_id
-                        and doc.doctype_alias = 'community');
-            new.live_community_id = new.own_community_head;
-            new.live_community_head =
-                (select doc.head from doc
-                    where doc.id = new.live_community_id
-                        and doc.doctype_alias = 'community');
-        else
-            raise exception 'exists_live_community';
-        end if;
-    end if;
+--     if (
+--         (new.own_community_id != old.own_community_id)
+--     and
+--         (not (new.own_community_id is null))
+--     and (
+--             (not (new.live_community_id is null))
+-- --         or
+-- --             (not (old.live_community_id is null))
+--     )) then
+-- --         if (new.live_community_id is null) then
+-- --             new.own_community_head =
+-- --                 (select doc.head from doc
+-- --                     where doc.id = new.own_community_id
+-- --                         and doc.doctype_alias = 'community');
+-- --             new.live_community_id = new.own_community_head;
+-- --             new.live_community_head =
+-- --                 (select doc.head from doc
+-- --                     where doc.id = new.live_community_id
+-- --                         and doc.doctype_alias = 'community');
+-- --         else
+--         raise exception 'exists_own_community';
+--         else
+--         new.live_community_id = new.own_community_id;
+-- --      end if;
+--     end if;
 
     /**
         Статус online \ offline

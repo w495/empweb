@@ -1019,7 +1019,7 @@ create_community(Params)->
                                 {id, Owner_id}
                             ]},
                             {values, [
-                                {own_community_id, proplists:get_value(id, Respl)}
+                                {live_community_id, proplists:get_value(id, Respl)}
                             ]}
                         ]),
                         {ok, [{Respl}]};

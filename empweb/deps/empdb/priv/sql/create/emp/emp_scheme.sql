@@ -413,7 +413,7 @@ create table pers(
     empl        varchar(1024)   default null,
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
-    interest    varchar(1024)   default null;
+    interest    varchar(1024)   default null,
     
 
     geo_id  decimal references  geo(id)     default null,
