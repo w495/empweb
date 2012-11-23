@@ -417,6 +417,11 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
+            #norm_rule{
+                key         = live_community_approved,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
         %% Эмоции пользователя.
             #norm_rule{
                 key         = emotion_id,
@@ -550,6 +555,10 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = live_community_id,
                         types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = live_community_approved,
+                        types = [nullable, boolean]
                     },
                 %% Эмоции пользователя.
                     #norm_rule{
