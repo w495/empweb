@@ -150,9 +150,9 @@ create table fileinfo(
     md5string       char(32)                            default null,
 
     fileinfotype_id     decimal references fileinfotype(id)     default null,
-    fileinfotype_alias  decimal varchar(1024)                   default null,
+    fileinfotype_alias  varchar(1024)                   default null,
     filetype_id         decimal references filetype(id)         default null,
-    filetype_alias      decimal varchar(1024)                   default null,
+    filetype_alias      varchar(1024)                   default null,
 
     created             timestamp without time zone not null    default utcnow(),
     isdeleted           bool default false
@@ -338,7 +338,7 @@ create table perspicbody(
 create sequence seq_geo_id;
 create table geo(
     id          decimal primary key default nextval('seq_geo_id'),
-    alias       varchar(1024)   unique,
+    alias       varchar(1024)   default null,
     /**
         Номер языковой сущности
     **/
@@ -1104,7 +1104,7 @@ create sequence seq_communitycand_id;
 create table communitycand (
     id                  decimal primary key default nextval('seq_communitycand_id'),
     pers_id             decimal references pers(id) not null,
-    community_id        decimal references community(id) not null,
+    community_id        decimal references community(doc_id) not null,
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
 );
@@ -1116,7 +1116,7 @@ create sequence seq_communitymemb_id;
 create table communitymemb (
     id                  decimal primary key default nextval('seq_communitymemb_id'),
     pers_id             decimal references pers(id) not null,
-    community_id        decimal references community(id) not null,
+    community_id        decimal references community(doc_id) not null,
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
 );
