@@ -194,3 +194,7 @@ alter table community add column ncands decimal default 0;
 alter table community add column nmembs decimal default 0;
 
 */
+
+
+
+alter table photo add column path varchar(1024) default null;

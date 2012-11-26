@@ -58,6 +58,7 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
+        path,
         file_id,
         is_cover
     ];

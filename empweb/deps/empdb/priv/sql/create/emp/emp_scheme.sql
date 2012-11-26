@@ -542,6 +542,13 @@ alter table file add column owner_id
 alter table fileinfo add owner_id
     decimal references pers(id) default null;
 
+
+alter table file     add owner_nick varchar(1024)
+    references pers(nick) default null;
+alter table fileinfo add owner_nick varchar(1024)
+    references pers(nick) default null;
+
+
 /**
  *  Группа пользователей
 **/
@@ -1245,7 +1252,6 @@ create table roombet(
 );
 
 
-
 alter table room add column roomlot_id          decimal         references roomlot(doc_id)  default null;
 alter table room add column roomlot_betmin      numeric(1000, 2)                            default null;
 alter table room add column roomlot_betmax      numeric(1000, 2)                            default null;
@@ -1253,6 +1259,7 @@ alter table room add column roomlot_dtstart     timestamp without time zone not 
 alter table room add column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
 alter table room add column roombet_id          decimal        references roombet(id)       default null;
 alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
+alter table room add column roombet_owner_nick  varchar(1024)       references pers(nick)   default null;
 alter table room add column roombet_price       decimal                                     default null;
 
 
