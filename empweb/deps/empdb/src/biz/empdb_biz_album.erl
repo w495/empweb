@@ -79,7 +79,40 @@ get(Params)->
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_album:get_adds(Con,
-            empdb_dao_album:get(Con, [{isdeleted, false}|Params], Fileds)
+            case empdb_dao_album:get(Con, [
+                {isdeleted, false}
+                |Params
+            ], Fileds) of
+                {ok, Albums} ->
+                    {ok,
+                        lists:map(
+                            fun({Albumpl})->
+                                case proplists:get_value(id, Albumpl) of
+                                    undefined ->
+                                        {[{path, null}|Albumpl]};
+                                    Id ->
+                                        case empdb_dao_photo:get(Con, [
+                                            {isdeleted, false},
+                                            {order, {desc, created}},
+                                            {limit, 1},
+                                            {fields, [path]}
+                                        ]) of
+                                            {ok, []} ->
+                                                {[{path, null}|Albumpl]};
+                                            {ok, [Photopl]} ->
+                                                Path = proplists:get_value(path, Photopl, null),
+                                                {[{path, Path}|Albumpl]};
+                                            {Eclassp, Ereasonp} ->
+                                                {Eclassp, Ereasonp}
+                                        end
+                                end
+                            end,
+                            Albums
+                        )
+                    };
+                {Eclassa, Ereasona} ->
+                    {Eclassa, Ereasona}
+            end
         )
     end).
 
