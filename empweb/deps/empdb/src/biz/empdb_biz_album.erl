@@ -99,7 +99,7 @@ get(Params, Fileds)->
                                         ]) of
                                             {ok, []} ->
                                                 {[{path, null}|Albumpl]};
-                                            {ok, [Photopl]} ->
+                                            {ok, [{Photopl}]} ->
                                                 Path = proplists:get_value(path, Photopl, null),
                                                 {[{path, Path}|Albumpl]};
                                             {Eclassp, Ereasonp} ->
