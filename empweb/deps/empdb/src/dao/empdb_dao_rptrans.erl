@@ -1,17 +1,8 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add descr to biz_user
+%%
+%% Перевод денег между пользователем и комнатой.
+%%
 -module(empdb_dao_rptrans).
 -behaviour(empdb_dao).
-
-%%
-%% Include files
-%%
-
-
-%%
-%% Exported Functions
-%%
 
 -export([
     table/1,
@@ -57,16 +48,14 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        room_id,
-        price,
-        isincome,
-        treastype_id,
-        reastype_alias,
         pers_id,
         pers_nick,
-        info,
+        room_id,
+        transtype_id,
+        transtype_alias,
+        price,
         created,
-        isdeleted
+        isdeleteds
     ];
 
 %%

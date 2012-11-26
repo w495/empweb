@@ -1160,6 +1160,60 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 };
 
             %% ==================================================
+            <<"get_transtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_transtype,
+                    action          =   'get'
+                };
+            <<"get_all_transtypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_transtype,
+                    action          =   'get'
+                };
+            <<"create_transtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_transtype,
+                    action          =   create
+                };
+            <<"update_transtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_transtype,
+                    action          =   update
+                };
+            <<"delete_transtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_transtype,
+                    action          =   delete
+                };
+                
+            %% ==================================================
+            <<"get_rptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_rptrans,
+                    action          =   'get'
+                };
+            <<"get_all_rptranss">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_rptrans,
+                    action          =   'get'
+                };
+            <<"create_rptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_rptrans,
+                    action          =   create
+                };
+            <<"update_rptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_rptrans,
+                    action          =   update
+                };
+            <<"delete_rptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_rptrans,
+                    action          =   delete
+                };
+                
+            %% ==================================================
             <<"get_communitymemb">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_communitymemb,

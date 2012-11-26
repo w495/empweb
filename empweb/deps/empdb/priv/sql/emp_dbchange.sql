@@ -178,7 +178,7 @@ alter table fileinfo add column file_id decimal references file(id) default null
 
 -- 2012.11.23 00:27:16:733548113 --------------------------------------------
 
-
+/*
 alter table pers add column live_community_id
     decimal references community(doc_id) default null;
 alter table pers add column own_community_id
@@ -192,3 +192,5 @@ alter table pers add column live_community_approved     boolean  default null;
 
 alter table community add column ncands decimal default 0;
 alter table community add column nmembs decimal default 0;
+
+*/
