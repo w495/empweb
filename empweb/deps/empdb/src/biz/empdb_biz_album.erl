@@ -49,7 +49,7 @@ get(Params)->
                             fun({Albumpl})->
                                 case proplists:get_value(id, Albumpl) of
                                     undefined ->
-                                        {Albumpl};
+                                        {[{path, null}|Albumpl]};
                                     Id ->
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
@@ -58,7 +58,7 @@ get(Params)->
                                             {fields, [path]}
                                         ]) of
                                             {ok, []} ->
-                                                {Albumpl};
+                                                {[{path, null}|Albumpl]};
                                             {ok, [Photopl]} ->
                                                 Path = proplists:get_value(path, Photopl, null),
                                                 {[{path, Path}|Albumpl]};
