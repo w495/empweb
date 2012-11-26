@@ -53,7 +53,7 @@ get(Params)->
                                     Id ->
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
-                                            {order, {desc, created}},
+                                            {order, {desc, 'photo.created'}},
                                             {limit, 1},
                                             {fields, [path]}
                                         ]) of
@@ -93,7 +93,7 @@ get(Params, Fileds)->
                                     Id ->
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
-                                            {order, {desc, created}},
+                                            {order, {desc, 'photo.created'}},
                                             {limit, 1},
                                             {fields, [path]}
                                         ]) of
