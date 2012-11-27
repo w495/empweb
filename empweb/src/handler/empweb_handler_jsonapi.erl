@@ -893,7 +893,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
             <<"count_pers">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
-                    action          =   get_pers
+                    action          =   count_pers
                 };
             %%
             %% {"fname": "get_all_perss", "params":{}}
