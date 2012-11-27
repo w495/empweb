@@ -393,7 +393,7 @@ ok(Code, {ok, Body}) ->
         %status  = Code,
         status  = 200,
         format  = json,
-        body    = {[{ok, Body}]}
+        body    = {[{'length', erlang:length(Body)}, {ok, Body}]}
     };
 ok(Code, Body) ->
     ok(Code, {ok, Body}).
