@@ -94,6 +94,7 @@ get(Params, Fileds)->
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
                                             {order, {desc, 'photo.created'}},
+                                            {parent_id, Id},
                                             {limit, 1},
                                             {fields, [path]}
                                         ]) of
