@@ -452,6 +452,138 @@ handle(_req, #empweb_hap{
         Hap
     );
 
+
+
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{
+        action=count_pers, params=Params, is_auth=true
+    } = Hap) ->
+    ?evman_args(Hap, <<" = count pers">>),
+    % io:format("Params = ~p~n~n", [Params]),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+        %% ----------------------------------------------------
+        %% Имя
+            #norm_rule{
+                key         = fname,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Фамилия
+            #norm_rule{
+                key         = sname,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Род занятий
+            #norm_rule{
+                key         = empl,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Xобби
+            #norm_rule{
+                key         = hobby,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Интерес
+            #norm_rule{
+                key         = interest,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Oписание
+            #norm_rule{
+                key         = descr,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Регион pregion_id
+            #norm_rule{
+                key         = pregion_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Дата рождения
+            #norm_rule{
+                key         = birthday,
+                required    = false,
+                types       = empweb_norm:filter([nullable, unixdatetime])
+            },
+        %% Флаг пола
+            #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+        %% Комната
+            #norm_rule{
+                key         = live_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Положение в комнате
+            #norm_rule{
+                key         = live_room_pos,
+                 required   = false,
+                types       = empweb_norm:filter([nullable, 'float'])
+            },
+        %% Сообщество
+            #norm_rule{
+                key         = live_community_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = live_community_approved,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+        %% Эмоции пользователя.
+            #norm_rule{
+                key         = emotion_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = emotion_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Язык пользователя.
+            #norm_rule{
+                key         = lang_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = lang_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm:norm('count')
+        ]),
+        fun(Data)->
+            {ok,empweb_jsonapi:resp(empweb_biz_pers:count(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+    
 % 
 % %%
 % %% Функция отрабатывает только если пользователь идентифицирован

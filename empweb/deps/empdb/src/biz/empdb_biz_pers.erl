@@ -23,6 +23,7 @@
     logout/1,
     get/1,
     get/2,
+    count/1,
     get_opt/2,
     get_opt/3
 ]).
@@ -475,6 +476,12 @@ logout(Params)->
 get(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
         empdb_dao_pers:get(Con, [{isdeleted, false}|Params])
+    end).
+
+
+count(Params)->
+    empdb_dao:with_connection(emp, fun(Con)->
+        empdb_dao_pers:count(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params, Fileds)->

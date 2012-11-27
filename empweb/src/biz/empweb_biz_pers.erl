@@ -59,6 +59,7 @@
     get_pers_id/1,
     get_pers_nick/1,
     get/1,
+    count/1,
     pass/1
 ]).
 
@@ -219,6 +220,10 @@ get(Params) ->
         ]
     ).
 
+
+count(Params) ->
+    ?evman_args(Params, <<"count pers">>),
+    empdb_biz_pers:count(Params).
 %%
 %% Вход пользователя. Создание сессии.
 %%
