@@ -198,3 +198,12 @@ alter table community add column nmembs decimal default 0;
 
 
 alter table photo add column path varchar(1024) default null;
+
+
+alter table room add column roombet_owner_nick      varchar(1024)  default null;
+
+alter table room
+alter table room alter column roomlot_dtstart     timestamp without time zone not null default utcnow();
+alter table room alter column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+
+ALTER [ COLUMN ] column { SET | DROP } NOT NULL

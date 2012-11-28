@@ -96,14 +96,17 @@ create(Params)->
                 %%
                 Mbmaxprev = empdb_dao_roombet:get(Con, [
                     {isdeleted, false},
-                    {price, {lte, Price}},
+                    {price, {lt, Price + ?EMPDB_BIZ_ROOMBET_EPSILON}},
                     {roomlot_id, Roomlot_id},
                     {limit, 1},
                     {order, [
-                        {desc, price},
-                        {asc, created}
+                        {desc, price}
                     ]}
                 ]),
+
+
+                io:format("~n~nMbmaxprev = ~p~n~n", [Mbmaxprev]),
+                
                 %%
                 %% Вычисляем минимально возможную цену ставки.
                 %% Она должна быть больше и равна минимальной ставки за лот,
@@ -117,6 +120,10 @@ create(Params)->
                         _ ->
                             Betmin
                     end,
+
+                io:format("~n~nBetminc = ~p~n~n", [Betminc]),
+                io:format("~n~nBetmin = ~p~n~n", [Betmin]),
+                
                 case (
                     (
                         Roombet_owner_id =/= Roomlot_owner_id
@@ -232,8 +239,14 @@ create(Params)->
                             {dtstop,            Dtstop}
                         ]}}}
                 end;
-            {_, _} ->
-                {ok, []}
+            {{ok, []}, {ok, _}} ->
+                {error, no_such_roomlot};
+            {{ok, _}, {ok, []}} ->
+                {error, no_such_pers};
+            {Error1, {ok, _}} ->
+                Error1;
+            {{ok, _}, Error2} ->
+                Error2
         end
     end).
 
