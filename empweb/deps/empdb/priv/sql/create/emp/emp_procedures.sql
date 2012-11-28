@@ -694,19 +694,19 @@ begin
     end if;
 
     if (new.live_community_approved != old.live_community_approved) then
-        if(new.live_community_approved == null) then
+        if(new.live_community_approved is null) then
             update community set ncands = ncands + 1
                 where community.doc_id = new.live_community_id;
             update community set nmembs = nmembs - 1
                 where community.doc_id = new.live_community_id;
         end if;
-        if(new.live_community_approved == true) then
+        if(new.live_community_approved is true) then
             update community set ncands = ncands - 1
                 where community.doc_id = new.live_community_id;
             update community set nmembs = nmembs + 1
                 where community.doc_id = new.live_community_id;
         end if;
-        if(new.live_community_approved == false) then
+        if(new.live_community_approved is false) then
             update community set ncands = ncands - 1
                 where community.doc_id = new.live_community_id;
             update community set nmembs = nmembs - 1
