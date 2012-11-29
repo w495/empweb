@@ -216,7 +216,8 @@ get(Params) ->
         [   without_phash,
             blog,
             album,
-            nfriends
+            nfriends,
+            community
         ]
     ).
 
