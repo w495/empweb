@@ -150,6 +150,7 @@
 -export([
     get_blog/1,
     get_blog/2,
+    count_room/1,
     create_blog/1,
     update_blog/1,
     delete_blog/1
@@ -948,7 +949,15 @@ delete_room_topic(Params)->
                 Error
         end
     end).
-    
+
+count_room(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao_room:get(Con, [
+            {isdeleted, false}
+            |Params
+        ])
+    end).
+
 get_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
         get_room_adds(Con, {

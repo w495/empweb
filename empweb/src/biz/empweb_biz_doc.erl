@@ -177,6 +177,7 @@
 -export([
     get_room/1,
     get_room/2,
+    count_room/1,
     create_room/1,
     join_room/1,
     add_room_topic/1,
@@ -486,7 +487,9 @@ add_room_topic(Params)->
 delete_room_topic(Params)->
     empdb_biz_doc:delete_room_topic(Params).
 
-    
+count_room(Params)->
+    empdb_biz_doc:count_room(Params).
+
 get_room(Params)->
     empdb_biz_doc:get_room(Params).
 

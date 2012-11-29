@@ -1110,6 +1110,80 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
+        action  =   count_room,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get room">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+                #norm_rule{
+                    key         = roomtype_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = roomtype_alias,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = ulimit,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = topic_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_alias,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = treasury,
+                    required    = false,
+                    types       = [float]
+                },
+                #norm_rule{
+                    key         = weather,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
+                    key         = slogan,
+                    required    = false,
+                    types       = [string]
+                }
+                |empweb_norm_doc:norm('get')
+            ]
+        ),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:count_room(
+                        empweb_norm:filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
         action  =   join_room,
         params  =   Params,
         pers_id =   Pers_id

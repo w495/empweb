@@ -22,6 +22,7 @@
     update/2,
     get/2,
     get/3,
+    count/2,
     delete_room_topic/2,
     add_room_topic/2,
     get_room_topic/2,
@@ -203,7 +204,9 @@ delete_room_topic(Con, Proplist)->
             Res
     end.
 
-    
+count(Con, What) ->
+    empdb_dao_doc:count(?MODULE, Con, What).
+
 get(Con, What) ->
     case proplists:get_value(topic_id, What) of
         undefined ->
