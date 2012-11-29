@@ -1055,7 +1055,6 @@ delete_community(Params)->
                             ]},
                             {values, [
                                 {live_community_id,         null},
-                                {live_community_head,       null},
                                 {live_community_approved,   null}
                             ]}
                         ])

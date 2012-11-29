@@ -443,6 +443,12 @@ handle(_req, #empweb_hap{
                 key         = lang_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+        %% Реальное место положение
+            #norm_rule{
+                key         = geo_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             }
             |empweb_norm:norm('get')
         ]),
@@ -574,6 +580,12 @@ handle(_req, #empweb_hap{
                 key         = lang_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+        %% Реальное место положение
+            #norm_rule{
+                key         = geo_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             }
             |empweb_norm:norm('count')
         ]),
@@ -714,6 +726,12 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = allowauctionoffer,
                         types = [nullable, boolean]
+                    },
+                %% Реальное место положение
+                    #norm_rule{
+                        key         = geo_id,
+                        required    = false,
+                        types       = [nullable, integer]
                     }
                 ]
             }

@@ -187,7 +187,6 @@ table({fields, all})->
         father_id,
         
         live_community_id,
-        live_community_head,
         live_community_approved,
 
         own_community_id,

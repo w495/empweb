@@ -411,6 +411,7 @@ login({Uf, Uv}, Params) ->
                                 {fields, [
                                     ncands,
                                     nmembs,
+                                    head,
                                     id,
                                     communitytype_id,
                                     communitytype_alias,
@@ -587,38 +588,39 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
                     end
             end;
-%         community ->
-%             case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-%                 {undefined, undefined} ->
-%                     get_opt(Con, Params, Options, [{Acc}]);
-%                 {Id, Nick} ->
-%                     case empdb_dao_community:get(Con, [
-%                         {'or', [
-%                             {owner_id,      Id},
-%                             {owner_nick,    Nick}
-%                         ]},
-%                         {limit, 1},
-%                         {fields, [
-%                             ncands,
-%                             nmembs,
-%                             id,
-%                             communitytype_id,
-%                             communitytype_alias,
-%                             read_acctype_id,
-%                             read_acctype_alias,
-%                             comm_acctype_id,
-%                             comm_acctype_alias,
-%                             contype_id,
-%                             contype_alias,
-%                             vcounter
-%                         ]}
-%                     ]) of
-%                         {ok, [Community|_]} ->
-%                             get_opt(Con, Params, Options, [{[{community, Community}|Acc]}]);
-%                         _ ->
-%                             get_opt(Con, Params, Options, [{[{community, null}|Acc]}])
-%                     end
-%             end;
+        community ->
+            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                {undefined, undefined} ->
+                    get_opt(Con, Params, Options, [{Acc}]);
+                {Id, Nick} ->
+                    case empdb_dao_community:get(Con, [
+                        {'or', [
+                            {owner_id,      Id},
+                            {owner_nick,    Nick}
+                        ]},
+                        {limit, 1},
+                        {fields, [
+                            ncands,
+                            nmembs,
+                            head,
+                            id,
+                            communitytype_id,
+                            communitytype_alias,
+                            read_acctype_id,
+                            read_acctype_alias,
+                            comm_acctype_id,
+                            comm_acctype_alias,
+                            contype_id,
+                            contype_alias,
+                            vcounter
+                        ]}
+                    ]) of
+                        {ok, [Community|_]} ->
+                            get_opt(Con, Params, Options, [{[{community, Community}|Acc]}]);
+                        _ ->
+                            get_opt(Con, Params, Options, [{[{community, null}|Acc]}])
+                    end
+            end;
         without_phash ->
             Nacc = proplists:delete(phash,
                 proplists:delete(pass, Acc)
