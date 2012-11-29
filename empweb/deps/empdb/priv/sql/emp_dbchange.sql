@@ -183,27 +183,42 @@ alter table pers add column live_community_id
     decimal references community(doc_id) default null;
 alter table pers add column own_community_id
     decimal references community(doc_id) default null;
-
 alter table pers add column live_community_head varchar(1024) default null;
 alter table pers add column own_community_head  varchar(1024) default null;
-
-
 alter table pers add column live_community_approved     boolean  default null;
-
 alter table community add column ncands decimal default 0;
 alter table community add column nmembs decimal default 0;
+alter table photo add column path varchar(1024) default null;
+alter table room add column roombet_owner_nick      varchar(1024)  default null;
+-- alter table room alter column roomlot_dtstart       drop  not null;
+alter table room alter column roomlot_dtstop        drop not null;
 
 */
 
+-- 2012.11.29 12:28:58:757638537 --------------------------------------------
 
 
-alter table photo add column path varchar(1024) default null;
+create sequence seq_noticetype_id;
+create table noticetype(
+    id          decimal primary key default nextval('seq_noticetype_id'),
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   bool            default false
+);
+
+create table notice(
+    doc_id              decimal         unique references doc(id),
+    noticetype_id       decimal         references noticetype(id)       default null,
+    noticetype_alias    varchar(1024)   references noticetype(alias)    default null,
+    datetime            timestamp       without time zone             default utcnow()
+);
 
 
-alter table room add column roombet_owner_nick      varchar(1024)  default null;
+insert into doctype(alias) values ('notice');
 
-alter table room
-alter table room alter column roomlot_dtstart     timestamp without time zone not null default utcnow();
-alter table room alter column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
 
-ALTER [ COLUMN ] column { SET | DROP } NOT NULL
+
+alter table notice add column pers_id   decimal       references pers(id) default null;
+alter table notice add column pers_nick varchar(1024) references pers(nick) default null;
+

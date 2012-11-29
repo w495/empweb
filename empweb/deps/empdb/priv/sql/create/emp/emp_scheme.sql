@@ -1138,6 +1138,27 @@ alter table pers add column live_community_id
 alter table pers add column own_community_id
     decimal references community(doc_id) default null;
 
+/**
+ *  Календарная запись
+**/
+
+create sequence seq_noticetype_id;
+create table noticetype(
+    id          decimal primary key default nextval('seq_noticetype_id'),
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   bool            default false
+);
+
+create table notice(
+    doc_id              decimal unique references doc(id),
+    noticetype_id       decimal references noticetype(id)       default null,
+    noticetype_alias    decimal references noticetype(alias)    default null,
+    datetime            timestamp without time zone             default utcnow()
+);
+
+
 ------------------------------------------------------------------------------
 -- События
 ------------------------------------------------------------------------------
@@ -1148,9 +1169,10 @@ create table eventtype(
     /**
         Номер языковой сущности
     **/
-    name_ti     decimal unique      default nextval('seq_any_ti'),
+    name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    isdeleted   bool default false
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   bool            default false
 );
 
 
@@ -1285,7 +1307,6 @@ create table roomoffer(
 );
 
 */
-
 
 
 

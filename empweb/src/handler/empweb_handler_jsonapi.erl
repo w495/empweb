@@ -1301,7 +1301,61 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
-                
+
+            %% ==================================================
+            <<"get_noticetype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_noticetype,
+                    action          =   'get'
+                };
+            <<"get_all_noticetypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_noticetype,
+                    action          =   'get'
+                };
+            <<"create_noticetype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_noticetype,
+                    action          =   create
+                };
+            <<"update_noticetype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_noticetype,
+                    action          =   update
+                };
+            <<"delete_noticetype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_noticetype,
+                    action          =   delete
+                };
+
+        %% ==================================================
+            <<"get_notice">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_notice,
+                    action          =   'get'
+                };
+            <<"get_all_notices">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_notice,
+                    action          =   'get'
+                };
+            <<"create_notice">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_notice,
+                    action          =   create
+                };
+            <<"update_notice">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_notice,
+                    action          =   update
+                };
+            <<"delete_notice">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_notice,
+                    action          =   delete
+                };
+
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),
