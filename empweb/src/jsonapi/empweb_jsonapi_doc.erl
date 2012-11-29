@@ -1046,47 +1046,47 @@ handle(_req, #empweb_hap{
                 #norm_rule{
                     key         = roomtype_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = roomtype_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = ulimit,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = topic_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = chatlang_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = chatlang_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = treasury,
                     required    = false,
-                    types       = [float]
+                    types       = empweb_norm:filter([float])
                 },
                 #norm_rule{
                     key         = weather,
                     required    = false,
-                    types       = [string]
+                    types       = empweb_norm:filter([string])
                 },
                 #norm_rule{
                     key         = slogan,
                     required    = false,
-                    types       = [string]
+                    types       = empweb_norm:filter([string])
                 }
                 |empweb_norm_doc:norm('get')
             ]
@@ -1121,47 +1121,47 @@ handle(_req, #empweb_hap{
                 #norm_rule{
                     key         = roomtype_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = roomtype_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = ulimit,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = topic_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = chatlang_id,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = chatlang_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
                     key         = treasury,
                     required    = false,
-                    types       = [float]
+                    types       = empweb_norm:filter([float])
                 },
                 #norm_rule{
                     key         = weather,
                     required    = false,
-                    types       = [string]
+                    types       = empweb_norm:filter([string])
                 },
                 #norm_rule{
                     key         = slogan,
                     required    = false,
-                    types       = [string]
+                    types       = empweb_norm:filter([string])
                 }
                 |empweb_norm_doc:norm('get')
             ]
