@@ -1359,22 +1359,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = communitytype_alias,
                 required    = false,
-                types       = [nullable, atom]
+                types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
                 key         = treasury,
                 required    = false,
-                types       = [float]
+                types       = empweb_norm:filter([float])
             },
             #norm_rule{
                 key         = slogan,
                 required    = false,
-                types       = [string]
+                types       = empweb_norm:filter([string])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -1409,22 +1409,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = communitytype_alias,
                 required    = false,
-                types       = [nullable, atom]
+                types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
                 key         = treasury,
                 required    = false,
-                types       = [float]
+                types       = empweb_norm:filter([float])
             },
             #norm_rule{
                 key         = slogan,
                 required    = false,
-                types       = [string]
+                types       = empweb_norm:filter([string])
             }
             |empweb_norm_doc:norm('get')
         ]),

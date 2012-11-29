@@ -1041,7 +1041,31 @@ update_community(Params)->
 
 delete_community(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:update(Con, [{isdeleted, true}|Params])
+        case empdb_dao_community:update(Con, [
+            {filter, [{isdeleted, false} |Params]},
+            {values, [{isdeleted, true}]}
+        ]) of
+            {ok, List}->
+                lists:map(
+                    fun({Communitypl})->
+                        {ok, _} = empdb_dao_pers:update(Con, [
+                            {filter, [
+                                {live_community_id,
+                                    proplists:get_value(id, Communitypl)}
+                            ]},
+                            {values, [
+                                {live_community_id,         null},
+                                {live_community_head,       null},
+                                {live_community_approved,   null}
+                            ]}
+                        ])
+                    end,
+                    List
+                ),
+                {ok, List};
+            Error ->
+                Error
+        end
     end).
 
 get_community(Params)->
