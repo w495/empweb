@@ -1108,6 +1108,34 @@ create table community(
     treasury                decimal default null
 );
 
+create sequence seq_communityhisttype_id;
+create table communityhisttype(
+    id          decimal primary key default nextval('seq_communityhisttype_id'),
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   bool            default false
+);
+
+
+/**
+ *  Кандидат в сообщество
+**/
+create sequence seq_communityhist_id;
+create table communityhist(
+    id                  decimal primary key default nextval('seq_communitycand_id'),
+    pers_id             decimal         references pers(id) not null,
+    pers_nick           varchar(1024)   references pers(nick) not null,
+
+
+    communityhisttype_id        decimal         references communityhisttype(id)    default null,
+    communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+
 /**
  *  Кандидат в сообщество
 **/

@@ -570,6 +570,17 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
+        %% 
+            #norm_rule{
+                key         = pstatus_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pstatus_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
         %% Язык пользователя.
             #norm_rule{
                 key         = lang_id,
@@ -712,6 +723,17 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = emotion_alias,
                         types = [nullable, string]
+                    },
+                %%
+                    #norm_rule{
+                        key         = pstatus_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key         = pstatus_alias,
+                        required    = false,
+                        types       = [nullable, string]
                     },
                 %% Язык пользователя.
                     #norm_rule{
