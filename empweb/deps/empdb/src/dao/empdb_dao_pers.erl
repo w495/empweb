@@ -198,7 +198,7 @@ table({fields, all})->
         geo_id,
 
 
-        % own_room_id,
+        own_room_id,
         % own_room_head,
         % allowauctoffer,
         perspicbody_id,

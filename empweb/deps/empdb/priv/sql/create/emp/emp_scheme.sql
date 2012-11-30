@@ -1592,12 +1592,12 @@ create table transtype (
 
 create sequence seq_rptrans_id;
 create table rptrans (
-    id                  decimal primary key default nextval('seq_rptrans_id'),
+    id                 decimal primary key default nextval('seq_rptrans_id'),
     pers_id            decimal         references pers(id)     not null,
     pers_nick          varchar(1024)   references pers(nick)   not null,
     room_id            decimal         references room(doc_id)       not null,
-    transtype_id       decimal         references transtype(id)      not null,
-    transtype_alias    varchar(1024)   references transtype(alias)   not null,
+    transtype_id       decimal         references transtype(id)      default null,
+    transtype_alias    varchar(1024)   references transtype(alias)   default null,
     price              numeric(1000, 2)    default null,
     created            timestamp without time zone not null default utcnow(),
     isdeleted          bool default false
@@ -1632,8 +1632,8 @@ create table roomtreas (
         Владелец, тот кто обладает товаром после покупки
     **/
     room_id            decimal         references room(doc_id)       not null,
-    treastype_id       decimal         references treastype(id)      not null,
-    treastype_alias    varchar(1024)   references treastype(alias)   not null,
+    treastype_id       decimal         references treastype(id)      default null,
+    treastype_alias    varchar(1024)   references treastype(alias)   default null,
     isincome           bool            default null,
     price              numeric(1000, 2)    default null,
     info               varchar(1024)   default null,

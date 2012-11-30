@@ -197,7 +197,7 @@ alter table room alter column roomlot_dtstop        drop not null;
 
 -- 2012.11.29 12:28:58:757638537 --------------------------------------------
 
-
+/*
 create sequence seq_noticetype_id;
 create table noticetype(
     id          decimal primary key default nextval('seq_noticetype_id'),
@@ -214,11 +214,17 @@ create table notice(
     datetime            timestamp       without time zone             default utcnow()
 );
 
-
 insert into doctype(alias) values ('notice');
 
-
-
 alter table notice add column pers_id   decimal       references pers(id) default null;
-alter table notice add column pers_nick varchar(1024) references pers(nick) default null;
+alter table notice add column pers_nick varchar(1024) references pers(nick) default null;*/
 
+
+alter table rptrans alter column transtype_id drop not null;
+alter table rptrans alter column transtype_alias drop not null;
+
+
+
+
+alter table roomtreas alter column treastype_id drop not null;
+alter table roomtreas alter column treastype_alias drop not null;

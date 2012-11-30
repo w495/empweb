@@ -140,7 +140,13 @@ handle(_req, #empweb_hap{
             io:format("~nData  = ~p~n", [Data]),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_rptrans:get(Data#norm.return)
+                    empweb_biz_rptrans:get(
+                        empweb_norm:filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ]),
+                        proplists:get_value(fields, Data#norm.return, [])
+                    )
                 ),
                 Hap
             }
@@ -195,7 +201,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_rptrans:create(Data#norm.return)
+                    empweb_biz_rptrans:create([{pers_id, Pers_id}|Data#norm.return])
                 ),
                 Hap
             }
@@ -256,7 +262,10 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_rptrans:update(Data#norm.return)
+                    empweb_biz_rptrans:update([
+                        {pers_id, Pers_id}
+                        |Data#norm.return
+                    ])
                 ),
                 Hap
             }
