@@ -103,10 +103,6 @@ create(Params)->
                         {desc, price}
                     ]}
                 ]),
-
-
-                io:format("~n~nMbmaxprev = ~p~n~n", [Mbmaxprev]),
-                
                 %%
                 %% Вычисляем минимально возможную цену ставки.
                 %% Она должна быть больше и равна минимальной ставки за лот,
@@ -120,10 +116,6 @@ create(Params)->
                         _ ->
                             Betmin
                     end,
-
-                io:format("~n~nBetminc = ~p~n~n", [Betminc]),
-                io:format("~n~nBetmin = ~p~n~n", [Betmin]),
-                
                 case (
                     (
                         Roombet_owner_id =/= Roomlot_owner_id

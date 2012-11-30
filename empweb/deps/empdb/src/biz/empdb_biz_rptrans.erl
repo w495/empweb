@@ -40,6 +40,16 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
+        Price   = proplists:get_value(price, Params),
+        Room_id = proplists:get_value(room_id, Params),
+        empdb_dao_room:update(Con, [
+            {values, [
+                {treas, {incr, Price}}
+            ]},
+            {filter, [
+                {id, Room_id}
+            ]}
+        ]),
         empdb_dao_rptrans:create(Con, Params)
     end).
 

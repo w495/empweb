@@ -49,12 +49,21 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_notice:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_notice:get(Con, [
+            {isdeleted, false}
+            |Params
+        ] ++ [
+            {order, [{datetime, asc}]}
+        ])
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_notice:get(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_notice:get(Con, [
+            {isdeleted, false}|Params
+        ] ++ [
+            {order, [{datetime, asc}]}
+        ], Fileds)
     end).
 
 delete(Params)->
