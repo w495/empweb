@@ -224,7 +224,7 @@ alter table rptrans alter column transtype_id drop not null;
 alter table rptrans alter column transtype_alias drop not null;
 
 
-
-
 alter table roomtreas alter column treastype_id drop not null;
 alter table roomtreas alter column treastype_alias drop not null;
+
+

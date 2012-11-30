@@ -115,7 +115,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = datetime,
                 required    = false,
-                types       = empweb_norm:filter([nullable, float])
+                types       = empweb_norm:filter([nullable, unixdatetime])
             }
             |empweb_norm_doc:norm('get')
         ]),
