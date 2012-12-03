@@ -217,7 +217,7 @@ create table notice(
 insert into doctype(alias) values ('notice');
 
 alter table notice add column pers_id   decimal       references pers(id) default null;
-alter table notice add column pers_nick varchar(1024) references pers(nick) default null;*/
+alter table notice add column pers_nick varchar(1024) references pers(nick) default null;
 
 
 alter table rptrans alter column transtype_id drop not null;
@@ -226,5 +226,37 @@ alter table rptrans alter column transtype_alias drop not null;
 
 alter table roomtreas alter column treastype_id drop not null;
 alter table roomtreas alter column treastype_alias drop not null;
+*/
 
+-- 2012.11.30 19:13:49:175377606 --------------------------------------------
+
+create sequence seq_communityhisttype_id;
+create table communityhisttype(
+    id          decimal primary key default nextval('seq_communityhisttype_id'),
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   bool            default false
+);
+
+
+insert into communityhisttype(alias) values
+    ('candidate'),
+    ('insider'),
+    ('outsider'),
+    ('exile');
+
+create sequence seq_communityhist_id;
+create table communityhist(
+    id                  decimal primary key default nextval('seq_communitycand_id'),
+    pers_id             decimal         references pers(id) not null,
+    pers_nick           varchar(1024)   references pers(nick) not null,
+
+
+    communityhisttype_id        decimal         references communityhisttype(id)    default null,
+    communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
 

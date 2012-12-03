@@ -111,14 +111,24 @@ norm('delete') ->
 norm([])->
     [
         #norm_rule{
-            key = read_acctype_id,
-            required = false,
-            types = empweb_norm:filter([nullable, integer])
+            key         = head,
+            required    = false,
+            types       = empweb_norm:filter([nullable, string])
         },
         #norm_rule{
-            key = read_acctype_alias,
-            required = false,
-            types = empweb_norm:filter([nullable, atom])
+            key         = body,
+            required    = false,
+            types       = empweb_norm:filter([nullable, string])
+        },
+        #norm_rule{
+            key         = read_acctype_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key         = read_acctype_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
             key = comm_acctype_id,

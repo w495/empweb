@@ -91,7 +91,7 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, empweb_norm_tree:norm('get')),
+        norm:norm(Params, empweb_norm_opt:norm('get')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -109,7 +109,7 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = create communityhisttype">>),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params,empweb_norm_tree:norm('create')),
+        norm:norm(Params,empweb_norm_opt:norm('create')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
 
@@ -131,7 +131,7 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params,empweb_norm_tree:norm('update')),
+        norm:norm(Params,empweb_norm_opt:norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -150,7 +150,7 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, empweb_norm_tree:norm('update')),
+        norm:norm(Params, empweb_norm_opt:norm('update')),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,

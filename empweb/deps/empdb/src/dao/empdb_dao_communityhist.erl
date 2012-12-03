@@ -57,8 +57,11 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        alias, 
-        name_ti,
+        pers_id,
+        pers_nick,
+        communityhisttype_id,
+        communityhisttype_alias,
+        created,
         isdeleted
     ];
 

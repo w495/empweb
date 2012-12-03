@@ -91,7 +91,34 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, empweb_norm_tree:norm('get')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = communityhisttype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = communityhisttype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm:norm('get')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -109,7 +136,30 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = create communityhist">>),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params,empweb_norm_tree:norm('create')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = communityhisttype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communityhisttype_alias,
+                required    = false,
+                types       = [nullable, string]
+            }
+
+            |empweb_norm:norm('create')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
 
@@ -131,7 +181,29 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params,empweb_norm_tree:norm('update')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = communityhisttype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = communityhisttype_alias,
+                required    = false,
+                types       = [nullable, string]
+            }
+            |empweb_norm:norm('create')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,

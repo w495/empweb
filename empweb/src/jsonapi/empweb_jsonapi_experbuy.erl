@@ -150,6 +150,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [nullable, integer]
             }
+            |empweb_norm:norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -188,6 +189,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [nullable, integer]
             }
+            |empweb_norm:norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),

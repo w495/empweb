@@ -1361,6 +1361,62 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+        %% ==================================================
+            <<"get_communityhist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   'get'
+                };
+            <<"get_all_communityhists">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   'get'
+                };
+            <<"create_communityhist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   create
+                };
+            <<"update_communityhist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   update
+                };
+            <<"delete_communityhist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   delete
+                };
+
+
+        %% ==================================================
+            <<"get_communityhisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhisttype,
+                    action          =   'get'
+                };
+            <<"get_all_communityhisttypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhisttype,
+                    action          =   'get'
+                };
+            <<"create_communityhisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhisttype,
+                    action          =   create
+                };
+            <<"update_communityhisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhisttype,
+                    action          =   update
+                };
+            <<"delete_communityhisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhisttype,
+                    action          =   delete
+                };
+                
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),
