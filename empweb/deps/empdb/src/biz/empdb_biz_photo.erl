@@ -35,6 +35,7 @@ create(Params)->
     end).
 
 update(Params)->
+    
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:update(Con, Params)
     end).

@@ -59,6 +59,7 @@ table({fields, all})->
         id,
         pers_id,
         pers_nick,
+        community_id,
         communityhisttype_id,
         communityhisttype_alias,
         created,

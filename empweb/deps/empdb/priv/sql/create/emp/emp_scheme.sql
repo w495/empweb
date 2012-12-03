@@ -1127,6 +1127,8 @@ create table communityhist(
     pers_id             decimal         references pers(id) not null,
     pers_nick           varchar(1024)   references pers(nick) not null,
 
+    community_id          decimal         references roomlot(doc_id)  default null,
+    
 
     communityhisttype_id        decimal         references communityhisttype(id)    default null,
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,

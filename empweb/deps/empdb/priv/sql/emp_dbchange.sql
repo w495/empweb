@@ -241,10 +241,10 @@ create table communityhisttype(
 
 
 insert into communityhisttype(alias) values
-    ('candidate'),
-    ('insider'),
-    ('outsider'),
-    ('exile');
+    ('pers_cand'),
+    ('pers_memb'),
+    ('pers_out'),
+    ('pers_exile');
 
 create sequence seq_communityhist_id;
 create table communityhist(
@@ -252,7 +252,8 @@ create table communityhist(
     pers_id             decimal         references pers(id) not null,
     pers_nick           varchar(1024)   references pers(nick) not null,
 
-
+    community_id          decimal         references roomlot(doc_id)  default null,
+    
     communityhisttype_id        decimal         references communityhisttype(id)    default null,
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
 

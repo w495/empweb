@@ -32,11 +32,6 @@ norm('get') ->
             types = empweb_norm:filter([integer])
         },
         #norm_rule{
-            key         = parent_id,
-            required    = false,
-            types       = empweb_norm:filter([integer])
-        },
-        #norm_rule{
             rules       =   norm([]),
             required    =   false
         },
@@ -50,21 +45,6 @@ norm('get') ->
 
 norm('create') ->
     [
-        #norm_rule{
-            key         = head,
-            required    = false,
-            types       = [string]
-        },
-        #norm_rule{
-            key         = body,
-            required    = false,
-            types       = [string]
-        },
-        #norm_rule{
-            key         = parent_id,
-            required    = false,
-            types       = [integer]
-        },
         #norm_rule{
             key         = position,
             required    = false,
@@ -119,6 +99,11 @@ norm([])->
             key         = body,
             required    = false,
             types       = empweb_norm:filter([nullable, string])
+        },
+        #norm_rule{
+            key         = parent_id,
+            required    = false,
+            types       = empweb_norm:filter([integer])
         },
         #norm_rule{
             key         = read_acctype_id,

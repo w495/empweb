@@ -237,6 +237,14 @@ update(Params)->
     end.
 
 update_(Con, Params)->
+%     case proplists:get_value(live_community_id, Params) of
+%         undefined ->
+%             ok;
+%         Community_id ->
+%             empdb_dao_communityhist:create(Con, [
+%                 {community_id, Community_id}
+%             ]).
+        
     empdb_dao_pers:update(Con, Params).
 
 
