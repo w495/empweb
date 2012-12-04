@@ -1123,13 +1123,10 @@ create table communityhisttype(
 **/
 create sequence seq_communityhist_id;
 create table communityhist(
-    id                  decimal primary key default nextval('seq_communitycand_id'),
-    pers_id             decimal         references pers(id) not null,
-    pers_nick           varchar(1024)   references pers(nick) not null,
-
-    community_id          decimal         references roomlot(doc_id)  default null,
-    
-
+    id                          decimal         primary key default nextval('seq_communityhist_id'),
+    pers_id                     decimal         references pers(id) not null,
+    pers_nick                   varchar(1024)   references pers(nick) not null,
+    community_id                decimal         references community(doc_id)  default null,
     communityhisttype_id        decimal         references communityhisttype(id)    default null,
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
 
@@ -1184,7 +1181,7 @@ create table noticetype(
 create table notice(
     doc_id              decimal unique references doc(id),
     noticetype_id       decimal references noticetype(id)       default null,
-    noticetype_alias    decimal references noticetype(alias)    default null,
+    noticetype_alias    varchar(1024)   references noticetype(alias)    default null,
     datetime            timestamp without time zone             default utcnow()
 );
 

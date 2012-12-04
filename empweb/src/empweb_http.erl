@@ -109,6 +109,14 @@ call(Req, #empweb_hap{handler=Handler,action=Action,params=Params} = Hao) ->
             {error, Error}
     end;
 
+
+call(Req, #empweb_hap{handler=undefined} = Hao) ->
+    {error, unknown_function};
+
+call(Req, #empweb_hap{action=undefined} = Hao) ->
+    {error, unknown_function};
+
+    
 call(Req, Some) ->
     {error, unknown_function}.
 

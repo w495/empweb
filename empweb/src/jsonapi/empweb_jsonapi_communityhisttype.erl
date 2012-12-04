@@ -47,6 +47,40 @@
 %% Внешние функции
 %% ===========================================================================
 
+map(<<"get_communityhisttype">>, Eh)->
+    Eh#empweb_hap{
+        handler         =   empweb_jsonapi_communityhisttype,
+        action          =   'get'
+    };
+
+map(<<"get_all_communityhisttypes">>, Eh)->
+    Eh#empweb_hap{
+        handler         =   empweb_jsonapi_communityhisttype,
+        action          =   'get'
+    };
+
+map(<<"create_communityhisttype">>, Eh)->
+    Eh#empweb_hap{
+        handler         =   empweb_jsonapi_communityhisttype,
+        action          =   'create'
+    };
+
+map(<<"update_communityhisttype">>, Eh)->
+    Eh#empweb_hap{
+        handler         =   empweb_jsonapi_communityhisttype,
+        action          =   'update'
+    };
+
+map(<<"delete_communityhisttype">>, Eh)->
+    Eh#empweb_hap{
+        handler         =   empweb_jsonapi_communityhisttype,
+        action          =   'delete'
+    };
+
+map(Function, Eh)->
+    Eh.
+
+
 %%
 %% @doc Инициализация запроса
 %%
@@ -78,11 +112,6 @@ init(_, Req, #empweb_hap{
             pers_perm_names =   Pns
         }
     }.
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Языки
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 handle(_req, #empweb_hap{
         action='get', params=Params, pers_id=Pers_id

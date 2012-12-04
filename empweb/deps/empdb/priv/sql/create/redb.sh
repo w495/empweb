@@ -64,35 +64,69 @@ echo "initdata      ${initdatafname}"                   &>> $logfname;
 echo "indexes       ${indexesfname}"                    &>> $logfname;
 echo "log           ${logfname}"                        &>> $logfname;
 
+p_createdb() {
+    if createdb ${dbname} &>> $logfname
+    then
+        echo "      ${dbname}:createdb      OK";
+    else
+        echo "      ${dbname}:createdb      ERROR"
+        echo "[LOG]:";
+        tail $logfname;
+        echo "</${dbname}>";
+        exit 133;
+    fi
+}
+
+p_createscheme() {
+    echo "==============[SCHEME]==============" >> $logfname;
+    if psql -d ${dbname} -f $schemefname \
+        -v DIRPATH=$(dirname "$schemefname") \
+        -v SECTIONPATH=${schemefname%.*} \
+        &>> $logfname
+    then
+        echo "      ${dbname}:scheme        OK";
+}
 
 ##
 ## \fn Процедура создания базы
 ##
-##	p_createdb() ->
+##	p_createall() ->
 ##      createdb ${dbname};
 ##      psql < ./${dbname}/${dbname}_scheme.sql;
 ##      psql < ./${dbname}/${dbname}_procedures.sql;
 ##      psql < ./${dbname}/${dbname}_initdata.sql;
 ##      psql < ./${dbname}/${dbname}_indexes.sql;
 ##
-p_createdb() {
+p_createall() {
     if createdb ${dbname} &>> $logfname
     then
         echo "      ${dbname}:createdb      OK";
         echo "==============[SCHEME]==============" >> $logfname
-        if psql -d ${dbname} < $schemefname &>> $logfname
+        if psql -d ${dbname} -f $schemefname \
+            -v DIRPATH=$(dirname "$schemefname") \
+            -v SECTIONPATH=${schemefname%.*} \
+            &>> $logfname
         then
             echo "      ${dbname}:scheme        OK";
             echo "==============[PROCEDURES]==============" >> $logfname
-            if psql -d ${dbname} < $proceduresfname &>> $logfname
+            if psql -d ${dbname} -f $proceduresfname \
+                -v DIRPATH=$(dirname "$proceduresfname") \
+                -v SECTIONPATH=${proceduresfname%.*} \
+                &>> $logfname
             then
                 echo "      ${dbname}:procedures    OK";
                 echo "==============[DATA]==============" >> $logfname
-                if psql -d ${dbname} < $initdatafname &>> $logfname
+                if psql -d ${dbname} -f $initdatafname \
+                    -v DIRPATH=$(dirname "$initdatafname") \
+                    -v SECTIONPATH=${initdatafname%.*} \
+                    &>> $logfname
                 then
                     echo "      ${dbname}:initdata      OK";
                     echo "==============[INDEXES]==============" >> $logfname
-                    if psql -d ${dbname} < $indexesfname &>> $logfname
+                    if psql -d ${dbname} -f $indexesfname  \
+                        -v DIRPATH=$(dirname "$indexesfname") \
+                        -v SECTIONPATH=${indexesfname%.*} \
+                        &>> $logfname
                     then
                         echo "      ${dbname}:indexes       OK";
                         if cat $logfname | grep -A2 -n -T -i "ERROR:"
@@ -128,14 +162,14 @@ p_createdb() {
             echo "[LOG]:";
             tail $logfname;
             echo "</${dbname}>";
-            exit 132;
+            exit 133;
         fi
     else
         echo "      ${dbname}:createdb      ERROR"
         echo "[LOG]:";
         tail $logfname;
         echo "</${dbname}>";
-        exit 133;
+        exit 134;
     fi
 }
 
@@ -146,9 +180,9 @@ p_createdb() {
     then
         ## Если база есть, то удаляем.
         echo "      ${dbname}:dropdb        OK";
-        p_createdb;
+        p_createall;
     else
         ## Если базы нет, то просто создаем.
-        p_createdb;
+        p_createall;
     fi
     exit 0;

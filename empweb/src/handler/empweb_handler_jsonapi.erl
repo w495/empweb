@@ -31,6 +31,11 @@
 }).
 
 
+% 
+% -define(APPLICATION, application:get_application(?MODULE)).
+% 
+
+
 init(_, Req, _Opts) ->
     ?evman_warning({erlang:time(), Req}),
     {Auth, Req1}    =   empweb_http:auth(Req),
@@ -149,28 +154,28 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             <<"get_oktype">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_oktype
+                    handler         =   empweb_jsonapi_oktype,
+                    action          =   'get'
                 };
             <<"get_all_oktypes">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_oktype
+                    handler         =   empweb_jsonapi_oktype,
+                    action          =   'get'
                 };
             <<"create_oktype">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   create_oktype
+                    handler         =   empweb_jsonapi_oktype,
+                    action          =   create
                 };
             <<"update_oktype">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   update_oktype
+                    handler         =   empweb_jsonapi_oktype,
+                    action          =   update
                 };
             <<"delete_oktype">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   delete_oktype
+                    handler         =   empweb_jsonapi_oktype,
+                    action          =   delete
                 };
         %% ----------------------------------------------------------------
             <<"get_thingtype">> ->
