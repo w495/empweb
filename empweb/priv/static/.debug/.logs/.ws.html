@@ -1,0 +1,261 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru"><head xml:lang="ru"><meta xmlns="" http-equiv="Content-Type" content="text/html;charset=UTF-8" charset="UTF-8"/><meta xmlns="" http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><meta xmlns="" data-name="author" content="ζAVρ λαβ"/><meta xmlns="" data-name="description" content="adv com system"/><meta xmlns="" data-name="viewport" content="width=device-width, initial-scale=1.0"/><title xmlns="">Ручной тест</title>
+    <head>
+        <style>
+            *{
+                margin:0;
+                padding:0;
+            }
+            body{
+                padding-left: 30px;
+            }
+            .about{
+                font-size: 80%;
+                margin: 20px 20px 30px 200px;
+                padding:5px 5px 5px 5px;
+                width: 900px;
+                word-wrap: break-word;
+                border: 1px solid black;
+            }
+            .as{
+                margin: 10px 0px 0px 20px;
+                padding:5px 5px 5px 5px;
+            }
+            .asd{
+                margin: 5px 0px 5px 20px;
+            }
+            .debug-set{
+                margin: 40px 40px 40px 40px;
+                padding-left: 30px;
+            }
+            .debug-set h2{
+                margin: 40px 40px 40px 40px;
+            }
+            .input-w, .output-w{
+                margin: 10px 10px 10px 10px;
+                padding: 10px 10px 10px 10px;
+                width:  800px;
+                height: 400px;
+            }
+            .input, .output{
+                margin: 10px 10px 10px 10px;
+                width:  780px;
+                height: 380px;
+                word-wrap: break-word;
+                margin: 10px 0 10px 20px;
+                font-family:monospace;
+            }
+            .submit{
+                width:  820px;
+                height: 60px;
+            }
+            dl{
+                margin: 10px 10px 10px 10px;
+            }
+            dt{
+                display: inline;
+            }
+            dd{
+                margin: 0px 0px 0px 10px;
+            }
+        </style>
+    </head>
+<body>
+    <h1 class="gh">Логирование</h1>
+    <section class="debug-set">
+        <div id="status"></div>
+    </section>
+        <!-- ============================================================== -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+// ------------------------------------------------------------------------------------
+
+// var default_url  =  "" + window.location.protocol + "//"+ window.location.host +"/jsonapi/";
+var default_c = 1;
+
+var default_url  =  "" + "ws:" + "//"+ window.location.host +"/.debug/.logs/.ws";
+
+
+mark_err = function(debug){
+    $(".output", debug).css("color", "red");
+    $("h3", debug)
+        .css("color", "red")
+        .html($("h3", debug).html()+ " [OШИБКА]");
+}
+mark_suc = function(debug){
+    $(".output", debug).css("color", "green")
+}
+ups = function(){
+    var urlParams = {};
+    (function () {
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+    })();
+    return urlParams;
+};
+function base64_decode (data) {
+  // http://kevin.vanzonneveld.net
+  // +   original by: Tyler Akins (http://rumkin.com)
+  // +   improved by: Thunder.m
+  // +      input by: Aman Gupta
+  // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // +   bugfixed by: Onno Marsman
+  // +   bugfixed by: Pellentesque Malesuada
+  // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // +      input by: Brett Zamir (http://brett-zamir.me)
+  // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+  // *     returns 1: 'Kevin van Zonneveld'
+  // mozilla has this native
+  // - but breaks in 2.0.0.12!
+  //if (typeof this.window['atob'] == 'function') {
+  //    return atob(data);
+  //}
+  var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+    ac = 0,
+    dec = "",
+    tmp_arr = [];
+
+  if (!data) {
+    return data;
+  }
+
+  data += '';
+
+  do { // unpack four hexets into three octets using index points in b64
+    h1 = b64.indexOf(data.charAt(i++));
+    h2 = b64.indexOf(data.charAt(i++));
+    h3 = b64.indexOf(data.charAt(i++));
+    h4 = b64.indexOf(data.charAt(i++));
+
+    bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+    o1 = bits >> 16 & 0xff;
+    o2 = bits >> 8 & 0xff;
+    o3 = bits & 0xff;
+
+    if (h3 == 64) {
+      tmp_arr[ac++] = String.fromCharCode(o1);
+    } else if (h4 == 64) {
+      tmp_arr[ac++] = String.fromCharCode(o1, o2);
+    } else {
+      tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+    }
+  } while (i < data.length);
+
+  dec = tmp_arr.join('');
+
+  return dec;
+}
+
+function msg(text){
+    var date = new Date();
+    document.getElementById('status').innerHTML
+        = "" + date + ": " + (text) + "<br/>"
+          + document.getElementById('status').innerHTML;
+}
+function rpl(text){
+    var date = new Date();
+    document.getElementById('status').innerHTML
+        =   "<p>" + date + " server :" + base64_decode(text) + "</p>"
+            + document.getElementById('status').innerHTML;
+}
+function ready(url, level){
+    if ("MozWebSocket" in window) {
+        WebSocket = MozWebSocket;
+    }
+    if ("WebSocket" in window) {
+        // browser supports websockets
+        var ws = new WebSocket(url + "?level=" + level);
+        ws.onopen = function() {
+            // websocket is connected
+            msg("log websocket connected!");
+            // send hello data to server.
+            ws.send("" + level);
+        };
+        ws.onmessage = function (evt) {
+            var receivedMsg = evt.data;
+            rpl(receivedMsg);
+        };
+        ws.onclose = function() {
+            // websocket was closed
+            msg("websocket was closed");
+        };
+    } else {
+        // browser does not support websockets
+        msg("sorry, your browser does not support websockets.");
+    }
+}
+
+jQuery(document).ready(function($) {
+    
+    var url = ups().url;
+    var c = ups().c;
+    if(!url)
+        url = default_url;
+    if(!c)
+        c = default_c;
+    var level = ups().level;
+    if(!level)
+        level = 'all';
+
+    ready(url, level);
+    $(".form").attr("action", url);
+    $(".cnum").html("" + c);
+
+    var debug = $(".debug");
+    var input = $(".input", debug).html();
+
+    $(".submit").click(function(){
+        var input = $(".input").val();
+        var cdate = new Date();
+        var sms = cdate.getTime();
+        $(".cdate").html("" + cdate);
+        for(var cc = 0; cc != c; ++cc){
+            $.post(url, {data: input})
+                .success(function() {
+                    $(".ostatus", debug).css("color", "blue");
+                    if($(debug).data("anti") == "anti"){
+                        mark_err(debug)
+                    }else{
+                        mark_suc(debug)
+                    }
+                })
+                .error(function() {
+                    $(".ostatus", debug).css("color", "maroon");
+                    if($(debug).data("anti") == "anti"){
+                        mark_suc(debug)
+                    }else{
+                        mark_err(debug)
+                    }
+                })
+                .complete(function(response) {
+                    if(response){
+                        cc = cc - 1;
+                        if(0 == cc){
+                            var rms = (new Date()).getTime();
+                            var rtime = "" + (rms - sms);
+                            $(".rtime").html(rtime);
+                            if(response.responseText){
+                                $(".output", debug).html(response.responseText)
+                            }
+                            if(response.status)
+                                $(".ostatus", debug).html(response.status)
+                        }
+                    }
+                });
+        }
+        return false;
+    });
+});
+// ------------------------------------------------------------------------------------
+        </script>
+</body>
+</html>
