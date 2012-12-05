@@ -963,7 +963,7 @@ get_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
         get_room_adds(Con, {
             empdb_dao_room:get(Con, [
-                {order, {desc, created}},
+                {order, {desc, doc.created}},
                 {isdeleted, false}
                 |Params
             ]),
@@ -975,7 +975,7 @@ get_room(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
         get_room_adds(Con,{
             empdb_dao_room:get(Con, [
-                {order, {desc, created}},
+                {order, {desc, doc.created}},
                 {isdeleted, false}
                 |Params
             ], Fileds),

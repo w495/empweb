@@ -56,7 +56,7 @@ init(_, Req, #empweb_hap{
         is_auth         =   Is_auth,
         pers_id         =   Pid,
         pers_perm_names =   Pns
-    } = Hap)->
+    } = _Hap)->
     %%%
     %%% Это нужно, чтобы понять, какая функция дальше выполнится
     %%%
@@ -166,7 +166,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = datetime,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, unixdatetime]
             }
             |empweb_norm_doc:norm('create')
         ]),
@@ -215,7 +215,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = datetime,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, unixdatetime]
             }
             |empweb_norm_doc:norm('update')
         ]),
@@ -264,7 +264,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = datetime,
                 required    = false,
-                types       = [nullable, float]
+                types       = [nullable, unixdatetime]
             }
             |empweb_norm_doc:norm('update')
         ]),

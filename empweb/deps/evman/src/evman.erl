@@ -14,9 +14,9 @@
     start_link/1,
     add_handler/2,
     add_sup_handler/2,
-    rem_handler/2,
-    rem_sup_handler/2,
-    get_handlers/0,
+    delete_handler/2,
+    delete_sup_handler/2,
+    which_handlers/0,
     format/1,
     format/2,
     llog/2,
@@ -44,15 +44,16 @@ add_handler(ModuleName, Args) ->
 add_sup_handler(ModuleName, Args) ->
     evman_notifier:add_sup_handler(?EVENTNAME, ModuleName, Args).
 
-rem_handler(ModuleName, Args) ->
-    evman_notifier:rem_handler(?EVENTNAME, ModuleName, Args).
+delete_handler(ModuleName, Args) ->
+    evman_notifier:delete_handler(?EVENTNAME, ModuleName, Args).
 
-rem_sup_handler(ModuleName, Args) ->
-    evman_notifier:rem_sup_handler(?EVENTNAME, ModuleName, Args).
+delete_sup_handler(ModuleName, Args) ->
+    evman_notifier:delete_sup_handler(?EVENTNAME, ModuleName, Args).
 
-get_handlers() ->
-    evman_notifier:get_handlers(?EVENTNAME).
+which_handlers() ->
+    evman_notifier:which_handlers(?EVENTNAME).
 
+    
 info(Msg) ->
     evman_notifier:info(?EVENTNAME, Msg).
 

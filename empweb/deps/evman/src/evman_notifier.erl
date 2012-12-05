@@ -6,9 +6,9 @@
     start_link/2,
     add_handler/3,
     add_sup_handler/3,
-    rem_handler/3,
-    rem_sup_handler/3,
-    get_handlers/1,
+    delete_handler/3,
+    delete_sup_handler/3,
+    which_handlers/1,
     info/2,
     note/2
 ]).
@@ -17,14 +17,12 @@
 
 behaviour_info(callbacks) ->
     [
-        {start_link,0},
-        {start_link,1},
-        {add_handler, 2},
-        {add_guarded_handler, 2},
-        {rem_handler, 1},
-        {rem_guarded_handler, 1},
-        {info, 1},
-        {get_handlers, 0}
+        {start_link,        0},
+        {start_link,        1},
+        {add_handler,       2},
+        {delete_handler,    2},
+        {info,              1},
+        {which_handlers,    0}
     ];
 
 behaviour_info(_Other) ->
@@ -48,15 +46,16 @@ add_handler(Eventname, ModuleName, Args) ->
 add_sup_handler(Eventname, ModuleName, Args) ->
     ok = gen_event:add_sup_handler(Eventname, ModuleName, Args).
 
-rem_handler(Eventname, ModuleName, Args) ->
-    ok = gen_event:delete_handler(Eventname, ModuleName, Args),
-    ok.
+delete_handler(Eventname, ModuleName, Args) ->
+    gen_event:delete_handler(Eventname, ModuleName, Args).
 
-rem_sup_handler(Eventname, ModuleName, Args) ->
-    ok = gen_event:delete_sup_handler(Eventname, ModuleName, Args),
-    ok.
-
+delete_sup_handler(Eventname, ModuleName, Args) ->
+    gen_event:delete_handler(Eventname, ModuleName, Args).
+    
 get_handlers(Eventname) ->
+    gen_event:which_handlers(Eventname).
+
+which_handlers(Eventname) ->
     gen_event:which_handlers(Eventname).
 
 
