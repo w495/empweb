@@ -40,6 +40,7 @@
 -define(HANDLERNAME, ?MODULE).
 
 -record(state, {
+    level,
     storage,
     event
 }).
@@ -60,82 +61,32 @@ init({_Any, http}, Req, Options) ->
     end.
 
 handle(Req, State) ->
-    ?debug("(2.0)~n"),
-
     {Host, Req} = cowboy_http_req:raw_host(Req),
     {Port, Req} = cowboy_http_req:port(Req),
-
-
-
-    {ok, Req2} = cowboy_http_req:reply(200, [{'Content-Type', <<"text/html">>}],
-
-%% HTML code taken from misultin's example file.
-[<<"<html>
-<head>
-<script type=\"text/javascript\">
-function msg(text){
-    var date = new Date();
-    document.getElementById('status').innerHTML
-        = \"\" + date + \": \" + text + \"<br/>\"
-          + document.getElementById('status').innerHTML;
-}
-function rpl(text){
-    var date = new Date();
-    document.getElementById('status').innerHTML
-        =   \"<p>\" + date + \" server :\" + text + \"</p>\"
-            + document.getElementById('status').innerHTML;
-}
-function ready(){
-    if (\"MozWebSocket\" in window) {
-        WebSocket = MozWebSocket;
-    }
-    if (\"WebSocket\" in window) {
-        // browser supports websockets
-        var ws = new WebSocket(\"ws://">>, Host, <<":">>, empweb_convert:to_list(Port), <<"/.debug/.logs/.ws\");
-        ws.onopen = function() {
-            // websocket is connected
-            msg(\"log websocket connected!\");
-            // send hello data to server.
-            ws.send(\"give me log!\");
-        };
-        ws.onmessage = function (evt) {
-            var receivedMsg = evt.data;
-            rpl(receivedMsg);
-        };
-        ws.onclose = function() {
-            // websocket was closed
-            msg(\"websocket was closed\");
-        };
-    } else {
-        // browser does not support websockets
-        msg(\"sorry, your browser does not support websockets.\");
-    }
-}
-</script>
-</head>
-<body onload=\"ready();\">
-<div id=\"status\"></div>
-</body>
-</html>">>], Req),
+    {ok, Req2} = cowboy_http_req:reply(200, [{'Content-Type', <<"text/html">>}],[], Req),
     {ok, Req2, State}.
 
 terminate(_Req, _State) ->
     ok.
 
 websocket_init(_Any, Req, _State) ->
+    %{Level, Req} = cowboy_req:qs_val(<<"level">>, Req_),
+
     ?debug("(3)~n"),
     timer:send_interval(1000, tick),
     Req2 = cowboy_http_req:compact(Req),
     ?debug("(4)~n"),
-    State = #state{storage=ets:new(?HANDLERNAME, [set, public, {write_concurrency,true}])},
+    State = #state{
+        storage=ets:new(?HANDLERNAME, [set, public, {write_concurrency,true}])
+    },
     ?debug("(4)~n"),
-    evman:add_empweb_handler(?HANDLERNAME, [State]),
+    evman:add_handler(?HANDLERNAME, [State]),
     ?debug("(4)~n"),
     {ok, Req2, State}.
 
 websocket_handle({text, Msg}, Req, State) ->
     ?debug("--> ~p <-- ~n", [?LINE]),
-    {reply, {text, << "You said: ", Msg/binary >>}, Req, State};
+    {reply, {text, base64:encode(<< "You said: ", Msg/binary >>)}, Req, State#state{level=erlang:binary_to_atom(Msg, utf8)}};
 
 websocket_handle(_Any, Req, State) ->
     ?debug("--> ~p <-- ~n", [?LINE]),
@@ -146,17 +97,17 @@ websocket_info(tick, Req, #state{event=undefined} = State) ->
     ?debug("--> ~p <-- ~n", [?LINE]),
     {ok, Req, State#state{event = []}};
 
-websocket_info(tick, Req, #state{storage=Storage, event=[]} = State) ->
-    ?debug("--> ~p <-- ~n", [?LINE]),
-    {ok, Req, State#state{event = handle_ets(Storage)}};
+websocket_info(tick, Req, #state{storage=Storage, level= Level, event=[]} = State) ->
+    ?debug("--> ~p <-- Level = ~p ~n", [?LINE, Level]),
+    {ok, Req, State#state{event = handle_ets(Storage, State)}};
 
 websocket_info(tick, Req, #state{storage=Storage, event=Events} = State) ->
     ?debug("--> ~p <-- ~n", [?LINE]),
     Result = handle_event_list(Events),
     {reply, {text, Result}, Req, State#state{event=[]}};
 
-websocket_info(_Info, Req, State) ->
-    ?debug("--> ~p <-- ~n", [?LINE]),
+websocket_info(_Info, Req, #state{level=Level} = State) ->
+    ?debug("--> ~p <-- Level = ~p ~n", [?LINE, Level]),
     {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, #state{storage=Storage}) ->
@@ -164,22 +115,22 @@ websocket_terminate(_Reason, _Req, #state{storage=Storage}) ->
     ets:delete(Storage),
     ok.
 
-handle_ets(Storage)->
+handle_ets(Storage, State)->
     First = ets:first(Storage),
-    handle_ets(Storage, First, []).
+    handle_ets(Storage, First, [], State).
 
-handle_ets(Storage, '$end_of_table', Acc)->
+handle_ets(Storage, '$end_of_table', Acc, State)->
     Acc;
 
-handle_ets(Storage, Key, Acc)->
+handle_ets(Storage, Key, Acc, State)->
     Next = ets:next(Storage, Key),
     Event = ets:lookup(Storage, Key),
-    Res = handle_event(Event),
+    Res = handle_event1(Event, State),
     ets:delete(Storage, Key),
-    handle_ets(Storage, Next, [Res|Acc]).
+    handle_ets(Storage, Next, [Res|Acc], State).
 
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -194,7 +145,7 @@ handle_event([{_sender, #evman_note{
             error       = Error,
             comment     = Comment
         }
-    }}]) when Error =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Error =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:red'>ERROR ~p:<pre><code>"
         "   call:~n"
@@ -219,7 +170,7 @@ handle_event([{_sender, #evman_note{
         ]
     ));
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -234,7 +185,7 @@ handle_event([{_sender, #evman_note{
             warning     = Warning,
             comment     = Comment
         }
-    }}]) when Warning =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Warning =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:orange'>WARNING ~p:<pre><code>"
         "   call:~n"
@@ -259,7 +210,7 @@ handle_event([{_sender, #evman_note{
         ]
     ));
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -274,7 +225,7 @@ handle_event([{_sender, #evman_note{
             notice      = Notice,
             comment     = Comment
         }
-    }}]) when Notice =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Notice =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:green'>NOTICE ~p:<pre><code>"
         "   call:~n"
@@ -299,7 +250,7 @@ handle_event([{_sender, #evman_note{
         ]
     ));
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -314,7 +265,7 @@ handle_event([{_sender, #evman_note{
             info        = Info,
             comment     = Comment
         }
-    }}]) when Info =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Info =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:green'>INFO ~p:<pre><code>"
         "   call:~n"
@@ -339,7 +290,7 @@ handle_event([{_sender, #evman_note{
         ]
     ));
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -354,7 +305,7 @@ handle_event([{_sender, #evman_note{
             debug       = Debug,
             comment     = Comment
         }
-    }}]) when Debug =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Debug =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:gray'>DEBUG ~p:<pre><code>"
         "   call:~n"
@@ -380,7 +331,7 @@ handle_event([{_sender, #evman_note{
     ));
 
 
-handle_event([{_sender, #evman_note{
+handle_event1([{_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -394,7 +345,7 @@ handle_event([{_sender, #evman_note{
             args        = Args,
             comment     = Comment
         }
-    }}]) when Args =/=  ?EVMAN_UNDEFINED->
+    }}], State) when Args =/=  ?EVMAN_UNDEFINED->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div style='color:gray'>FUNCTION CALL ~p:<pre><code>"
         "   was function call:~n"
@@ -416,7 +367,7 @@ handle_event([{_sender, #evman_note{
     ));
 
 
-handle_event([{_, #evman_note{
+handle_event1([{_, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -438,7 +389,7 @@ handle_event([{_, #evman_note{
             emergency   = Emergency,
             comment     = Comment
         }
-    } =Event}]) ->
+    } =Event}], State) ->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div><pre><code>"
         "   call:~n"
@@ -484,7 +435,7 @@ handle_event([{_, #evman_note{
         ]
     ));
 
-handle_event([{_, #evman_note{
+handle_event1([{_, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -506,7 +457,7 @@ handle_event([{_, #evman_note{
             emergency   = Emergency,
             comment     = Comment
         }
-    } =Event}]) ->
+    } =Event}], State) ->
     erlang:list_to_binary(io_lib:format(
         "<hr/><div><pre><code>"
         "   call:~n"
@@ -552,16 +503,120 @@ handle_event([{_, #evman_note{
         ]
     ));
   
-handle_event([{_, Event}])->
+handle_event1([{_, Event}],State)->
     erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event]));
     
-handle_event(Event)->
+handle_event1(Event, State)->
     erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event])).
 
-handle_event_list(Events)->
-    erlang:list_to_binary(Events).
+handle_event_list([])->
+    [];
+    %erlang:list_to_binary(
     
+handle_event_list([E|_]=Events)->
+    Events1 = lists:map(
+        fun(X) ->
+            base64:encode(X)
+            %urlencode(X, [{noplus, true}])
+        end,
+        Events
+    ),
+    try
+        erlang:list_to_binary(Events1)
+    catch
+        X:Y ->
+            io:format("~p:~p:~p:~p~n", [?MODULE, ?LINE, X, Y])
+    end.
 
+
+
+urldecode(Bin) when is_binary(Bin) ->
+    urldecode(Bin, <<>>, crash).
+
+
+urldecode(Bin, OnError) when is_binary(Bin) ->
+    urldecode(Bin, <<>>, OnError).
+
+
+urldecode(<<$%, H, L, Rest/binary>>, Acc, OnError) ->
+    G = unhex(H),
+    M = unhex(L),
+    if  G =:= error; M =:= error ->
+        case OnError of skip -> ok; crash -> erlang:error(badarg) end,
+        urldecode(<<H, L, Rest/binary>>, <<Acc/binary, $%>>, OnError);
+        true ->
+        urldecode(Rest, <<Acc/binary, (G bsl 4 bor M)>>, OnError)
+    end;
+urldecode(<<$%, Rest/binary>>, Acc, OnError) ->
+    case OnError of skip -> ok; crash -> erlang:error(badarg) end,
+    urldecode(Rest, <<Acc/binary, $%>>, OnError);
+urldecode(<<$+, Rest/binary>>, Acc, OnError) ->
+    urldecode(Rest, <<Acc/binary, $ >>, OnError);
+urldecode(<<C, Rest/binary>>, Acc, OnError) ->
+    urldecode(Rest, <<Acc/binary, C>>, OnError);
+urldecode(<<>>, Acc, _OnError) ->
+    Acc.
+
+unhex(C) when C >= $0, C =< $9 -> C - $0;
+unhex(C) when C >= $A, C =< $F -> C - $A + 10;
+unhex(C) when C >= $a, C =< $f -> C - $a + 10;
+unhex(_) -> error.
+
+
+%% @doc URL encode a string binary.
+%% @equiv urlencode(Bin, [])
+-spec urlencode(binary()) -> binary().
+urlencode(Bin) ->
+    urlencode(Bin, []).
+
+%% @doc URL encode a string binary.
+%% The `noplus' option disables the default behaviour of quoting space
+%% characters, `\s', as `+'. The `upper' option overrides the default behaviour
+%% of writing hex numbers using lowecase letters to using uppercase letters
+%% instead.
+
+urlencode(Bin, Opts) ->
+    Plus = not proplists:get_value(noplus, Opts, false),
+    Upper = proplists:get_value(upper, Opts, false),
+    urlencode(Bin, <<>>, Plus, Upper).
+
+urlencode(<<C, Rest/binary>>, Acc, P=Plus, U=Upper) ->
+    if  C >= $0, C =< $9 -> urlencode(Rest, <<Acc/binary, C>>, P, U);
+        C >= $A, C =< $Z -> urlencode(Rest, <<Acc/binary, C>>, P, U);
+        C >= $a, C =< $z -> urlencode(Rest, <<Acc/binary, C>>, P, U);
+        C =:= $.; C =:= $-; C =:= $~; C =:= $_ ->
+        urlencode(Rest, <<Acc/binary, C>>, P, U);
+        C =:= $ , Plus ->
+        urlencode(Rest, <<Acc/binary, $+>>, P, U);
+        true ->
+        H = C band 16#F0 bsr 4, L = C band 16#0F,
+        H1 = if Upper -> tohexu(H); true -> tohexl(H) end,
+        L1 = if Upper -> tohexu(L); true -> tohexl(L) end,
+        urlencode(Rest, <<Acc/binary, $%, H1, L1>>, P, U)
+    end;
+urlencode(<<>>, Acc, _Plus, _Upper) ->
+    Acc.
+
+-spec tohexu(byte()) -> byte().
+tohexu(C) when C < 10 -> $0 + C;
+tohexu(C) when C < 17 -> $A + C - 10.
+
+-spec tohexl(byte()) -> byte().
+tohexl(C) when C < 10 -> $0 + C;
+tohexl(C) when C < 17 -> $a + C - 10.
+
+-spec x_www_form_urlencoded(binary(), fun((binary()) -> binary())) ->
+        list({binary(), binary() | true}).
+x_www_form_urlencoded(<<>>, _URLDecode) ->
+    [];
+x_www_form_urlencoded(Qs, URLDecode) ->
+    Tokens = binary:split(Qs, <<"&">>, [global, trim]),
+    [case binary:split(Token, <<"=">>) of
+        [Token] -> {URLDecode(Token), true};
+        [Name, Value] -> {URLDecode(Name), URLDecode(Value)}
+    end || Token <- Tokens].
+
+    
 handle_event({_sender, Event}, #state{storage=Storage} = State) ->
     ets:insert_new(Storage, {now(), Event}),
     {ok, State#state{event = Event}};

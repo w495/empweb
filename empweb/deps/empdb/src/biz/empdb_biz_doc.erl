@@ -186,6 +186,7 @@
 -export([
     get_room/1,
     get_room/2,
+    count_room/1,
     join_room/1,
     create_room/1,
     add_room_topic/1,
@@ -952,7 +953,7 @@ delete_room_topic(Params)->
 
 count_room(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_room:get(Con, [
+        empdb_dao_room:count(Con, [
             {isdeleted, false}
             |Params
         ])

@@ -20,13 +20,14 @@
 }).
 
 
+% 
+% -ifndef(empdb_debug).
+%     -define(empdb_debug(F),     spawn_link(fun()-> io:format(F) end)).
+%     -define(empdb_debug(F, P),  spawn_link(fun()-> io:format(F, P) end)).
+% -endif.
 
--ifndef(empdb_debug).
-    -define(empdb_debug(F),     spawn_link(fun()-> io:format(F) end)).
-    -define(empdb_debug(F, P),  spawn_link(fun()-> io:format(F, P) end)).
-%     -define(empdb_debug(F),  spawn_link(fun()-> ok end)).
-%     -define(empdb_debug(F, P),  spawn_link(fun()-> ok end)).
--endif.
+    -define(empdb_debug(F),  spawn_link(fun()-> ok end)).
+    -define(empdb_debug(F, P),  spawn_link(fun()-> ok end)).
 
 -endif. %%% __EMPDB_3024595043__
 
