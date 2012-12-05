@@ -70,16 +70,23 @@ handle(Req, State) ->
 terminate(_Req, _State) ->
     ok.
 
+level_to_atom(<<"debug">>) ->
+    debug;
+
+level_to_atom(_) ->
+    all.
+
 websocket_init(_Any, Req, _State) ->
     timer:send_interval(1000, tick),
-    ?HANDLERMODULE:start(),
     {ok, cowboy_http_req:compact(Req), #state{}}.
 
 websocket_handle({text, Msg}, Req, State) ->
+    Level = level_to_atom(Msg),
+    ?HANDLERMODULE:start([{level, Level}]),
     {reply,
         {text, base64:encode(<< "You said: ", Msg/binary >>)},
         Req,
-        State#state{level=erlang:binary_to_atom(Msg, utf8)}
+        State#state{level=Level }
     };
 
 websocket_handle(_Any, Req, State) ->
@@ -96,22 +103,36 @@ websocket_info(tick, Req, #state{event = Events} = State) ->
     {reply, {text, Result}, Req, State#state{event=[]}};
 
 websocket_info(_Info, Req, #state{} = State) ->
+
     {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, _) ->
     ?HANDLERMODULE:stop(),
     ok.
 
-get_events(State)->
+get_events(#state{level=Level} = State)->
     lists:map(
         fun(Event)->
             format_event(Event, State)
         end,
         ?HANDLERMODULE:get_events()
     ).
+    
+% get_events(#state{level=Level} = State)->
+%     case ?HANDLERMODULE:get_events() of
+%         {error,bad_module} ->
+%             ?HANDLERMODULE:start([{level, Level}]),
+%             [];
+%         Events ->
+%             lists:map(
+%                 fun(Event)->
+%                     format_event(Event, State)
+%                 end,
+%                 Events
+%             )
+%     end.
 
-
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -126,7 +147,7 @@ format_event([{_sender, #evman_note{
             error       = Error,
             comment     = Comment
         }
-    }}], _State) when Error =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Error =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:red'>ERROR ~p:<pre><code>"
         "   call:~n"
@@ -140,7 +161,7 @@ format_event([{_sender, #evman_note{
         "   event (error):~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -151,7 +172,7 @@ format_event([{_sender, #evman_note{
         ]
     );
 
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -166,7 +187,7 @@ format_event([{_sender, #evman_note{
             warning     = Warning,
             comment     = Comment
         }
-    }}], _State) when Warning =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Warning =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:orange'>WARNING ~p:<pre><code>"
         "   call:~n"
@@ -180,7 +201,7 @@ format_event([{_sender, #evman_note{
         "   event (warning):~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -191,7 +212,7 @@ format_event([{_sender, #evman_note{
         ]
     );
 
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -206,7 +227,7 @@ format_event([{_sender, #evman_note{
             notice      = Notice,
             comment     = Comment
         }
-    }}], _State) when Notice =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Notice =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:green'>NOTICE ~p:<pre><code>"
         "   call:~n"
@@ -220,7 +241,7 @@ format_event([{_sender, #evman_note{
         "   event (notice):~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -231,7 +252,7 @@ format_event([{_sender, #evman_note{
         ]
     );
 
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -246,7 +267,7 @@ format_event([{_sender, #evman_note{
             info        = Info,
             comment     = Comment
         }
-    }}], _State) when Info =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Info =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:green'>INFO ~p:<pre><code>"
         "   call:~n"
@@ -260,7 +281,7 @@ format_event([{_sender, #evman_note{
         "   event (info):~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -271,7 +292,7 @@ format_event([{_sender, #evman_note{
         ]
     );
 
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -286,7 +307,7 @@ format_event([{_sender, #evman_note{
             debug       = Debug,
             comment     = Comment
         }
-    }}], _State) when Debug =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Debug =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:gray'>DEBUG ~p:<pre><code>"
         "   call:~n"
@@ -300,7 +321,7 @@ format_event([{_sender, #evman_note{
         "   event (debug):~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -312,7 +333,7 @@ format_event([{_sender, #evman_note{
     );
 
 
-format_event([{_sender, #evman_note{
+format_event({_sender, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -326,7 +347,7 @@ format_event([{_sender, #evman_note{
             args        = Args,
             comment     = Comment
         }
-    }}], _State) when Args =/=  ?EVMAN_UNDEFINED->
+    }}, _State) when Args =/=  ?EVMAN_UNDEFINED->
     io_lib:format(
         "<hr/><div style='color:gray'>FUNCTION CALL ~p:<pre><code>"
         "   was function call:~n"
@@ -338,7 +359,7 @@ format_event([{_sender, #evman_note{
         "   comment: ~n"
         "       ~p~n"
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -348,7 +369,7 @@ format_event([{_sender, #evman_note{
     );
 
 
-format_event([{_, #evman_note{
+format_event({_, #evman_note{
     event_fun=
         #event_fun{
             module      = Module,
@@ -370,7 +391,7 @@ format_event([{_, #evman_note{
             emergency   = Emergency,
             comment     = Comment
         }
-    } = _Event}], _State) ->
+    } = _Event}, _State) ->
     io_lib:format(
         "<hr/><div>EVENT ~p:<pre><code>"
         "   call:~n"
@@ -399,7 +420,7 @@ format_event([{_, #evman_note{
         "       emergency:"
         "           ~p~n    "
         "</code></pre></div>",
-        [   Datetime,
+        [   unixtime(Datetime),
             Line,
             Module,
             Function,
@@ -419,10 +440,10 @@ format_event([{_, #evman_note{
 
   
 format_event([{_, Event}], _State)->
-    erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event]));
+    io_lib:format("<hr/><p> ~p </p>", [Event]);
     
 format_event(Event, _State)->
-    erlang:list_to_binary(io_lib:format("<p> ~p </p>", [Event])).
+    io_lib:format("<hr/><p> ~p </p>", [Event]).
 
 list_events(Events)->
     lists:map(
@@ -434,3 +455,7 @@ list_events(Events)->
 
 
 
+
+unixtime({Ma, S, Mi}) ->
+    {Ma * 1000000 +  S +  Mi * 0.000001, calendar:now_to_datetime({Ma, S, Mi})}.
+    

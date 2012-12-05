@@ -19,6 +19,7 @@
 }).
 
 -record(event, {
+    type        = undefined,
     args        = ?EVMAN_UNDEFINED,
     debug       = ?EVMAN_UNDEFINED,
     info        = ?EVMAN_UNDEFINED,
@@ -76,13 +77,13 @@
     )
 ).
 
--define(evman_info(X,       C), evman:info(?evman_note(#event{info=X,       comment=C}))).
--define(evman_notice(X,     C), evman:info(?evman_note(#event{notice=X,     comment=C}))).
--define(evman_warning(X,    C), evman:info(?evman_note(#event{warning=X,    comment=C}))).
--define(evman_error(X,      C), evman:info(?evman_note(#event{error=X,      comment=C}))).
--define(evman_critical(X,   C), evman:info(?evman_note(#event{critical=X,   comment=C}))).
--define(evman_alert(X,      C), evman:info(?evman_note(#event{alert=X,      comment=C}))).
--define(evman_emergency(X,  C), evman:info(?evman_note(#event{emergency=X,  comment=C}))).
+-define(evman_info(X,       C), evman:info(?evman_note(#event{type=info,        info=X,       comment=C}))).
+-define(evman_notice(X,     C), evman:info(?evman_note(#event{type=notice,      notice=X,     comment=C}))).
+-define(evman_warning(X,    C), evman:info(?evman_note(#event{type=warning,     warning=X,    comment=C}))).
+-define(evman_error(X,      C), evman:info(?evman_note(#event{type=error,       error=X,      comment=C}))).
+-define(evman_critical(X,   C), evman:info(?evman_note(#event{type=critical,    critical=X,   comment=C}))).
+-define(evman_alert(X,      C), evman:info(?evman_note(#event{type=alert,       alert=X,      comment=C}))).
+-define(evman_emergency(X,  C), evman:info(?evman_note(#event{type=emergency,   emergency=X,  comment=C}))).
 
 -define(evman_args(X),      ?evman_args(X,       <<"">>)).
 -define(evman_debug(X),     ?evman_debug(X,      <<"">>)).
