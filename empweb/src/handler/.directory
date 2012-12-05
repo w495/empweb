@@ -1,0 +1,7 @@
+[Dolphin]
+AdditionalInfo=Details_Size,Details_Type,Details_Date,Details_Permissions,CustomizedDetails
+Timestamp=2012,12,4,11,30,5
+ViewMode=1
+
+[Settings]
+HiddenFilesShown=true
