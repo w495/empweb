@@ -467,7 +467,7 @@ create table pers(
     mstatus_id          decimal         references mstatus(id)     default null,
     mstatus_alias       varchar(1024)   references mstatus(alias)  default null,
     /**
-        язык пользователя
+        язык пользователяад
     **/
     lang_id             decimal         references lang(id)     default null,
     lang_alias          varchar(1024)   references lang(alias)  default null,
