@@ -199,6 +199,8 @@ begin
         (not (new.live_community_id is null))
     and
         (not (old.live_community_id is null))
+    and
+        (new.live_community_approved != true)
     ) then
         raise exception 'exists_live_community';
     else
