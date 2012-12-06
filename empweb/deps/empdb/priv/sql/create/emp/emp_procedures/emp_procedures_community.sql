@@ -44,7 +44,6 @@ begin
     /**
     *  Типы сообщества
     **/
-    new.nmembs = 1;
     if (not (new.communitytype_id is null))
         and (new.communitytype_alias is null) then
         new.communitytype_alias =
@@ -71,7 +70,7 @@ $$ language plpgsql;
 drop trigger if exists t1community_util_fields_on_insert on community ;
 create trigger t1community_util_fields_on_insert before insert
 on community for each row execute procedure community_util_fields_on_insert();
-
+/*
 
 create or replace function community_util_fields_after_insert() returns "trigger" as $$
 begin
@@ -89,7 +88,7 @@ $$ language plpgsql;
 
 drop trigger if exists t1community_util_fields_after_insert on community ;
 create trigger t1community_util_fields_after_insert after insert
-on community for each row execute procedure community_util_fields_after_insert();
+on community for each row execute procedure community_util_fields_after_insert();*/
 
 
 

@@ -1023,14 +1023,15 @@ create_community(Params)->
             {isdeleted, false}
         ]) of
             {ok, []} ->
-                case empdb_dao_community:create(Con, Params) of
+                case empdb_dao_community:create(Con, [{nmembs, 1}|Params]) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pers:update(Con, [
                             {filter, [
                                 {id, Owner_id}
                             ]},
                             {values, [
-                                {live_community_id, proplists:get_value(id, Respl)}
+                                {live_community_id, proplists:get_value(id, Respl)},
+                                {live_community_approved, true}
                             ]}
                         ]),
                         {ok, [{Respl}]};
