@@ -45,8 +45,7 @@ begin
     *  Типы сообщества
     **/
     update pers set
-        live_community_approved = true,
-        live_community_id = new.doc_id
+        live_community_approved = true
     where pers.id = (select owner_id from doc where doc.id = new.doc_id);
     
     
