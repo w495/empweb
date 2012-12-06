@@ -200,6 +200,7 @@ begin
     ) then
         raise exception 'exists_live_community';
     else
+        new.live_community_approved = false;
         update community set ncands = ncands + 1
             where community.doc_id = new.live_community_id;
     end if;

@@ -613,6 +613,23 @@ create table perm (
     type            int
 );
 
+
+/**
+ *  Типы прав
+**/
+create sequence seq_friendtype_id;
+create table friendtype (
+    id          decimal primary key default nextval('seq_friendtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   bool    default false
+);
+
+
 /**
  *  Друзья
 **/
