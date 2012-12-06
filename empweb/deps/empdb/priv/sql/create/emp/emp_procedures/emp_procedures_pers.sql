@@ -194,7 +194,7 @@ begin
     end if;
 
     if (
-        (not (new.live_community_id != old.live_community_id))
+        (new.live_community_id = old.live_community_id)
     and
         (not (new.live_community_id is null))
     ) then
@@ -206,7 +206,7 @@ begin
 
     if (new.live_community_approved != old.live_community_approved) then
         if(new.live_community_approved is null) then
-            update community set     = ncands + 1
+            update community set ncands = ncands + 1
                 where community.doc_id = new.live_community_id;
             update community set nmembs = nmembs - 1
                 where community.doc_id = new.live_community_id;
