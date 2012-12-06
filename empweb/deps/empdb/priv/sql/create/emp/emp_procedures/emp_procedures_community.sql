@@ -13,7 +13,6 @@ begin
     /**
         Типы сообщества
     **/
-    new.ncands = 1;
     if new.communitytype_id != old.communitytype_id then
         new.communitytype_alias =
             (select communitytype.alias
@@ -45,6 +44,13 @@ begin
     /**
     *  Типы сообщества
     **/
+    update pers set
+        live_community_approved = true,
+        live_community_id = new.doc_id
+    where pers.id = (select owner_id from doc where doc.id = new.doc_id);
+    
+    
+    new.nmembs = 1;
     if (not (new.communitytype_id is null))
         and (new.communitytype_alias is null) then
         new.communitytype_alias =
