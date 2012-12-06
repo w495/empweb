@@ -13,6 +13,7 @@ begin
     /**
         Типы сообщества
     **/
+    new.ncands = 1;
     if new.communitytype_id != old.communitytype_id then
         new.communitytype_alias =
             (select communitytype.alias
