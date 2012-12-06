@@ -194,7 +194,7 @@ begin
     end if;
 
     if (
-        (new.live_community_id = old.live_community_id)
+        (not (new.live_community_id != old.live_community_id))
     and
         (not (new.live_community_id is null))
     ) then
