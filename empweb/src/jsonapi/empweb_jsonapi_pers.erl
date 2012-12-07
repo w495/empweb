@@ -193,7 +193,10 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(Req, #empweb_hap{
-        action=logout,  params=Params, is_auth=true, auth=Auth
+        action=logout,
+        params=Params,
+        is_auth=true,
+        auth=Auth
     } = Hap) ->
     ?evman_args(Hap, <<" = logout">>),
     empweb_jsonapi:handle_params(
@@ -218,11 +221,19 @@ handle(Req, #empweb_hap{
 %% Друзья пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%% ===========================================================================
+%% ===========================================================================
+%% ===========================================================================
+
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=get_friend, params=Params, is_auth=true, pers_id=Pers_id
+        action=get_friend,
+        params=Params,
+        is_auth=true,
+        pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = get friends">>),
 
@@ -269,7 +280,10 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=add_friend, params=Params, is_auth=true, pers_id=Pers_id
+        action=add_friend,
+        params=Params,
+        is_auth=true,
+        pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = add friend">>),
     empweb_jsonapi:handle_params(
@@ -313,7 +327,10 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=delete_friend, params=Params, is_auth=true, pers_id=Pers_id
+        action=delete_friend,
+        params=Params,
+        is_auth=true,
+        pers_id=Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = delete friend">>),
     empweb_jsonapi:handle_params(
@@ -353,11 +370,17 @@ handle(_req, #empweb_hap{
         end
     );
 
+%% ===========================================================================
+%% ===========================================================================
+%% ===========================================================================
+
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=get_pers, params=Params, is_auth=true
+        action=get_pers,
+        params=Params,
+        is_auth=true
     } = Hap) ->
     ?evman_args(Hap, <<" = get pers">>),
     % io:format("Params = ~p~n~n", [Params]),

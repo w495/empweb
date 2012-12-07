@@ -59,7 +59,6 @@ table({fields, all})->
         id,
         alias, 
         name_ti,
-        isincome,
         isdeleted
     ];
 

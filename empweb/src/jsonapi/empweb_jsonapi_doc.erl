@@ -89,8 +89,6 @@ init(_, Req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   'get_doctype',
         params  =   Params
     } = Hap) ->
@@ -146,8 +144,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   'get_contype',
         params  =   Params
     } = Hap) ->
@@ -205,8 +201,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_acctype,
         params  =   Params
     } = Hap) ->
@@ -262,8 +256,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_roomtype,
         params  =   Params
     } = Hap) ->
@@ -320,8 +312,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_chatlang,
         params  =   Params
     } = Hap) ->
@@ -435,8 +425,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_topic,
         params  =   Params
     } = Hap) ->
@@ -499,8 +487,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_communitytype,
         params  =   Params
     } = Hap) ->
@@ -556,8 +542,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   'get_messagetype',
         params  =   Params
     } = Hap) ->

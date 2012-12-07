@@ -913,6 +913,34 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   get_pers
                 };
 
+            %% ==================================================
+            <<"get_friendtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_friendtype,
+                    action          =   'get'
+                };
+            <<"get_all_friendtypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_friendtype,
+                    action          =   'get'
+                };
+            <<"create_friendtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_friendtype,
+                    action          =   create
+                };
+            <<"update_friendtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_friendtype,
+                    action          =   update
+                };
+            <<"delete_friendtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_friendtype,
+                    action          =   delete
+                };
+            %% ==================================================
+            
             %%
             %% {"fname": "get_friend", "params":{"pers_id":1}}
             %%
