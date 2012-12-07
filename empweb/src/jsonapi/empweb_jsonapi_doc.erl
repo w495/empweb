@@ -1082,6 +1082,16 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
+                    key         = regimen_id,
+                    required    = false,
+                    types       = empweb_norm:filter([integer])
+                },
+                #norm_rule{
+                    key         = regimen_alias,
+                    required    = false,
+                    types       = empweb_norm:filter([string])
+                },
+                #norm_rule{
                     key         = roomtype_id,
                     required    = false,
                     types       = empweb_norm:filter([integer])
@@ -1185,6 +1195,16 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
+                    key         = regimen_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = regimen_alias,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
                     key         = roomtype_id,
                     required    = false,
                     types       = [integer]
@@ -1192,7 +1212,7 @@ handle(_req, #empweb_hap{
                 #norm_rule{
                     key         = roomtype_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = [string]
                 },
                 #norm_rule{
                     key         = ulimit,
@@ -1251,6 +1271,16 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
                 #norm_rule{
+                    key         = regimen_id,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
+                    key         = regimen_alias,
+                    required    = false,
+                    types       = [string]
+                },
+                #norm_rule{
                     key         = roomtype_id,
                     required    = false,
                     types       = [integer]
@@ -1258,7 +1288,7 @@ handle(_req, #empweb_hap{
                 #norm_rule{
                     key         = roomtype_alias,
                     required    = false,
-                    types       = [integer]
+                    types       = [string]
                 },
                 #norm_rule{
                     key         = ulimit,
