@@ -36,6 +36,22 @@ begin
             (select pers.id from pers where pers.nick = new.friend_nick);
     end if;
 
+
+    if (new.friendtype_alias is null) then
+        if not (new.friendtype_id is null) then
+            new.friendtype_alias =
+                (select friendtype.alias
+                    from friendtype
+                        where friendtype.id = new.friendtype_id);
+        end if;
+    end if;
+    if (new.friendtype_id is null) then
+        new.friendtype_id           =
+            (select friendtype.id
+                from friendtype
+                    where friendtype.alias = new.friendtype_alias);
+    end if;
+
     return new;
 end;
 $$ language plpgsql;
@@ -71,6 +87,19 @@ begin
             (select pers.id from pers where pers.nick = new.friend_nick);
     end if;
 
+
+    if new.friendtype_id != old.friendtype_id then
+        new.friendtype_alias =
+            (select friendtype.alias
+                from friendtype
+                    where friendtype.id = new.friendtype_id);
+    end if;
+    if new.friendtype_alias != old.friendtype_alias then
+        new.friendtype_id =
+            (select friendtype.id
+                from friendtype
+                    where friendtype.nick = new.friendtype_alias);
+    end if;
     return new;
 end;
 $$ language plpgsql;

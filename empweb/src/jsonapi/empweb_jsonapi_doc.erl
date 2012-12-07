@@ -1190,6 +1190,11 @@ handle(_req, #empweb_hap{
                     types       = [integer]
                 },
                 #norm_rule{
+                    key         = roomtype_alias,
+                    required    = false,
+                    types       = [integer]
+                },
+                #norm_rule{
                     key         = ulimit,
                     required    = false,
                     types       = [integer]
@@ -1198,6 +1203,11 @@ handle(_req, #empweb_hap{
                     key         = chatlang_id,
                     required    = false,
                     types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_alias,
+                    required    = false,
+                    types       = [string]
                 },
                 #norm_rule{
                     key         = treasury,
@@ -1246,12 +1256,12 @@ handle(_req, #empweb_hap{
                     types       = [integer]
                 },
                 #norm_rule{
-                    key         = ulimit,
+                    key         = roomtype_alias,
                     required    = false,
                     types       = [integer]
                 },
                 #norm_rule{
-                    key         = topic_id,
+                    key         = ulimit,
                     required    = false,
                     types       = [integer]
                 },
@@ -1259,6 +1269,11 @@ handle(_req, #empweb_hap{
                     key         = chatlang_id,
                     required    = false,
                     types       = [integer]
+                },
+                #norm_rule{
+                    key         = chatlang_alias,
+                    required    = false,
+                    types       = [string]
                 },
                 #norm_rule{
                     key         = treasury,

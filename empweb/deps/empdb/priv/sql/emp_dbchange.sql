@@ -261,3 +261,25 @@ create table communityhist(
     isdeleted           bool default false
 );
 
+-- 2012.12.07 12:31:59:027268735 --------------------------------------------
+
+create sequence seq_friendtype_id;
+create table friendtype (
+    id          decimal primary key default nextval('seq_friendtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   bool    default false
+);
+
+alter table friend add column friendtype_id       decimal         references friendtype(id)       default null;
+alter table friend add column friendtype_alias    varchar(1024)   references friendtype(alias)    default null;
+
+
+insert into friendtype(alias) values
+    ('foe'),
+    ('friend');
+    

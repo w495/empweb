@@ -232,8 +232,18 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key = pers_id,
                 required = false,
-                types = [integer]
-            }
+                types = empweb_norm:filter([integer])
+            },
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key     = friendtype_id,
+                    types   = empweb_norm:filter([integer])
+                },
+                #norm_rule{
+                    key     = friendtype_alias,
+                    types   = empweb_norm:filter([string])
+                }
+            ]}
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
@@ -274,6 +284,16 @@ handle(_req, #empweb_hap{
                     key     = friend_nick,
                     types   = [string]
                 }
+            ]},
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key     = friendtype_id,
+                    types   = [integer]
+                },
+                #norm_rule{
+                    key     = friendtype_alias,
+                    types   = [string]
+                }
             ]}
         ]),
         fun(Data)->
@@ -306,6 +326,16 @@ handle(_req, #empweb_hap{
                 },
                 #norm_rule{
                     key     = friend_nick,
+                    types   = [string]
+                }
+            ]},
+            #norm_at_least_one{rules=[
+                #norm_rule{
+                    key     = friendtype_id,
+                    types   = [integer]
+                },
+                #norm_rule{
+                    key     = friendtype_alias,
                     types   = [string]
                 }
             ]}

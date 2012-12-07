@@ -42,14 +42,13 @@
     update_pgroup/2
 ]).
 
-%%
-%% Группа пользователя
-%%
--export([
-    get_friends/2,
-    add_friend/2,
-    delete_friend/2
-]).
+% %%
+% %% Группа пользователя
+% %%
+% -export([
+%     add_friend/2,
+%     delete_friend/2
+% ]).
 
 %%
 %% Статус пользователя
@@ -378,67 +377,39 @@ create_pgroup(Con, Proplist)->
 update_pgroup(Con, Proplist)->
     empdb_dao:update(pgroup(), Con, Proplist).
 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Друзья пользователя
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% Друзья пользователя
+% %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% add_friend(Con, Proplist)->
+%     case empdb_dao:pgret(
+%         empdb_dao:equery(Con,
+%             <<"insert into friend (pers_id, friend_id) "
+%                 "values ($pers_id, $friend_id) "
+%                 "returning id">>,
+%             Proplist
+%         )
+%     ) of
+%         {error,{not_unique,<<"pers_id_friend_id_many">>}} ->
+%             {error, {not_unique, [pers_id, friend_id]}};
+%         Res ->
+%             Res
+%     end.
+% 
+% delete_friend(Con, Proplist)->
+%     case empdb_dao:pgret(
+%         empdb_dao:equery(Con,
+%             <<"delete from friend where "
+%             " pers_id=$pers_id and friend_id=$friend_id returning id">>,
+%             Proplist
+%         )
+%     ) of
+%         {ok, 0} ->
+%             {error, not_exists};
+%         Res ->
+%             Res
+%     end.
 
-add_friend(Con, Proplist)->
-    case empdb_dao:pgret(
-        empdb_dao:equery(Con,
-            <<"insert into friend (pers_id, friend_id) "
-                "values ($pers_id, $friend_id) "
-                "returning id">>,
-            Proplist
-        )
-    ) of
-        {error,{not_unique,<<"pers_id_friend_id_many">>}} ->
-            {error, {not_unique, [pers_id, friend_id]}};
-        Res ->
-            Res
-    end.
-
-delete_friend(Con, Proplist)->
-    case empdb_dao:pgret(
-        empdb_dao:equery(Con,
-            <<"delete from friend where "
-            " pers_id=$pers_id and friend_id=$friend_id returning id">>,
-            Proplist
-        )
-    ) of
-        {ok, 0} ->
-            {error, not_exists};
-        Res ->
-            Res
-    end.
-
-get_friends(Con, {id, User_id})->
-    get_friends(Con, [{pers_id, User_id}]);
-
-get_friends(Con, {pers_id, User_id})->
-    get_friends(Con, [{pers_id, User_id}]);
-
-get_friends(Con, Proplist)->
-    empdb_dao:eqret(Con,
-        <<"select "
-            " pers.id as id, "
-            " pstatus.alias as pstatus_alias, "
-            " pers.nick as nick, "
-            " doc.head as live_room_head, "
-            " doc.id as live_room_id "
-        " from "
-            " friend "
-        " join pers on "
-            " friend.friend_id = pers.id "
-        " left join pstatus on "
-            " pstatus.id = pers.pstatus_id "
-        " left join doc on "
-            " doc.id = pers.live_room_id "
-        " join room on "
-            " room.doc_id = doc.id "
-        " where "
-            " friend.pers_id = $pers_id; ">>,
-        Proplist
-    ).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Статус пользователя пользователя: в сети \ не в сети.

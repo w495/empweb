@@ -691,44 +691,44 @@ get_opt(Con,Params, [Option|Options], Accs)->
 
 add_friend(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-    
-        Pers_id = proplists:get_value(pers_id, Params,
-            case empdb_dao_pers:get(Con,
-                [   {isdeleted, false},
-                    {nick, proplists:get_value(pers_nick, Params, [])},
-                    {limit, 1}
-                ], [id]
-            ) of
-                {ok, [{[{id, Id1}]}]} ->
-                    Id1;
-                Error1 ->
-                    Error1
-            end
-        ),
-        Friend_id = proplists:get_value(friend_id, Params,
-            case empdb_dao_pers:get(Con,
-                [   {isdeleted, false},
-                    {nick, proplists:get_value(friend_nick, Params, [])},
-                    {limit, 1}
-                ], [id]
-            ) of
-                {ok, {[{id, Id2}]}} ->
-                    Id2;
-                Error2 ->
-                    Error2
-            end
-        ),
-        case empdb_dao_pers:add_friend(Con, [
-            {pers_id,   Pers_id},
-            {friend_id, Friend_id}
-        ]) of
+        % Pers_id = proplists:get_value(pers_id, Params,
+        %     case empdb_dao_pers:get(Con,
+        %         [   {isdeleted, false},
+        %             {nick, proplists:get_value(pers_nick, Params, [])},
+        %             {limit, 1}
+        %         ], [id]
+        %     ) of
+        %         {ok, [{[{id, Id1}]}]} ->
+        %             Id1;
+        %         Error1 ->
+        %             Error1
+        %     end
+        % ),
+        %         = proplists:get_value(friend_id, Params,
+        %     case empdb_dao_pers:get(Con,
+        %         [   {isdeleted, false},
+        %             {nick, proplists:get_value(friend_nick, Params, [])},
+        %             {limit, 1}
+        %         ], [id]
+        %     ) of
+        %         {ok, {[{id, Id2}]}} ->
+        %             Id2;
+        %         Error2 ->
+        %             Error2
+        %     end
+        % ),
+        case empdb_dao_friend:create(Con, Params) of
             {ok, _frndpls} ->
                 %% TODO: костыль
                 %% Возможно, иммет смысл получать 
                 %% на основе _frndpls
                 empdb_dao_pers:get(Con,
-                    [{isdeleted, false},
-                    {id, proplists:get_value(friend_id, Params)}],
+                    [   {isdeleted, false},
+                        {'or', [
+                            {id, proplists:get_value(friend_id, Params)},
+                            {nick, proplists:get_value(friend_nick, Params)}
+                        ]}
+                    ],
                     [   id,
                         nick,
                         pstatus_id,
@@ -743,38 +743,34 @@ add_friend(Params)->
     end).
 
 delete_friend(Params)->
-    io:format("~n~n~n~nParams = ~p~n~n~n~n", [Params]),
     empdb_dao:with_connection(emp, fun(Con)->
-        Pers_id = proplists:get_value(pers_id, Params,
-            case empdb_dao_pers:get(Con,
-                [   {isdeleted, false},
-                    {nick, proplists:get_value(pers_nick, Params, [])},
-                    {limit, 1}
-                ], [id]
-            ) of
-                {ok, [{[{id, Id1}]}]} ->
-                    Id1;
-                Error ->
-                    Error
-            end
-        ),
-        Friend_id = proplists:get_value(friend_id, Params,
-            case empdb_dao_pers:get(Con,
-                [   {isdeleted, false},
-                    {nick, proplists:get_value(friend_nick, Params, [])},
-                    {limit, 1}
-                ], [id]
-            ) of
-                {ok, {[{id, Id2}]}} ->
-                    Id2;
-                Error2 ->
-                    Error2
-            end
-        ),
-        empdb_dao_pers:delete_friend(Con, [
-            {pers_id,   Pers_id},
-            {friend_id, Friend_id}
-        ])
+        % Pers_id = proplists:get_value(pers_id, Params,
+        %     case empdb_dao_pers:get(Con,
+        %         [   {isdeleted, false},
+        %             {nick, proplists:get_value(pers_nick, Params, [])},
+        %             {limit, 1}
+        %         ], [id]
+        %     ) of
+        %         {ok, [{[{id, Id1}]}]} ->
+        %             Id1;
+        %         Error ->
+        %             Error
+        %     end
+        % ),
+        % Friend_id = proplists:get_value(friend_id, Params,
+        %     case empdb_dao_pers:get(Con,
+        %         [   {isdeleted, false},
+        %             {nick, proplists:get_value(friend_nick, Params, [])},
+        %             {limit, 1}
+        %         ], [id]
+        %     ) of
+        %         {ok, {[{id, Id2}]}} ->
+        %             Id2;
+        %         Error2 ->
+        %             Error2
+        %     end
+        % ),
+        empdb_dao_friend:delete(Con, Params)
     end).
 
 get_friend(Params)->

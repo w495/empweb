@@ -70,13 +70,11 @@ $$ language plpgsql;
 drop trigger if exists t1community_util_fields_on_insert on community ;
 create trigger t1community_util_fields_on_insert before insert
 on community for each row execute procedure community_util_fields_on_insert();
-/*
 
+
+/*
 create or replace function community_util_fields_after_insert() returns "trigger" as $$
 begin
-    /**
-    *  Типы сообщества
-    **/
     update pers set
         live_community_approved = true,
         live_community_id = new.doc_id

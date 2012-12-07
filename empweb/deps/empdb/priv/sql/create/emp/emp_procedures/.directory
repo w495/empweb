@@ -1,6 +1,7 @@
 [Dolphin]
-AdditionalInfo=Details_Size,Details_Type,Details_Date,Details_Permissions,CustomizedDetails
-Timestamp=2012,12,3,18,23,11
+AdditionalInfo=CustomizedDetails,Details_Size,Details_Type,Details_Date,Details_Permissions
+SortOrder=1
+Timestamp=2012,12,7,13,34,54
 ViewMode=1
 
 [Settings]

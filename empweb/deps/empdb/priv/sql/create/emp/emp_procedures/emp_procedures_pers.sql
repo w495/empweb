@@ -6,6 +6,7 @@
 /**
     Aтомарное создание комнаты для новичков.
 **/
+drop sequence if exists seq_noobslive_room_id;
 create sequence seq_noobslive_room_id;
 create or replace function  mknoobsroom() returns numeric as $$
 declare

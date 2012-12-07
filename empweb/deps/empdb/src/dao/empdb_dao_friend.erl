@@ -2,6 +2,12 @@
 %% Created: 25.07.2012
 %% Description: TODO: Add description to biz_user
 -module(empdb_dao_friend).
+
+
+%% 
+%% Возможно, имеет смысл переименовать friend в perslink
+%%
+
 -behaviour(empdb_dao).
 
 %% ===========================================================================
@@ -20,6 +26,7 @@
     table/0,
     create/2,
     update/2,
+    delete/2,
     count/2,
     get/2,
     get/3
@@ -62,11 +69,13 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        pers_id     ,
-        friend_id   ,
-        pers_nick   ,
-        friend_nick ,
-        created     
+        pers_id             ,
+        friend_id           ,
+        friendtype_id       ,
+        pers_nick           ,
+        friend_nick         ,
+        friendtype_alias    ,
+        created             
     ];
 
 %%
@@ -95,7 +104,6 @@ empdb_dao_pers({fields, select})->
         empl,
         hobby,
         descr,
-        pregion_id,
         birthday,
         lang_id,
         lang_alias,
@@ -158,15 +166,38 @@ get(Con, Proplist, Fields) ->
     ).
 
 create(Con, Proplist) ->
-    empdb_dao:create(
+    case empdb_dao:create(
         ?MODULE,
         Con,
         Proplist
-    ).
+    ) of
+        {error,{not_unique,<<"pers_id_friend_id_many">>}} ->
+            {error, {not_unique, [pers_id, friend_id]}};
+        Res ->
+            Res
+    end.
 
 update(Con, Proplist) ->
-    empdb_dao:update(
+    case empdb_dao:update(
         ?MODULE,
         Con,
         Proplist
-    ).
+    ) of
+        {error,{not_unique,<<"pers_id_friend_id_many">>}} ->
+            {error, {not_unique, [pers_id, friend_id]}};
+        Res ->
+            Res
+    end.
+
+
+delete(Con, Proplist)->
+    case empdb_dao:delete(
+        ?MODULE,
+        Con,
+        Proplist
+    ) of
+        {ok, 0} ->
+            {error, not_exists};
+        Res ->
+            Res
+    end.
