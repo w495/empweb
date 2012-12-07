@@ -236,12 +236,12 @@ handle(_req, #empweb_hap{
             },
             #norm_at_least_one{rules=[
                 #norm_rule{
-                    key     = friendtype_id,
-                    types   = empweb_norm:filter([integer])
+                    key         = friendtype_id,
+                    types       = empweb_norm:filter([integer])
                 },
                 #norm_rule{
-                    key     = friendtype_alias,
-                    types   = empweb_norm:filter([string])
+                    key         = friendtype_alias,
+                    types       = empweb_norm:filter([string])
                 }
             ]}
             |empweb_norm:norm('get')

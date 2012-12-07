@@ -98,7 +98,7 @@ begin
         new.friendtype_id =
             (select friendtype.id
                 from friendtype
-                    where friendtype.nick = new.friendtype_alias);
+                    where friendtype.alias = new.friendtype_alias);
     end if;
     return new;
 end;

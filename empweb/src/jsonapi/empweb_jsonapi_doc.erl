@@ -380,8 +380,6 @@ handle(_req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
-        %% Возможно, просматривать список нужно разрешить всем.
-        is_auth =   true,
         action  =   get_regimen,
         params  =   Params
     } = Hap) ->
