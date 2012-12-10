@@ -203,7 +203,7 @@ begin
     ) then
         raise exception 'exists_live_community';
     else
-        if(new.own_community_id != new.live_community_id) or (new.own_community_id is null) then
+        if(new.own_community_id != new.live_community_id) or ((new.own_community_id is null) and (new.live_community_id is null)) then
             new.live_community_approved = false;
             update community set ncands = ncands + 1
                 where community.doc_id = new.live_community_id;
