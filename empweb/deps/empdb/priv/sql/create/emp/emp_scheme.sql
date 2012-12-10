@@ -830,7 +830,11 @@ create table doc(
     /**
         количество просмотров документа
     **/
-    vcounter            decimal default 0,
+    nviews              decimal default 0,
+    /**
+        количество голосований
+    **/
+    nvotes              decimal default 0,
     /**
         количество обновлений
     **/
@@ -888,7 +892,6 @@ create table attach(
 create table blog(
     doc_id              decimal unique references doc(id),
     nposts              decimal default 0,
-    nvotes              decimal default 0,
     npublicposts        decimal default 0,
     nprivateposts       decimal default 0,
     nprotectedposts     decimal default 0,
@@ -900,8 +903,7 @@ create table blog(
 **/
 create table post(
     doc_id              decimal unique references doc(id),
-    ncomments           decimal default 0,
-    nvotes              decimal default 0
+    ncomments           decimal default 0
 );
 
 /**
@@ -952,6 +954,21 @@ create table photo(
     **/
     is_cover            bool default false
 );
+
+
+create sequence seq_vote_id;
+create table vote(
+    id                  decimal primary key default nextval('seq_vote_id'),
+    doc_id              decimal         references doc(id),
+    pers_id             decimal         references pers(id),
+    pers_nick           varchar(1024)   references pers(nick),
+    rating              numeric         default null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false,
+    constraint          room2topic_doc_id_pers_id_many_key    unique (doc_id, pers_id)
+);
+
+
 
 
 
@@ -1551,6 +1568,42 @@ create table thingbuy (
     isdeleted           bool default false
 );
 
+
+
+/**
+ *  Многие ко многим для пользователей и вещей
+**/
+create sequence seq_thingwish_id;
+create table thingwish (
+    id                  decimal primary key default nextval('seq_thingwish_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    buyer_id            decimal         references pers(id)     not null,
+    buyer_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id            decimal         references pers(id)     not null,
+    owner_nick          varchar(1024)   references pers(nick)   not null,
+
+    /**
+        Вещь которую приобрели
+    **/
+    thing_id            decimal         references thing(id)    not null,
+    thing_alias         varchar(1024)   references thing(alias) not null,
+
+    price               numeric(1000, 2) default null,
+
+    counter             timestamp without time zone not null default utcnow(),
+
+    -- expired             timestamp without time zone          default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
 
 
 create sequence seq_experbuy_id;

@@ -29,11 +29,19 @@
 }).
 
 -record(norm_at_least_one, {
-        rules =        []               :: [record(norm_rule)]
+        rules =        []               :: [record(norm_rule)],
+    %% Новое имя ключа
+        nkey =         ?UNIQ_UNDEFINED  ::  norm_key(),
+    %% Значение по умолчанию
+        default =      ?UNIQ_UNDEFINED  ::  any()
 }).
 
 -record(norm_one, {
-        rules =        []               :: [record(norm_rule)]
+        rules =        []               :: [record(norm_rule)],
+    %% Новое имя ключа
+        nkey =         ?UNIQ_UNDEFINED  ::  norm_key(),
+    %% Значение по умолчанию
+        default =      ?UNIQ_UNDEFINED  ::  any()
 }).
 
 -record(norm_error, {

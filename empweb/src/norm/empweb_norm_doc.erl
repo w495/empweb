@@ -116,44 +116,54 @@ norm([])->
             types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
-            key = comm_acctype_id,
-            required = false,
-            types = empweb_norm:filter([nullable, integer])
+            key         = comm_acctype_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = comm_acctype_alias,
-            required = false,
-            types = empweb_norm:filter([nullable, atom])
+            key         = comm_acctype_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
-            key = doctype_id,
-            required = false,
-            types = empweb_norm:filter([nullable, integer])
+            key         = doctype_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = doctype_alias,
-            required = false,
-            types = empweb_norm:filter([nullable, atom])
+            key         = doctype_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
-            key = oktype_id,
-            required = false,
-            types = empweb_norm:filter([nullable, integer])
+            key         = oktype_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = oktype_alias,
-            required = false,
-            types = empweb_norm:filter([nullable, atom])
+            key         = oktype_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
-            key = contype_id,
-            required = false,
-            types = empweb_norm:filter([nullable, integer])
+            key         = contype_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = contype_alias,
-            required = false,
-            types = empweb_norm:filter([nullable, atom])
+            key         = contype_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
+        },
+        #norm_rule{
+            key         = nviews,
+            required    = false,
+            types       = empweb_norm:filter([float])
+        },
+        #norm_rule{
+            key         = nvotes,
+            required    = false,
+            types       = empweb_norm:filter([float])
         }
         %%
         %% | empweb_norm:norm([])

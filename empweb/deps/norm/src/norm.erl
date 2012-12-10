@@ -74,10 +74,10 @@ norm(Data, [#norm_one{rules=Crules}|Restrules], Norm) ->
             )
     end;
 
-norm(Data, [#norm_at_least_one{rules=Crules}|Restrules], Norm) ->
+norm(Data, [#norm_at_least_one{rules=Crules, nkey=Nkey, default=Default}|Restrules], Norm) ->
     norm(Data,
         [
-            #norm_rule{rules=set_required(Crules, false), required=true}
+            #norm_rule{rules=set_required(Crules, false), required=true, nkey=Nkey, default=Default}
             |Restrules
         ],
         Norm
@@ -89,7 +89,7 @@ norm(Data, [#norm_at_least_one{rules=Crules}|Restrules], Norm) ->
 norm(Data, [#norm_rule{rules=[], required=true, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
     Norm;
 
-norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
+norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[],  default=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
     io:format("norm(Data, Crules, Norm) ~p ~n", [norm(Data, Crules, Norm)]),
     case norm(Data, Crules, #norm{}) of
         #norm{errors=[], return=[]} ->
@@ -100,6 +100,28 @@ norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ
                             reason  =   param,
                             rule    =   Rule
                         } |Norm#norm.errors
+                    ]
+                }
+            );
+        New_norm ->
+            norm(Data, Restrules,
+                #norm{
+                    errors=lists:append(Norm#norm.errors, New_norm#norm.errors),
+                    return=lists:append(Norm#norm.return, New_norm#norm.return)
+                }
+            )
+    end;
+
+
+norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[], nkey=Nkey, default=Default}=Rule|Restrules], Norm) ->
+    io:format("norm(Data, Crules, Norm) ~p ~n", [norm(Data, Crules, Norm)]),
+    case norm(Data, Crules, #norm{}) of
+        #norm{errors=[], return=[]} ->
+            norm(Data, Restrules,
+                Norm#norm{
+                    return=[
+                        {norm_convert:to_atom(Nkey), Default}
+                        | Norm#norm.return
                     ]
                 }
             );

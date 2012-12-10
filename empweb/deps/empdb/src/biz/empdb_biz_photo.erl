@@ -42,6 +42,18 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
+        %% ===============================================================
+        %% TODO:    Вынести в отдельное соединение.
+        %%          Или вообще в декоратор.
+        %%
+        spawn_link(fun()->
+            {ok, _} = empdb_dao_photo:update(Con, [
+                {filter, [{isdeleted, true}|Params]},
+                {values, [{nviews, {incr, 1}}]}
+            ])
+        end),
+        %% ===============================================================
+
         empdb_dao_photo:get_adds(Con,
             empdb_dao_photo:get(Con, [{isdeleted, false}|Params])
         )
@@ -49,6 +61,18 @@ get(Params)->
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
+        %% ===============================================================
+        %% TODO:    Вынести в отдельное соединение.
+        %%          Или вообще в декоратор.
+        %%
+        spawn_link(fun()->
+            {ok, _} = empdb_dao_photo:update(Con, [
+                {filter, [{isdeleted, true}|Params]},
+                {values, [{nviews, {incr, 1}}]}
+            ])
+        end),
+        %% ===============================================================
+        
         empdb_dao_photo:get_adds(Con,
             empdb_dao_photo:get(Con, [{isdeleted, false}|Params], Fileds)
         )

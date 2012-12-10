@@ -43,6 +43,12 @@ drop function make_plpgsql();
 \set FILE :SECTIONPATH /emp_procedures_pers.sql \i :FILE
 
 /**
+    @doc История сообщества
+**/
+\set FILE :SECTIONPATH /emp_procedures_vote.sql \i :FILE
+
+
+/**
     @doc 
 **/
 \set FILE :SECTIONPATH /emp_procedures_doc.sql \i :FILE
@@ -81,6 +87,12 @@ drop function make_plpgsql();
     @doc 
 **/
 \set FILE :SECTIONPATH /emp_procedures_thingbuy.sql \i :FILE
+
+/**
+    @doc
+**/
+\set FILE :SECTIONPATH /emp_procedures_thingwish.sql \i :FILE
+
 
 /**
     @doc 

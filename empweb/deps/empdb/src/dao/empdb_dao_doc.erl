@@ -96,7 +96,10 @@ table({fields, all})->
         owner_id,
         owner_nick,
         parent_id,
-        vcounter,
+        
+        nviews,
+        nvotes,
+        
         created,
         nchildren,  %% количество детей
         nnodes,     %% количество потомков

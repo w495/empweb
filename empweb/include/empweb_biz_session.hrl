@@ -10,6 +10,7 @@
     uid,
     id,
     login,
+    nick,
     perm_names=[],
     time,
     phash

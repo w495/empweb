@@ -287,3 +287,49 @@ insert into friendtype(alias) values
     ('foe'),
     ('friend');
 */
+
+-- 2012.12.10 15:07:26:274198859 --------------------------------------------
+
+
+create sequence seq_thingwish_id;
+create table thingwish (
+    id                  decimal primary key default nextval('seq_thingwish_id'),
+    buyer_id            decimal         references pers(id)     not null,
+    buyer_nick          varchar(1024)   references pers(nick)   not null,
+    owner_id            decimal         references pers(id)     not null,
+    owner_nick          varchar(1024)   references pers(nick)   not null,
+    thing_id            decimal         references thing(id)    not null,
+    thing_alias         varchar(1024)   references thing(alias) not null,
+    price               numeric(1000, 2) default null,
+    counter             timestamp without time zone not null default utcnow(),
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+
+
+create sequence seq_vote_id;
+create table vote(
+    id                  decimal primary key default nextval('seq_vote_id'),
+    doc_id              decimal         references doc(id),
+    pers_id             decimal         references pers(id),
+    pers_nick           varchar(1024)   references pers(nick),
+    rating              numeric         default null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false,
+    constraint          room2topic_doc_id_pers_id_many_key    unique (doc_id, pers_id)
+);
+
+
+
+alter  table post  drop column nvotes;
+
+alter  table blog  drop column nvotes;
+
+alter  table doc  drop column vcounter;
+
+alter table doc add column nvotes numeric default 0;
+
+alter table doc add column nviews numeric default 0;
+
+

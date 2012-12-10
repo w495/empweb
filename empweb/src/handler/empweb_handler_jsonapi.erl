@@ -41,6 +41,7 @@ init(_, Req, _Opts) ->
     {Auth, Req1}    =   empweb_http:auth(Req),
     Is_auth         =   empweb_biz_pers:is_auth(Auth),
     Pid             =   empweb_biz_pers:get_pers_id(Auth),
+    Pnick           =   empweb_biz_pers:get_pers_nick(Auth),
     Pperm_names     =   empweb_biz_pers:get_perm_names(Auth),
     {ok, Req1, #state{
         empweb_hap  =
@@ -48,9 +49,9 @@ init(_, Req, _Opts) ->
                 auth            =   Auth,
                 is_auth         =   Is_auth,
                 pers_id         =   Pid,
+                pers_nick       =   Pnick,
                 pers_perm_names =   Pperm_names
             }
-            
     }}.
 
 handle(Req, State) ->
@@ -458,6 +459,32 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
                     action          =   delete_communitytype
+                };
+
+            <<"get_vote">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_vote,
+                    action          =   'get'
+                };
+            <<"get_all_votes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_vote,
+                    action          =   'get'
+                };
+            <<"create_vote">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_vote,
+                    action          =   create
+                };
+            <<"update_vote">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_vote,
+                    action          =   update
+                };
+            <<"delete_vote">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_vote,
+                    action          =   delete
                 };
             %%
             %% Блоги
@@ -1338,8 +1365,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
-
-            %% ==================================================
+        %% ==================================================
             <<"get_noticetype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_noticetype,
@@ -1448,6 +1474,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_communityhisttype,
                     action          =   delete
                 };
+
                 
             _ -> []
         end,

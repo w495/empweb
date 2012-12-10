@@ -195,8 +195,8 @@ get_pers_nick({session_id, Session_id})->
     case empweb_biz_session:get(Session_id) of
         [] ->
             undefined;
-        [_H=#empweb_biz_session{id=Id}|_] ->
-            Id
+        [_H=#empweb_biz_session{nick=Nick}|_] ->
+            Nick
     end.
 
 %% ---------------------------------------------------------------------------
@@ -234,11 +234,12 @@ login(Params) ->
     case empdb_biz_pers:login(Params) of
         {ok, [{Userpl}]} ->
             Id          = proplists:get_value(id,           Userpl),
-            Nick        = proplists:get_value(nick,        Userpl),
+            Nick        = proplists:get_value(nick,         Userpl),
             Login       = proplists:get_value(login,        Userpl),
             Perm_names  = proplists:get_value(perm_names,   Userpl),
             Session_id  = empweb_biz_session:new(#empweb_biz_session{
                 id          =   Id,
+                nick        =   Nick,
                 login       =   Login,
                 perm_names  =   Perm_names
             }),
