@@ -171,20 +171,6 @@
     delete_comment/1
 ]).
 
-%%
-%% Чат-комнаты (комнаты)
-%%
--export([
-    get_room/1,
-    get_room/2,
-    count_room/1,
-    create_room/1,
-    join_room/1,
-    add_room_topic/1,
-    delete_room_topic/1,
-    update_room/1,
-    delete_room/1
-]).
 
 %%
 %% Сообщества
@@ -461,40 +447,6 @@ get_comment(Params)->
 get_comment(Params, Fields)->
     empdb_biz_doc:get_comment(Params, Fields).
 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Чат-комнаты (комнаты)
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-create_room(Params)->
-    empdb_biz_doc:create_room(Params).
-
-update_room(Params)->
-    empdb_biz_doc:update_room(Params).
-
-join_room(Params)->
-    empdb_biz_doc:join_room(Params).
-% 
-% update_room(Params)->
-%     empdb_biz_doc:update_room(Params).
-%
-
-delete_room(Params)->
-    empdb_biz_doc:delete_room(Params).
-
-add_room_topic(Params)->
-    empdb_biz_doc:add_room_topic(Params).
-
-delete_room_topic(Params)->
-    empdb_biz_doc:delete_room_topic(Params).
-
-count_room(Params)->
-    empdb_biz_doc:count_room(Params).
-
-get_room(Params)->
-    empdb_biz_doc:get_room(Params).
-
-get_room(Params, Fields)->
-    empdb_biz_doc:get_room(Params, Fields).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сообщества

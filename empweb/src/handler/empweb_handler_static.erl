@@ -39,36 +39,25 @@
 %% ----------------------------------------------------------------------------
 
 init({_Transport, http}, Req, Opts) ->
-    io:format("<init>~n"),
-    io:format("Req = ~p ~n", [Req]),
     erlang:append(erlang:tuple_to_list(Req), [some]),
-    io:format("</init>~n"),
-
-    
-    {Auth, Req1}    =   empweb_http:auth(Req),
-    Is_auth = proplists:get_value(is_auth, Opts, empweb_biz_pers:is_auth(Auth)),
+    %                   {Auth, Req1}    =   empweb_http:auth(Req),
+    Is_auth = true,     % proplists:get_value(is_auth, Opts, empweb_biz_pers:is_auth(Auth)),
 
     case lists:keyfind(path, 1, Opts) of
         {path, Path} ->
-            {ok, Req1, #state{
+            {ok, Req, #state{
                 path    =   Path,
                 is_auth =   Is_auth
             }};
         false ->
-            {error, "No Path Given"}
+            {error, <<"No Path Given">>}
     end.
 
 handle(Req, State) ->
     {Method, Req2} = cowboy_http_req:method(Req),
-    io:format("<handle>~n"),
-    io:format("Req = ~p ~n", [Req]),
-    io:format("</handle>~n"),
     method_allowed(Req2, State#state{method=Method}).
 
 terminate(Req, _State) ->
-    io:format("<terminate>~n"),
-    io:format("Req = ~p ~n", [Req]),
-    io:format("</terminate>~n"),
     ok.
 
 

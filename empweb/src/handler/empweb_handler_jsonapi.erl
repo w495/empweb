@@ -575,81 +575,81 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             <<"count_room">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   count_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   count
                 };
             <<"get_room">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_room
-                };
-            <<"join_room">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   join_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   get
                 };
             <<"get_all_rooms">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   get
+                };
+            <<"join_room">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_room,
+                    action          =   join
                 };
             <<"create_room">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   create_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   create
                 };
             <<"update_room">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   update_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   update
                 };
             <<"delete_room">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   delete_room
+                    handler         =   empweb_jsonapi_room,
+                    action          =   delete
                 };
             <<"add_room_topic">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   add_room_topic
+                    handler         =   empweb_jsonapi_room,
+                    action          =   add_topic
                 };
             <<"delete_room_topic">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   delete_room_topic
+                    handler         =   empweb_jsonapi_room,
+                    action          =   delete_topic
                 };
             %%
             %% Сообщества
             %%
             <<"count_community">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   count_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   count
                 };
             <<"get_community">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   get
                 };
             <<"get_all_communities">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   get_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   get
                 };
             <<"create_community">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   create_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   create
                 };
             <<"update_community">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   update_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   update
                 };
             <<"delete_community">> ->
                 Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_doc,
-                    action          =   delete_community
+                    handler         =   empweb_jsonapi_community,
+                    action          =   delete
                 };
 
             %%
