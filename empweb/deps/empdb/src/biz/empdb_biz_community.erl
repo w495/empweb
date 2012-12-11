@@ -57,7 +57,7 @@ create(Params)->
         %% WARNING: В текущей реализации, мы действуем не очень эффективно.
         %%
         Head = proplists:get_value(head, Params),
-        Mbcommobjs = empdb_dao_community:get(Con, [
+        {ok, Mbcommobjs} = empdb_dao_community:get(Con, [
             {'or', [
                 {owner_id, Owner_id},
                 {head, Head}

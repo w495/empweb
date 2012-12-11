@@ -90,7 +90,7 @@ init(_, Req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   get_community,
+        action  =   get,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -123,7 +123,7 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_doc:get_community(
+                    empweb_biz_community:get(
                         empweb_norm:filter_owner([
                             {pers_id, Pers_id}
                             |Data#norm.return
@@ -140,7 +140,7 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   count_community,
+        action  =   count,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -173,7 +173,7 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_doc:count_community(
+                    empweb_biz_community:count(
                         empweb_norm:filter_owner([
                             {pers_id, Pers_id}
                             |Data#norm.return
@@ -188,7 +188,7 @@ handle(_req, #empweb_hap{
     
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   create_community,
+        action  =   create,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -222,7 +222,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_doc:create_community([
+                    empweb_biz_community:create([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
@@ -234,7 +234,7 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   update_community,
+        action  =   update,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -269,7 +269,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_doc:update_community([
+                    empweb_biz_community:update([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
@@ -281,7 +281,7 @@ handle(_req, #empweb_hap{
 
 handle(_req, #empweb_hap{
         is_auth =   true,
-        action  =   delete_community,
+        action  =   delete,
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
@@ -292,7 +292,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_doc:delete_community([
+                    empweb_biz_community:delete([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
