@@ -41,43 +41,48 @@ update(Params)->
     end).
 
 get(Params)->
-    empdb_dao:with_connection(fun(Con)->
-        %% ===============================================================
-        %% TODO:    Вынести в отдельное соединение.
-        %%          Или вообще в декоратор.
-        %%
-        spawn_link(fun()->
-            {ok, _} = empdb_dao_photo:update(Con, [
-                {filter, [{isdeleted, true}|Params]},
-                {values, [{nviews, {incr, 1}}]}
-            ])
-        end),
-        %% ===============================================================
+    nviewsup(fun empdb_dao_photo:update/2, [Params]),
 
+    empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:get_adds(Con,
             empdb_dao_photo:get(Con, [{isdeleted, false}|Params])
         )
     end).
 
 get(Params, Fileds)->
+    nviewsup(fun empdb_dao_photo:update/2, [Params]),
+    
     empdb_dao:with_connection(fun(Con)->
-        %% ===============================================================
-        %% TODO:    Вынести в отдельное соединение.
-        %%          Или вообще в декоратор.
-        %%
-        spawn_link(fun()->
-            {ok, _} = empdb_dao_photo:update(Con, [
-                {filter, [{isdeleted, true}|Params]},
-                {values, [{nviews, {incr, 1}}]}
-            ])
-        end),
-        %% ===============================================================
-        
         empdb_dao_photo:get_adds(Con,
             empdb_dao_photo:get(Con, [{isdeleted, false}|Params], Fileds)
         )
     end).
 
+nviewsup(Function, [Params]) when erlang:is_function(Function, 2)->
+    spawn_link(fun()->
+        empdb_dao:with_connection(fun(Con)->
+            {ok, _} = Function(Con, [
+                {filter, [{isdeleted, false}|Params]},
+                {values, [{nviews, {incr, 1}}]}
+            ])
+        end)
+    end);
+
+nviewsup(Module, [Params])->
+    nviewsup(Module, update, [Params]).
+
+nviewsup(Module, Function, [Params])->
+    spawn_link(fun()->
+        empdb_dao:with_connection(fun(Con)->
+            {ok, _} = Module:Function(Con, [
+                {filter, [{isdeleted, false}|Params]},
+                {values, [{nviews, {incr, 1}}]}
+            ])
+        end)
+    end).
+
+
+    
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_photo:update(Con, [{isdeleted, true}|Params])
