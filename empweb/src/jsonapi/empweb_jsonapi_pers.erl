@@ -241,9 +241,10 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = pers_id,
-                required = false,
-                types = empweb_norm:filter([integer])
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer]),
+                default     = Pers_id
             },
             #norm_rule{
                 key         = friendtype_id,
@@ -350,19 +351,15 @@ handle(_req, #empweb_hap{
                     types   = [string]
                 }
             ]},
-            #norm_at_least_one{
-                rules = [
-                    #norm_rule{
-                        key     = friendtype_id,
-                        types   = [integer]
-                    },
-                    #norm_rule{
-                        key     = friendtype_alias,
-                        types   = [string]
-                    }
-                ],
-                nkey    =   friendtype_alias,
-                default =   friend
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = friendtype_alias,
+                required    = false,
+                types       = [string]
             }
         ]),
         fun(Data)->
