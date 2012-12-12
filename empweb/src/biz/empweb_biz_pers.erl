@@ -217,6 +217,7 @@ get(Params) ->
             blog,
             album,
             nfriends,
+            nfoes,
             community
         ]
     ).
