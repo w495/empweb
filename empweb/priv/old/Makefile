@@ -81,3 +81,16 @@ BIZ_SESSION_EXPIRE_TIMEOUT
 
 
 	ls | sed s/empweb_//g |  xargs -i echo ./empweb_empweb_{} ./empweb_{}
+
+
+
+
+
+	ls | sed s/empweb_//g |  xargs -i mv ./empweb{} ./taweb_{}
+
+	find -type f -name \* -exec sed -i -r s/empweb/taweb/g {} \;
+
+
+
+
+	find -type f -name \* -exec sed -i -r s/EMPWEB/TAWEB/g {} \;

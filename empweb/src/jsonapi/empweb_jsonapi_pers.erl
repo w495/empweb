@@ -245,16 +245,16 @@ handle(_req, #empweb_hap{
                 required = false,
                 types = empweb_norm:filter([integer])
             },
-            #norm_at_least_one{rules=[
-                #norm_rule{
-                    key         = friendtype_id,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = friendtype_alias,
-                    types       = empweb_norm:filter([string])
-                }
-            ]}
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = friendtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
@@ -299,16 +299,20 @@ handle(_req, #empweb_hap{
                     types   = [string]
                 }
             ]},
-            #norm_at_least_one{rules=[
-                #norm_rule{
-                    key     = friendtype_id,
-                    types   = [integer]
-                },
-                #norm_rule{
-                    key     = friendtype_alias,
-                    types   = [string]
-                }
-            ]}
+            #norm_at_least_one{
+                rules = [
+                    #norm_rule{
+                        key     = friendtype_id,
+                        types   = [integer]
+                    },
+                    #norm_rule{
+                        key     = friendtype_alias,
+                        types   = [string]
+                    }
+                ],
+                nkey    =   friendtype_alias,
+                default =   friend
+            }
         ]),
         fun(Data)->
             {ok,
@@ -346,16 +350,20 @@ handle(_req, #empweb_hap{
                     types   = [string]
                 }
             ]},
-            #norm_at_least_one{rules=[
-                #norm_rule{
-                    key     = friendtype_id,
-                    types   = [integer]
-                },
-                #norm_rule{
-                    key     = friendtype_alias,
-                    types   = [string]
-                }
-            ]}
+            #norm_at_least_one{
+                rules = [
+                    #norm_rule{
+                        key     = friendtype_id,
+                        types   = [integer]
+                    },
+                    #norm_rule{
+                        key     = friendtype_alias,
+                        types   = [string]
+                    }
+                ],
+                nkey    =   friendtype_alias,
+                default =   friend
+            }
         ]),
         fun(Data)->
             {ok,
