@@ -439,6 +439,12 @@ login({Uf, Uv}, Params) ->
                             end,
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
+                                {friendtype_alias, friend},
+                                {pers_id, proplists:get_value(id, Userpl)}
+                            ]),
+                        {ok,[{[{count,Nfoes}]}]} =
+                            empdb_dao_friend:count(Con, [
+                                {friendtype_alias, foe},
                                 {pers_id, proplists:get_value(id, Userpl)}
                             ]),
                         {ok,[{[{count,Nnewmessages}]}]} =
@@ -453,6 +459,7 @@ login({Uf, Uv}, Params) ->
                         {ok, [{[
                             {nnewmessages,      Nnewmessages},
                             {nfriends,          Nfriends},
+                            {nfoes,             Nfoes},
                             {perm_names,        Perm_names},
                             {blog,              Blog},
                             {album,             Album},
@@ -523,14 +530,33 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                     get_opt(Con, Params, Options, [{Acc}]);
                 {undefined, Nick} ->
                     {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                        {friendtype_alias, friend},
                         {pers_nick, Nick}
                     ]),
                     get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}]);
                 {Id, _} ->
                     {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                        {friendtype_alias, friend},
                         {pers_id, Id}
                     ]),
                     get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}])
+            end;
+        nfoes ->
+            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                {undefined, undefined} ->
+                    get_opt(Con, Params, Options, [{Acc}]);
+                {undefined, Nick} ->
+                    {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
+                        {friendtype_alias, foe},
+                        {pers_nick, Nick}
+                    ]),
+                    get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}]);
+                {Id, _} ->
+                    {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
+                        {friendtype_alias, foe},
+                        {pers_id, Id}
+                    ]),
+                    get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}])
             end;
         blog ->
             case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
