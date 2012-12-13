@@ -371,3 +371,4 @@
 
 -- 2012.12.11 16:58:01:647478891 --------------------------------------------
 
+alter table pers add column isempl      boolean         default null;

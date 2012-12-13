@@ -154,6 +154,7 @@ table({fields, all})->
         %% Информация о пользователе
         fname,
         sname,
+        isempl,
         empl,
         hobby,
         interest,

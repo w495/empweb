@@ -563,6 +563,12 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
+        %% Работает или нет
+            #norm_rule{
+                key         = isempl,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
         %% Род занятий
             #norm_rule{
                 key         = empl,
@@ -729,6 +735,11 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = sname,
                         types = [nullable, string]
+                    },
+                %% Работает или нет
+                    #norm_rule{
+                        key = isempl,
+                        types = [nullable, boolean]
                     },
                 %% Род занятий
                     #norm_rule{
