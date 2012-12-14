@@ -490,7 +490,7 @@ create table pers(
     
     /** Страна \ рай \ aд
         [см далее]: live_room_id decimal references room(id) default null,
-    **/
+    **/ 
     live_room_head      varchar(1024) /*references doc(head)*/ default null,
     /**
         позиция в списке
@@ -876,6 +876,20 @@ create table attach(
     attachtype_alias   varchar(1024)   references attachtype(alias)   default null,
     
     file_id         decimal references file(id)         default null
+);
+
+------------------------------------------------------------------------------
+-- Блог
+------------------------------------------------------------------------------
+
+
+create table repost(
+    doc_id              decimal unique references doc(id),
+    target_doc_id       decimal unique references doc(id),
+    owner_id            decimal         references pers(id)     default null,
+    owner_nick          varchar(1024)   references pers(nick)   default null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
 );
 
 ------------------------------------------------------------------------------

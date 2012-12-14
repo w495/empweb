@@ -111,6 +111,44 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
     );
 
 
+% 
+% handle(Req, #empweb_hap{
+%         action  =   nick,
+%         params  =   Params,
+%         is_auth =   Is_auth,
+%         pers_id =   Pers_id,
+%         auth    =   Auth,
+%         pers_perm_names=Pperm_names
+%     }=Hap) ->
+%     ?evman_args(Hap, <<" = pass">>),
+%     empweb_jsonapi:handle_params(
+%         %% проверка входных параметров и приведение к нужному типу
+%         norm:norm(Params, [
+%             #norm_rule{
+%                 key = id,
+%                 types = [integer]
+%             },
+%             #norm_rule{
+%                 key = email,
+%                 types = [string]
+%             }
+%         ]),
+%         fun(Data)->
+%             {ok,
+%                 empweb_jsonapi:resp(
+%                     empweb_biz_pers:pass([
+%                         Auth,
+%                         {pers_id, Pers_id},
+%                         {is_auth, Is_auth}
+%                         | Data#norm.return
+%                     ])
+%                 ),
+%                 Hap
+%             }
+%         end
+%     );
+
+
 handle(Req, #empweb_hap{
         action  =   pass,
         params  =   Params,
@@ -193,10 +231,11 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(Req, #empweb_hap{
-        action=logout,
-        params=Params,
-        is_auth=true,
-        auth=Auth
+        action  = logout,
+        params  = Params,
+        is_auth = true,
+        pers_id = Pers_id,
+        auth    = Auth
     } = Hap) ->
     ?evman_args(Hap, <<" = logout">>),
     empweb_jsonapi:handle_params(
@@ -204,7 +243,8 @@ handle(Req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key = id,
-                types = [integer]
+                types = [integer],
+                default = Pers_id
             }
         ]),
         fun(Data)->        
@@ -383,9 +423,10 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=get_pers,
-        params=Params,
-        is_auth=true
+        action  = get_pers,
+        params  = Params,
+        is_auth = true,
+        pers_id = Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = get pers">>),
     % io:format("Params = ~p~n~n", [Params]),
@@ -395,7 +436,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = empweb_norm:filter([integer])
+                types       = empweb_norm:filter([integer]),
+                default     = Pers_id
             },
             #norm_rule{
                 key         = nick,
@@ -533,7 +575,10 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентифицирован
 %%
 handle(_req, #empweb_hap{
-        action=count_pers, params=Params, is_auth=true
+        action=count_pers,
+        params=Params,
+        is_auth=true,
+        pers_id = Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = count pers">>),
     % io:format("Params = ~p~n~n", [Params]),
@@ -543,7 +588,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = empweb_norm:filter([integer])
+                types       = empweb_norm:filter([integer]),
+                default     = Pers_id
             },
             #norm_rule{
                 key         = nick,
@@ -696,7 +742,10 @@ handle(_req, #empweb_hap{
 %% Функция отрабатывает только если пользователь идентиф ицирован
 %%
 handle(_req, #empweb_hap{
-        action=update_pers, params=Params, is_auth=true
+        action      =   update_pers,
+        params      =   Params,
+        is_auth     =   true,
+        pers_id     =   Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = update pers">>),
     empweb_jsonapi:handle_params(
@@ -705,7 +754,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key = id,
                 required = false,
-                types = [integer]
+                types = [integer],
+                default =  Pers_id
             },
             #norm_at_least_one{
                 rules=[

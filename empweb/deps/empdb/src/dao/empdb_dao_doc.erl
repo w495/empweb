@@ -178,10 +178,10 @@ get(Module, Con, What, Fields)->
     empdb_dao:get([{?MODULE, id},{Module, doc_id}], Con, What, Fields).
 
 create(Con, What)->
-    empdb_dao:create(?MODULE, Con, alias2id_pl(What, [])).
+    empdb_dao:create(?MODULE, Con, What).
 
 update(Con, What)->
-    empdb_dao:update(?MODULE, Con, alias2id_pl(What, [])).
+    empdb_dao:update(?MODULE, Con, What).
 
 is_owner(Con, {owner_id, Owner_id}, {id, Id})->
     case get(Con, {id, Id}, [owner_id]) of

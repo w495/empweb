@@ -127,6 +127,7 @@ register(Params)->
 
 
 suggest_nick(Con, Orgnick)->
+    io:format("~n~n~n~nOrgnick = ~p ~n~n~n~n", [Orgnick]),
     lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
@@ -134,7 +135,7 @@ suggest_nick(Con, Orgnick)->
         lists:sort(
             lists:filter(
                 fun(Nick)->
-                    case empdb_dao_pers:get(Con, [{nick, Nick}]) of
+                    case empdb_dao_pers:get(Con, [{nick, Nick}], [nick]) of
                         {ok, []} ->
                             true;
                         _ ->
@@ -237,15 +238,62 @@ update(Params)->
     end.
 
 update_(Con, Params)->
-%     case proplists:get_value(live_community_id, Params) of
-%         undefined ->
-%             ok;
-%         Community_id ->
-%             empdb_dao_communityhist:create(Con, [
-%                 {community_id, Community_id}
-%             ]).
-        
-    empdb_dao_pers:update(Con, Params).
+    Fun = lists:foldl(
+        fun({Key, Value}, Accfun)->
+            fun(Con1, Params1) ->
+                update(Con1, {Key, Value},  {Accfun, [Params1]})
+            end
+        end,
+        fun empdb_dao_pers:update/2,
+        Params
+    ),
+    Fun(Con, Params).
+
+
+update(Con, {nick, undefined},  {Function, [Params]}) ->
+    Function(Con, Params);
+
+update(Con, {nick, Nick},  {Function, [Params]}) ->
+    Price = 1.0,
+    case Function(Con, Params) of
+        {ok, [{Item}]} ->
+            {ok, _} = empdb_dao_pay:create(Con, [
+                {pers_id,           proplists:get_value(id,   Item)},
+                {paytype_alias,     change_nick},
+                {isincome,          false},
+                {price,             Price}
+            ]),
+            empdb_dao_pers:update(Con,[
+                {id,    proplists:get_value(id,   Item)},
+                {money, {decr, Price}}
+            ]),
+%             empdb_dao_doc:update(Con,[
+%                 {filter [
+%                     {owner_id,    proplists:get_value(id,   Item)},
+%                 ]},
+%                 {values, [
+%                     {owner_nick, Nick}
+%                 ]}
+%             ]),
+%             empdb_dao_pers:update(Con,[
+%                 {filter [
+%                     {owner_id,    proplists:get_value(id,   Item)},
+%                 ]},
+%                 {values, [
+%                     {owner_nick, Nick}
+%                 ]}
+%             ]),
+            {ok, [{Item}]};
+        {error,{not_unique,<<"nick">>}}->
+            Sugs = suggest_nick(Con, Nick),
+            {error,{not_unique_nick,Sugs}};
+        Error ->
+            Error
+    end;
+
+update(Con, {_pname, _pvalue}, {Function, [Params]}) ->
+    Function(Con, Params).
+
 
 
 %%

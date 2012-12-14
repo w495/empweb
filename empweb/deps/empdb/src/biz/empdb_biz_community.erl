@@ -221,12 +221,24 @@ delete(Params)->
 
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params])
+        empdb_dao_community:get(Con, [
+            {isdeleted, false}
+            |Params
+        ] ++ [
+            {order, {desc, head}}
+        ])
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
+        empdb_dao_community:get(Con, [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {desc, head}}
+            ],
+            Fileds
+        )
     end).
 
 count(Params)->

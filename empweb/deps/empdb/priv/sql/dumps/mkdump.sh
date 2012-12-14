@@ -64,7 +64,7 @@ fi
         echo "  <${dbname}:${tbname}>";
         dumpfname=${abspath}/dump-${dbname}-`date "+%Y-%m-%d_%H-%M-%S-%N"`.${tbname}.sql
         ## Создаем дамп конкретной таблицы базы данных
-        pg_dump --table=${tbname} ${dbname} ${options} > "${dumpfname}"s
+        pg_dump --table=${tbname} ${dbname} ${options} > "${dumpfname}"
         if [ 0 == $? ]
         then
             echo    "      ${dbname}:dump          OK";

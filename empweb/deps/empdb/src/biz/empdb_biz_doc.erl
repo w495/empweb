@@ -691,10 +691,82 @@ is_comment_owner(Uid, Oid)->
 %% Сообщения
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% 
+% filterfoe(Function, Options)->
+%     case {proplists:get_value(connection,      Options)} of
+%         undefined ->
+%             empdb_dao:with_transaction(
+%                 fun(Connection)->
+%                     filterfoe(Connection, Function, [{connection, Connection}|Options])
+%                 end
+%             );
+%         Connection ->
+%             filterfoe_(Connection, Function, Options)
+%     end.
+%     
+% filterfoe(Connection, Function, Options)->
+%     Pers_id     = proplists:get_value(pers_id,      Options),
+%     Pers_nick   = proplists:get_value(pers_nick,    Options),
+%     Friend_id   = proplists:get_value(friend_id,    Options),
+%     Friend_nick = proplists:get_value(friend_nick,  Options),
+%     {ok, Objs} = empdb_dao_friend:get(Connection, [
+%         {'or', [
+%             {pers_id, Pers_id}
+%             {pers_nick, Pers_nick}
+%         ]},
+%         {'or', [
+%             {friend_id, Friend_id}
+%             {friend_nick, Friend_nick}
+%         ]},
+%         {friendtype_alias, foe}
+%     ]),
+% 
+%     case Objs of
+%         [] ->
+%             Function()
+%         _ ->
+%             {error, forbiden}
+%     end.
+% 
+
+wfoe(Function, Options)->
+    Pers_id     = proplists:get_value(pers_id,      Options),
+    Pers_nick   = proplists:get_value(pers_nick,    Options),
+    Friend_id   = proplists:get_value(friend_id,    Options),
+    Friend_nick = proplists:get_value(friend_nick,  Options),
+    fun(Connection) ->
+        {ok, Objs} = empdb_dao_friend:get(Connection, [
+            {'or', [
+                {pers_id,   Pers_id},
+                {pers_nick, Pers_nick}
+            ]},
+            {'or', [
+                {friend_id,     Friend_id},
+                {friend_nick,   Friend_nick}
+            ]},
+            {friendtype_alias, foe}
+        ]),
+        case Objs of
+            [] ->
+                Function(Connection);
+            _ ->
+                {error, forbiden}
+        end
+    end.
+
+    
 create_message(Params)->
-    empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_message:create(Con, Params)
-    end).
+    empdb_dao:with_transaction(wfoe(
+        fun(Con)->
+            empdb_dao_message:create(Con, Params)
+        end,
+        [
+            {pers_id,       proplists:get_value(owner_id, Params)},
+            {pers_nick,     proplists:get_value(owner_nick, Params)},
+            {friend_id,     proplists:get_value(reader_id, Params)},
+            {friend_nick,   proplists:get_value(reader_nick, Params)}
+        ]
+    )).
 
 update_message(Params)->
     empdb_dao:with_transaction(fun(Con)->

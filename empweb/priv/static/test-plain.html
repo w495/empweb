@@ -39,6 +39,7 @@
     </head>
 <body>
     <h1 class="gh">Ручное тестирование</h1>
+    <a target="fuck" href="http://ya.ru">sdsdsd</a>
     <nav><a href="test-plain.html">plain</a>&nbsp;<a href="test-ajax.html">ajax</a>&nbsp;<a href="test-auto.html">auto</a>&nbsp;<a href="test-hl.html">hl</a></nav>
     <section class="test-set">
         <h2>Прямой вариант</h2>
@@ -52,6 +53,17 @@
         <script type="text/javascript">
 // ------------------------------------------------------------------------------------
 var default_url  =  "" + window.location.protocol + "//"+ window.location.host +"/jsonapi/";
+
+
+// function new_window()
+// {
+//     window.open('http://www.site.ru','_blank','top=15, left=20, menubar=0, toolbar=0, location=0, directories=0, status=0, scrollbars=0, resizable=0, width=400, height=300');
+// }
+// 
+// new_window()
+
+
+eval( "window.open('http://www.tvzavr.ru/action/window/" + "sdsd" +"','_blank','top=15, left=20, menubar=0, toolbar=0, location=0, directories=0, status=0, scrollbars=0, resizable=0, width=400, height=300');")
 
 mark_err = function(test){
     $(".output", test).css("color", "red");
