@@ -225,7 +225,7 @@ get(Params)->
             {isdeleted, false}
             |Params
         ] ++ [
-            {order, {desc, head}}
+            {order, {asc, head}}
         ])
     end).
 
@@ -235,7 +235,7 @@ get(Params, Fileds)->
                 {isdeleted, false}
                 |Params
             ] ++ [
-                {order, {desc, head}}
+                {order, {asc, head}}
             ],
             Fileds
         )
