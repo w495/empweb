@@ -207,7 +207,22 @@ register(Params)->
 
 update(Params)->
     ?evman_args(Params, <<"pers try to update him self">>),
-    empdb_biz_pers:update(Params).
+    Session_id  = proplists:get_value(session_id, Params),
+    case empdb_biz_pers:update(Params) of
+        {ok, [{Userpl}]} ->
+            case proplists:get_value(nick, Params) of
+                undefined ->
+                    {ok, [{Userpl}]};
+                Nick ->
+                    [Biz_session] = empweb_biz_session:get({uid, Session_id}),
+                    empweb_biz_session:remove(Session_id),
+                    empweb_biz_session:new(Biz_session#empweb_biz_session{nick=Nick}),
+                    {ok, [{[{session_id, Session_id}|Userpl]}]}
+            end;
+        Else ->
+            Else
+    end.
+    % empdb_biz_pers:update(Params).
 
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),

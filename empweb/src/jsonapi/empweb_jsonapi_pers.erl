@@ -745,7 +745,8 @@ handle(_req, #empweb_hap{
         action      =   update_pers,
         params      =   Params,
         is_auth     =   true,
-        pers_id     =   Pers_id
+        pers_id     =   Pers_id,
+        auth        =   Auth
     } = Hap) ->
     ?evman_args(Hap, <<" = update pers">>),
     empweb_jsonapi:handle_params(
@@ -759,6 +760,11 @@ handle(_req, #empweb_hap{
             },
             #norm_at_least_one{
                 rules=[
+                %% Пароль
+                    #norm_rule{
+                        key = nick,
+                        types = [string]
+                    },
                 %% ----------------------------------------------------
                 %% Пароль
                     #norm_rule{
@@ -888,8 +894,28 @@ handle(_req, #empweb_hap{
                 ]
             }
         ]),
+%         fun(Data)->
+%             {ok,empweb_jsonapi:resp(empweb_biz_pers:update([Auth|Data#norm.return])),Hap}
+%         end
         fun(Data)->
-            {ok,empweb_jsonapi:resp(empweb_biz_pers:update(Data#norm.return)),Hap}
+            %% Если login выполнился успешно,
+            %%  то устанавливаем клиенту cookie.
+            case empweb_biz_pers:update([Auth|Data#norm.return]) of
+                {ok, [{Bodypl}]} ->
+                    case proplists:get_value(session_id, Bodypl) of
+                        undefined ->
+                            {ok, empweb_jsonapi:resp( {ok, [{Bodypl}]}), Hap};
+                        _ ->
+                            {ok,
+                                (empweb_jsonapi:resp({ok, [{Bodypl}]}))#empweb_resp{
+                                    cookies = [empweb_http:make_auth([{Bodypl}])]
+                                },
+                                Hap
+                            }
+                    end;
+                Some ->
+                    {ok, empweb_jsonapi:resp(Some), Hap}
+            end
         end
     );
 

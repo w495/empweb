@@ -374,26 +374,26 @@
 -- alter table pers add column isempl      boolean         default null;
 -- 
 
+alter table pers add column isempl      boolean         default null;
 
-alter TABLE doc DROP CONSTRAINT doc_owner_nick_fkey;
-alter TABLE pay DROP CONSTRAINT pay_pers_nick_fkey;
-alter TABLE vote DROP CONSTRAINT vote_pers_nick_fkey;
-
-
-
-alter TABLE  file         DROP CONSTRAINT  file_owner_nick_fkey
-alter TABLE fileinfo      DROP CONSTRAINT fileinfo_owner_nick_fkey
-alter TABLE communityhist DROP CONSTRAINT  communityhist_pers_nick_fkey
-alter TABLE message       DROP CONSTRAINT  message_reader_nick_fkey
-alter TABLE roombet       DROP CONSTRAINT  roombet_owner_nick_fkey
-alter TABLE room          DROP CONSTRAINT  room_roombet_owner_nick_fkey
-alter TABLE thingbuy      DROP CONSTRAINT  thingbuy_buyer_nick_fkey
-alter TABLE thingbuy      DROP CONSTRAINT  thingbuy_owner_nick_fkey
-alter TABLE experbuy      DROP CONSTRAINT  experbuy_buyer_nick_fkey
-alter TABLE experbuy      DROP CONSTRAINT  experbuy_owner_nick_fkey
-alter TABLE rptrans       DROP CONSTRAINT  rptrans_pers_nick_fkey
-alter TABLE roomtreas     DROP CONSTRAINT  roomtreas_pers_nick_fkey
-alter TABLE thingwish     DROP CONSTRAINT  thingwish_buyer_nick_fkey
-alter TABLE thingwish     DROP CONSTRAINT  thingwish_owner_nick_fkey
+alter table doc           drop constraint  doc_owner_nick_fkey;
+alter table pay           drop constraint  pay_pers_nick_fkey;
+alter table vote          drop constraint  vote_pers_nick_fkey;
+alter table file          drop constraint  file_owner_nick_fkey;
+alter table fileinfo      drop constraint  fileinfo_owner_nick_fkey;
+alter table communityhist drop constraint  communityhist_pers_nick_fkey;
+alter table message       drop constraint  message_reader_nick_fkey;
+alter table roombet       drop constraint  roombet_owner_nick_fkey;
+alter table room          drop constraint  room_roombet_owner_nick_fkey;
+alter table thingbuy      drop constraint  thingbuy_buyer_nick_fkey;
+alter table thingbuy      drop constraint  thingbuy_owner_nick_fkey;
+alter table experbuy      drop constraint  experbuy_buyer_nick_fkey;
+alter table experbuy      drop constraint  experbuy_owner_nick_fkey;
+alter table rptrans       drop constraint  rptrans_pers_nick_fkey;
+alter table roomtreas     drop constraint  roomtreas_pers_nick_fkey;
+alter table thingwish     drop constraint  thingwish_buyer_nick_fkey;
+alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
 
 
+    insert into paytype(alias, isincome)
+        values  ('change_nick',     false);

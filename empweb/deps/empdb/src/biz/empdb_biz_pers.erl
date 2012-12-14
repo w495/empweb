@@ -255,46 +255,86 @@ update(Con, {nick, undefined},  {Function, [Params]}) ->
 
 update(Con, {nick, Nick},  {Function, [Params]}) ->
     Price = 1.0,
-    case Function(Con, Params) of
-        {ok, [{Item}]} ->
-            {ok, _} = empdb_dao_pay:create(Con, [
-                {pers_id,           proplists:get_value(id,   Item)},
-                {paytype_alias,     change_nick},
-                {isincome,          false},
-                {price,             Price}
-            ]),
-            empdb_dao_pers:update(Con,[
-                {id,    proplists:get_value(id,   Item)},
-                {money, {decr, Price}}
-            ]),
-%             empdb_dao_doc:update(Con,[
-%                 {filter [
-%                     {owner_id,    proplists:get_value(id,   Item)},
-%                 ]},
-%                 {values, [
-%                     {owner_nick, Nick}
-%                 ]}
-%             ]),
-%             empdb_dao_pers:update(Con,[
-%                 {filter [
-%                     {owner_id,    proplists:get_value(id,   Item)},
-%                 ]},
-%                 {values, [
-%                     {owner_nick, Nick}
-%                 ]}
-%             ]),
-            {ok, [{Item}]};
-        {error,{not_unique,<<"nick">>}}->
-            Sugs = suggest_nick(Con, Nick),
-            {error,{not_unique_nick,Sugs}};
-        Error ->
-            Error
+    case empdb_dao_pers:get(Con,[
+        {id,    proplists:get_value(id,   Params)},
+        {fields, [
+            nick,
+            money
+        ]}
+    ]) of
+        {ok, [{Mbownerpl}]} ->
+            Money = proplists:get_value(money, Mbownerpl),
+            Oldnick = proplists:get_value(nick, Mbownerpl),
+            case {Price =< Money, Oldnick =:= Nick} of
+                {true, false} ->
+                    case Function(Con, Params) of
+                        {ok, [{Item}]} ->
+                            {ok, _} = empdb_dao_pay:create(Con, [
+                                {pers_id,           proplists:get_value(id,   Item)},
+                                {paytype_alias,     change_nick},
+                                {isincome,          false},
+                                {price,             Price}
+                            ]),
+                            empdb_dao_pers:update(Con,[
+                                {id,    proplists:get_value(id,   Item)},
+                                {money, {decr, Price}}
+                            ]),
+                            Itemid = proplists:get_value(id,   Item),
+                            update_change_connected(Con, doc, owner, Itemid, Nick),
+                            update_change_connected(Con, pay, pers, Itemid, Nick),
+                            update_change_connected(Con, vote, pers, Itemid, Nick),
+                            update_change_connected(Con, file, owner, Itemid, Nick),
+                            update_change_connected(Con, fileinfo, owner, Itemid, Nick),
+                            update_change_connected(Con, communityhist, pers, Itemid, Nick),
+                            update_change_connected(Con, message, reader, Itemid, Nick),
+                            update_change_connected(Con, roombet, owner, Itemid, Nick),
+                            update_change_connected(Con, room, roombet, Itemid, Nick),
+                            update_change_connected(Con, thingbuy, buyer, Itemid, Nick),
+                            update_change_connected(Con, thingbuy, owner, Itemid, Nick),
+                            update_change_connected(Con, experbuy, buyer, Itemid, Nick),
+                            update_change_connected(Con, experbuy, owner, Itemid, Nick),
+                            update_change_connected(Con, rptrans, pers, Itemid, Nick),
+                            update_change_connected(Con, roomtreas, pers, Itemid, Nick),
+                %             update_change_connected(Con, thingwish, buyer, Itemid, Nick),
+                %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
+                            {ok, [{Item}]};
+                        {error,{not_unique,<<"nick">>}}->
+                            Sugs = suggest_nick(Con, Nick),
+                            {error,{not_unique_nick,Sugs}};
+                        Error ->
+                            Error
+                    end;
+                {true, _} ->
+                    {ok, []};
+                {false, _} ->
+                    {error, {not_enough_money, {[
+                        {money, Money},
+                        {price, Price}
+                    ]}}}
+            end;
+        Else ->
+            Else
     end;
 
 update(Con, {_pname, _pvalue}, {Function, [Params]}) ->
     Function(Con, Params).
 
 
+update_change_connected(Con, Msuffix, Fprefix, Itemid, Nick) ->
+    Module = ca(empdb_dao, Msuffix),
+    Fid = ca(Fprefix, id),
+    Fnick = ca(Fprefix, nick),
+    Module:update(Con,[
+        {filter, [
+            {Fid,   Itemid}
+        ]},
+        {values, [
+            {Fnick, Nick}
+        ]}
+    ]).
+
+ca(L, R) ->
+    erlang:list_to_atom(string:join([erlang:atom_to_list(L), erlang:atom_to_list(R)], "_")).
 
 %%
 %% @doc Вход пользователя. Создание сессии.
