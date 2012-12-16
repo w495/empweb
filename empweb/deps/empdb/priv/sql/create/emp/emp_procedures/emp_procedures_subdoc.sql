@@ -121,6 +121,10 @@ drop trigger if exists t1on_insert_subdoc_inst on notice;
 create trigger t1on_insert_subdoc_inst after insert
    on notice for each row execute procedure on_insert_subdoc_inst('notice');
 
+drop trigger if exists t1on_insert_subdoc_inst on claim;
+create trigger t1on_insert_subdoc_inst after insert
+   on claim for each row execute procedure on_insert_subdoc_inst('claim');
+
 
 
 \echo :FILE ok

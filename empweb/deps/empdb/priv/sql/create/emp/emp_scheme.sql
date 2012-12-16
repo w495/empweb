@@ -927,7 +927,9 @@ create table post(
 create table claim(
     doc_id              decimal unique references doc(id),
     pers_id             decimal         references pers(id),
-    pers_nick           varchar(1024)   default null
+    pers_nick           varchar(1024)   default null,
+    judge_id            decimal         references pers(id),
+    judge_nick          varchar(1024)   default null
 );
 
 

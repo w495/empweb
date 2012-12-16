@@ -59,7 +59,9 @@ table({fields, all})->
     [
         doc_id,
         pers_id,
-        pers_nick
+        pers_nick,
+        judge_id,
+        judge_nick
     ];
 
 %%

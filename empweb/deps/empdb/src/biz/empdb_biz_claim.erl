@@ -49,12 +49,50 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_claim:get(Con, [{isdeleted, false}|Params])
+        get_adds(
+            Con,
+            empdb_dao_claim:get(Con, [{isdeleted, false}|Params])
+        )
     end).
+
+get_adds(Con, {ok, Res}) ->
+    {ok,
+        lists:map(
+            fun({Itempl})->
+                {ok, [{Ownerpl}]} =
+                    empdb_dao_pers:get(
+                        Con,
+                        [
+                            {'or', [
+                                {id,    proplists:get_value(owner_id,   Itempl)},
+                                {nick,  proplists:get_value(owner_nick, Itempl)}
+                            ]},
+                            {fields, [authority_id, authority_alias]}
+                        ]
+                    ),
+                {[
+                    {pers_authority_id,
+                        proplists:get_value(authority_id, Ownerpl)
+                    },
+                    {pers_authority_alias,
+                        proplists:get_value(authority_alias, Ownerpl)
+                    }
+                    |Itempl
+                ]}
+            end,
+            Res
+        )
+    };
+
+get_adds(_Con, Else) ->
+    Else.
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_claim:get(Con, [{isdeleted, false}|Params], Fileds)
+        get_adds(
+            Con,
+            empdb_dao_claim:get(Con, [{isdeleted, false}|Params], Fileds)
+        )
     end).
 
 is_owner(Uid, Oid)->

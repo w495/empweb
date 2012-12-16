@@ -752,7 +752,8 @@ insert into doctype(alias)
             ('event'),
             ('roomlot'),
             ('album'),
-            ('photo');
+            ('photo'),
+            ('claim');
             
 insert into tr (text, tt, tf, ta, ti, lang_id, trtype_id)
     values

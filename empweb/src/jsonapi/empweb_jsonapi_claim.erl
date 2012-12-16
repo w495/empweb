@@ -97,29 +97,32 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-                #norm_rule{
-                    key         = pers_id,
-                    required    = false,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = pers_nick,
-                    required    = false,
-                    types       = empweb_norm:filter([string])
-                }
-                |empweb_norm_doc:norm('get')
-            ]
-        ),
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = judge_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = judge_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:get(
-                        empweb_norm:filter_owner([
-                            {pers_id, Pers_id}
-                            |Data#norm.return
-                        ]),
-                        proplists:get_value(fields, Data#norm.return, [])
-                    )
+                    empweb_biz_claim:get(Data#norm.return)
                 ),
                 Hap
             }
@@ -137,34 +140,37 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-                #norm_rule{
-                    key         = pers_id,
-                    required    = false,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = pers_nick,
-                    required    = false,
-                    types       = empweb_norm:filter([string])
-                }
-                |empweb_norm_doc:norm('get')
-            ]
-        ),
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = judge_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = judge_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:count(
-                        empweb_norm:filter_owner([
-                            {pers_id, Pers_id}
-                            |Data#norm.return
-                        ])
-                    )
+                    empweb_biz_claim:get(Data#norm.return)
                 ),
                 Hap
             }
         end
     );
-
 
 handle(_req, #empweb_hap{
         is_auth =   true,
@@ -176,26 +182,33 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-                #norm_rule{
-                    key         = pers_id,
-                    required    = false,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = pers_nick,
-                    required    = false,
-                    types       = empweb_norm:filter([string])
-                }
-                |empweb_norm_doc:norm('create')
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = judge_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = judge_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
+            |empweb_norm_doc:norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:create([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])  
+                    empweb_biz_claim:create(Data#norm.return)
                 ),
                 Hap
             }
@@ -212,26 +225,33 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
-                #norm_rule{
-                    key         = pers_id,
-                    required    = false,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = pers_nick,
-                    required    = false,
-                    types       = empweb_norm:filter([string])
-                }
-                |empweb_norm_doc:norm('update')
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = judge_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = judge_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
+            |empweb_norm_doc:norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:update([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_claim:update(Data#norm.return)
                 ),
                 Hap
             }
@@ -248,26 +268,33 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = update claim">>),
     empweb_jsonapi:handle_params(
         norm:norm(Params, [
-                #norm_rule{
-                    key         = pers_id,
-                    required    = false,
-                    types       = empweb_norm:filter([integer])
-                },
-                #norm_rule{
-                    key         = pers_nick,
-                    required    = false,
-                    types       = empweb_norm:filter([string])
-                }
-                |empweb_norm_doc:norm('delete')
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = judge_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = judge_nick,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            }
+            |empweb_norm_doc:norm('delete')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:delete([
-                        {owner_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_claim:delete(Data#norm.return)
                 ),
                 Hap
             }

@@ -406,3 +406,9 @@ create table claim(
     pers_nick           varchar(1024)   default null
 );
 
+
+
+alter table claim add column judge_id numeric references pers(id) default null;
+alter table claim add column judge_nick varchar(1024) default null;
+
+
