@@ -546,9 +546,9 @@ alter table fileinfo add owner_id
 
 
 alter table file     add owner_nick varchar(1024)
-    references pers(nick) default null;
+    default null default null;
 alter table fileinfo add owner_nick varchar(1024)
-    references pers(nick) default null;
+    default null default null;
 
 
 /**
@@ -773,7 +773,7 @@ create table doc(
         Владелец документа
     **/
     owner_id            decimal         references pers(id)     default null,
-    owner_nick          varchar(1024)   references pers(nick)   default null,
+    owner_nick          varchar(1024)   default null   default null,
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
@@ -879,7 +879,7 @@ create table attach(
 );
 
 ------------------------------------------------------------------------------
--- Блог
+-- Репост
 ------------------------------------------------------------------------------
 
 
@@ -887,7 +887,7 @@ create table repost(
     doc_id              decimal unique references doc(id),
     target_doc_id       decimal unique references doc(id),
     owner_id            decimal         references pers(id)     default null,
-    owner_nick          varchar(1024)   references pers(nick)   default null,
+    owner_nick          varchar(1024)   default null   default null,
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false
 );
@@ -921,6 +921,15 @@ create table post(
     doc_id              decimal unique references doc(id),
     ncomments           decimal default 0
 );
+
+
+
+create table claim(
+    doc_id              decimal unique references doc(id),
+    pers_id             decimal         references pers(id),
+    pers_nick           varchar(1024)   default null
+);
+
 
 /**
  *  Запись комментарий
@@ -977,7 +986,7 @@ create table vote(
     id                  decimal primary key default nextval('seq_vote_id'),
     doc_id              decimal         references doc(id),
     pers_id             decimal         references pers(id),
-    pers_nick           varchar(1024)   references pers(nick),
+    pers_nick           varchar(1024)   default null,
     rating              numeric         default null,
     created             timestamp without time zone not null default utcnow(),
     isdeleted           bool default false,
@@ -1180,7 +1189,7 @@ create sequence seq_communityhist_id;
 create table communityhist(
     id                          decimal         primary key default nextval('seq_communityhist_id'),
     pers_id                     decimal         references pers(id) not null,
-    pers_nick                   varchar(1024)   references pers(nick) not null,
+    pers_nick                   varchar(1024)   default null not null,
     community_id                decimal         references community(doc_id)  default null,
     communityhisttype_id        decimal         references communityhisttype(id)    default null,
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
@@ -1294,7 +1303,7 @@ create table message(
     messagetype_alias   varchar(1024)   references messagetype(alias)   default null,
     
     reader_id           decimal         references pers(id) default null,
-    reader_nick         varchar(1024)   references pers(nick) default null,
+    reader_nick         varchar(1024)   default null default null,
     /**
         Удалено для отправителя (из почтового ящика отправителя)
     **/
@@ -1348,7 +1357,7 @@ create table roombet(
         Владелец, тот кто обладает товаром после покупки
     **/
     owner_id        decimal             references pers(id)     not null,
-    owner_nick      varchar(1024)       references pers(nick)   not null,
+    owner_nick      varchar(1024)       default null   not null,
     price           numeric(1000, 2)    default 0,
 
     created         timestamp without time zone not null    default utcnow(),
@@ -1363,7 +1372,7 @@ alter table room add column roomlot_dtstart     timestamp without time zone not 
 alter table room add column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
 alter table room add column roombet_id          decimal        references roombet(id)       default null;
 alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
-alter table room add column roombet_owner_nick  varchar(1024)       references pers(nick)   default null;
+alter table room add column roombet_owner_nick  varchar(1024)       default null   default null;
 alter table room add column roombet_price       decimal                                     default null;
 
 
@@ -1377,10 +1386,10 @@ create table roomoffer(
     room_head       varchar(1024) references doc(head) default nul
 
     owner_id        decimal         references pers(id)     not null,
-    owner_nick      varchar(1024)   references pers(nick)   not null,
+    owner_nick      varchar(1024)   default null   not null,
 
     reader_id       decimal         references pers(id)     not null,
-    reader_nick     varchar(1024)   references pers(nick)   not null,
+    reader_nick     varchar(1024)   default null   not null,
 
     price           numeric(1000, 2) default 0,
 
@@ -1565,13 +1574,13 @@ create table thingbuy (
         Покупатель, тот кто платит
     **/
     buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   references pers(nick)   not null,
+    buyer_nick          varchar(1024)   default null   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
     owner_id            decimal         references pers(id)     not null,
-    owner_nick          varchar(1024)   references pers(nick)   not null,
+    owner_nick          varchar(1024)   default null   not null,
 
     /**
         Вещь которую приобрели
@@ -1602,13 +1611,13 @@ create table thingwish (
         Покупатель, тот кто платит
     **/
     buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   references pers(nick)   not null,
+    buyer_nick          varchar(1024)   default null   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
     owner_id            decimal         references pers(id)     not null,
-    owner_nick          varchar(1024)   references pers(nick)   not null,
+    owner_nick          varchar(1024)   default null   not null,
 
     /**
         Вещь которую приобрели
@@ -1635,13 +1644,13 @@ create table experbuy (
         Покупатель, тот кто платит
     **/
     buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   references pers(nick)   not null,
+    buyer_nick          varchar(1024)   default null   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
     **/
     owner_id            decimal         references pers(id)     not null,
-    owner_nick          varchar(1024)   references pers(nick)   not null,
+    owner_nick          varchar(1024)   default null   not null,
 
     /**
         Вещь которую приобрели --- опыт.
@@ -1684,7 +1693,7 @@ create sequence seq_rptrans_id;
 create table rptrans (
     id                 decimal primary key default nextval('seq_rptrans_id'),
     pers_id            decimal         references pers(id)     not null,
-    pers_nick          varchar(1024)   references pers(nick)   not null,
+    pers_nick          varchar(1024)   default null   not null,
     room_id            decimal         references room(doc_id)       not null,
     transtype_id       decimal         references transtype(id)      default null,
     transtype_alias    varchar(1024)   references transtype(alias)   default null,
@@ -1716,7 +1725,7 @@ create table roomtreas (
         Покупатель, тот кто платит
     **/
     pers_id            decimal         references pers(id)     not null,
-    pers_nick          varchar(1024)   references pers(nick)   not null,
+    pers_nick          varchar(1024)   default null   not null,
 
     /**
         Владелец, тот кто обладает товаром после покупки
@@ -1756,7 +1765,7 @@ create table pay (
     paytype_id      decimal         references paytype(id)      not null,
     paytype_alias   varchar(1024)   references paytype(alias)   not null,
     pers_id         decimal         references pers(id)         not null,
-    pers_nick       varchar(1024)   references pers(nick)       not null,
+    pers_nick       varchar(1024)   default null       not null,
     info            varchar(1024)   default null,
     created         timestamp without time zone not null default utcnow(),
     isdeleted       bool default false

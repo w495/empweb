@@ -373,7 +373,7 @@
 
 -- alter table pers add column isempl      boolean         default null;
 -- 
-
+/*
 alter table pers add column isempl      boolean         default null;
 
 alter table doc           drop constraint  doc_owner_nick_fkey;
@@ -396,4 +396,13 @@ alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
 
 
     insert into paytype(alias, isincome)
-        values  ('change_nick',     false);
+        values  ('change_nick',     false);*/
+
+
+
+create table claim(
+    doc_id              decimal unique references doc(id),
+    pers_id             decimal         references pers(id),
+    pers_nick           varchar(1024)   default null
+);
+

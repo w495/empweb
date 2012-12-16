@@ -232,6 +232,16 @@ get(Con, What, Fields)->
             ], Con, What, Fields)
     end.
 
+% 
+% get_blogs(Con, What) ->
+%     " select "
+%         " id, head "
+%     " from doc "
+%     " join pers on
+%         " pers.id = doc.owner_id "
+%     " where "
+%         " doc.doctype_alias = 'blog' and doc.owner_id = "
+
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).
 
