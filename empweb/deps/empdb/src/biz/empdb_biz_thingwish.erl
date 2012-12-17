@@ -40,7 +40,27 @@
 
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingwish:create(Con, Params)
+        
+        case empdb_dao_thingwish:get(Con, [
+            {'and', [
+                {'or', [
+                    {owner_id, proplists:get_value(owner_id, Params)},
+                    {owner_nick, proplists:get_value(owner_nick, Params)}
+                ]},
+                {'or', [
+                    {thing_id, proplists:get_value(thing_id, Params)},
+                    {thing_alias, proplists:get_value(thing_alias, Params)}
+                ]},
+                {isdeleted, false}
+            ]}
+        ]) of
+            {ok, []} ->
+                empdb_dao_thingwish:create(Con, Params);
+            {ok, Ok} ->
+                {error, dublicate_thing};
+            Else ->
+                Else
+        end
     end).
 
 update(Params)->

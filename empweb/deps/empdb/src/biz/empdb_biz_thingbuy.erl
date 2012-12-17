@@ -84,6 +84,23 @@ create(Params)->
                             {isincome,          false},
                             {price,             Price}
                         ]),
+                        {ok, _} = empdb_dao_thingwish:update(Con, [
+                            {filter, [
+                                {'or', [
+                                    {thing_id,     proplists:get_value(thing_id,   Params)},
+                                    {thing_alias,  proplists:get_value(thing_alias, Params)}
+                                ]},
+                                {'or', [
+                                    {owner_id,    proplists:get_value(owner_id,   Params, null)},
+                                    {owner_nick,  proplists:get_value(owner_nick, Params, null)}
+                                ]},
+                                {isdeleted, false}
+                            ]},
+                            {values, [
+                                {isdeleted, true}
+                            ]}
+                        ]),
+                        
                         {ok, [
                             {[
                                 {money, Newmoney},
