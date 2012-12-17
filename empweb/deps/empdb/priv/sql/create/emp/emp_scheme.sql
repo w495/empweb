@@ -1266,6 +1266,10 @@ create table notice(
     datetime            timestamp without time zone             default utcnow()
 );
 
+    alter table notice add column pers_id   decimal
+        references pers(id) default null;
+    alter table notice add column pers_nick varchar(1024)
+        references pers(nick) default null;
 
 ------------------------------------------------------------------------------
 -- События
