@@ -25,6 +25,22 @@ begin
     end if;
 
     /**
+        Владелец оригинального документа
+    **/
+    if (new.orig_owner_nick is null) then
+        if not (new.orig_owner_id is null) then
+            new.orig_owner_nick =
+                (select pers.nick from pers where pers.id = new.orig_owner_id);
+        else
+            new.orig_owner_nick        = null;
+        end if;
+    end if;
+    if (new.orig_owner_id is null) then
+        new.orig_owner_id           =
+            (select pers.id from pers where pers.nick = new.orig_owner_nick);
+    end if;
+
+    /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
     if (new.oktype_alias is null) then
@@ -110,6 +126,19 @@ begin
             (select pers.id from pers where pers.nick = new.owner_nick);
     end if;
 
+    /**
+        Владелец оригинального документа
+    **/
+    if new.orig_owner_id != old.orig_owner_id then
+        new.orig_owner_nick =
+            (select pers.nick from pers where pers.id = new.orig_owner_id);
+    end if;
+    if new.orig_owner_nick != old.orig_owner_nick then
+        new.orig_owner_id =
+            (select pers.id from pers where pers.nick = new.orig_owner_nick);
+    end if;
+
+    
     if new.head != old.head then
         if new.doctype_alias = 'room' then
             update pers set live_room_head = new.head

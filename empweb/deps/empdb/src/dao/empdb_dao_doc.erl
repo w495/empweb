@@ -81,6 +81,8 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
+        orig_id,
+        
         head,
         body,
         read_acctype_id,
@@ -93,13 +95,21 @@ table({fields, all})->
         doctype_alias,
         contype_id,
         contype_alias,
+
         owner_id,
         owner_nick,
+
+        orig_owner_id,
+        orig_owner_nick,
+
+        isrepost,
+        isrepostable,
+
         parent_id,
-        
+
         nviews,
         nvotes,
-        
+
         created,
         nchildren,  %% количество детей
         nnodes,     %% количество потомков
@@ -258,7 +268,6 @@ create(Module, Con, Proplist)->
 %%
 update(Module, Con, Proplist)->
     empdb_dao:update([{?MODULE, id}, {Module, doc_id}], Con, Proplist).
-
 
 
 get_acctype(Con, What) ->

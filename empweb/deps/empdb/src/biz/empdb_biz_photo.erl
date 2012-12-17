@@ -26,8 +26,15 @@
     get/2,
     create/1,
     delete/1,
-    update/1
+    update/1,
+    repost/1
 ]).
+
+
+repost(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_biz_doc:repost(?MODULE, Con, Params)
+    end).
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->

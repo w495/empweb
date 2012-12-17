@@ -207,6 +207,73 @@
 %% API Functions
 %%
 
+%%
+%% Репост
+%%
+-export([
+    repost/3
+]).
+
+repost(Module, Con, Params)->
+    Doc_id      = proplists:get_value(id, Params),
+    Owner_id    = proplists:get_value(owner_id, Params),
+    Owner_nick  = proplists:get_value(owner_nick, Params),
+
+    {ok, [{Instpl}]} = Module:get(Con, [{id, Doc_id}]),
+
+    Orig_id          = repost_orig(id, orig_id, Instpl),
+    Orig_owner_id    = repost_orig(owner_id, orig_owner_id, Instpl),
+    Orig_owner_nick  = repost_orig(owner_nick, orig_owner_nick, Instpl),
+
+    Preinstpl =
+        proplists:delete(id,
+            proplists:delete(owner_id,
+                proplists:delete(owner_nick,
+                    proplists:delete(orig_id,
+                        proplists:delete(orig_owner_id,
+                            proplists:delete(orig_owner_nick,
+                                Instpl
+                            )
+                        )
+                    )
+                )
+            )
+        ),
+
+    case Module:create(Con, [
+        {owner_id,          Owner_id},
+        {owner_nick,        Owner_nick},
+        {orig_id,           Orig_id},
+        {orig_owner_id,     Orig_owner_id},
+        {orig_owner_nick,   Orig_owner_nick}
+        |Preinstpl
+    ]) of
+        {ok, [{Newinstpl}]} ->
+            {ok, _} = empdb_biz_repost:create(Con, [
+                {doc_id,            proplists:get_value(id, Newinstpl)},
+                {owner_id,          Owner_id},
+                {owner_nick,        Owner_nick},
+                {orig_doc_id,       Orig_id},
+                {orig_owner_id,     Orig_owner_id},
+                {orig_owner_nick,   Orig_owner_nick}
+            ]),
+            {ok, [{Newinstpl}]};
+        Else ->
+            Else
+    end.
+    
+repost_orig(Field, Orig_field, Instpl)->
+    case
+        proplists:get_value(Orig_field, Instpl,
+            proplists:get_value(Field, Instpl)
+        )
+    of
+        null ->
+            proplists:get_value(Field, Instpl);
+        Else ->
+            Else
+    end.
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %%                          УТИЛИТАРНЫЕ ОБЪЕКТЫ

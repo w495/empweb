@@ -773,7 +773,8 @@ create table doc(
         Владелец документа
     **/
     owner_id            decimal         references pers(id)     default null,
-    owner_nick          varchar(1024)   default null   default null,
+    owner_nick          varchar(1024)                           default null,
+
     /**
         Непросмотрен, разрешен, запрещен, там где это нужно,
     **/
@@ -801,6 +802,13 @@ create table doc(
     **/
     comm_acctype_id     decimal         references acctype(id)    default null,
     comm_acctype_alias  varchar(1024)   references acctype(alias) default null,
+
+
+    orig_id           decimal         references doc(id)      default null,
+    orig_owner_id     decimal         references pers(id)     default null,
+    orig_owner_nick   varchar(1024)                           default null,
+
+    
     /**
         Родительский элемент
     **/
@@ -843,7 +851,10 @@ create table doc(
     nupdates            decimal default 0,
     /**
         флаг удаления
-    **/    
+    **/
+    isrepost            bool default false,
+    isrepostable        bool default true,
+    
     isdeleted           bool default false
 );
 
@@ -883,13 +894,17 @@ create table attach(
 ------------------------------------------------------------------------------
 
 
+create sequence seq_repost_id;    
 create table repost(
-    doc_id              decimal unique references doc(id),
-    target_doc_id       decimal unique references doc(id),
-    owner_id            decimal         references pers(id)     default null,
-    owner_nick          varchar(1024)   default null   default null,
-    created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    id                decimal   primary key default nextval('seq_repost_id'),
+    doc_id            decimal         references doc(id)      default null,
+    owner_id          decimal         references pers(id)     default null,
+    owner_nick        varchar(1024)                           default null,
+    orig_doc_id       decimal         references doc(id)      default null,
+    orig_owner_id     decimal         references pers(id)     default null,
+    orig_owner_nick   varchar(1024)                           default null,
+    created           timestamp without time zone not null default utcnow(),
+    isdeleted         bool default false
 );
 
 ------------------------------------------------------------------------------

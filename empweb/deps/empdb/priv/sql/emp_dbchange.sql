@@ -398,17 +398,44 @@ alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
     insert into paytype(alias, isincome)
         values  ('change_nick',     false);*/
 
+-- 2012.12.16 19:31:02:859818643 --------------------------------------------
 
+/*
+    create table claim(
+        doc_id              decimal unique references doc(id),
+        pers_id             decimal         references pers(id),
+        pers_nick           varchar(1024)   default null
+    );
 
-create table claim(
-    doc_id              decimal unique references doc(id),
-    pers_id             decimal         references pers(id),
-    pers_nick           varchar(1024)   default null
+    alter table claim add column judge_id numeric references pers(id) default null;
+    alter table claim add column judge_nick varchar(1024) default null;
+*/
+
+-- 2012.12.16 20:34:28:513375684 --------------------------------------------
+
+create sequence seq_repost_id;
+create table repost(
+    id                decimal   primary key default nextval('seq_repost_id'),
+    doc_id            decimal         references doc(id)      default null,
+    owner_id          decimal         references pers(id)     default null,
+    owner_nick        varchar(1024)                           default null,
+    orig_doc_id       decimal         references doc(id)      default null,
+    orig_owner_id     decimal         references pers(id)     default null,
+    orig_owner_nick   varchar(1024)                           default null,
+    created           timestamp without time zone not null default utcnow(),
+    isdeleted         bool default false
 );
 
 
+alter table doc add column orig_id
+    decimal         references doc(id)      default null;
+alter table doc add column orig_owner_id
+    decimal         references pers(id)     default null;
+alter table doc add column orig_owner_nick
+    varchar(1024)                           default null;
 
-alter table claim add column judge_id numeric references pers(id) default null;
-alter table claim add column judge_nick varchar(1024) default null;
 
-
+alter table doc add column isrepost
+    bool default false;
+alter table doc add column isrepostable
+    bool default true;

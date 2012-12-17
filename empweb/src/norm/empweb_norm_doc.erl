@@ -34,33 +34,12 @@ norm('get') ->
         #norm_rule{
             rules       =   norm([]),
             required    =   false
-        },
-        #norm_rule{
-            key = owner_id,
-            required = false,
-            types = empweb_norm:filter([nullable, allable, integer])
         }
         | empweb_norm:norm('get')
     ];
 
 norm('create') ->
-    [
-        #norm_rule{
-            key         = position,
-            required    = false,
-            types       = [integer]
-        },
-        #norm_rule{
-            rules       =   norm([]),
-            required    =   false
-        },
-        #norm_rule{
-            key         = oktype_id,
-            required    = false,
-            types       = [integer]
-        }
-        | empweb_norm:norm('create')
-    ];
+    norm([]);
 
 norm('update') ->
     [
@@ -69,7 +48,7 @@ norm('update') ->
             required    = false,
             types       = [integer]
         }
-        |norm('create')
+        |norm([])
         %% 
         %% | empweb_norm:norm('update')
         %%
@@ -90,6 +69,31 @@ norm('delete') ->
 
 norm([])->
     [
+        #norm_rule{
+            key         = owner_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, allable, integer])
+        },
+        #norm_rule{
+            key         = owner_nick,
+            required    = false,
+            types       = empweb_norm:filter([nullable, string])
+        },
+        #norm_rule{
+            key         = orig_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key         = orig_owner_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, allable, integer])
+        },
+        #norm_rule{
+            key         = orig_owner_nick,
+            required    = false,
+            types       = empweb_norm:filter([nullable, string])
+        },
         #norm_rule{
             key         = head,
             required    = false,
@@ -156,6 +160,11 @@ norm([])->
             types       = empweb_norm:filter([nullable, atom])
         },
         #norm_rule{
+            key         = position,
+            required    = false,
+            types       = empweb_norm:filter([integer])
+        },
+        #norm_rule{
             key         = nviews,
             required    = false,
             types       = empweb_norm:filter([float])
@@ -164,7 +173,22 @@ norm([])->
             key         = nvotes,
             required    = false,
             types       = empweb_norm:filter([float])
+        },
+
+        #norm_rule{
+            key         = isrepost,
+            required    = false,
+            types       = empweb_norm:filter([nullable, boolean])
+        },
+
+
+        #norm_rule{
+            key         = isrepostable,
+            required    = false,
+            types       = empweb_norm:filter([nullable, boolean])
         }
+        
+        
         %%
         %% | empweb_norm:norm([])
         %%
