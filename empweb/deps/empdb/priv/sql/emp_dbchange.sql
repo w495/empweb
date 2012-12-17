@@ -442,6 +442,12 @@ alter table doc add column isrepostable
 
 
 alter table thingwish drop column buyer_id;
+
 alter table thingwish drop column buyer_nick;
+
+alter table thingwish drop column counter;
+
+
+
 
  

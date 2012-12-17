@@ -13,7 +13,8 @@
     update/1,
     create/1,
     get/1,
-    get/2
+    get/2,
+    delete/1
 ]).
 
 
@@ -30,6 +31,9 @@ create(Params)->
 
 update(Params)->
     empdb_biz_thingwish:update(Params).
+
+delete(Params)->
+    empdb_biz_thingwish:delete(Params).
 
 get(Params)->
     empdb_biz_thingwish:get(Params).

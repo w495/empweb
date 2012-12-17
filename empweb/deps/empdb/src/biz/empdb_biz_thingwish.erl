@@ -24,7 +24,8 @@
     get/1,
     get/2,
     create/1,
-    update/1
+    update/1,
+    delete/1
 ]).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,8 +50,8 @@ update(Params)->
 
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingwish:delete(Con, [
-            {fields, [
+        empdb_dao_thingwish:update(Con, [
+            {filter, [
                 {isdeleted, false}
                 |Params
             ]},
