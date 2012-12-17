@@ -165,7 +165,7 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:get(Data#norm.return)
+                    empweb_biz_claim:count(Data#norm.return)
                 ),
                 Hap
             }
@@ -208,7 +208,10 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:create(Data#norm.return)
+                    empweb_biz_claim:create([
+                        {owner_id, Pers_id}
+                        | Data#norm.return
+                    ])
                 ),
                 Hap
             }
@@ -251,7 +254,10 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:update(Data#norm.return)
+                    empweb_biz_claim:update([
+                        {owner_id, Pers_id}
+                        | Data#norm.return
+                    ])
                 ),
                 Hap
             }
@@ -294,7 +300,10 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:delete(Data#norm.return)
+                    empweb_biz_claim:delete([
+                        {owner_id, Pers_id}
+                        | Data#norm.return
+                    ])
                 ),
                 Hap
             }
