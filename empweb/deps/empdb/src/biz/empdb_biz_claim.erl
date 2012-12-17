@@ -89,10 +89,10 @@ get_adds(_Con, Else) ->
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        get_adds(
-            Con,
+%         get_adds(
+%             Con,
             empdb_dao_claim:get(Con, [{isdeleted, false}|Params], Fileds)
-        )
+%         )
     end).
 
 is_owner(Uid, Oid)->
