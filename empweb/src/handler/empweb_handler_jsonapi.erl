@@ -1034,11 +1034,41 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
             <<"buy_product">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
                     action          =   create
                 };
+
+            %% ==================================================
+
+            <<"get_thingwish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   'get'
+                };
+            <<"get_all_thingwishs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   'get'
+                };
+            <<"create_thingwish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   create
+                };
+            <<"update_thingwish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   update
+                };
+            <<"delete_thingwish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   delete
+                };
+
 
             %% ==================================================
             

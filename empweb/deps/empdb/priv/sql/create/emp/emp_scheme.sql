@@ -1629,12 +1629,6 @@ create table thingwish (
     id                  decimal primary key default nextval('seq_thingwish_id'),
 
     /**
-        Покупатель, тот кто платит
-    **/
-    buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   default null   not null,
-
-    /**
         Владелец, тот кто обладает товаром после покупки
     **/
     owner_id            decimal         references pers(id)     not null,

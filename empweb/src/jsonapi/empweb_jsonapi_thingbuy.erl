@@ -114,18 +114,6 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
-                key         = buyer_id,
-                required    = false,
-                types       = [nullable, integer],
-                default     = Pers_id
-            },
-            #norm_rule{
-                key         = buyer_nick,
-                required    = false,
-                types       = [nullable, string],
-                default     = Pers_nick
-            },
-            #norm_rule{
                 key         = thing_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -172,16 +160,6 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
-                key         = buyer_id,
-                required    = false,
-                types       = [nullable, integer]
-            },
-            #norm_rule{
-                key         = buyer_nick,
-                required    = false,
-                types       = [nullable, string]
-            },
-            #norm_rule{
                 key         = thing_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -224,16 +202,6 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = owner_nick,
-                required    = false,
-                types       = [nullable, string]
-            },
-            #norm_rule{
-                key         = buyer_id,
-                required    = false,
-                types       = [nullable, integer]
-            },
-            #norm_rule{
-                key         = buyer_nick,
                 required    = false,
                 types       = [nullable, string]
             },
@@ -285,18 +253,6 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
-                key         = buyer_id,
-                required    = false,
-                types       = [nullable, integer],
-                default     = Pers_id
-            },
-            #norm_rule{
-                key         = buyer_nick,
-                required    = false,
-                types       = [nullable, string],
-                default     = Pers_nick
-            },
-            #norm_rule{
                 key         = thing_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -311,12 +267,16 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_thingbuy:delete(Data#norm.return)
+                    empweb_biz_thingbuy:delete([
+                        {buyer_id, Pers_id}
+                        |Data#norm.return
+                    ])
                 ),
                 Hap
             }
         end
     );
+
 
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id

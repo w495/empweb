@@ -62,7 +62,6 @@ table({fields, all})->
         thing_id,
         thing_alias,
         created,
-        counter,
         isdeleted
     ];
 

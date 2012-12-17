@@ -439,3 +439,9 @@ alter table doc add column isrepost
     bool default false;
 alter table doc add column isrepostable
     bool default true;
+
+
+alter table thingwish drop column buyer_id;
+alter table thingwish drop column buyer_nick;
+
+ 

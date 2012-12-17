@@ -85,7 +85,9 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action='get', params=Params, pers_id=Pers_id
+        action  =   'get',
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get buy">>),
 
@@ -100,7 +102,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = [nullable, integer],
+                default     = Pers_id
             },
             #norm_rule{
                 key         = owner_nick,
@@ -123,10 +126,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_thingwish:get([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_thingwish:get(Data#norm.return)
                 ),
                 Hap
             }
@@ -134,7 +134,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=create, params=Params, pers_id=Pers_id
+        action  =   create,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create buy">>),
     empweb_jsonapi:handle_params(
@@ -143,7 +145,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = [nullable, integer],
+                default     = Pers_id
             },
             #norm_rule{
                 key         = owner_nick,
@@ -165,10 +168,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_thingwish:create([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_thingwish:create(Data#norm.return)
                 ),
                 Hap
             }
@@ -176,7 +176,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update, params=Params, pers_id=Pers_id
+        action  =   update,
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update buy">>),
 
@@ -186,7 +188,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = [nullable, integer],
+                default     = Pers_id
             },
             #norm_rule{
                 key         = owner_nick,
@@ -208,10 +211,50 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_thingwish:update([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_thingwish:update(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+
+handle(_req, #empweb_hap{
+        action  =   delete,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = delete buy">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer],
+                default     = Pers_id
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = thing_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = thing_alias,
+                required    = false,
+                types       = [nullable, string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_thingwish:delete(Data#norm.return)
                 ),
                 Hap
             }
