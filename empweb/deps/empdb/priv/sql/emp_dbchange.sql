@@ -506,4 +506,5 @@ create table roomexperbuy (
 
 
 
-    
+insert into treastype (alias, isincome)
+    values  ('exper_out',       false);

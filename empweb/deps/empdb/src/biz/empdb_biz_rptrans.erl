@@ -76,6 +76,14 @@ create(Params)->
                         {id, Room_id}
                     ]}
                 ]),
+                {ok, _} = empdb_dao_pers:update(Con, [
+                    {values, [
+                        {money, {decr, Price}}
+                    ]},
+                    {filter, [
+                        {id, Pers_id}
+                    ]}
+                ]),
                 {ok, Res};
             Error ->
                 Error

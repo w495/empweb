@@ -2164,6 +2164,7 @@ select 'log:treastype' as log;
 
 insert into treastype (alias, isincome)
     values  ('transfer_in',     true),
+            ('exper_out',       false),
             ('transfer_out',    false);
 
 select 'log:transtype' as log;
