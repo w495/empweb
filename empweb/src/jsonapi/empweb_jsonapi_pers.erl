@@ -587,8 +587,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = empweb_norm:filter([integer]),
-                default     = Pers_id
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = nick,
