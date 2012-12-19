@@ -95,22 +95,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = owner_nick,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = exper,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             }
             |empweb_norm:norm('get')
         ]),

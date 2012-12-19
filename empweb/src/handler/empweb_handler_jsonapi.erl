@@ -1107,6 +1107,35 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_experbuy,
                     action          =   delete
                 };
+
+
+            %% ==================================================
+
+            <<"get_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   'get'
+                };
+            <<"get_all_roomexperbuys">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   'get'
+                };
+            <<"create_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   create
+                };
+            <<"update_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   update
+                };
+            <<"delete_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   delete
+                };
             
             %% ==================================================
             <<"get_roomlot">> ->

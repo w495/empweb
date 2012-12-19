@@ -95,22 +95,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = room_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = room_head,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = exper,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             }
             |empweb_norm:norm('get')
         ]),
@@ -118,10 +118,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomexperbuy:get([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_roomexperbuy:get(|Data#norm.return)
                 ),
                 Hap
             }
@@ -156,10 +153,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomexperbuy:create([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_roomexperbuy:create(Data#norm.return)
                 ),
                 Hap
             }
@@ -195,10 +189,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomexperbuy:update([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_roomexperbuy:update([Data#norm.return)
                 ),
                 Hap
             }
