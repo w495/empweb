@@ -252,7 +252,8 @@ add_topic(Params)->
             {ok, Res} ->
                 empdb_dao_room:update_topic(Con, [
                     {id, proplists:get_value(topic_id, Params)},
-                    {nchildtargets, {incr, 1}}
+                    {nchildtargets, {incr, 1}},
+                    {nroomtargets,  {incr, 1}}
                 ]),
                 {ok, Res};
             Error ->
@@ -266,7 +267,8 @@ delete_topic(Params)->
             {ok, Res} ->
                 empdb_dao_room:update_topic(Con, [
                     {id, proplists:get_value(topic_id, Params)},
-                    {nchildtargets, {decr, 1}}
+                    {nchildtargets, {decr, 1}},
+                    {nroomtargets,  {decr, 1}}
                 ]),
                 {ok, Res};
             Error ->
@@ -286,9 +288,10 @@ get(Params)->
     empdb_dao:with_transaction(fun(Con)->
         get_adds(Con, {
             empdb_dao_room:get(Con, [
-                {order, {desc, doc.created}},
                 {isdeleted, false}
                 |Params
+            ] ++ [
+                {order, {desc, doc.created}}
             ]),
             proplists:get_value(id, Params)
         })
@@ -298,9 +301,10 @@ get(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
         get_adds(Con,{
             empdb_dao_room:get(Con, [
-                {order, {desc, doc.created}},
                 {isdeleted, false}
                 |Params
+            ] ++ [
+                {order, {desc, doc.created}}
             ], Fileds),
             proplists:get_value(id, Params)
         })

@@ -95,14 +95,89 @@ table(name)->
 table()->
     table(name).
 
-count(Con, Some) ->
-    empdb_dao_doc:count(?MODULE, Con, Some).
+get_community_topic(Con, What) ->
+    empdb_dao:get([
+%         {empdb_dao_doc, id},
+%         {empdb_dao_community, doc_id},
+%         {community2topic(), {community_id, topic_id}},
+        {community2topic(), topic_id },
+        {topic(),      id       }
+     ], Con, What).
 
-get(Con, Some) ->
-    empdb_dao_doc:get(?MODULE, Con, Some).
+get_community_topic(Con, What, Fields)->
+    empdb_dao:get([
+%         {empdb_dao_doc, id},
+%         {empdb_dao_community, doc_id},
+%         {community2topic(), {community_id, topic_id}},
+        {community2topic(),  topic_id},
+        {topic(),       id      }
+    ], Con, What, Fields).
+
+% add_community_topic(Con, What)->
+%     empdb_dao:insert(community2topic(), Con, What).
+%
+%
+% del_community_topic(Con, What)->
+%     empdb_dao:delete(community2topic(), Con, What).
+
+
+
+add_community_topic(Con, Proplist)->
+    case empdb_dao:pgret(
+        empdb_dao:equery(Con,
+            <<"insert into community2topic (topic_id, community_id) "
+                "values ($topic_id, $community_id) "
+                "returning id">>,
+            Proplist
+        )
+    ) of
+        {error,{not_unique,<<"topic_id_community_id_many">>}} ->
+            {error, {not_unique, [topic_id, community_id]}};
+        Res ->
+            Res
+    end.
+
+delete_community_topic(Con, Proplist)->
+    case empdb_dao:pgret(
+        empdb_dao:equery(Con,
+            <<"delete from community2topic where "
+            " topic_id=$topic_id and community_id=$community_id returning id">>,
+            Proplist
+        )
+    ) of
+        {ok, 0} ->
+            {error, not_exists};
+        Res ->
+            Res
+    end.
+
+count(Con, What) ->
+    empdb_dao_doc:count(?MODULE, Con, What).
+
+get(Con, What) ->
+    case proplists:get_value(topic_id, What) of
+        undefined ->
+            empdb_dao_doc:get(?MODULE, Con, What);
+        Topic_id ->
+            empdb_dao:get([
+                {empdb_dao_doc, id},
+                {empdb_dao_community, doc_id},
+                {community2topic(), community_id}
+            ], Con, What)
+    end
+    .
 
 get(Con, What, Fields)->
-    empdb_dao_doc:get(?MODULE, Con, What, Fields).
+    case proplists:get_value(topic_id, What) of
+        undefined ->
+            empdb_dao_doc:get(?MODULE, Con, What, Fields);
+        Topic_id ->
+            empdb_dao:get([
+                {empdb_dao_doc, id},
+                {empdb_dao_community, doc_id},
+                {community2topic(), community_id}
+            ], Con, What, Fields)
+    end.
 
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).
@@ -144,3 +219,101 @@ communitytype() ->
         {{table, fields, insert, required},   [alias]}
     ].
 
+
+
+
+
+%%
+%% @doc Описывает темы чата комнаты.
+%% Сами по себе темы представлют из себя дерево:
+%% -------------------------------------------------
+%%  [Все темы]
+%%      |-[Автомобили]
+%%          |-[Хорошие]
+%%              |-[Чайка]
+%%              |-[Уазик]
+%%          |-[Плохие]
+%%              |-[Калина]
+%%              |-[Запорожец]
+%%      ...
+%% -------------------------------------------------
+%%
+topic() ->
+    [
+        %% Имя таблицы.
+        {{table, name},                       topic},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id,
+            alias,
+            name_ti,    %% имя на нескольких языках.
+            descr_ti,   %% описание на нескольких языках.
+            parent_id,  %% ссылка на родительскую тему
+            nchildren,  %% количество детей
+            nnodes,     %% количество потомков
+            nchildtargets,
+            isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id,
+            name_ti,
+            descr_ti,
+            parent_id,
+            alias,
+            nchildtargets,
+            nroomtargets,
+            ncommunitytargets,
+            nchildren,
+            nnodes
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            name_ti, descr_ti, parent_id, alias
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            name_ti, descr_ti, parent_id, alias, nchildtargets
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            name_ti, descr_ti, parent_id, alias
+        ]}
+    ].
+
+
+community2topic() ->
+   [
+        %% Имя таблицы.
+        {{table, name},                       community2topic},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            topic_id,
+            community_id,
+            isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            topic_id,
+            community_id,
+            isdeleted
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            topic_id,
+            community_id,
+            isdeleted
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            topic_id,
+            community_id,
+            isdeleted
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            topic_id,
+            community_id,
+            isdeleted
+        ]}
+    ].

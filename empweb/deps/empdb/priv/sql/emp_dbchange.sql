@@ -450,4 +450,19 @@ alter table thingwish drop column counter;
 
 
 
- 
+
+
+/**
+ *  Многие ко многим для комнат и тем
+**/
+create sequence seq_community2topic_id;
+create table community2topic (
+    id                  decimal primary key default     nextval('seq_community2topic_id'),
+    topic_id            decimal references topic(id)    not null,
+    community_id             decimal references room(doc_id) not null,
+    isdeleted           bool    default false,
+    created             timestamp without time zone not null default utcnow(),
+    constraint          room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
+);
+
+

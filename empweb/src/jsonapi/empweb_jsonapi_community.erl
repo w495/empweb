@@ -302,6 +302,70 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   add_topic,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update community">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_community:add_topic(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   delete_topic,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update community">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_community:delete_topic(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
     
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% То что не прошло сопоставления с образцом.

@@ -417,6 +417,8 @@ topic() ->
             parent_id,
             alias,
             nchildtargets,
+            nroomtargets,
+            ncommunitytargets,
             nchildren,
             nnodes
         ]},

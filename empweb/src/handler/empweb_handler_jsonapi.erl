@@ -651,6 +651,16 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_community,
                     action          =   delete
                 };
+            <<"add_community_topic">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_community,
+                    action          =   add_topic
+                };
+            <<"delete_community_topic">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_community,
+                    action          =   delete_topic
+                };
 
             %%
             %% Сообщения

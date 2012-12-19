@@ -47,11 +47,11 @@ create(Params)->
         %%
         %% Здесь надо вводить, дополнительное ограничение на уровне базы.
         %% Это делать не хочется, так как
-        %%  * room --- это doc
+        %%  * community --- это doc
         %%  * ввести ограничение:
         %%  * * введение нового поля с дублированием смысла head;
-        %%  * * описание ограничения constrait конкретно для room;
-        %%  * * в doc ввести поле isroom и сделать constrait на head и isroom;
+        %%  * * описание ограничения constrait конкретно для community;
+        %%  * * в doc ввести поле iscommunity и сделать constrait на head и iscommunity;
         %%  * * => все это немного бредово.
         %%
         %% WARNING: В текущей реализации, мы действуем не очень эффективно.
@@ -77,7 +77,7 @@ create(Params)->
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
                             {pers_id,           proplists:get_value(owner_id,   Params)},
-                            {paytype_alias,     room_out},
+                            {paytype_alias,     community_out},
                             {isincome,          false},
                             {price,             Price}
                         ]),
@@ -135,7 +135,7 @@ suggest_head(Con, Orghead, Opts)->
         lists:sort(
             lists:filter(
                 fun(Head)->
-                    case empdb_dao_room:get(Con, [{head, Head}]) of
+                    case empdb_dao_community:get(Con, [{head, Head}]) of
                         {ok, []} ->
                             true;
                         _ ->
@@ -219,37 +219,124 @@ delete(Params)->
         end
     end).
 
-get(Params)->
+
+
+add_topic(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:get(Con, [
-            {isdeleted, false}
-            |Params
-        ] ++ [
-            {order, {asc, head}}
-        ])
+        case  empdb_dao_community:add_community_topic(Con, Params) of
+            {ok, Res} ->
+                empdb_dao_community:update_topic(Con, [
+                    {id, proplists:get_value(topic_id, Params)},
+                    {nchildtargets, {incr, 1}},
+                    {ncommunitytargets, {incr, 1}}
+                ]),
+                {ok, Res};
+            Error ->
+                Error
+        end
     end).
 
-get(Params, Fileds)->
+delete_topic(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:get(Con, [
-                {isdeleted, false}
-                |Params
-            ] ++ [
-                {order, {asc, head}}
-            ],
-            Fileds
-        )
+        case empdb_dao_community:delete_community_topic(Con, Params) of
+            {ok, Res} ->
+                empdb_dao_community:update_topic(Con, [
+                    {id, proplists:get_value(topic_id, Params)},
+                    {nchildtargets, {decr, 1}},
+                    {ncommunitytargets, {decr, 1}}
+                ]),
+                {ok, Res};
+            Error ->
+                Error
+        end
     end).
 
 count(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_community:count(Con, [{isdeleted, false}|Params])
+        empdb_dao_community:count(Con, [
+            {isdeleted, false}
+            |Params
+        ])
     end).
 
-is_community_owner(Uid, Oid)->
+
+%
+% get(Params)->
+%     empdb_dao:with_transaction(fun(Con)->
+%         empdb_dao_community:get(Con, [
+%             {isdeleted, false}
+%             |Params
+%         ] ++ [
+%             {order, {asc, head}}
+%         ])
+%     end).
+%
+% get(Params, Fileds)->
+%     empdb_dao:with_transaction(fun(Con)->
+%         empdb_dao_community:get(Con, [
+%                 {isdeleted, false}
+%                 |Params
+%             ] ++ [
+%                 {order, {asc, head}}
+%             ],
+%             Fileds
+%         )
+%     end).
+%
+
+get(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        get_adds(Con, {
+            empdb_dao_community:get(Con, [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {asc, head}}
+            ]),
+            proplists:get_value(id, Params)
+        })
+    end).
+
+get(Params, Fileds)->
+    empdb_dao:with_transaction(fun(Con)->
+        get_adds(Con,{
+            empdb_dao_community:get(Con, [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {asc, head}}
+            ], Fileds),
+            proplists:get_value(id, Params)
+        })
+    end).
+
+get_adds(Con, {Res, undefined}) ->
+    Res;
+
+get_adds(Con,{{ok, Rooms}, Id}) ->
+    {ok,
+        lists:map(fun({Roompl})->
+            case empdb_dao_community:get_community_topic(Con, [
+                {isdeleted, false},
+                {community_id, Id}
+            ]) of
+                {ok, Topiclist} ->
+                    {[{topic_list, Topiclist}|Roompl]};
+                Error ->
+                    {Roompl}
+            end
+        end, Rooms)
+    };
+
+get_adds(Con, {Err, _}) ->
+    Err.
+
+
+is_owner(Uid, Oid)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_community:is_owner(Con, Uid, Oid)
     end).
+
 
 %%
 %% Local Functions
