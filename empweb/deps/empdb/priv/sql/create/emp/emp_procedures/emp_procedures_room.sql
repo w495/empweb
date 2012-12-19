@@ -8,6 +8,73 @@
 **/
 create or replace function room_util_fields_on_update() returns "trigger" as $$
 begin
+
+    if new.exper != old.exper then
+        /**
+            Авторитет комнаты,
+            Перевычисляем каждый раз
+            на основе его опыта.
+        **/
+        new.authority_alias =
+            (   select
+                    alias
+                from
+                    authority
+                where
+                    level
+                in (    select
+                            max(level)
+                        from
+                            authority
+                        where
+                            level <= new.exper
+                )
+            );
+        /**
+            Сколько еще нужно опыта
+            для перехода на следующий уровень.
+        **/
+        new.experlack    =
+            (   select
+                    min(cur.level)
+                from
+                    authority as cur
+                join
+                    authority as prev
+                on
+                    prev.level < cur.level
+                where
+                    prev.alias = new.authority_alias
+            ) - new.exper;
+    end if;
+
+    if not (new.experlack is null) then
+        new.experlackprice  = 0.5 * new.experlack;
+    else
+        new.experlackprice  = null;
+    end if;
+
+    /**
+        Авторитет комнаты
+    **/
+    if new.authority_id != old.authority_id then
+        new.authority_alias =
+            (select authority.alias
+                from
+                    authority
+                where
+                    authority.id = new.authority_id);
+    end if;
+    if new.authority_alias != old.authority_alias then
+        new.authority_id =
+            (select authority.id
+                from
+                    authority
+                where
+                    authority.alias = new.authority_alias);
+    end if;
+    
+    
     /**
     *  Типы чат-комнат. (страна, тюрьма, ад, рай)
     **/
@@ -119,6 +186,41 @@ on room for each row execute procedure room_util_fields_on_update();
 
 create or replace function room_util_fields_on_insert() returns "trigger" as $$
 begin
+
+    /**
+        Авторитет комнаты
+    **/
+    new.authority_alias = 'noob';
+    new.authority_id    =
+        (select id from authority where alias = new.authority_alias);
+    /**
+        Опыт комнаты
+    **/
+    new.exper    =
+        (select level from authority where alias = new.authority_alias);
+    /**
+        Сколько еще нужно опыта
+        для перехода на следующий уровень.
+    **/
+    new.experlack    =
+        (   select
+                min(cur.level)
+            from
+                authority as cur
+            join
+                authority as prev
+            on
+                prev.level < cur.level
+            where
+                prev.alias = new.authority_alias
+        ) - new.exper;
+
+    if not (new.experlack is null) then
+        new.experlackprice  = 0.5 * new.experlack;
+    else
+        new.experlackprice  = null;
+    end if;
+    
     /**
     *  Типы чат-комнат. (страна, тюрьма, ад, рай)
     **/

@@ -1078,7 +1078,18 @@ create table topic(
     nchildtargets   decimal default 0,
 
 
-ы
+
+    /**
+        ссылок на эту сущность из комнаты
+    **/
+    nroomtargets   decimal default 0,
+
+
+    /**
+        ссылок на эту сущность из сообществ
+    **/
+    ncommunitytargets   decimal default 0,
+
     
     /**
         целевых ссылок на эту сущность и ее детей
@@ -1115,31 +1126,46 @@ create table regimen(
 create table room(
     doc_id              decimal unique references doc(id),
     ulimit              decimal default 5000,
-    
     /**
         Тип комнаты
     **/
     roomtype_id         decimal         references roomtype(id)     default null,
     roomtype_alias      varchar(1024)   references roomtype(alias)  default null,
-
     /**
         Язык комнаты
     **/
     chatlang_id         decimal         references chatlang(id)     default null,
     chatlang_alias      varchar(1024)   references chatlang(alias)  default null,
-   
     /**
         Режим комнаты
     **/
     regimen_id          decimal         references regimen(id)      default null,
     regimen_alias       varchar(1024)   references regimen(alias)   default null,
-
     topic_id            decimal references topic(id) default null,
-    
     slogan              text default null,
     weather             text default null,
+    /**
+        Авторитет пользователя
+    **/
+    authority_id        decimal         references authority(id)        default null,
+    authority_alias     varchar(1024)   references authority(alias)     default null,
+    /**
+        Опыт пользователя,
+        некоторая непрерывная велицина.
+    **/
+    exper               numeric         default 0,
+    /**
+        Недостаток опыта.
+        Сколько не хватает для перехода на следующий уровень.
+    **/
+    experlack           numeric         default null,
+
+    /**
+        Стоймость недостатока опыта.
+        Сколько стоит то, что не хватает для перехода на следующий уровень.
+    **/
+    experlackprice      numeric(1000, 2)         default null,
     treas               numeric(1000, 2) default 1
-    
 --     bearing - герб
 --     flag - ссылка на картинку флага
 --     wallpaper - ссылка на картинку фона ?????? не закончено
@@ -1670,6 +1696,28 @@ create table experbuy (
     owner_id            decimal         references pers(id)     not null,
     owner_nick          varchar(1024)   default null   not null,
 
+    /**
+        Вещь которую приобрели --- опыт.
+        Нужно знать, какой количество
+    **/
+    exper               numeric             default null,
+    price               numeric(1000, 2)    default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+
+
+create sequence seq_roomexperbuy_id;
+create table roomexperbuy (
+    id                  decimal primary key default nextval('seq_roomexperbuy_id'),
+    /**
+        Покупатель, тот кто платит
+    **/
+    room_id            decimal         references room(id)      default null,
+    room_head          varchar(1024)                            default null,
+    
     /**
         Вещь которую приобрели --- опыт.
         Нужно знать, какой количество

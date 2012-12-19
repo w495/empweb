@@ -451,6 +451,8 @@ alter table thingwish drop column counter;
 
 
 
+alter table topic add column  nroomtargets  decimal default 0;
+alter table topic add column  ncommunitytargets  decimal default 0;
 
 /**
  *  Многие ко многим для комнат и тем
@@ -466,3 +468,42 @@ create table community2topic (
 );
 
 
+
+-----------------------------------------------------------------------------
+alter table room add column authority_id
+    decimal         references authority(id)        default null;
+alter table room add column authority_alias
+    varchar(1024)   references authority(alias)     default null;
+alter table room add column exper
+    numeric         default 0;
+alter table room add column experlack
+    numeric         default null;
+alter table room add column experlackprice
+    numeric(1000, 2)         default null;
+
+
+
+create sequence seq_roomexperbuy_id;
+create table roomexperbuy (
+    id                  decimal primary key default nextval('seq_roomexperbuy_id'),
+    /**
+        Покупатель, тот кто платит
+    **/
+    room_id            decimal         references room(doc_id)      default null,
+    room_head          varchar(1024)                            default null,
+
+    /**
+        Вещь которую приобрели --- опыт.
+        Нужно знать, какой количество
+    **/
+    exper               numeric             default null,
+    price               numeric(1000, 2)    default null,
+
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           bool default false
+);
+
+
+
+
+    

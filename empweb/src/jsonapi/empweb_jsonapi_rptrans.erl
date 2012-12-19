@@ -163,7 +163,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = pers_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = [nullable, integer],
+                default     = Pers_id
             },
             #norm_rule{
                 key         = pers_nick,
@@ -201,7 +202,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_rptrans:create([{pers_id, Pers_id}|Data#norm.return])
+                    empweb_biz_rptrans:create(Data#norm.return)
                 ),
                 Hap
             }
@@ -229,7 +230,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = pers_nick,
                 required    = false,
-                types       = [nullable, string]
+                types       = [nullable, string],
+                default     = Pers_id
             },
             #norm_rule{
                 key         = room_id,
@@ -262,10 +264,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_rptrans:update([
-                        {pers_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_rptrans:update(Data#norm.return)
                 ),
                 Hap
             }

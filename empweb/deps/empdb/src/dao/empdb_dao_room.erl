@@ -129,6 +129,11 @@ table({fields, all})->
         roombet_price,
         slogan,
         weather,
+        authority_id,
+        authority_alias,
+        exper,
+        experlack,
+        experlackprice,
         treas
     ];
 

@@ -50,6 +50,20 @@ filter_owner(Params) ->
             proplists:delete(pers_id, Params)
     end.
 
+
+fieldtrigger(Params, {F1, F2}, Options) ->
+    case {
+        proplists:get_value(F1, Params),
+        proplists:get_value(F2, Params)
+    } of
+        {all     , _      } ->
+            proplists:delete(F2, proplists:delete(F1, Params));
+        {undefined, Value2} ->
+            [{F1, Value2}|proplists:delete(F2, Params)];
+        {_value1, _      } ->
+            proplists:delete(F2, Params)
+    end.
+    
 filter_self(Params) ->
     case {
         proplists:get_value(id, Params),
