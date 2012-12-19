@@ -118,7 +118,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomexperbuy:get(|Data#norm.return)
+                    empweb_biz_roomexperbuy:get(Data#norm.return)
                 ),
                 Hap
             }
@@ -189,7 +189,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomexperbuy:update([Data#norm.return)
+                    empweb_biz_roomexperbuy:update(Data#norm.return)
                 ),
                 Hap
             }
