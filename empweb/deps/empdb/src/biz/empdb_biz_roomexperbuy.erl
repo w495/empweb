@@ -49,6 +49,7 @@ create(Params)->
                 ]},
                 {fields, [
                     id,
+                    owner_id,
                     experlack,
                     treas
                 ]},
@@ -66,6 +67,7 @@ create(Params)->
         Exper = proplists:get_value(exper,   Params,    Experlack),
         Price = exper2price(Exper),
         Treas = proplists:get_value(treas, Mbroompl,   0),
+        Owner_id = proplists:get_value(owner_id, Mbroompl),
 
         ?empdb_debug("Experlack = ~p~n", [Experlack]),
         ?empdb_debug("Exper = ~p~n", [Exper]),
@@ -102,6 +104,7 @@ create(Params)->
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_roomtreas:create(Con, [
                             {room_id,           proplists:get_value(room_id,   Params)},
+                            {pers_id,           Owner_id},
                             {paytype_alias,     exper_out},
                             {isincome,          false},
                             {price,             Price}

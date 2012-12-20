@@ -441,70 +441,123 @@ alter table doc add column isrepostable
     bool default true;
 
 
-alter table thingwish drop column buyer_id;
+-- 2012.12.18 16:59:05:953080627 --------------------------------------------
 
-alter table thingwish drop column buyer_nick;
+/*
+    alter table thingwish drop column buyer_id;
+    alter table thingwish drop column buyer_nick;
+    alter table thingwish drop column counter;
+*/
 
-alter table thingwish drop column counter;
+-- 2012.12.19 16:59:05:953080627 --------------------------------------------
+
+/*
+    alter table topic add column  nroomtargets  decimal default 0;
+    alter table topic add column  ncommunitytargets  decimal default 0;
+    create sequence seq_community2topic_id;
+    create table community2topic (
+        id
+            decimal primary key default     nextval('seq_community2topic_id'),
+        topic_id
+            decimal references topic(id)    not null,
+        community_id
+            decimal references room(doc_id) not null,
+        isdeleted
+            bool    default false,
+        created
+            timestamp without time zone not null default utcnow(),
+        constraint
+            room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
+    );
+    alter table room add column authority_id
+        decimal         references authority(id)        default null;
+    alter table room add column authority_alias
+        varchar(1024)   references authority(alias)     default null;
+    alter table room add column exper
+        numeric         default 0;
+    alter table room add column experlack
+        numeric         default null;
+    alter table room add column experlackprice
+        numeric(1000, 2)         default null;
+    create sequence seq_roomexperbuy_id;
+    create table roomexperbuy (
+        id
+            decimal primary key default nextval('seq_roomexperbuy_id'),
+        room_id
+            decimal         references room(doc_id)      default null,
+        room_head
+            varchar(1024)                            default null,
+        exper
+            numeric             default null,
+        price
+            numeric(1000, 2)    default null,
+        created
+            timestamp without time zone not null default utcnow(),
+        isdeleted
+            bool default false
+    );
+    insert into treastype (alias, isincome)
+        values  ('exper_out',       false);
+*/
 
 
 
-
-
-alter table topic add column  nroomtargets  decimal default 0;
-alter table topic add column  ncommunitytargets  decimal default 0;
-
-/**
- *  Многие ко многим для комнат и тем
-**/
-create sequence seq_community2topic_id;
-create table community2topic (
-    id                  decimal primary key default     nextval('seq_community2topic_id'),
-    topic_id            decimal references topic(id)    not null,
-    community_id             decimal references room(doc_id) not null,
-    isdeleted           bool    default false,
-    created             timestamp without time zone not null default utcnow(),
-    constraint          room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
+create sequence seq_cptrans_id;
+create table cptrans (
+    id
+        decimal primary key default nextval('seq_cptrans_id'),
+    pers_id
+        decimal         references pers(id)     not null,
+    pers_nick
+        varchar(1024)   default null   not null,
+    community_id
+        decimal         references community(doc_id)       not null,
+    transtype_id
+        decimal         references transtype(id)      default null,
+    transtype_alias
+        varchar(1024)   references transtype(alias)   default null,
+    price
+        numeric(1000, 2)    default null,
+    created
+        timestamp without time zone not null default utcnow(),
+    isdeleted
+        bool default false
 );
 
 
 
------------------------------------------------------------------------------
-alter table room add column authority_id
-    decimal         references authority(id)        default null;
-alter table room add column authority_alias
-    varchar(1024)   references authority(alias)     default null;
-alter table room add column exper
-    numeric         default 0;
-alter table room add column experlack
-    numeric         default null;
-alter table room add column experlackprice
-    numeric(1000, 2)         default null;
-
-
-
-create sequence seq_roomexperbuy_id;
-create table roomexperbuy (
-    id                  decimal primary key default nextval('seq_roomexperbuy_id'),
-    /**
-        Покупатель, тот кто платит
-    **/
-    room_id            decimal         references room(doc_id)      default null,
-    room_head          varchar(1024)                            default null,
-
-    /**
-        Вещь которую приобрели --- опыт.
-        Нужно знать, какой количество
-    **/
-    exper               numeric             default null,
-    price               numeric(1000, 2)    default null,
-
-    created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+create sequence seq_communitytreas_id;
+create table communitytreas (
+    id
+        decimal primary key default nextval('seq_communitytreas_id'),
+    pers_id
+        decimal         references pers(id)     not null,
+    pers_nick
+        varchar(1024)   default null   not null,
+    community_id
+        decimal         references community(doc_id)       not null,
+    treastype_id
+        decimal         references treastype(id)      default null,
+    treastype_alias
+        varchar(1024)   references treastype(alias)   default null,
+    isincome
+        bool            default null,
+    price
+        numeric(1000, 2)    default null,
+    info
+        varchar(1024)   default null,
+    created
+        timestamp without time zone not null default utcnow(),
+    isdeleted
+        bool default false
 );
 
 
+alter table community add column treas
+    decimal default 0;
+
+alter table community add column fee
+    decimal default 0;
 
 
-insert into treastype (alias, isincome)
-    values  ('exper_out',       false);
+    

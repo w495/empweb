@@ -119,10 +119,24 @@ drop function make_plpgsql();
 **/
 \set FILE :SECTIONPATH /emp_procedures_roomtreas.sql \i :FILE
 
+
+/**
+    @doc
+**/
+\set FILE :SECTIONPATH /emp_procedures_communitytreas.sql \i :FILE
+
+
 /**
     @doc Денежные переводы между пользователями и комнатами
 **/
 \set FILE :SECTIONPATH /emp_procedures_rptrans.sql \i :FILE
+
+
+/**
+    @doc Денежные переводы между пользователями и комнатами
+**/
+\set FILE :SECTIONPATH /emp_procedures_cptrans.sql \i :FILE
+
 
 /**
     @doc Файловые сущности

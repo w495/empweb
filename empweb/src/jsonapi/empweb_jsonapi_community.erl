@@ -109,7 +109,12 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
-                key         = treasury,
+                key         = treas,
+                required    = false,
+                types       = empweb_norm:filter([float])
+            },
+            #norm_rule{
+                key         = fee,
                 required    = false,
                 types       = empweb_norm:filter([float])
             },
@@ -159,7 +164,12 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
-                key         = treasury,
+                key         = treas,
+                required    = false,
+                types       = empweb_norm:filter([float])
+            },
+            #norm_rule{
+                key         = fee,
                 required    = false,
                 types       = empweb_norm:filter([float])
             },
@@ -207,7 +217,12 @@ handle(_req, #empweb_hap{
                 types       = [nullable, atom]
             },
             #norm_rule{
-                key         = treasury,
+                key         = treas,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = fee,
                 required    = false,
                 types       = [float]
             },
@@ -254,7 +269,12 @@ handle(_req, #empweb_hap{
                 types       = [nullable, atom]
             },
             #norm_rule{
-                key         = treasury,
+                key         = treas,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
+                key         = fee,
                 required    = false,
                 types       = [float]
             },

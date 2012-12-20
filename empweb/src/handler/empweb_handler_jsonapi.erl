@@ -1299,6 +1299,35 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+
+            %% ==================================================
+            <<"get_communitytreas">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitytreas,
+                    action          =   'get'
+                };
+            <<"get_all_communitytreass">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitytreas,
+                    action          =   'get'
+                };
+            <<"create_communitytreas">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitytreas,
+                    action          =   create
+                };
+            <<"update_communitytreas">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitytreas,
+                    action          =   update
+                };
+            <<"delete_communitytreas">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitytreas,
+                    action          =   delete
+                };
+
             %% ==================================================
             <<"get_transtype">> ->
                 Eh#empweb_hap{
@@ -1350,6 +1379,35 @@ empweb_jsonapi_map(Req, {List}, State) ->
             <<"delete_rptrans">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_rptrans,
+                    action          =   delete
+                };
+
+
+
+            %% ==================================================
+            <<"get_cptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cptrans,
+                    action          =   'get'
+                };
+            <<"get_all_cptranss">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cptrans,
+                    action          =   'get'
+                };
+            <<"create_cptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cptrans,
+                    action          =   create
+                };
+            <<"update_cptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cptrans,
+                    action          =   update
+                };
+            <<"delete_cptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cptrans,
                     action          =   delete
                 };
                 

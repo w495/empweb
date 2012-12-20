@@ -1207,15 +1207,13 @@ create table community(
     **/
     communitytype_id        decimal         references communitytype(id)    default null,
     communitytype_alias     varchar(1024)   references communitytype(alias) default null,
-
-
     cands_gte_authority_id            decimal         references authority(id) default null,
     cands_gte_authority_alias         varchar(1024)   references authority(alias) default null,
-    
     ncands                  decimal default 0,
     nmembs                  decimal default 0,
     slogan                  text default null,
-    treasury                decimal default null
+    treas                   decimal default 0,
+    fee                     decimal default 0
 );
 
 create sequence seq_communityhisttype_id;
@@ -1769,6 +1767,20 @@ create table rptrans (
 );
 
 
+create sequence seq_cptrans_id;
+create table cptrans (
+    id                 decimal primary key default nextval('seq_cptrans_id'),
+    pers_id            decimal         references pers(id)     not null,
+    pers_nick          varchar(1024)   default null   not null,
+    community_id       decimal         references community(doc_id)       not null,
+    transtype_id       decimal         references transtype(id)      default null,
+    transtype_alias    varchar(1024)   references transtype(alias)   default null,
+    price              numeric(1000, 2)    default null,
+    created            timestamp without time zone not null default utcnow(),
+    isdeleted          bool default false
+);
+
+
 
 create sequence seq_treastype_id;
 create table treastype (
@@ -1805,6 +1817,32 @@ create table roomtreas (
     created            timestamp without time zone not null default utcnow(),
     isdeleted          bool default false
 );
+
+
+
+create sequence seq_communitytreas_id;
+create table communitytreas (
+    id                  decimal primary key default nextval('seq_communitytreas_id'),
+
+    /**
+        Покупатель, тот кто платит
+    **/
+    pers_id            decimal         references pers(id)     not null,
+    pers_nick          varchar(1024)   default null   not null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    community_id       decimal         references community(doc_id)       not null,
+    treastype_id       decimal         references treastype(id)      default null,
+    treastype_alias    varchar(1024)   references treastype(alias)   default null,
+    isincome           bool            default null,
+    price              numeric(1000, 2)    default null,
+    info               varchar(1024)   default null,
+    created            timestamp without time zone not null default utcnow(),
+    isdeleted          bool default false
+);
+
 
 create sequence seq_paytype_id;
 create table paytype (

@@ -77,7 +77,8 @@ table({fields, all})->
         communitytype_id,
         communitytype_alias,
         slogan,
-        treasury
+        treas,
+        fee
     ];
 
 %%
