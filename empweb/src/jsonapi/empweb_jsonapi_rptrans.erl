@@ -126,7 +126,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = empweb_norm:filter([nullable, string])
+                types       = empweb_norm:filter([nullable, float])
             },
             #norm_rule{
                 key         = created,
@@ -189,7 +189,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [nullable, string]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = created,
@@ -251,7 +251,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [nullable, string]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = created,

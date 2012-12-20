@@ -74,7 +74,6 @@ create(Params)->
                 
                 case Price =< Money of
                     true ->
-                        
                         %% Создаем платеж пользователя
                         {ok, _} = empdb_dao_pay:create(Con, [
                             {pers_id,           Pers_id},
