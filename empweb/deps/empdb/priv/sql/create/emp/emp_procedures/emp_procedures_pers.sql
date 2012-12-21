@@ -334,7 +334,7 @@ begin
     /**
         Авторитет пользователя
     **/
-    if new.live_roomtype_id != old.roomtype_id then
+    if new.live_roomtype_id != old.live_roomtype_id then
         new.live_roomtype_alias =
             (select roomtype.alias
                 from
@@ -342,7 +342,7 @@ begin
                 where
                     roomtype.id = new.live_roomtype_id);
     end if;
-    if new.live_roomtype_alias != old.roomtype_alias then
+    if new.live_roomtype_alias != old.live_roomtype_alias then
         new.live_roomtype_id =
             (select roomtype.id
                 from
