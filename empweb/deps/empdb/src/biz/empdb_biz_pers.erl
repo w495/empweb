@@ -316,6 +316,7 @@ update(Con, {nick, Nick},  {Function, [Params]}) ->
             Else
     end;
 
+
 update(Con, {_pname, _pvalue}, {Function, [Params]}) ->
     Function(Con, Params).
 
@@ -584,7 +585,7 @@ count(Params)->
             Con,
             [
                 {isdeleted, false}
-                |get_geo_tfparams(Con, Params)
+                |get_tfparams(Con, Params)
             ]
         )
     end).
@@ -595,7 +596,7 @@ get(Params)->
             Con,
             [
                 {isdeleted, false}
-                |get_geo_tfparams(Con, Params)
+                |get_tfparams(Con, Params)
             ]
         )
     end).
@@ -606,23 +607,23 @@ get(Params, Fileds)->
             Con,
             [
                 {isdeleted, false}
-                |get_geo_tfparams(Con, Params)
+                |get_tfparams(Con, Params)
             ],
             Fileds
         )
     end).
 
 
-get_geo_tfparams(Con, Params) ->
+get_tfparams(Con, Params) ->
     lists:foldl(
         fun({Key, Value}, Acc)->
-            get_geo_tfparams(Con, {Key, Value}, Acc)
+            get_tfparams(Con, {Key, Value}, Acc)
         end,
         [],
         Params
     ).
 
-get_geo_tfparams(Con, {geo_id, Geo_id}, Acc1)->
+get_tfparams(Con, {geo_id, Geo_id}, Acc1)->
     Geo_ids =
         case empdb_dao_geo:get(emp,
             [
@@ -644,20 +645,20 @@ get_geo_tfparams(Con, {geo_id, Geo_id}, Acc1)->
         end,
     [{geo_id, {in, Geo_ids}}|Acc1];
 
-get_geo_tfparams(Con, _, Acc1)->
-    Acc1.
+get_tfparams(Con, {Key, Value}, Acc1)->
+    [{Key, Value}|Acc1].
 
 
 
 get_opt(Params, Options)->
     empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_geo_tfparams(Con, Params)]),
+        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)]),
         get_opt(Con, Params, Options, Userpls)
     end).
 
 get_opt(Params, Fileds, Options)->
     empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_geo_tfparams(Con, Params)], Fileds),
+        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)], Fileds),
         get_opt(Con, Params, Options, Userpls)
     end).
 

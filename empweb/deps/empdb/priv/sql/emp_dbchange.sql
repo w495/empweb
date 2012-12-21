@@ -502,88 +502,71 @@ alter table doc add column isrepostable
 
 -- 2012.12.21 13:16:08:401186853 ---------------------------------------------
 
-
-create sequence seq_cptrans_id;
-create table cptrans (
-    id
-        decimal primary key default nextval('seq_cptrans_id'),
-    pers_id
-        decimal         references pers(id)     not null,
-    pers_nick
-        varchar(1024)   default null   not null,
-    community_id
-        decimal         references community(doc_id)       not null,
-    transtype_id
-        decimal         references transtype(id)      default null,
-    transtype_alias
-        varchar(1024)   references transtype(alias)   default null,
-    price
-        numeric(1000, 2)    default null,
-    created
-        timestamp without time zone not null default utcnow(),
-    isdeleted
-        bool default false
-);
-
-
-
-create sequence seq_communitytreas_id;
-create table communitytreas (
-    id
-        decimal primary key default nextval('seq_communitytreas_id'),
-    pers_id
-        decimal         references pers(id)     not null,
-    pers_nick
-        varchar(1024)   default null   not null,
-    community_id
-        decimal         references community(doc_id)       not null,
-    treastype_id
-        decimal         references treastype(id)      default null,
-    treastype_alias
-        varchar(1024)   references treastype(alias)   default null,
-    isincome
-        bool            default null,
-    price
-        numeric(1000, 2)    default null,
-    info
-        varchar(1024)   default null,
-    created
-        timestamp without time zone not null default utcnow(),
-    isdeleted
-        bool default false
-);
-
-
-alter table community add column treas
-    decimal default 0;
-
-alter table community add column fee
-    decimal default 0;
-
-
-alter table pers add column live_roomtype_id
-    decimal references roomtype(id)     default null;
-
-alter table pers add column live_roomtype_alias
-    varchar(1024) references roomtype(alias)     default null;
-
-alter table pers add column isprisoner
-    boolean default false;
-
-
-
+/*
+    create sequence seq_cptrans_id;
+    create table cptrans (
+        id
+            decimal primary key default nextval('seq_cptrans_id'),
+        pers_id
+            decimal         references pers(id)     not null,
+        pers_nick
+            varchar(1024)   default null   not null,
+        community_id
+            decimal         references community(doc_id)       not null,
+        transtype_id
+            decimal         references transtype(id)      default null,
+        transtype_alias
+            varchar(1024)   references transtype(alias)   default null,
+        price
+            numeric(1000, 2)    default null,
+        created
+            timestamp without time zone not null default utcnow(),
+        isdeleted
+            bool default false
+    );
+    create sequence seq_communitytreas_id;
+    create table communitytreas (
+        id
+            decimal primary key default nextval('seq_communitytreas_id'),
+        pers_id
+            decimal         references pers(id)     not null,
+        pers_nick
+            varchar(1024)   default null   not null,
+        community_id
+            decimal         references community(doc_id)       not null,
+        treastype_id
+            decimal         references treastype(id)      default null,
+        treastype_alias
+            varchar(1024)   references treastype(alias)   default null,
+        isincome
+            bool            default null,
+        price
+            numeric(1000, 2)    default null,
+        info
+            varchar(1024)   default null,
+        created
+            timestamp without time zone not null default utcnow(),
+        isdeleted
+            bool default false
+    );
+    alter table community add column treas
+        decimal default 0;
+    alter table community add column fee
+        decimal default 0;
+    alter table pers add column live_roomtype_id
+        decimal references roomtype(id)     default null;
+    alter table pers add column live_roomtype_alias
+        varchar(1024) references roomtype(alias)     default null;
+    alter table pers add column isprisoner
+        boolean default false;
     insert into paytype(alias, isincome)
         values  ('community_out',     false),
                 ('community_in',      true );
+    alter table pers add  column citizen_room_id
+        decimal references room(doc_id) default null;
 
+    alter table pers add column citizen_room_head
+        varchar(1024) default null;
 
-
-alter table pers add  column citizen_room_id
-    decimal references room(doc_id) default null;
-
-alter table pers add column citizen_room_head
-    varchar(1024) default null;
-
-alter table pers add column citizen_room_fromdatetime
-    timestamp without time zone default null;
-      
+    alter table pers add column citizen_room_fromdatetime
+        timestamp without time zone default null;*/
