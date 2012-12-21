@@ -233,11 +233,12 @@ table()->
     table(name).
 
 
-get(Con, What) ->
-    empdb_dao:get(?MODULE, Con, What).
-
 count(Con, What) ->
     empdb_dao:count(?MODULE, Con, What).
+
+
+get(Con, What) ->
+    empdb_dao:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, What, Fields).
