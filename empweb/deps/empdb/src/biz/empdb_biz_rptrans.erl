@@ -65,12 +65,12 @@ create(Params)->
 
                 Pers_id     = proplists:get_value(id,           Mbownerpl),
                 Money       = proplists:get_value(money,        Mbownerpl),
-                Def_room_id = proplists:get_value(own_room_id,  Mbownerpl),
+                Defroomid   = proplists:get_value(own_room_id,  Mbownerpl),
                 
                 Price =
                     proplists:get_value(price,    Params, 1.0),
                 Room_id =
-                    proplists:get_value(room_id,  Params, Def_room_id),
+                    proplists:get_value(room_id,  Params, Defroomid),
                 
                 case Price =< Money of
                     true ->

@@ -569,3 +569,9 @@ alter table pers add column live_roomtype_alias
 
 alter table pers add column isprisoner
     boolean default false;
+
+
+
+    insert into paytype(alias, isincome)
+        values  ('community_out',     false),
+                ('community_in',      true );

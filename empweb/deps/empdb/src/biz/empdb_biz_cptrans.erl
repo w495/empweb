@@ -42,49 +42,76 @@ create(Params)->
         %% Создаем денежный перевод
         case empdb_dao_cptrans:create(Con, Params) of
             {ok, Res} ->
-                Pers_id = proplists:get_value(pers_id, Params),
-                {ok, [{[{own_room_id, Def_room_id}]}]}
-                    = empdb_dao_pers:get(
+                {ok, [{Mbownerpl}]} =
+                    empdb_dao_pers:get(
                             Con,
-                            [   {id,    Pers_id},
-                                {fields, [own_room_id]}
+                            [
+                                {'or', [
+                                    {id,
+                                        proplists:get_value(pers_id, Params)
+                                    },
+                                    {nick,
+                                        proplists:get_value(pers_nick, Params)
+                                    }
+                                ]},
+                                {fields, [
+                                    id,
+                                    own_community_id,
+                                    money
+                                ]},
+                                {limit, 1}
                             ]
                     ),
-                Price   = proplists:get_value(price, Params, 1.0),
-                Room_id = proplists:get_value(room_id,Params,Def_room_id),
-                %% Создаем платеж пользователя
-                {ok, _} = empdb_dao_pay:create(Con, [
-                    {pers_id,           Pers_id},
-                    {paytype_alias,     room_out},
-                    {isincome,          false},
-                    {price,             Price}
-                ]),
-                %% Создаем платеж комнаты
-                {ok, _} = empdb_dao_roomtreas:create(Con, [
-                    {pers_id,           Pers_id},
-                    {room_id,           Room_id},
-                    {isincome,          true},
-                    {treastype_alias,   in},
-                    {price,             Price}
-                ]),
-                %% Обновляем комнату
-                {ok, _} = empdb_dao_room:update(Con, [
-                    {values, [
-                        {treas, {incr, Price}}
-                    ]},
-                    {filter, [
-                        {id, Room_id}
-                    ]}
-                ]),
-                {ok, _} = empdb_dao_pers:update(Con, [
-                    {values, [
-                        {money, {decr, Price}}
-                    ]},
-                    {filter, [
-                        {id, Pers_id}
-                    ]}
-                ]),
-                {ok, Res};
+
+                Pers_id     = proplists:get_value(id,           Mbownerpl),
+                Money       = proplists:get_value(money,        Mbownerpl),
+                Defcommunityid =
+                    proplists:get_value(own_community_id,  Mbownerpl),
+                Price =
+                    proplists:get_value(price,    Params, 1.0),
+                Room_id =
+                    proplists:get_value(community_id,  Params, Defcommunityid),
+                case Price =< Money of
+                    true ->
+                        %% Создаем платеж пользователя
+                        {ok, _} = empdb_dao_pay:create(Con, [
+                            {pers_id,           Pers_id},
+                            {paytype_alias,     community_out},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
+                        %% Создаем платеж комнаты
+                        {ok, _} = empdb_dao_communitytreas:create(Con, [
+                            {pers_id,           Pers_id},
+                            {community_id,      Room_id},
+                            {isincome,          true},
+                            {treastype_alias,   in},
+                            {price,             Price}
+                        ]),
+                        %% Обновляем комнату
+                        {ok, _} = empdb_dao_community:update(Con, [
+                            {values, [
+                                {treas, {incr, Price}}
+                            ]},
+                            {filter, [
+                                {id, Room_id}
+                            ]}
+                        ]),
+                        {ok, _} = empdb_dao_pers:update(Con, [
+                            {values, [
+                                {money, {decr, Price}}
+                            ]},
+                            {filter, [
+                                {id, Pers_id}
+                            ]}
+                        ]),
+                        {ok, Res};
+                    false ->
+                        {error, {not_enough_money, {[
+                            {money, Money},
+                            {price, Price}
+                        ]}}}
+                end;
             Error ->
                 Error
         end
