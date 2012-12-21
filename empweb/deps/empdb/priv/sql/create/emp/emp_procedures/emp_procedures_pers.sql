@@ -137,11 +137,18 @@ begin
     new.lang_alias      = 'en_gb';
     new.lang_id         =
         (select id from lang      where alias = new.lang_alias);
+
     new.live_room_id         = (select noobsroom());
     new.live_room_head       =
         (select doc.head from doc
             where doc.id = new.live_room_id and doc.doctype_alias = 'room');
 
+    new.citizen_room_id         = new.live_room_id;
+    new.citizen_room_head       =
+        (select doc.head from doc
+            where doc.id = new.citizen_room_id and doc.doctype_alias = 'room');
+
+            
     new.live_roomtype_alias         = 'noobs';
     new.live_roomtype_id      =
         (select id from roomtype where roomtype.alias = new.live_roomtype_alias);
@@ -196,6 +203,14 @@ begin
             (select doc.head from doc
                 where doc.id = new.live_room_id
                     and doc.doctype_alias = 'room');
+    end if;
+    
+    if new.citizen_room_id != old.citizen_room_id then
+        new.citizen_room_head =
+            (select doc.head from doc
+                where doc.id = new.citizen_room_id
+                    and doc.doctype_alias = 'room');
+        new.citizen_room_fromdatetime = utcnow();
     end if;
 
     if (

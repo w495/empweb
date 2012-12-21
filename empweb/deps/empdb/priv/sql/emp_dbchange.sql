@@ -575,3 +575,15 @@ alter table pers add column isprisoner
     insert into paytype(alias, isincome)
         values  ('community_out',     false),
                 ('community_in',      true );
+
+
+
+alter table pers add  column citizen_room_id
+    decimal references room(doc_id) default null;
+
+alter table pers add column citizen_room_head
+    varchar(1024) default null;
+
+alter table pers add column citizen_room_fromdatetime
+    timestamp without time zone default null;
+      

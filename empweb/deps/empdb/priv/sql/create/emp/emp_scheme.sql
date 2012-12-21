@@ -488,10 +488,18 @@ create table pers(
     **/
     own_community_head      varchar(1024) /*references doc(head)*/ default null,
     
-    /** Страна \ рай \ aд
+    /** Страна \ рай \ aд, где он сейчас находится
         [см далее]: live_room_id decimal references room(id) default null,
     **/ 
     live_room_head      varchar(1024) /*references doc(head)*/ default null,
+
+    /** Страна \ рай \ aд, гражданином которой он является
+        [см далее]: citizen_room_id decimal references room(id) default null,
+    **/ 
+    citizen_room_head   varchar(1024) /*references doc(head)*/ default null,
+    
+    citizen_room_fromdatetime       timestamp without time zone default null,
+      
     /**
         позиция в списке
     **/
@@ -1186,6 +1194,9 @@ create table room(
 
 
 alter table pers add  column live_room_id
+    decimal references room(doc_id) default null;
+
+alter table pers add  column citizen_room_id
     decimal references room(doc_id) default null;
 
 alter table pers add  column own_room_id

@@ -203,7 +203,11 @@ table({fields, all})->
         live_roomtype_id,
         live_roomtype_alias,
         isprisoner,
-        
+
+        citizen_room_id,
+        citizen_room_head,
+        citizen_room_fromdatetime,
+  
         own_room_id,
         % own_room_head,
         % allowauctoffer,

@@ -504,6 +504,12 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
+        %% Комната
+            #norm_rule{
+                key         = citizen_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
         %% Положение в комнате
             #norm_rule{
                 key         = live_room_pos,
@@ -671,9 +677,15 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             },
-        %% Комната
+        %% Комната, где находится
             #norm_rule{
                 key         = live_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+        %% Комната, где гражданин
+            #norm_rule{
+                key         = citizen_room_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
@@ -862,9 +874,14 @@ handle(_req, #empweb_hap{
                         key = ismale,
                         types = [nullable, boolean]
                     },
-                %% Комната
+                %% Комната где находится
                     #norm_rule{
                         key = live_room_id,
+                        types = [nullable, integer]
+                    },
+                %% Комната где гражданин
+                    #norm_rule{
+                        key = citizen_room_id,
                         types = [nullable, integer]
                     },
                 %% Положение в комнате
