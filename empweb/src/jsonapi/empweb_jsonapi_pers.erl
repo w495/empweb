@@ -510,6 +510,22 @@ handle(_req, #empweb_hap{
                  required   = false,
                 types       = empweb_norm:filter([nullable, 'float']) 
             },
+        %% Тип комнаты
+            #norm_rule{
+                key         = live_roomtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = live_roomtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isprisoner,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
         %% Сообщество
             #norm_rule{
                 key         = live_community_id,
@@ -666,6 +682,22 @@ handle(_req, #empweb_hap{
                 key         = live_room_pos,
                  required   = false,
                 types       = empweb_norm:filter([nullable, 'float'])
+            },
+        %% Тип комнаты
+            #norm_rule{
+                key         = live_roomtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = live_roomtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isprisoner,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             },
         %% Сообщество
             #norm_rule{
@@ -839,6 +871,22 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = live_room_pos,
                         types = [nullable, 'float']
+                    },
+                %% Тип комнаты
+                    #norm_rule{
+                        key         = live_roomtype_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key         = live_roomtype_alias,
+                        required    = false,
+                        types       = [nullable, string]
+                    },
+                    #norm_rule{
+                        key         = isprisoner,
+                        required    = false,
+                        types       = [nullable, boolean]
                     },
                 %% Сообщество
                     #norm_rule{
