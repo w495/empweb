@@ -142,6 +142,10 @@ begin
         (select doc.head from doc
             where doc.id = new.live_room_id and doc.doctype_alias = 'room');
 
+    new.live_roomtype_alias         = 'noobs';
+    new.live_roomtype_id      =
+        (select id from roomtype where roomtype.alias = new.live_roomtype_alias);
+
     /**
         Положение пользователя в стране
     **/
@@ -327,6 +331,26 @@ begin
         new.experlackprice  = null;
     end if;
 
+    /**
+        Авторитет пользователя
+    **/
+    if new.live_roomtype_id != old.roomtype_id then
+        new.live_roomtype_alias =
+            (select roomtype.alias
+                from
+                    roomtype
+                where
+                    roomtype.id = new.live_roomtype_id);
+    end if;
+    if new.live_roomtype_alias != old.roomtype_alias then
+        new.live_roomtype_id =
+            (select roomtype.id
+                from
+                    roomtype
+                where
+                    roomtype.alias = new.live_roomtype_alias);
+    end if;
+    
     /**
         Авторитет пользователя
     **/

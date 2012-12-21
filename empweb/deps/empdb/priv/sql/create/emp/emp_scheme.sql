@@ -496,6 +496,7 @@ create table pers(
         позиция в списке
     **/
     live_room_pos       numeric default 0,
+
     
     /** Страна \ рай \ aд
         [см далее]: own_room_id decimal references room(id) default null,
@@ -1034,6 +1035,18 @@ create table roomtype(
     created     timestamp without time zone not null default utcnow(),
     isdeleted   bool default false
 );
+
+
+
+alter table pers add column live_roomtype_id
+    decimal references roomtype(id)     default null;
+
+alter table pers add column live_roomtype_alias
+    varchar(1024) references roomtype(alias)     default null;
+
+alter table pers add column isprisoner
+    boolean default false;
+     
 
 /**
  *  Список языков чата. Не обязан пересекаться с таблицей lang.

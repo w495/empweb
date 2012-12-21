@@ -500,6 +500,7 @@ alter table doc add column isrepostable
         values  ('exper_out',       false);
 */
 
+-- 2012.12.21 13:16:08:401186853 ---------------------------------------------
 
 
 create sequence seq_cptrans_id;
@@ -560,4 +561,11 @@ alter table community add column fee
     decimal default 0;
 
 
-    
+alter table pers add column live_roomtype_id
+    decimal references roomtype(id)     default null;
+
+alter table pers add column live_roomtype_alias
+    varchar(1024) references roomtype(alias)     default null;
+
+alter table pers add column isprisoner
+    boolean default false;

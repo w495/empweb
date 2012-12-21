@@ -199,6 +199,11 @@ table({fields, all})->
         
         % {virtual, blog, {empdb_dao_blog, get, [{owner_id, '$id'}]}}
 
+
+        live_roomtype_id,
+        live_roomtype_alias,
+        isprisoner,
+        
         own_room_id,
         % own_room_head,
         % allowauctoffer,
