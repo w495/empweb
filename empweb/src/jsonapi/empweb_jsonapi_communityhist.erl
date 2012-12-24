@@ -98,6 +98,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([integer])
             },
             #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
                 key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
@@ -143,6 +148,11 @@ handle(_req, #empweb_hap{
                 types       = [nullable, integer]
             },
             #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
                 key         = pers_nick,
                 required    = false,
                 types       = [nullable, string]
@@ -184,6 +194,11 @@ handle(_req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key         = pers_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = community_id,
                 required    = false,
                 types       = [nullable, integer]
             },

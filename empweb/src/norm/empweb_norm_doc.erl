@@ -180,8 +180,6 @@ norm([])->
             required    = false,
             types       = empweb_norm:filter([nullable, boolean])
         },
-
-
         #norm_rule{
             key         = isrepostable,
             required    = false,
