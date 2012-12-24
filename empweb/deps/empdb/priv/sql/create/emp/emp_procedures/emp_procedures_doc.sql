@@ -246,6 +246,16 @@ begin
                     contype.alias = new.contype_alias);
     end if;
 
+    /**
+        Делаем репост зависимым по дереву.
+        Если ставим isrepostable = false
+        для родителя, то тоже самое ставится для его детей.
+    **/
+    if new.isrepostable != old.isrepostable then
+        update doc set isrepostable = new.isrepostable
+            where parent_id = new.id and owner_id = new.owner_id;
+    end if;
+
     return new;
 end;
 $$ language plpgsql;

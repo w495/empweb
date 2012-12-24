@@ -368,35 +368,31 @@
 
 */
 
-
 -- 2012.12.11 16:58:01:647478891 --------------------------------------------
 
--- alter table pers add column isempl      boolean         default null;
--- 
 /*
-alter table pers add column isempl      boolean         default null;
-
-alter table doc           drop constraint  doc_owner_nick_fkey;
-alter table pay           drop constraint  pay_pers_nick_fkey;
-alter table vote          drop constraint  vote_pers_nick_fkey;
-alter table file          drop constraint  file_owner_nick_fkey;
-alter table fileinfo      drop constraint  fileinfo_owner_nick_fkey;
-alter table communityhist drop constraint  communityhist_pers_nick_fkey;
-alter table message       drop constraint  message_reader_nick_fkey;
-alter table roombet       drop constraint  roombet_owner_nick_fkey;
-alter table room          drop constraint  room_roombet_owner_nick_fkey;
-alter table thingbuy      drop constraint  thingbuy_buyer_nick_fkey;
-alter table thingbuy      drop constraint  thingbuy_owner_nick_fkey;
-alter table experbuy      drop constraint  experbuy_buyer_nick_fkey;
-alter table experbuy      drop constraint  experbuy_owner_nick_fkey;
-alter table rptrans       drop constraint  rptrans_pers_nick_fkey;
-alter table roomtreas     drop constraint  roomtreas_pers_nick_fkey;
-alter table thingwish     drop constraint  thingwish_buyer_nick_fkey;
-alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
-
-
+    alter table pers add column isempl      boolean         default null;
+    alter table pers add column isempl      boolean         default null;
+    alter table doc           drop constraint  doc_owner_nick_fkey;
+    alter table pay           drop constraint  pay_pers_nick_fkey;
+    alter table vote          drop constraint  vote_pers_nick_fkey;
+    alter table file          drop constraint  file_owner_nick_fkey;
+    alter table fileinfo      drop constraint  fileinfo_owner_nick_fkey;
+    alter table communityhist drop constraint  communityhist_pers_nick_fkey;
+    alter table message       drop constraint  message_reader_nick_fkey;
+    alter table roombet       drop constraint  roombet_owner_nick_fkey;
+    alter table room          drop constraint  room_roombet_owner_nick_fkey;
+    alter table thingbuy      drop constraint  thingbuy_buyer_nick_fkey;
+    alter table thingbuy      drop constraint  thingbuy_owner_nick_fkey;
+    alter table experbuy      drop constraint  experbuy_buyer_nick_fkey;
+    alter table experbuy      drop constraint  experbuy_owner_nick_fkey;
+    alter table rptrans       drop constraint  rptrans_pers_nick_fkey;
+    alter table roomtreas     drop constraint  roomtreas_pers_nick_fkey;
+    alter table thingwish     drop constraint  thingwish_buyer_nick_fkey;
+    alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
     insert into paytype(alias, isincome)
-        values  ('change_nick',     false);*/
+        values  ('change_nick',     false);
+*/
 
 -- 2012.12.16 19:31:02:859818643 --------------------------------------------
 
@@ -406,39 +402,36 @@ alter table thingwish     drop constraint  thingwish_owner_nick_fkey;
         pers_id             decimal         references pers(id),
         pers_nick           varchar(1024)   default null
     );
-
     alter table claim add column judge_id numeric references pers(id) default null;
     alter table claim add column judge_nick varchar(1024) default null;
 */
 
 -- 2012.12.16 20:34:28:513375684 --------------------------------------------
 
-create sequence seq_repost_id;
-create table repost(
-    id                decimal   primary key default nextval('seq_repost_id'),
-    doc_id            decimal         references doc(id)      default null,
-    owner_id          decimal         references pers(id)     default null,
-    owner_nick        varchar(1024)                           default null,
-    orig_doc_id       decimal         references doc(id)      default null,
-    orig_owner_id     decimal         references pers(id)     default null,
-    orig_owner_nick   varchar(1024)                           default null,
-    created           timestamp without time zone not null default utcnow(),
-    isdeleted         bool default false
-);
-
-
-alter table doc add column orig_id
-    decimal         references doc(id)      default null;
-alter table doc add column orig_owner_id
-    decimal         references pers(id)     default null;
-alter table doc add column orig_owner_nick
-    varchar(1024)                           default null;
-
-
-alter table doc add column isrepost
-    bool default false;
-alter table doc add column isrepostable
-    bool default true;
+/*
+    create sequence seq_repost_id;
+    create table repost(
+        id                decimal   primary key default nextval('seq_repost_id'),
+        doc_id            decimal         references doc(id)      default null,
+        owner_id          decimal         references pers(id)     default null,
+        owner_nick        varchar(1024)                           default null,
+        orig_doc_id       decimal         references doc(id)      default null,
+        orig_owner_id     decimal         references pers(id)     default null,
+        orig_owner_nick   varchar(1024)                           default null,
+        created           timestamp without time zone not null default utcnow(),
+        isdeleted         bool default false
+    );
+    alter table doc add column orig_id
+        decimal         references doc(id)      default null;
+    alter table doc add column orig_owner_id
+        decimal         references pers(id)     default null;
+    alter table doc add column orig_owner_nick
+        varchar(1024)                           default null;
+    alter table doc add column isrepost
+        bool default false;
+    alter table doc add column isrepostable
+        bool default true;
+*/
 
 
 -- 2012.12.18 16:59:05:953080627 --------------------------------------------
@@ -564,9 +557,8 @@ alter table doc add column isrepostable
                 ('community_in',      true );
     alter table pers add  column citizen_room_id
         decimal references room(doc_id) default null;
-
     alter table pers add column citizen_room_head
         varchar(1024) default null;
-
     alter table pers add column citizen_room_fromdatetime
-        timestamp without time zone default null;*/
+        timestamp without time zone default null;
+*/
