@@ -1563,6 +1563,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
 
         %% ==================================================
+            <<"count_communityhist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communityhist,
+                    action          =   'count'
+                };
             <<"get_communityhist">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_communityhist,

@@ -21,6 +21,7 @@
 %% Блоги
 %%
 -export([
+    count/1,
     get/1,
     get/2,
     create/1,
@@ -45,6 +46,11 @@ create(Params)->
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_communityhist:update(Con, Params)
+    end).
+
+count(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_communityhist:count(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params)->

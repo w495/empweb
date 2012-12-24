@@ -23,6 +23,7 @@
 -export([
     update/1,
     create/1,
+    count/1,
     get/1,
     get/2
 ]).
@@ -41,6 +42,10 @@ create(Params)->
 
 update(Params)->
     empdb_biz_communityhist:update(Params).
+
+
+count(Params)->
+    empdb_biz_communityhist:count(Params).
 
 get(Params)->
     empdb_biz_communityhist:get(Params).

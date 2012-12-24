@@ -135,6 +135,60 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+handle(_req, #empweb_hap{
+        action='count',
+        params=Params,
+        pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get communityhist">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = communityhisttype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = communityhisttype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_communityhist:count(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+    
 handle(_req, #empweb_hap{
         action=create, params=Params, pers_id=Pers_id
     } = Hap) ->
