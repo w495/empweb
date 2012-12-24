@@ -219,9 +219,9 @@
 
 
 repost(Module, Con, Params)->
-    repost(fun Module:get/2, fun Module:create/2, Con, Params).
+    repost({Module, get}, {Module, create}, Con, Params).
 
-repost(Get, Create, Con, Params)->
+repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
     Doc_id      = proplists:get_value(id, Params,
         proplists:get_value(doc_id, Params)
     ),
@@ -229,7 +229,7 @@ repost(Get, Create, Con, Params)->
     Owner_nick  = proplists:get_value(owner_nick, Params, null),
     Parent_id   = proplists:get_value(parent_id, Params, null),
     
-    {ok, [{Instpl}]} = Get(Con, [{id, Doc_id}]),
+    {ok, [{Instpl}]} = Getmodule:Get(Con, [{id, Doc_id}]),
 
     
     case proplists:get_value(isrepostable, Instpl) of
@@ -257,7 +257,7 @@ repost(Get, Create, Con, Params)->
                         )
                     )
                 ),
-            case Create(Con, [
+            case Createmodule:Create(Con, [
                 {parent_id,         Parent_id},
                 {owner_id,          Owner_id},
                 {owner_nick,        Owner_nick},
