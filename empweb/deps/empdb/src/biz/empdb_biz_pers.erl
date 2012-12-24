@@ -25,7 +25,8 @@
     get/2,
     count/1,
     get_opt/2,
-    get_opt/3
+    get_opt/3,
+    wfoe/2
 ]).
 
 %%
@@ -85,6 +86,33 @@
 %% ===========================================================================
 %% Внешние функции
 %% ===========================================================================
+
+
+
+wfoe(Function, Options)->
+    Pers_id     = proplists:get_value(pers_id,      Options),
+    Pers_nick   = proplists:get_value(pers_nick,    Options),
+    Friend_id   = proplists:get_value(friend_id,    Options),
+    Friend_nick = proplists:get_value(friend_nick,  Options),
+    fun(Connection) ->
+        {ok, Objs} = empdb_dao_friend:get(Connection, [
+            {'or', [
+                {pers_id,   Pers_id},
+                {pers_nick, Pers_nick}
+            ]},
+            {'or', [
+                {friend_id,     Friend_id},
+                {friend_nick,   Friend_nick}
+            ]},
+            {friendtype_alias, foe}
+        ]),
+        case Objs of
+            [] ->
+                Function(Connection);
+            _ ->
+                {error, forbiden}
+        end
+    end.
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Сам пользователь
@@ -315,7 +343,9 @@ update(Con, {nick, Nick},  {Function, [Params]}) ->
         Else ->
             Else
     end;
-
+% 
+% update(Con, {live_community_id, Live_community_id}, {Function, [Params]}) ->
+%     Function(Con, Params).
 
 update(Con, {_pname, _pvalue}, {Function, [Params]}) ->
     Function(Con, Params).

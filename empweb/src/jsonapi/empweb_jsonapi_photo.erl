@@ -165,7 +165,48 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action=update, params=Params, pers_id=Pers_id
+        action=repost,
+        params=Params,
+        pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = create photo">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params,[
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_photo:create([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=update,
+        params=Params,
+        pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = update photo">>),
 

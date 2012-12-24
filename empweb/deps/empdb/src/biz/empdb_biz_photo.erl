@@ -33,7 +33,7 @@
 
 repost(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_biz_doc:repost(?MODULE, Con, Params)
+        empdb_biz_doc:repost(empdb_dao_photo, Con, Params)
     end).
 
 create(Params)->

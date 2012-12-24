@@ -12,6 +12,7 @@
 -export([
     update/1,
     create/1,
+    repost/1,
     delete/1,
     get/1,
     get/2
@@ -25,6 +26,9 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Списки языков
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+repost(Params)->
+    empdb_biz_photo:repost(Params).
 
 create(Params)->
     empdb_biz_photo:create(Params).

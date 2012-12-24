@@ -161,6 +161,7 @@
     get_post/1,
     get_post/2,
     create_post/1,
+    repost_post/1,
     update_post/1,
     delete_post/1
 ]).
@@ -172,6 +173,7 @@
 -export([
     get_comment/1,
     get_comment/2,
+    repost_comment/1,
     create_comment/1,
     update_comment/1,
     delete_comment/1
@@ -211,55 +213,73 @@
 %% Репост
 %%
 -export([
-    repost/3
+    repost/3,
+    repost/4
 ]).
 
+
 repost(Module, Con, Params)->
-    Doc_id      = proplists:get_value(id, Params),
-    Owner_id    = proplists:get_value(owner_id, Params),
-    Owner_nick  = proplists:get_value(owner_nick, Params),
+    repost(fun Module:get/2, fun Module:create/2, Con, Params).
 
-    {ok, [{Instpl}]} = Module:get(Con, [{id, Doc_id}]),
+repost(Get, Create, Con, Params)->
+    Doc_id      = proplists:get_value(id, Params,
+        proplists:get_value(doc_id, Params)
+    ),
+    Owner_id    = proplists:get_value(owner_id, Params, null),
+    Owner_nick  = proplists:get_value(owner_nick, Params, null),
+    Parent_id   = proplists:get_value(parent_id, Params, null),
+    
+    {ok, [{Instpl}]} = Get(Con, [{id, Doc_id}]),
 
-    Orig_id          = repost_orig(id, orig_id, Instpl),
-    Orig_owner_id    = repost_orig(owner_id, orig_owner_id, Instpl),
-    Orig_owner_nick  = repost_orig(owner_nick, orig_owner_nick, Instpl),
-
-    Preinstpl =
-        proplists:delete(id,
-            proplists:delete(owner_id,
-                proplists:delete(owner_nick,
-                    proplists:delete(orig_id,
-                        proplists:delete(orig_owner_id,
-                            proplists:delete(orig_owner_nick,
-                                Instpl
+    
+    case proplists:get_value(isrepostable, Instpl) of
+        false ->
+            {error, forbiden};
+        true ->
+            Orig_id          = repost_orig(id, orig_id, Instpl),
+            Orig_owner_id    = repost_orig(owner_id, orig_owner_id, Instpl),
+            Orig_owner_nick  = repost_orig(owner_nick, orig_owner_nick, Instpl),
+            Preinstpl =
+                proplists:delete(id,
+                    proplists:delete(owner_id,
+                        proplists:delete(owner_nick,
+                            proplists:delete(orig_id,
+                                proplists:delete(orig_owner_id,
+                                    proplists:delete(orig_owner_nick,
+                                        proplists:delete(parent_id,
+                                            proplists:delete(created,
+                                                Instpl
+                                            )
+                                        )
+                                    )
+                                )
                             )
                         )
                     )
-                )
-            )
-        ),
-
-    case Module:create(Con, [
-        {owner_id,          Owner_id},
-        {owner_nick,        Owner_nick},
-        {orig_id,           Orig_id},
-        {orig_owner_id,     Orig_owner_id},
-        {orig_owner_nick,   Orig_owner_nick}
-        |Preinstpl
-    ]) of
-        {ok, [{Newinstpl}]} ->
-            {ok, _} = empdb_biz_repost:create(Con, [
-                {doc_id,            proplists:get_value(id, Newinstpl)},
+                ),
+            case Create(Con, [
+                {parent_id,         Parent_id},
                 {owner_id,          Owner_id},
                 {owner_nick,        Owner_nick},
-                {orig_doc_id,       Orig_id},
+                {orig_id,           Orig_id},
                 {orig_owner_id,     Orig_owner_id},
-                {orig_owner_nick,   Orig_owner_nick}
-            ]),
-            {ok, [{Newinstpl}]};
-        Else ->
-            Else
+                {orig_owner_nick,   Orig_owner_nick},
+                {isrepost,          true}
+                |Preinstpl
+            ]) of
+                {ok, [{Newinstpl}]} ->
+                    {ok, _} = empdb_dao_repost:create(Con, [
+                        {doc_id,            proplists:get_value(id, Newinstpl)},
+                        {owner_id,          Owner_id},
+                        {owner_nick,        Owner_nick},
+                        {orig_doc_id,       Orig_id},
+                        {orig_owner_id,     Orig_owner_id},
+                        {orig_owner_nick,   Orig_owner_nick}
+                    ]),
+                    {ok, [{Newinstpl}]};
+                Else ->
+                    Else
+            end
     end.
     
 repost_orig(Field, Orig_field, Instpl)->
@@ -636,12 +656,21 @@ is_blog_owner(Uid, Oid)->
 %% @doc Добавляет пост в блог.
 %% Все действия в одной транзакции.
 %%
+
+repost_post(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_biz_doc:repost(
+            empdb_dao_post,
+            Con,
+            Params
+        )
+    end).
+
 create_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_post:create(Con, Params)
     end).
-    
-    
+
 update_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_post:update(Con, Params)
@@ -660,7 +689,6 @@ delete_post(Filter)->
         ])
     end).
 
-    
 get_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
         get_post_adds(Con, empdb_dao_post:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params]))
@@ -703,6 +731,16 @@ is_post_owner(Uid, Oid)->
 %% @doc Добавляет комментарий, 
 %% Все действия в одной транзакции.
 %%
+
+repost_comment(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_biz_doc:repost(
+            empdb_dao_comment,
+            Con,
+            Params
+        )
+    end).
+
 create_comment(Params)->
     empdb_dao:with_transaction(fun(Con)->
         %% Создаем
@@ -796,34 +834,9 @@ is_comment_owner(Uid, Oid)->
 %     end.
 % 
 
-wfoe(Function, Options)->
-    Pers_id     = proplists:get_value(pers_id,      Options),
-    Pers_nick   = proplists:get_value(pers_nick,    Options),
-    Friend_id   = proplists:get_value(friend_id,    Options),
-    Friend_nick = proplists:get_value(friend_nick,  Options),
-    fun(Connection) ->
-        {ok, Objs} = empdb_dao_friend:get(Connection, [
-            {'or', [
-                {pers_id,   Pers_id},
-                {pers_nick, Pers_nick}
-            ]},
-            {'or', [
-                {friend_id,     Friend_id},
-                {friend_nick,   Friend_nick}
-            ]},
-            {friendtype_alias, foe}
-        ]),
-        case Objs of
-            [] ->
-                Function(Connection);
-            _ ->
-                {error, forbiden}
-        end
-    end.
-
     
 create_message(Params)->
-    empdb_dao:with_transaction(wfoe(
+    empdb_dao:with_transaction(empdb_biz_pers:wfoe(
         fun(Con)->
             empdb_dao_message:create(Con, Params)
         end,

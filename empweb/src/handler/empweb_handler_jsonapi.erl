@@ -527,6 +527,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_doc,
                     action          =   get_post
                 };
+            <<"repost_post">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   repost_post
+                };
             <<"create_post">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
@@ -554,6 +559,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
                     action          =   get_comment
+                };
+            <<"repost_comment">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   repost_comment
                 };
             <<"create_comment">> ->
                 Eh#empweb_hap{
@@ -760,6 +770,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_photo,
                     action          =   'get'
+                };
+            <<"repost_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   repost
                 };
             <<"create_photo">> ->
                 Eh#empweb_hap{

@@ -802,6 +802,48 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+
+handle(_req, #empweb_hap{
+        action=repost_post,
+        params=Params,
+        pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = repost post">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params,[
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:repost_post([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   update_post,
@@ -918,6 +960,45 @@ handle(_req, #empweb_hap{
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_doc:create_comment([
+                        {owner_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action=repost_comment,
+        params=Params,
+        pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = repost comment">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params,[
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:repost_comment([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])

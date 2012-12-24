@@ -155,6 +155,7 @@
     get_post/1,
     get_post/2,
     create_post/1,
+    repost_post/1,
     update_post/1,
     delete_post/1
 ]).
@@ -166,6 +167,7 @@
 -export([
     get_comment/1,
     get_comment/2,
+    repost_comment/1,
     create_comment/1,
     update_comment/1,
     delete_comment/1
@@ -411,8 +413,12 @@ get_blog(Params, Fields)->
 %% Посты \ коменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 create_post(Params)->
     empdb_biz_doc:create_post(Params).
+
+repost_post(Params)->
+    empdb_biz_doc:repost_post(Params).
 
 update_post(Params)->
     empdb_biz_doc:update_post(Params).
@@ -430,6 +436,10 @@ get_post(Params, Fields)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Посты \ коменты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+repost_comment(Params)->
+    empdb_biz_doc:repost_comment(Params).
 
 create_comment(Params)->
     empdb_biz_doc:create_comment(Params).
