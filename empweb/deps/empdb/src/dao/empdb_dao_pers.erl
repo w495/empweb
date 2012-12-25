@@ -188,6 +188,7 @@ table({fields, all})->
         
         live_community_id,
         live_community_approved,
+        live_community_rejectreason,
 
         own_community_id,
         own_community_head,

@@ -580,3 +580,6 @@
         values  ('community_out',     false);
 
 
+    alter table pers add column live_community_rejectreason
+        text default null;
+

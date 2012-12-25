@@ -543,6 +543,11 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             },
+            #norm_rule{
+                key         = live_community_rejectreason,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
         %% Эмоции пользователя.
             #norm_rule{
                 key         = emotion_id,
@@ -721,6 +726,11 @@ handle(_req, #empweb_hap{
                 key         = live_community_approved,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = live_community_rejectreason,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             },
         %% Эмоции пользователя.
             #norm_rule{
@@ -907,12 +917,16 @@ handle(_req, #empweb_hap{
                     },
                 %% Сообщество
                     #norm_rule{
-                        key = live_community_id,
-                        types = [nullable, integer]
+                        key         = live_community_id,
+                        types       = [nullable, integer]
                     },
                     #norm_rule{
-                        key = live_community_approved,
-                        types = [nullable, boolean]
+                        key         = live_community_approved,
+                        types       = [nullable, boolean]
+                    },
+                    #norm_rule{
+                        key         = live_community_rejectreason,
+                        types       = [nullable, string]
                     },
                 %% Эмоции пользователя.
                     #norm_rule{
