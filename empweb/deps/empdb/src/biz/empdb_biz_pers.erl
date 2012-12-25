@@ -240,10 +240,10 @@ update(Params)->
     case proplists:get_value(pass, Params) of
         undefined ->
             %% не пытаемся поменять пароль
-            update_(emp, Params);
+            update_(Params);
         Mbpass ->
             %% пытаемся поменять пароль
-            case update_(emp, [
+            case update_([
                 {phash, phash(Mbpass)}
                 |Params
             ])  of
@@ -265,27 +265,28 @@ update(Params)->
             end
     end.
 
-update_(Con, Params)->
-    Pers =
-        empdb_dao_pers:get(Con,[
-            {id,    proplists:get_value(id,   Params)}
-        ]),
-    case Pers of
-        {ok, [{Mbperspl}]} ->
-            Fun = lists:foldl(
-                fun({Key, Value}, Accfun)->
-                    fun(Con1, Params1) ->
-                        update(Con1, {Key, Value},  {Accfun, [Params1]}, Mbperspl)
-                    end
-                end,
-                fun empdb_dao_pers:update/2,
-                Params
-            ),
-            Fun(Con, Params);
-        Else ->
-            Else
-    end.
-
+update_(Params)->
+    empdb:with_transaction(fun(Con)->
+        Pers =
+            empdb_dao_pers:get(Con,[
+                {id,    proplists:get_value(id,   Params)}
+            ]),
+        case Pers of
+            {ok, [{Mbperspl}]} ->
+                Fun = lists:foldl(
+                    fun({Key, Value}, Accfun)->
+                        fun(Con1, Params1) ->
+                            update(Con1, {Key, Value},  {Accfun, [Params1]}, Mbperspl)
+                        end
+                    end,
+                    fun empdb_dao_pers:update/2,
+                    Params
+                ),
+                Fun(Con, Params);
+            Else ->
+                Else
+        end
+    end).
 
 update(Con, {nick, undefined},  {Function, [Params]}, _mbperspl) ->
     Function(Con, Params);
