@@ -576,10 +576,22 @@
 
 -- 2012.12.25 13:05:06:298990484 ---------------------------------------------
 
-    insert into paytype(alias, isincome)
-        values  ('community_out',     false);
-
-
+/*
     alter table pers add column live_community_rejectreason
         text default null;
+*/
 
+-- 2012.12.25 17:22:06:355620587 ---------------------------------------------
+
+
+
+    alter table community add column read_gte_authority_id
+        decimal         references authority(id) default null;
+    alter table community add column read_gte_authority_alias
+        varchar(1024)   references authority(alias) default null;
+        
+    alter table community add column cands_gte_authority_id
+        decimal         references authority(id) default null;
+    alter table community add column cands_gte_authority_alias
+        varchar(1024)   references authority(alias) default null;
+        

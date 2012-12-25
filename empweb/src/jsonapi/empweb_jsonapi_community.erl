@@ -109,6 +109,26 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = cands_gte_authority_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, atom])
+            },
+            #norm_rule{
+                key         = read_gte_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = read_gte_authority_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, atom])
+            },
+            #norm_rule{
                 key         = treas,
                 required    = false,
                 types       = empweb_norm:filter([float])
@@ -169,7 +189,17 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
-                key         = cands_gte_authority_id,
+                key         = cands_gte_authority_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, atom])
+            },
+            #norm_rule{
+                key         = read_gte_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = read_gte_authority_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, atom])
             },
@@ -232,7 +262,17 @@ handle(_req, #empweb_hap{
                 types       = [nullable, integer]
             },
             #norm_rule{
-                key         = cands_gte_authority_id,
+                key         = cands_gte_authority_alias,
+                required    = false,
+                types       = [nullable, atom]
+            },
+            #norm_rule{
+                key         = read_gte_authority_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = read_gte_authority_alias,
                 required    = false,
                 types       = [nullable, atom]
             },
@@ -294,7 +334,17 @@ handle(_req, #empweb_hap{
                 types       = [nullable, integer]
             },
             #norm_rule{
-                key         = cands_gte_authority_id,
+                key         = cands_gte_authority_alias,
+                required    = false,
+                types       = [nullable, atom]
+            },
+            #norm_rule{
+                key         = read_gte_authority_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = read_gte_authority_alias,
                 required    = false,
                 types       = [nullable, atom]
             },

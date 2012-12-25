@@ -197,9 +197,6 @@ table({fields, all})->
         live_room_head,
         live_room_pos,
         geo_id,
-        
-        % {virtual, blog, {empdb_dao_blog, get, [{owner_id, '$id'}]}}
-
 
         live_roomtype_id,
         live_roomtype_alias,
