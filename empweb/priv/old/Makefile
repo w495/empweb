@@ -63,7 +63,9 @@ empweb_mailutils
 	
 BIZ_SESSION_EXPIRE_TIMEOUT
 
-	find -type f -name \* -exec sed -i -r s/?debug/?empdb_debug/g {} \;
+	find -type f -name \* -exec sed -i -r s/demo/udptv/g {} \;
+
+	find -type f -name \* -exec sed -i -r s/Demo/Udptv/g {} \;
 
 	find -type f -name \* -exec sed -i -r s/empdb_empweb_biz_/empdb_biz_/g {} \;
 
@@ -84,6 +86,13 @@ BIZ_SESSION_EXPIRE_TIMEOUT
 
 
 
+	ls | sed s/demo_//g |  xargs -i echo ./demo_{} ./udptv_{}
+
+
+	
+	find ./ -type f -exec sh -c 'mv {} `echo {} | sed "s/demo/udptv/"` ' \ ;
+
+
 
 
 	ls | sed s/empweb_//g |  xargs -i mv ./empweb{} ./taweb_{}
@@ -91,6 +100,7 @@ BIZ_SESSION_EXPIRE_TIMEOUT
 	find -type f -name \* -exec sed -i -r s/empweb/taweb/g {} \;
 
 
+	find ./ -type f -exec sh -c 'mv {} `echo {} | sed "s/.mp3/_old.mp3/"` ' \ ;
 
 
 	find -type f -name \* -exec sed -i -r s/EMPWEB/TAWEB/g {} \;

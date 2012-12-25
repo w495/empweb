@@ -562,3 +562,21 @@
     alter table pers add column citizen_room_fromdatetime
         timestamp without time zone default null;
 */
+
+-- 2012.12.24 15:55:05:901896410 ---------------------------------------------
+
+/*
+    alter table community add  column cands_gte_authority_id
+        decimal         references authority(id) default null;
+
+    alter table community add  column cands_gte_authority_alias
+        varchar(1024)   references authority(alias) default null;
+*/
+
+
+-- 2012.12.25 13:05:06:298990484 ---------------------------------------------
+
+    insert into paytype(alias, isincome)
+        values  ('community_out',     false);
+
+

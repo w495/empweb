@@ -1257,7 +1257,7 @@ create sequence seq_communityhist_id;
 create table communityhist(
     id                          decimal         primary key default nextval('seq_communityhist_id'),
     pers_id                     decimal         references pers(id) not null,
-    pers_nick                   varchar(1024)   default null not null,
+    pers_nick                   varchar(1024)   default null,
     community_id                decimal         references community(doc_id)  default null,
     communityhisttype_id        decimal         references communityhisttype(id)    default null,
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,

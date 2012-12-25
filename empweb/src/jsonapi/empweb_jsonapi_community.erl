@@ -164,6 +164,16 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, atom])
             },
             #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, atom])
+            },
+            #norm_rule{
                 key         = treas,
                 required    = false,
                 types       = empweb_norm:filter([float])
@@ -217,6 +227,16 @@ handle(_req, #empweb_hap{
                 types       = [nullable, atom]
             },
             #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = [nullable, atom]
+            },
+            #norm_rule{
                 key         = treas,
                 required    = false,
                 types       = [float]
@@ -265,6 +285,16 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = communitytype_alias,
+                required    = false,
+                types       = [nullable, atom]
+            },
+            #norm_rule{
+                key         = cands_gte_authority_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = cands_gte_authority_id,
                 required    = false,
                 types       = [nullable, atom]
             },

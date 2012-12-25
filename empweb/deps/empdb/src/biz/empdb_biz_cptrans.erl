@@ -69,7 +69,7 @@ create(Params)->
                     proplists:get_value(own_community_id,  Mbownerpl),
                 Price =
                     proplists:get_value(price,    Params, 1.0),
-                Room_id =
+                Community_id =
                     proplists:get_value(community_id,  Params, Defcommunityid),
                 case Price =< Money of
                     true ->
@@ -83,7 +83,7 @@ create(Params)->
                         %% Создаем платеж комнаты
                         {ok, _} = empdb_dao_communitytreas:create(Con, [
                             {pers_id,           Pers_id},
-                            {community_id,      Room_id},
+                            {community_id,      Community_id},
                             {isincome,          true},
                             {treastype_alias,   in},
                             {price,             Price}
@@ -94,7 +94,7 @@ create(Params)->
                                 {treas, {incr, Price}}
                             ]},
                             {filter, [
-                                {id, Room_id}
+                                {id, Community_id}
                             ]}
                         ]),
                         {ok, _} = empdb_dao_pers:update(Con, [

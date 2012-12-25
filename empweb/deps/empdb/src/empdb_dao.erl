@@ -856,13 +856,16 @@ get(Current, Con, #queryobj{fields=Fields}=Obj)
 
 get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     filter  =   Afilter,
-    fields  =   Fields,
+    fields  =   Input_fields,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
 } = Qo ) when
     erlang:is_list(Afilter),erlang:is_list(Aparent)
     orelse erlang:is_atom(Aparent)->
+    Fields = lists:reverse(Input_fields),
+
+    
     {Query, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         Op = lists:map(
             fun ({Current, Current_field}) when erlang:is_atom(Current) ->

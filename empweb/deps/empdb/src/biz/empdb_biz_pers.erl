@@ -266,88 +266,236 @@ update(Params)->
     end.
 
 update_(Con, Params)->
-    Fun = lists:foldl(
-        fun({Key, Value}, Accfun)->
-            fun(Con1, Params1) ->
-                update(Con1, {Key, Value},  {Accfun, [Params1]})
-            end
-        end,
-        fun empdb_dao_pers:update/2,
-        Params
-    ),
-    Fun(Con, Params).
+    Pers =
+        empdb_dao_pers:get(Con,[
+            {id,    proplists:get_value(id,   Params)}
+        ]),
+    case Pers of
+        {ok, [{Mbperspl}]} ->
+            Fun = lists:foldl(
+                fun({Key, Value}, Accfun)->
+                    fun(Con1, Params1) ->
+                        update(Con1, {Key, Value},  {Accfun, [Params1]}, Mbperspl)
+                    end
+                end,
+                fun empdb_dao_pers:update/2,
+                Params
+            ),
+            Fun(Con, Params);
+        Else ->
+            Else
+    end.
 
 
-update(Con, {nick, undefined},  {Function, [Params]}) ->
+update(Con, {nick, undefined},  {Function, [Params]}, _mbperspl) ->
     Function(Con, Params);
 
-update(Con, {nick, Nick},  {Function, [Params]}) ->
+update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
     Price = 1.0,
-    case empdb_dao_pers:get(Con,[
-        {id,    proplists:get_value(id,   Params)},
-        {fields, [
-            nick,
-            money
-        ]}
-    ]) of
-        {ok, [{Mbownerpl}]} ->
-            Money = proplists:get_value(money, Mbownerpl),
-            Oldnick = proplists:get_value(nick, Mbownerpl),
-            case {Price =< Money, Oldnick =:= Nick} of
-                {true, false} ->
+    Money = proplists:get_value(money, Mbperspl),
+    Oldnick = proplists:get_value(nick, Mbperspl),
+    case {Price =< Money, Oldnick =:= Nick} of
+        {true, false} ->
+            case Function(Con, Params) of
+                {ok, [{Item}]} ->
+                    {ok, _} =
+                        empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(id,   Item)},
+                            {paytype_alias,     change_nick},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
+                    {ok, _} =
+                        empdb_dao_pers:update(Con,[
+                            {id,    proplists:get_value(id,   Item)},
+                            {money, {decr, Price}}
+                        ]),
+                    Itemid = proplists:get_value(id,   Item),
+                    update_change_connected(Con, doc, owner, Itemid, Nick),
+                    update_change_connected(Con, pay, pers, Itemid, Nick),
+                    update_change_connected(Con, vote, pers, Itemid, Nick),
+                    update_change_connected(Con, file, owner, Itemid, Nick),
+                    update_change_connected(Con, fileinfo, owner, Itemid, Nick),
+                    update_change_connected(Con, communityhist, pers, Itemid, Nick),
+                    update_change_connected(Con, message, reader, Itemid, Nick),
+                    update_change_connected(Con, roombet, owner, Itemid, Nick),
+                    update_change_connected(Con, room, roombet, Itemid, Nick),
+                    update_change_connected(Con, thingbuy, buyer, Itemid, Nick),
+                    update_change_connected(Con, thingbuy, owner, Itemid, Nick),
+                    update_change_connected(Con, experbuy, buyer, Itemid, Nick),
+                    update_change_connected(Con, experbuy, owner, Itemid, Nick),
+                    update_change_connected(Con, rptrans, pers, Itemid, Nick),
+                    update_change_connected(Con, roomtreas, pers, Itemid, Nick),
+        %             update_change_connected(Con, thingwish, buyer, Itemid, Nick),
+        %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
+                    {ok, [{Item}]};
+                {error,{not_unique,<<"nick">>}}->
+                    Sugs = suggest_nick(Con, Nick),
+                    {error,{not_unique_nick,Sugs}};
+                Error ->
+                    Error
+            end;
+        {true, _} ->
+            {ok, []};
+        {false, _} ->
+            {error, {not_enough_money, {[
+                {money, Money},
+                {price, Price}
+            ]}}}
+    end;
+
+%% 
+%% Человек попросился в сообщество, 
+%% и стал кандидатом
+%% 
+update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) ->
+    case proplists:get_value(live_community_id, Mbperspl) =/= Community_id of
+        true ->
+            %% сообщество изменилось
+            case Function(Con, Params) of
+                {ok, Res} ->
+                    empdb_dao_communityhist:create(Con, [
+                        {community_id,
+                            Community_id},
+                        {pers_id,
+                            proplists:get_value(id, Mbperspl)},
+                        {communityhisttype_alias,
+                            pers_cand}
+                    ]),
+                    {ok, Res};
+                Else ->
+                    Else
+            end;
+        false ->
+            %% сообщество НЕ изменилось
+            Function(Con, Params)
+    end;
+
+%%
+%% Человека одобрили как члена сообщества
+%% 
+update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
+    Pers_id   = proplists:get_value(id, Mbperspl),
+    case proplists:get_value(live_community_id, Mbperspl) =/= null of
+        true ->
+            Community_id = proplists:get_value(live_community_id, Mbperspl),
+            {ok, [{Communitypl}]} =
+                empdb_dao_community:get(Con, [
+                    {id, Community_id},
+                    {limit, 1},
+                    {fields, [
+                        fee
+                    ]}
+                ]),
+            Money   = proplists:get_value(money, Mbperspl),
+            Price   = proplists:get_value(fee, Communitypl),
+            case Price =< Money of
+                true ->
                     case Function(Con, Params) of
-                        {ok, [{Item}]} ->
-                            {ok, _} = empdb_dao_pay:create(Con, [
-                                {pers_id,           proplists:get_value(id,   Item)},
-                                {paytype_alias,     change_nick},
-                                {isincome,          false},
-                                {price,             Price}
-                            ]),
-                            empdb_dao_pers:update(Con,[
-                                {id,    proplists:get_value(id,   Item)},
-                                {money, {decr, Price}}
-                            ]),
-                            Itemid = proplists:get_value(id,   Item),
-                            update_change_connected(Con, doc, owner, Itemid, Nick),
-                            update_change_connected(Con, pay, pers, Itemid, Nick),
-                            update_change_connected(Con, vote, pers, Itemid, Nick),
-                            update_change_connected(Con, file, owner, Itemid, Nick),
-                            update_change_connected(Con, fileinfo, owner, Itemid, Nick),
-                            update_change_connected(Con, communityhist, pers, Itemid, Nick),
-                            update_change_connected(Con, message, reader, Itemid, Nick),
-                            update_change_connected(Con, roombet, owner, Itemid, Nick),
-                            update_change_connected(Con, room, roombet, Itemid, Nick),
-                            update_change_connected(Con, thingbuy, buyer, Itemid, Nick),
-                            update_change_connected(Con, thingbuy, owner, Itemid, Nick),
-                            update_change_connected(Con, experbuy, buyer, Itemid, Nick),
-                            update_change_connected(Con, experbuy, owner, Itemid, Nick),
-                            update_change_connected(Con, rptrans, pers, Itemid, Nick),
-                            update_change_connected(Con, roomtreas, pers, Itemid, Nick),
-                %             update_change_connected(Con, thingwish, buyer, Itemid, Nick),
-                %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
-                            {ok, [{Item}]};
-                        {error,{not_unique,<<"nick">>}}->
-                            Sugs = suggest_nick(Con, Nick),
-                            {error,{not_unique_nick,Sugs}};
-                        Error ->
-                            Error
+                        {ok, Res} ->
+                            %% Создаем событие истории 
+                            %% о том что пользователь стал членом
+                            {ok, _} =
+                                empdb_dao_communityhist:create(Con, [
+                                    {community_id, Community_id },
+                                    {pers_id,
+                                        proplists:get_value(id, Mbperspl)},
+                                    {communityhisttype_alias,
+                                        pers_memb}
+                                ]),
+                            %% Создаем запись в лог казны сообщества
+                            {ok, _} =
+                                empdb_dao_communitytreas:create(Con, [
+                                    {pers_id,           Pers_id},
+                                    {community_id,      Community_id},
+                                    {isincome,          true},
+                                    {treastype_alias,   in},
+                                    {price,             Price}
+                                ]),
+                            %% Создаем запись в лог кошелька пользователя
+                            {ok, _} =
+                                empdb_dao_pay:create(Con, [
+                                    {pers_id,
+                                        proplists:get_value(id,   Mbperspl)},
+                                    {paytype_alias,     community_out},
+                                    {isincome,          false},
+                                    {price,             Price}
+                                ]),
+                            %% Добавляем деньги в общак сообщества
+                            {ok, _} =
+                                empdb_dao_community:update(Con, [
+                                    {id,    Community_id},
+                                    {treas, Price}
+                                ]),
+                            %% Снимаем с пользователя деньги
+                            {ok, _} =
+                                empdb_dao_pers:update(Con,[
+                                    {id,    proplists:get_value(id,   Mbperspl)},
+                                    {money, {decr, Price}}
+                                ]),
+                            {ok, Res};
+                        Else ->
+                            Else
                     end;
-                {true, _} ->
-                    {ok, []};
-                {false, _} ->
+                false ->
                     {error, {not_enough_money, {[
                         {money, Money},
                         {price, Price}
                     ]}}}
             end;
-        Else ->
-            Else
+        false ->
+            {error, forbiden}
     end;
-% 
-% update(Con, {live_community_id, Live_community_id}, {Function, [Params]}) ->
-%     Function(Con, Params).
 
-update(Con, {_pname, _pvalue}, {Function, [Params]}) ->
+%%
+%% Человека не одобряли как члена сообщества или выгнали.
+%%
+update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
+    case {
+        proplists:get_value(live_community_id, Mbperspl) =/= null,
+        proplists:get_value(live_community_approved, Mbperspl) =/= true
+    } of
+        {true, true} ->
+            %% Человека не одобряли как члена сообщества
+            case Function(Con, Params) of
+                {ok, Res} ->
+                    empdb_dao_communityhist:create(Con, [
+                        {community_id,
+                            proplists:get_value(live_community_id, Mbperspl)},
+                        {pers_id,
+                            proplists:get_value(id, Mbperspl)},
+                        {communityhisttype_alias,
+                            pers_out}
+                    ]),
+                    {ok, Res};
+                Else ->
+                    Else
+            end;
+        {true, false} ->
+            %% Человека выгнали из сообщества
+            case Function(Con, [
+                {live_community_id, null}
+                |proplists:delete(live_community_id, Params)
+            ]) of
+                {ok, Res} ->
+                    empdb_dao_communityhist:create(Con, [
+                        {community_id,
+                            proplists:get_value(live_community_id, Mbperspl)},
+                        {pers_id,
+                            proplists:get_value(id, Mbperspl)},
+                        {communityhisttype_alias,
+                            pers_exile}
+                    ]),
+                    {ok, Res};
+                Else ->
+                    Else
+            end;
+        {false, _} ->
+            {error, forbiden}
+    end;
+
+    
+update(Con, {_pname, _pvalue}, {Function, [Params]}, Mbperspl) ->
     Function(Con, Params).
 
 
@@ -631,7 +779,7 @@ get(Params)->
         )
     end).
 
-get(Params, Fileds)->
+get(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
         empdb_dao_pers:get(
             Con,
@@ -639,7 +787,7 @@ get(Params, Fileds)->
                 {isdeleted, false}
                 |get_tfparams(Con, Params)
             ],
-            Fileds
+            Fields
         )
     end).
 
@@ -686,194 +834,199 @@ get_opt(Params, Options)->
         get_opt(Con, Params, Options, Userpls)
     end).
 
-get_opt(Params, Fileds, Options)->
+get_opt(Params, Fields, Options)->
     empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)], Fileds),
-        get_opt(Con, Params, Options, Userpls)
+        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)], Fields),
+        get_opt(Con, [{fields, Fields}|Params], Options, Userpls)
     end).
 
 get_opt(Con, Params, [], Proplist)
     -> {ok, Proplist};
 
 get_opt(Con,Params, [Option|Options], [{Acc}])->
-    ?empdb_debug("Option = ~p~n", [Option]),
-    case Option of
-        nfriends ->
-            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-                {undefined, undefined} ->
-                    get_opt(Con, Params, Options, [{Acc}]);
-                {undefined, Nick} ->
-                    {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
-                        {friendtype_alias, friend},
-                        {pers_nick, Nick}
-                    ]),
-                    get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}]);
-                {Id, _} ->
-                    {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
-                        {friendtype_alias, friend},
-                        {pers_id, Id}
-                    ]),
-                    get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}])
-            end;
-        nfoes ->
-            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-                {undefined, undefined} ->
-                    get_opt(Con, Params, Options, [{Acc}]);
-                {undefined, Nick} ->
-                    {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
-                        {friendtype_alias, foe},
-                        {pers_nick, Nick}
-                    ]),
-                    get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}]);
-                {Id, _} ->
-                    {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
-                        {friendtype_alias, foe},
-                        {pers_id, Id}
-                    ]),
-                    get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}])
-            end;
-        blog ->
-            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-                {undefined, undefined} ->
-                    get_opt(Con, Params, Options, [{Acc}]);
-                {Id, Nick} ->
-                    case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                        {'or', [
-                            {owner_id,      Id},
-                            {owner_nick,    Nick}
-                        ]},
-                        {limit, 1},
-                        {fields, [
-                            nposts,
-                            npublicposts,
-                            nprotectedposts,
-                            ncomments,
-                            id,
-                            read_acctype_id,
-                            read_acctype_alias,
-                            comm_acctype_id,
-                            comm_acctype_alias,
-                            contype_id,
-                            contype_alias,
-                            vcounter
-                        ]}
-                    ])) of
-                        {ok, [Blog|_]} ->
-                            get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}]);
+    Fields = proplists:get_value(fields, Params, []),
+    case lists:member(Option, Fields) or (Fields =:= []) of
+        true ->
+            case Option of
+                nfriends ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {undefined, Nick} ->
+                            {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                                {friendtype_alias, friend},
+                                {pers_nick, Nick}
+                            ]),
+                            get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}]);
+                        {Id, _} ->
+                            {ok,[{[{count,Nfriends}]}]} = empdb_dao_friend:count(Con, [
+                                {friendtype_alias, friend},
+                                {pers_id, Id}
+                            ]),
+                            get_opt(Con, Params, Options, [{[{nfriends, Nfriends}|Acc]}])
+                    end;
+                nfoes ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {undefined, Nick} ->
+                            {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
+                                {friendtype_alias, foe},
+                                {pers_nick, Nick}
+                            ]),
+                            get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}]);
+                        {Id, _} ->
+                            {ok,[{[{count,Nfoes}]}]} = empdb_dao_friend:count(Con, [
+                                {friendtype_alias, foe},
+                                {pers_id, Id}
+                            ]),
+                            get_opt(Con, Params, Options, [{[{nfoes, Nfoes}|Acc]}])
+                    end;
+                blog ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Id, Nick} ->
+                            case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+                                {'or', [
+                                    {owner_id,      Id},
+                                    {owner_nick,    Nick}
+                                ]},
+                                {limit, 1},
+                                {fields, [
+                                    nposts,
+                                    npublicposts,
+                                    nprotectedposts,
+                                    ncomments,
+                                    id,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ])) of
+                                {ok, [Blog|_]} ->
+                                    get_opt(Con, Params, Options, [{[{blog, Blog}|Acc]}]);
+                                _ ->
+                                    get_opt(Con, Params, Options, [{[{blog, null}|Acc]}])
+                            end
+                    end;
+                album ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Id, Nick} ->
+                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                                {'or', [
+                                    {owner_id,      Id},
+                                    {owner_nick,    Nick}
+                                ]},
+                                {limit, 1},
+                                {fields, [
+                                    nposts,
+                                    npublicposts,
+                                    nprotectedposts,
+                                    ncomments,
+                                    id,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ])) of
+                                {ok, [Album|_]} ->
+                                    get_opt(Con, Params, Options, [{[{album, Album}|Acc]}]);
+                                _ ->
+                                    get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
+                            end
+                    end;
+                community ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Id, Nick} ->
+                            case empdb_dao_community:get(Con, [
+                                {'or', [
+                                    {owner_id,      Id},
+                                    {owner_nick,    Nick}
+                                ]},
+                                {limit, 1},
+                                {fields, [
+                                    ncands,
+                                    nmembs,
+                                    head,
+                                    id,
+                                    communitytype_id,
+                                    communitytype_alias,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ]) of
+                                {ok, [Community|_]} ->
+                                    get_opt(Con, Params, Options, [{[{community, Community}|Acc]}]);
+                                _ ->
+                                    get_opt(Con, Params, Options, [{[{community, null}|Acc]}])
+                            end
+                    end;
+                without_phash ->
+                    Nacc = proplists:delete(phash,
+                        proplists:delete(pass, Acc)
+                    ),
+                    get_opt(Con, Params, Options, [{Nacc}]);
+                %% ------------------------------------------------------------------
+                {perm_list, Spec} when erlang:is_list(Spec) ->
+                    {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, Spec),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                {perm_list, Spec} when erlang:is_atom(Spec) ->
+                    {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [Spec]),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                perm_list ->
+                    {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                perm_names ->
+                    {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),
+                    Perm_names = lists:map(fun({Permpl})->
+                        empdb_convert:to_atom(proplists:get_value(alias, Permpl))
+                    end, Perm_list),
+                    get_opt(Con, Params, Options, [{[{perm_names, Perm_names}|Acc]}]);
+                %% ------------------------------------------------------------------
+                {group_list, Spec} when erlang:is_list(Spec) ->
+                    {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, Spec),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                {group_list, Spec} when erlang:is_atom(Spec) ->
+                    {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, [Spec]),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                group_list ->
+                    {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, [alias]),
+                    get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
+                {room_, Fields} ->
+                    Roompl_ = case empdb_dao_room:get(Con,
+                        [{id, proplists:get_value(room_id, Acc, null)}],
+                        Fields
+                    ) of
+                        {ok, [{Roompl}]} ->
+                            lists:map(fun({Key, Value})->
+                                {list_to_atom("room_" ++ atom_to_list(Key)), Value}
+                            end, Roompl);
                         _ ->
-                            get_opt(Con, Params, Options, [{[{blog, null}|Acc]}])
-                    end
+                            []
+                    end,
+                    get_opt(Con, Params, Options, [{lists:append(Roompl_, Acc)}]);
+                _ ->
+                    get_opt(Con, Params, Options, [{Acc}])
             end;
-        album ->
-            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-                {undefined, undefined} ->
-                    get_opt(Con, Params, Options, [{Acc}]);
-                {Id, Nick} ->
-                    case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                        {'or', [
-                            {owner_id,      Id},
-                            {owner_nick,    Nick}
-                        ]},
-                        {limit, 1},
-                        {fields, [
-                            nposts,
-                            npublicposts,
-                            nprotectedposts,
-                            ncomments,
-                            id,
-                            read_acctype_id,
-                            read_acctype_alias,
-                            comm_acctype_id,
-                            comm_acctype_alias,
-                            contype_id,
-                            contype_alias,
-                            vcounter
-                        ]}
-                    ])) of
-                        {ok, [Album|_]} ->
-                            get_opt(Con, Params, Options, [{[{album, Album}|Acc]}]);
-                        _ ->
-                            get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
-                    end
-            end;
-        community ->
-            case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
-                {undefined, undefined} ->
-                    get_opt(Con, Params, Options, [{Acc}]);
-                {Id, Nick} ->
-                    case empdb_dao_community:get(Con, [
-                        {'or', [
-                            {owner_id,      Id},
-                            {owner_nick,    Nick}
-                        ]},
-                        {limit, 1},
-                        {fields, [
-                            ncands,
-                            nmembs,
-                            head,
-                            id,
-                            communitytype_id,
-                            communitytype_alias,
-                            read_acctype_id,
-                            read_acctype_alias,
-                            comm_acctype_id,
-                            comm_acctype_alias,
-                            contype_id,
-                            contype_alias,
-                            vcounter
-                        ]}
-                    ]) of
-                        {ok, [Community|_]} ->
-                            get_opt(Con, Params, Options, [{[{community, Community}|Acc]}]);
-                        _ ->
-                            get_opt(Con, Params, Options, [{[{community, null}|Acc]}])
-                    end
-            end;
-        without_phash ->
-            Nacc = proplists:delete(phash,
-                proplists:delete(pass, Acc)
-            ),
-            get_opt(Con, Params, Options, [{Nacc}]);
-        %% ------------------------------------------------------------------
-        {perm_list, Spec} when erlang:is_list(Spec) ->
-            {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, Spec),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
-        {perm_list, Spec} when erlang:is_atom(Spec) ->
-            {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [Spec]),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
-        perm_list ->
-            {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
-        perm_names ->
-            {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),
-            Perm_names = lists:map(fun({Permpl})->
-                empdb_convert:to_atom(proplists:get_value(alias, Permpl))
-            end, Perm_list),
-            get_opt(Con, Params, Options, [{[{perm_names, Perm_names}|Acc]}]);
-        %% ------------------------------------------------------------------
-        {group_list, Spec} when erlang:is_list(Spec) ->
-            {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, Spec),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
-        {group_list, Spec} when erlang:is_atom(Spec) ->
-            {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, [Spec]),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);
-        group_list ->
-            {ok, Perm_list} = empdb_dao_pers:get_group(Con, Params, [alias]),
-            get_opt(Con, Params, Options, [{[{perm_list, Perm_list}|Acc]}]);    
-        {room_, Fields} ->
-            Roompl_ = case empdb_dao_room:get(Con, 
-                [{id, proplists:get_value(room_id, Acc, null)}], 
-                Fields
-            ) of
-                {ok, [{Roompl}]} ->
-                    lists:map(fun({Key, Value})->
-                        {list_to_atom("room_" ++ atom_to_list(Key)), Value} 
-                    end, Roompl);
-                _ -> 
-                    []
-            end,
-            get_opt(Con, Params, Options, [{lists:append(Roompl_, Acc)}]);
-        _ ->
+        false ->
             get_opt(Con, Params, Options, [{Acc}])
     end;
 
@@ -990,9 +1143,9 @@ get_emotion(Params)->
         empdb_dao_pers:get_emotion(Con, [{isdeleted, false}|Params])
     end).
 
-get_emotion(Params, Fileds)->
+get_emotion(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_emotion(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_pers:get_emotion(Con, [{isdeleted, false}|Params], Fields)
     end).
 
 update_emotion(Params)->
@@ -1009,9 +1162,9 @@ get_pgroup(Params)->
         empdb_dao_pers:get_pgroup(Con, [{isdeleted, false}|Params])
     end).
 
-get_pgroup(Params, Fileds)->
+get_pgroup(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_pgroup(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_pers:get_pgroup(Con, [{isdeleted, false}|Params], Fields)
     end).
 
 update_pgroup(Params)->
@@ -1028,9 +1181,9 @@ get_mstatus(Params)->
         empdb_dao_pers:get_mstatus(Con, [{isdeleted, false}|Params])
     end).
 
-get_mstatus(Params, Fileds)->
+get_mstatus(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_mstatus(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_pers:get_mstatus(Con, [{isdeleted, false}|Params], Fields)
     end).
 
 update_mstatus(Params)->
@@ -1047,9 +1200,9 @@ get_pstatus(Params)->
         empdb_dao_pers:get_pstatus(Con, [{isdeleted, false}|Params])
     end).
 
-get_pstatus(Params, Fileds)->
+get_pstatus(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_pstatus(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_pers:get_pstatus(Con, [{isdeleted, false}|Params], Fields)
     end).
 
 update_pstatus(Params)->
@@ -1066,9 +1219,9 @@ get_authority(Params)->
         empdb_dao_pers:get_authority(Con, [{isdeleted, false}|Params])
     end).
 
-get_authority(Params, Fileds)->
+get_authority(Params, Fields)->
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_pers:get_authority(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_pers:get_authority(Con, [{isdeleted, false}|Params], Fields)
     end).
 
 update_authority(Params)->
