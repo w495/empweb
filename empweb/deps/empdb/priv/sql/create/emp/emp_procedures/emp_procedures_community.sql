@@ -37,10 +37,22 @@ begin
                     authority
                 where
                     authority.id = new.cands_gte_authority_id);
+        new.cands_gte_authority_level =
+            (select authority.level
+                from
+                    authority
+                where
+                    authority.id = new.cands_gte_authority_id);
     end if;
     if new.cands_gte_authority_alias != old.cands_gte_authority_alias then
         new.cands_gte_authority_id =
             (select authority.id
+                from
+                    authority
+                where
+                    authority.alias = new.cands_gte_authority_alias);
+        new.cands_gte_authority_level =
+            (select authority.level
                 from
                     authority
                 where
@@ -55,10 +67,22 @@ begin
                     authority
                 where
                     authority.id = new.read_gte_authority_id);
+        new.read_gte_authority_level =
+            (select authority.level
+                from
+                    authority
+                where
+                    authority.id = new.read_gte_authority_id);
     end if;
     if new.read_gte_authority_alias != old.read_gte_authority_alias then
         new.read_gte_authority_id =
             (select authority.id
+                from
+                    authority
+                where
+                    authority.alias = new.read_gte_authority_alias);
+        new.read_gte_authority_level =
+            (select authority.level
                 from
                     authority
                 where
@@ -107,11 +131,23 @@ begin
                     communitytype
                 where
                     communitytype.id = new.cands_gte_authority_id);
+        new.cands_gte_authority_level =
+            (select communitytype.level
+                from
+                    communitytype
+                where
+                    communitytype.id = new.cands_gte_authority_id);
     end if;
     if (new.cands_gte_authority_id is null)
         and (not (new.cands_gte_authority_alias is null)) then
         new.cands_gte_authority_id =
             (select communitytype.id
+                from
+                    communitytype
+                where
+                    communitytype.alias = new.cands_gte_authority_alias);
+        new.cands_gte_authority_level =
+            (select communitytype.level
                 from
                     communitytype
                 where
@@ -127,11 +163,23 @@ begin
                     communitytype
                 where
                     communitytype.id = new.read_gte_authority_id);
+        new.read_gte_authority_level =
+            (select communitytype.level
+                from
+                    communitytype
+                where
+                    communitytype.id = new.read_gte_authority_id);
     end if;
     if (new.read_gte_authority_id is null)
         and (not (new.read_gte_authority_alias is null)) then
         new.read_gte_authority_id =
             (select communitytype.id
+                from
+                    communitytype
+                where
+                    communitytype.alias = new.read_gte_authority_alias);
+        new.read_gte_authority_level =
+            (select communitytype.level
                 from
                     communitytype
                 where

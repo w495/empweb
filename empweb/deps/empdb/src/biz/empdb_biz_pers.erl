@@ -266,7 +266,7 @@ update(Params)->
     end.
 
 update_(Params)->
-    empdb:with_transaction(fun(Con)->
+    empdb_dao:with_transaction(fun(Con)->
         Pers =
             empdb_dao_pers:get(Con,[
                 {id,    proplists:get_value(id,   Params)}

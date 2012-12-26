@@ -584,14 +584,16 @@
 -- 2012.12.25 17:22:06:355620587 ---------------------------------------------
 
 
-
     alter table community add column read_gte_authority_id
-        decimal         references authority(id) default null;
+        decimal references authority(id) default null;
     alter table community add column read_gte_authority_alias
-        varchar(1024)   references authority(alias) default null;
-        
+        varchar(1024) references authority(alias) default null;
     alter table community add column cands_gte_authority_id
-        decimal         references authority(id) default null;
+        decimal references authority(id) default null;
     alter table community add column cands_gte_authority_alias
-        varchar(1024)   references authority(alias) default null;
-        
+        varchar(1024) references authority(alias) default null;
+    alter table community add column read_gte_authority_level
+        numeric default null;
+    alter table community add column cands_gte_authority_level
+        numeric default null;
+
