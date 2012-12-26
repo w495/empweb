@@ -54,7 +54,7 @@ create(Params)->
                             |proplists:delete(pers_nick, Params)
                         ]);
                     Else ->
-                        Else
+                        {error, pers_nick_do_not_exists}
                 end
         end
     end).

@@ -122,7 +122,15 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:get(Data#norm.return)
+                    empweb_biz_claim:get(
+                        empweb_norm:filter_owner([
+                            {pers_id_, Pers_id}
+                            |Data#norm.return
+                        ], {
+                            pers_id_,
+                            owner_id
+                        })
+                    )
                 ),
                 Hap
             }
@@ -165,7 +173,15 @@ handle(_req, #empweb_hap{
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:count(Data#norm.return)
+                    empweb_biz_claim:count(
+                        empweb_norm:filter_owner([
+                            {pers_id_, Pers_id}
+                            |Data#norm.return
+                        ], {
+                            pers_id_,
+                            owner_id
+                        })
+                    )
                 ),
                 Hap
             }

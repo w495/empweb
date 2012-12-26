@@ -23,7 +23,11 @@
     normpair/2,
     normfilter/1,
     filter/1,
+    fieldtrigger/2,
+    fieldtrigger/3,
     filter_owner/1,
+    filter_owner/2,
+    filter_owner/3,
     filter_self/1
 ]).
 
@@ -38,18 +42,26 @@
 %%      докуметы конкретного пользователя, pers_id --- список своих документов.
 %%
 filter_owner(Params) ->
+    filter_owner(Params, {owner_id, pers_id}).
+
+filter_owner(Params, {F1, F2}) ->
+    filter_owner(Params, {F1, F2}, []).
+
+filter_owner(Params, {F1, F2}, Options) ->
     case {
-        proplists:get_value(owner_id, Params),
-        proplists:get_value(pers_id, Params)
+        proplists:get_value(F1, Params),
+        proplists:get_value(F2, Params)
     } of
         {all     , _      } ->
-            proplists:delete(pers_id, proplists:delete(owner_id, Params));
-        {undefined, Pers_id} ->
-            [{owner_id, Pers_id}|proplists:delete(pers_id, Params)];
-        {_owner_id, _      } ->
-            proplists:delete(pers_id, Params)
+            proplists:delete(F2, proplists:delete(F1, Params));
+        {undefined, Value2} ->
+            [{F1, Value2}|proplists:delete(F2, Params)];
+        {_value1, _      } ->
+            proplists:delete(F2, Params)
     end.
 
+fieldtrigger(Params, {F1, F2}) ->
+    fieldtrigger(Params, {F1, F2}, []).
 
 fieldtrigger(Params, {F1, F2}, Options) ->
     case {

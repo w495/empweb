@@ -117,8 +117,7 @@ handle(_req, #empweb_hap{
                         empweb_norm:filter_owner([
                             {pers_id, Pers_id}
                             |Data#norm.return
-                        ]),
-                        proplists:get_value(fields, Data#norm.return, [])
+                        ])
                     )
                 ),
                 Hap
