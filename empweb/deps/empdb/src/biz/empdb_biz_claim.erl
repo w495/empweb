@@ -39,7 +39,24 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_claim:create(Con, Params)
+        case proplists:get_value(pers_nick, Params) of
+            undefined ->
+                empdb_dao_claim:create(Con, Params);
+            Nick ->
+                case empdb_dao_pers:get(Con, [
+                    {nick, Nick},
+                    {fields, [id]},
+                    {limit, 1}
+                ]) of
+                    {ok, [{[{id, Id}]}]} ->
+                        empdb_dao_claim:create(Con, [
+                            {pers_id, Id}
+                            |proplists:delete(pers_nick, Params)
+                        ]);
+                    Else ->
+                        Else
+                end
+        end
     end).
 
 update(Params)->
@@ -49,13 +66,16 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-%         get_adds(
-%             Con,
-            empdb_dao_claim:get(Con, [{isdeleted, false}|Params])
-%         )
+        get_adds(
+            Con,
+            empdb_dao_claim:get(Con, [{isdeleted, false}|Params]),
+            Params
+        )
     end).
 
-get_adds(Con, {ok, Res}) ->
+get_adds(Con, {ok, Res}, Params) ->
+    Fields = proplists:get_value(fields, Params, []),
+    % case lists:member(Option, Fields) or (Fields =:= []) of
     {ok,
         lists:map(
             fun({Itempl})->
@@ -70,21 +90,50 @@ get_adds(Con, {ok, Res}) ->
                             {fields, [authority_id, authority_alias]}
                         ]
                     ),
-                {[
-                    {pers_authority_id,
-                        proplists:get_value(authority_id, Ownerpl)
-                    },
-                    {pers_authority_alias,
-                        proplists:get_value(authority_alias, Ownerpl)
-                    }
-                    |Itempl
-                ]}
+                {ok, [{Perspl}]} =
+                    empdb_dao_pers:get(
+                        Con,
+                        [
+                            {'or', [
+                                {id,    proplists:get_value(pers_id,   Itempl)},
+                                {nick,  proplists:get_value(pers_nick, Itempl)}
+                            ]},
+                            {fields, [authority_id, authority_alias]}
+                        ]
+                    ),
+                {
+                    lists:foldl(
+                        fun({Key, Value}, Acc)->
+                            case lists:member(Key, Fields) or (Fields =:= []) of
+                                true ->
+                                    [{Key, Value}|Acc];
+                                false ->
+                                    Acc
+                            end
+                        end,
+                        Itempl,
+                        [
+                            {owner_authority_id,
+                                proplists:get_value(authority_id, Ownerpl)
+                            },
+                            {owner_authority_alias,
+                                proplists:get_value(authority_alias, Ownerpl)
+                            },
+                            {pers_authority_id,
+                                proplists:get_value(authority_id, Perspl)
+                            },
+                            {pers_authority_alias,
+                                proplists:get_value(authority_alias, Perspl)
+                            }
+                        ]
+                    )
+                }
             end,
             Res
         )
     };
 
-get_adds(_Con, Else) ->
+get_adds(_Con, Else, Params) ->
     Else.
 
 get(Params, Fileds)->

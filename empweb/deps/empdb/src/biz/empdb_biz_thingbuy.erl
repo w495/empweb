@@ -121,7 +121,28 @@ create(Params)->
 
 update(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingbuy:update(Con, Params)
+        case empdb_dao_thingbuy:update(Con, Params) of
+            {ok, [{Respl}]} ->
+                {ok, _} = empdb_dao_thingwish:update(Con, [
+                    {filter, [
+                        {'or', [
+                            {thing_id,     proplists:get_value(thing_id,    Respl, null)},
+                            {thing_alias,  proplists:get_value(thing_alias, Respl, null)}
+                        ]},
+                        {'or', [
+                            {owner_id,    proplists:get_value(owner_id,   Respl, null)},
+                            {owner_nick,  proplists:get_value(owner_nick, Respl, null)}
+                        ]},
+                        {isdeleted, false}
+                    ]},
+                    {values, [
+                        {isdeleted, true}
+                    ]}
+                ]),
+                {ok, [{Respl}]};
+            Else ->
+                Else
+        end
     end).
 
 get(Params)->

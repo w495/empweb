@@ -597,3 +597,26 @@
     alter table community add column cands_gte_authority_level
         numeric default null;
 
+
+    alter table pers add column authority_level
+        numeric default null;
+
+
+
+/**
+ *  Действия пользователя
+**/
+create sequence seq_actiontype_id;
+create table actiontype(
+    id          decimal primary key default nextval('seq_actiontype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    ispaid      boolean         default false,
+    price       decimal         default 0,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+

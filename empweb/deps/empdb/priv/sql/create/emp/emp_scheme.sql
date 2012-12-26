@@ -35,7 +35,7 @@ create table lang(
     name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 /**
@@ -51,7 +51,7 @@ create table trtype(
     name_ti         decimal unique default nextval('seq_any_ti'),
     descr           varchar(1024),
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 
@@ -92,7 +92,7 @@ create table tr(
     trtype_alias    varchar(1024)   references trtype(alias)    default null,
     text            text default null,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false,
+    isdeleted       boolean default false,
     constraint      tr_ti_lang_id_many_key unique (ti,lang_id)
 );
 
@@ -115,7 +115,7 @@ create table filetype(
     ext         varchar(1024)   default null,
     dir         varchar(1024)   default null,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -129,7 +129,7 @@ create table fileinfotype(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -155,7 +155,7 @@ create table fileinfo(
     filetype_alias      varchar(1024)                   default null,
 
     created             timestamp without time zone not null    default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 /**
@@ -176,13 +176,13 @@ create table file(
         Информация о файле на файловой системе
     **/
     fsfileinfo_id   decimal references fileinfo(id)    default null,
-    issystem        bool default false,
+    issystem        boolean default false,
 
     tokenlong       decimal                             default null,
     tokenstring     char(128)                           default null,
 
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 
@@ -195,7 +195,24 @@ alter table fileinfo add column
                                 ПОЛЬЗОВАТЕЛЬ
     =====================================================================
 ****************************************************************************/
-
+/*
+/**
+ *  Действия пользователя
+**/
+create sequence seq_actiontype_id;
+create table actiontype(
+    id          decimal primary key default nextval('seq_actiontype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    ispaid      boolean         default false,
+    price       decimal         default 0,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+*/
 
 /**
  *  Эмоция пользователя
@@ -209,7 +226,7 @@ create table emotion(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 /**
@@ -232,8 +249,9 @@ create table authority(
     
     level       decimal default 0,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
+
 
 /**
  *  Статус пользователя: оnline/offline/забанен
@@ -247,7 +265,7 @@ create table pstatus(
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -263,7 +281,7 @@ create table mstatus(
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 -- --
@@ -283,7 +301,7 @@ create table mstatus(
 --     **/
 --     name_ti     decimal unique default nextval('seq_any_ti'),
 --     alias       varchar(1024) unique,
---     isdeleted     bool default false
+--     isdeleted     boolean default false
 -- );
 -- -- ----------------------------------------------------------------------
 -- --
@@ -298,7 +316,7 @@ create table perspichead(
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 create sequence seq_perspicbody_id;
@@ -310,7 +328,7 @@ create table perspicbody(
     name_ti     decimal unique default nextval('seq_any_ti'),
     file_id     decimal references file(id) default null,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -327,7 +345,7 @@ create table perspicbody(
 --     alias       varchar(1024),
 --     pregion_id  decimal references pregion(id)     default null,
 --     created     timestamp without time zone not null default utcnow(),
---     isdeleted   bool default false,
+--     isdeleted   boolean default false,
 --     constraint  pregion_alias_pregion_id_many_key unique (alias,pregion_id)
 -- );
 
@@ -371,7 +389,7 @@ create table geo(
     **/
     nnodes          decimal default 0,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -423,7 +441,7 @@ create table pers(
     
     birthday    timestamp       without time zone not null default utcnow(),
     -- gender_id           decimal references gender(id)      default null,
-    ismale      bool    default false,
+    ismale      boolean    default false,
     /**
         ------------------------------------------------------------
             Информация о персоонаже
@@ -440,7 +458,7 @@ create table pers(
     **/
     authority_id        decimal         references authority(id)        default null,
     authority_alias     varchar(1024)   references authority(alias)     default null,
-
+    authority_level     numeric         default null,
     /**
         Опыт пользователя,
         некоторая непрерывная велицина.
@@ -513,7 +531,7 @@ create table pers(
     
     own_room_head       varchar(1024) /*references doc(head)*/ default null,
     
-    -- allowauctoffer      bool default false,
+    -- allowauctoffer      boolean default false,
     perspicbody_id      decimal references perspicbody(id)   default null,
     perspichead_id      decimal references perspichead(id)   default null,
     /**
@@ -545,7 +563,7 @@ create table pers(
     /**
         флаг удаления
     **/    
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 alter table file add column owner_id
@@ -572,9 +590,9 @@ create table pgroup (
     **/
     name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
-    issystem        bool    default false,
+    issystem        boolean    default false,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 /**
@@ -589,7 +607,7 @@ create table permtype (
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool    default false
+    isdeleted   boolean    default false
 );
 
 /**
@@ -604,7 +622,7 @@ create table permentitytype (
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool    default false
+    isdeleted   boolean    default false
 );
 
 
@@ -638,7 +656,7 @@ create table friendtype (
     name_ti     decimal unique default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool    default false
+    isdeleted   boolean    default false
 );
 
 
@@ -676,7 +694,7 @@ create table sysvartype(
     alias           varchar(1024) not null unique,
     name_ti         decimal unique default nextval('seq_any_ti'),
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 /**
@@ -692,7 +710,7 @@ create table sysvar(
     sysvar_id       decimal references sysvar(id),
     name_ti         decimal unique default nextval('seq_any_ti'),
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 
@@ -716,7 +734,7 @@ create table oktype(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -734,7 +752,7 @@ create table acctype(
     name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 /**
@@ -750,7 +768,7 @@ create table contype(
     name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 /**
@@ -767,7 +785,7 @@ create table doctype(
     name_ti         decimal unique default nextval('seq_any_ti'),
     alias           varchar(1024)   unique,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 
@@ -826,7 +844,7 @@ create table doc(
     /**
         Оповещение комментов
     **/
-    commnotice          bool default false,
+    commnotice          boolean default false,
     /**
         количество детей (дочерних элементов)
     **/
@@ -862,10 +880,10 @@ create table doc(
     /**
         флаг удаления
     **/
-    isrepost            bool default false,
-    isrepostable        bool default true,
+    isrepost            boolean default false,
+    isrepostable        boolean default true,
     
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -887,7 +905,7 @@ create table attachtype(
     name_ti           decimal unique default nextval('seq_any_ti'),
     alias             varchar(1024)   unique,
     created           timestamp without time zone not null default utcnow(),
-    isdeleted         bool default false
+    isdeleted         boolean default false
 );
 
 create table attach(
@@ -914,7 +932,7 @@ create table repost(
     orig_owner_id     decimal         references pers(id)     default null,
     orig_owner_nick   varchar(1024)                           default null,
     created           timestamp without time zone not null default utcnow(),
-    isdeleted         bool default false
+    isdeleted         boolean default false
 );
 
 ------------------------------------------------------------------------------
@@ -993,7 +1011,7 @@ create table album(
     /**
         Разрешение на перепост
     **/
-    repost              bool default false
+    repost              boolean default false
 );
 
 create table photo(
@@ -1004,7 +1022,7 @@ create table photo(
     /**
         Разрешение на перепост
     **/
-    is_cover            bool default false
+    is_cover            boolean default false
 );
 
 
@@ -1016,7 +1034,7 @@ create table vote(
     pers_nick           varchar(1024)   default null,
     rating              numeric         default null,
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false,
+    isdeleted           boolean default false,
     constraint          room2topic_doc_id_pers_id_many_key    unique (doc_id, pers_id)
 );
 
@@ -1042,7 +1060,7 @@ create table roomtype(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -1069,7 +1087,7 @@ create table chatlang(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -1126,7 +1144,7 @@ create table topic(
     **/
     nnodes          decimal default 0,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -1140,7 +1158,7 @@ create table regimen(
     descr_ti    decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -1219,7 +1237,7 @@ create table communitytype(
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 /**
@@ -1254,7 +1272,7 @@ create table communityhisttype(
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp       without time zone not null default utcnow(),
-    isdeleted   bool            default false
+    isdeleted   boolean            default false
 );
 
 
@@ -1271,7 +1289,7 @@ create table communityhist(
     communityhisttype_alias     varchar(1024)   references communityhisttype(alias) default null,
 
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1284,7 +1302,7 @@ create table communitycand (
     pers_id             decimal references pers(id) not null,
     community_id        decimal references community(doc_id) not null,
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 /**
@@ -1296,7 +1314,7 @@ create table communitymemb (
     pers_id             decimal references pers(id) not null,
     community_id        decimal references community(doc_id) not null,
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 alter table pers add column live_community_id
@@ -1315,7 +1333,7 @@ create table noticetype(
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp       without time zone not null default utcnow(),
-    isdeleted   bool            default false
+    isdeleted   boolean            default false
 );
 
 create table notice(
@@ -1343,7 +1361,7 @@ create table eventtype(
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp       without time zone not null default utcnow(),
-    isdeleted   bool            default false
+    isdeleted   boolean            default false
 );
 
 
@@ -1370,7 +1388,7 @@ create table messagetype(
     **/
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    isdeleted   bool default false
+    isdeleted   boolean default false
 );
 
 
@@ -1387,11 +1405,11 @@ create table message(
     /**
         Удалено для отправителя (из почтового ящика отправителя)
     **/
-    isdfo               bool default false,
+    isdfo               boolean default false,
     /**
         Удалено для получателя (из почтового ящика получателя)
     **/
-    isdfr               bool default false
+    isdfr               boolean default false
 );
 
 ------------------------------------------------------------------------------
@@ -1441,7 +1459,7 @@ create table roombet(
     price           numeric(1000, 2)    default 0,
 
     created         timestamp without time zone not null    default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 
@@ -1474,7 +1492,7 @@ create table roomoffer(
     price           numeric(1000, 2) default 0,
 
     created         timestamp without time zone not null    default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 */
@@ -1522,7 +1540,7 @@ create table thingtype(
     nnodes              decimal default 0,
 
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 
@@ -1553,7 +1571,7 @@ create table thing(
     price           numeric(1000, 2)   default null,
     
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 
@@ -1594,7 +1612,7 @@ create table renttype(
     nnodes              decimal default 0,
 
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 
@@ -1625,7 +1643,7 @@ create table rent(
     price           numeric(1000, 2)   default null,
 
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool    default false
+    isdeleted       boolean    default false
 );
 
 
@@ -1640,7 +1658,7 @@ create table rent(
 --     **/
 --     name_ti     decimal unique      default nextval('seq_any_ti'),
 --     alias       varchar(1024)   unique,
---     isdeleted   bool default false
+--     isdeleted   boolean default false
 -- );
 
 /**
@@ -1675,7 +1693,7 @@ create table thingbuy (
     -- expired             timestamp without time zone          default null,
 
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1706,7 +1724,7 @@ create table thingwish (
     -- expired             timestamp without time zone          default null,
 
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1734,7 +1752,7 @@ create table experbuy (
     price               numeric(1000, 2)    default null,
 
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1756,7 +1774,7 @@ create table roomexperbuy (
     price               numeric(1000, 2)    default null,
 
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1768,7 +1786,7 @@ create table roomexperbuy (
 --     **/
 --     name_ti     decimal unique      default nextval('seq_any_ti'),
 --     alias       varchar(1024)   unique,
---     isdeleted   bool default false
+--     isdeleted   boolean default false
 -- );
 
 
@@ -1779,10 +1797,10 @@ create table transtype (
         Номер языковой сущности
     **/
     name_ti         decimal unique      default nextval('seq_any_ti'),
-    isincome        bool                default null,
+    isincome        boolean                default null,
     alias           varchar(1024)   unique,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 create sequence seq_rptrans_id;
@@ -1795,7 +1813,7 @@ create table rptrans (
     transtype_alias    varchar(1024)   references transtype(alias)   default null,
     price              numeric(1000, 2)    default null,
     created            timestamp without time zone not null default utcnow(),
-    isdeleted          bool default false
+    isdeleted          boolean default false
 );
 
 
@@ -1809,7 +1827,7 @@ create table cptrans (
     transtype_alias    varchar(1024)   references transtype(alias)   default null,
     price              numeric(1000, 2)    default null,
     created            timestamp without time zone not null default utcnow(),
-    isdeleted          bool default false
+    isdeleted          boolean default false
 );
 
 
@@ -1821,10 +1839,10 @@ create table treastype (
         Номер языковой сущности
     **/
     name_ti         decimal unique      default nextval('seq_any_ti'),
-    isincome        bool                default null,
+    isincome        boolean                default null,
     alias           varchar(1024)   unique,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 create sequence seq_roomtreas_id;
@@ -1843,11 +1861,11 @@ create table roomtreas (
     room_id            decimal         references room(doc_id)       not null,
     treastype_id       decimal         references treastype(id)      default null,
     treastype_alias    varchar(1024)   references treastype(alias)   default null,
-    isincome           bool            default null,
+    isincome           boolean            default null,
     price              numeric(1000, 2)    default null,
     info               varchar(1024)   default null,
     created            timestamp without time zone not null default utcnow(),
-    isdeleted          bool default false
+    isdeleted          boolean default false
 );
 
 
@@ -1868,11 +1886,11 @@ create table communitytreas (
     community_id       decimal         references community(doc_id)       not null,
     treastype_id       decimal         references treastype(id)      default null,
     treastype_alias    varchar(1024)   references treastype(alias)   default null,
-    isincome           bool            default null,
+    isincome           boolean            default null,
     price              numeric(1000, 2)    default null,
     info               varchar(1024)   default null,
     created            timestamp without time zone not null default utcnow(),
-    isdeleted          bool default false
+    isdeleted          boolean default false
 );
 
 
@@ -1885,10 +1903,10 @@ create table paytype (
     name_ti                 decimal unique default nextval('seq_any_ti'),
     alias                   varchar(1024)   unique,
 
-    isincome                bool default null,
+    isincome                boolean default null,
 
     created                 timestamp without time zone not null default utcnow(),
-    isdeleted               bool default false
+    isdeleted               boolean default false
 );
 
 
@@ -1896,7 +1914,7 @@ create sequence seq_pay_id;
 create table pay (
     id              decimal primary key default nextval('seq_pay_id'),
 
-    isincome                bool default null,
+    isincome                boolean default null,
     price           numeric(1000, 2)    default 0,
     paytype_id      decimal         references paytype(id)      not null,
     paytype_alias   varchar(1024)   references paytype(alias)   not null,
@@ -1904,7 +1922,7 @@ create table pay (
     pers_nick       varchar(1024)   default null       not null,
     info            varchar(1024)   default null,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted       bool default false
+    isdeleted       boolean default false
 );
 
 
@@ -1924,7 +1942,7 @@ create table perm2pgroup (
     perm_id decimal     references perm(id) not null,
     group_id decimal    references pgroup(id) not null,
     created             timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 /**
@@ -1936,7 +1954,7 @@ create table pers2pgroup (
     pers_id decimal     references pers(id) not null,
     group_id decimal    references pgroup(id) not null,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted           bool default false
+    isdeleted           boolean default false
 );
 
 
@@ -1948,7 +1966,7 @@ create table room2topic (
     id                  decimal primary key default     nextval('seq_room2topic_id'),
     topic_id            decimal references topic(id)    not null,
     room_id             decimal references room(doc_id) not null,
-    isdeleted           bool    default false,
+    isdeleted           boolean    default false,
     created             timestamp without time zone not null default utcnow(),
     constraint          room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
 );
@@ -1962,7 +1980,7 @@ create table community2topic (
     id                  decimal primary key default     nextval('seq_community2topic_id'),
     topic_id            decimal references topic(id)    not null,
     community_id             decimal references room(doc_id) not null,
-    isdeleted           bool    default false,
+    isdeleted           boolean    default false,
     created             timestamp without time zone not null default utcnow(),
     constraint          room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
 );
