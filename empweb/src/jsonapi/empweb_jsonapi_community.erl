@@ -98,6 +98,49 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+
+            #norm_rule{
+                key         = back_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = back_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        
+            #norm_rule{
+                key         = wall_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = wall_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = flag_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = flag_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = arms_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = arms_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -173,6 +216,48 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+
+            #norm_rule{
+                key         = back_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = back_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = wall_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = wall_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = flag_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = flag_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = arms_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = arms_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -246,6 +331,49 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+
+            #norm_rule{
+                key         = back_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = back_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+
+            #norm_rule{
+                key         = wall_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = wall_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = flag_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = flag_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = arms_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = arms_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -318,6 +446,49 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+
+
+            #norm_rule{
+                key         = back_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = back_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = wall_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = wall_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = flag_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = flag_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = arms_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = arms_path,
+                required    = false,
+                types       = [nullable, string]
+            },
+
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,

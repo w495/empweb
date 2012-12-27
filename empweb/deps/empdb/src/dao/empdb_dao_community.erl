@@ -18,6 +18,8 @@
     create/2,
     update/2,
     count/2,
+    get_community_topic/2,
+    get_community_topic/3,
     get/2,
     get/3
 ]).
@@ -72,6 +74,14 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
+        back_file_id,
+        back_path,
+        wall_file_id,
+        wall_path,
+        flag_file_id,
+        flag_path,
+        arms_file_id,
+        arms_path,
         nmembs,
         ncands,
         communitytype_id,

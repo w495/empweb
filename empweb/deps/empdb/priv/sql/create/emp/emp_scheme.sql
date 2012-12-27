@@ -1176,6 +1176,31 @@ create table room(
     **/
     chatlang_id         decimal         references chatlang(id)     default null,
     chatlang_alias      varchar(1024)   references chatlang(alias)  default null,
+    
+    /**
+        Фон комнаты
+    **/
+    back_file_id        decimal references file(id)     default null,
+    back_path           varchar(1024)                   default null,
+    
+    /**
+        Обои комнаты
+    **/
+    wall_file_id        decimal references file(id)     default null,
+    wall_path           varchar(1024)                   default null,
+    
+    /**
+        Флаг комнаты
+    **/
+    flag_file_id        decimal references file(id)     default null,
+    flag_path           varchar(1024)                   default null,
+    
+    /**
+        Герб комнаты
+    **/
+    arms_file_id        decimal references file(id)     default null,
+    arms_path           varchar(1024)                   default null,
+    
     /**
         Режим комнаты
     **/
@@ -1206,6 +1231,11 @@ create table room(
     **/
     experlackprice      numeric(1000, 2)         default null,
     treas               numeric(1000, 2) default 1
+
+    
+    
+
+    
 --     bearing - герб
 --     flag - ссылка на картинку флага
 --     wallpaper - ссылка на картинку фона ?????? не закончено
@@ -1259,6 +1289,31 @@ create table community(
     cands_gte_authority_alias         varchar(1024)     references authority(alias) default null,
     cands_gte_authority_level         numeric           default null,
 
+
+    /**
+        Фон сообщества
+    **/
+    back_file_id        decimal references file(id)     default null,
+    back_path           varchar(1024)                   default null,
+
+    /**
+        Обои сообщества
+    **/
+    wall_file_id        decimal references file(id)     default null,
+    wall_path           varchar(1024)                   default null,
+
+    /**
+        Флаг сообщества
+    **/
+    flag_file_id        decimal references file(id)     default null,
+    flag_path           varchar(1024)                   default null,
+
+    /**
+        Герб сообщества
+    **/
+    arms_file_id        decimal references file(id)     default null,
+    arms_path           varchar(1024)                   default null,
+    
     ncands                  decimal default 0,
     nmembs                  decimal default 0,
     slogan                  text default null,

@@ -134,7 +134,15 @@ table({fields, all})->
         exper,
         experlack,
         experlackprice,
-        treas
+        treas,
+        back_file_id,
+        back_path,
+        wall_file_id,
+        wall_path,
+        flag_file_id,
+        flag_path,
+        arms_file_id,
+        arms_path
     ];
 
 %%

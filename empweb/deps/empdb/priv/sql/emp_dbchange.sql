@@ -454,13 +454,13 @@
         topic_id
             decimal references topic(id)    not null,
         community_id
-            decimal references room(doc_id) not null,
+            decimal references community(doc_id) not null,
         isdeleted
             bool    default false,
         created
             timestamp without time zone not null default utcnow(),
         constraint
-            room2topic_topic_id_room_id_many_key    unique (topic_id, room_id)
+            community2topic_topic_id_community_id_many_key    unique (topic_id, community_id)
     );
     alter table room add column authority_id
         decimal         references authority(id)        default null;
@@ -602,7 +602,6 @@
         numeric default null;
 
 
-
 /**
  *  Действия пользователя
 **/
@@ -620,3 +619,82 @@ create table actiontype(
     isdeleted   boolean default false
 );
 
+
+
+
+insert into doctype(alias)
+    values  ('claim');
+
+
+
+alter table room add column back_file_id
+    decimal references file(id)     default null;
+
+alter table room add column back_path
+    varchar(1024)                   default null;
+
+alter table room add column wall_file_id
+    decimal references file(id)     default null;
+
+alter table room add column wall_path
+    varchar(1024)                   default null;
+
+alter table room add column flag_file_id
+    decimal references file(id)     default null;
+
+alter table room add column flag_path
+    varchar(1024)                   default null;
+
+alter table room add column arms_file_id
+    decimal references file(id)     default null;
+
+alter table room add column arms_path
+    varchar(1024)                   default null;
+
+
+
+
+
+alter table community add column back_file_id
+    decimal references file(id)     default null;
+
+alter table community add column back_path
+    varchar(1024)                   default null;
+
+alter table community add column wall_file_id
+    decimal references file(id)     default null;
+
+alter table community add column wall_path
+    varchar(1024)                   default null;
+
+alter table community add column flag_file_id
+    decimal references file(id)     default null;
+
+alter table community add column flag_path
+    varchar(1024)                   default null;
+
+alter table community add column arms_file_id
+    decimal references file(id)     default null;
+
+alter table community add column arms_path
+    varchar(1024)                   default null;
+
+
+
+
+
+create sequence seq_community2topic_id;
+create table community2topic (
+    id
+        decimal primary key default     nextval('seq_community2topic_id'),
+    topic_id
+        decimal references topic(id)    not null,
+    community_id
+        decimal references community(doc_id) not null,
+    isdeleted
+        bool    default false,
+    created
+        timestamp without time zone not null default utcnow(),
+    constraint
+        community2topic_topic_id_community_id_many_key    unique (topic_id, community_id)
+);
