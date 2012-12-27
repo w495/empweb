@@ -45,7 +45,6 @@ norm('update') ->
     [
         #norm_rule{
             key         = id,
-            required    = false,
             types       = [integer]
         }
         |norm([])

@@ -651,10 +651,6 @@ alter table room add column arms_file_id
 alter table room add column arms_path
     varchar(1024)                   default null;
 
-
-
-
-
 alter table community add column back_file_id
     decimal references file(id)     default null;
 
