@@ -667,20 +667,20 @@
 
 create table wall(
     doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    file_id             decimal references file(id)     default null
 );
 
 create table back(
     doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    file_id             decimal references file(id)     default null
 );
 
 create table flag(
     doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    file_id             decimal references file(id)     default null
 );
 
 create table arms(
     doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    file_id             decimal references file(id)     default null
 );
