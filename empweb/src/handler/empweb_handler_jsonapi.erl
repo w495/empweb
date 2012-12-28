@@ -791,6 +791,138 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_photo,
                     action          =   delete
                 };
+            %%
+            %% флаги
+            %%
+            <<"get_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   'get'
+                };
+            <<"get_all_flags">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   'get'
+                };
+            <<"repost_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   repost
+                };
+            <<"create_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   'create'
+                };
+            <<"update_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   'update'
+                };
+            <<"delete_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   delete
+                };
+            %%
+            %% Фоны
+            %%
+            <<"get_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   'get'
+                };
+            <<"get_all_backs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   'get'
+                };
+            <<"repost_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   repost
+                };
+            <<"create_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   'create'
+                };
+            <<"update_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   'update'
+                };
+            <<"delete_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   delete
+                };
+            %%
+            %% Обои
+            %%
+            <<"get_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   'get'
+                };
+            <<"get_all_walls">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   'get'
+                };
+            <<"repost_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   repost
+                };
+            <<"create_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   'create'
+                };
+            <<"update_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   'update'
+                };
+            <<"delete_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   delete
+                };
+            %%
+            %% гербы
+            %%
+            <<"get_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   'get'
+                };
+            <<"get_all_armss">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   'get'
+                };
+            <<"repost_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   repost
+                };
+            <<"create_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   'create'
+                };
+            <<"update_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   'update'
+                };
+            <<"delete_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   delete
+                };
         %% ----------------------------------------------------------------
         %% Функции системы
         %% ----------------------------------------------------------------

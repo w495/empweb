@@ -350,22 +350,51 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
 %% и стал кандидатом
 %% 
 update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) ->
-    case proplists:get_value(live_community_id, Mbperspl) =/= Community_id of
+    case
+        (proplists:get_value(live_community_id, Mbperspl) =/= Community_id)
+            and
+        (Community_id =/= null)
+    of
         true ->
             %% сообщество изменилось
-            case Function(Con, Params) of
-                {ok, Res} ->
-                    empdb_dao_communityhist:create(Con, [
-                        {community_id,
-                            Community_id},
-                        {pers_id,
-                            proplists:get_value(id, Mbperspl)},
-                        {communityhisttype_alias,
-                            pers_cand}
-                    ]),
-                    {ok, Res};
-                Else ->
-                    Else
+            {ok, [{Communitypl}]} =
+                empdb_dao_community:get(Con, [
+                    {id, Community_id},
+                    {limit, 1},
+                    {fields, [
+                        cands_gte_authority_level
+                    ]}
+                ]),
+            Candsgteauthoritylevel =
+                proplists:get_value(cands_gte_authority_level, Communitypl),
+            Authoritylevel =
+                proplists:get_value(authority_level, Mbperspl),
+            %% если уровень человека ниже уровня сообщества,
+            %% то вступить в него он не может.
+            case  Candsgteauthoritylevel =< Authoritylevel of
+                true ->
+                    case Function(Con, Params) of
+                        {ok, Res} ->
+                            empdb_dao_communityhist:create(Con, [
+                                {community_id,
+                                    Community_id},
+                                {pers_id,
+                                    proplists:get_value(id, Mbperspl)},
+                                {communityhisttype_alias,
+                                    pers_cand}
+                            ]),
+                            {ok, Res};
+                        Else ->
+                            Else
+                    end;
+                _ ->
+                    {error, {not_enough_level, {[
+                        {cands_gte_authority_level,
+                            Candsgteauthoritylevel
+                        },
+                        {authority_level,
+                            Authoritylevel}
+                    ]}}}
             end;
         false ->
             %% сообщество НЕ изменилось

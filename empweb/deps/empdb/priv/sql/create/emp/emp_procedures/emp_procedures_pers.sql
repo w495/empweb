@@ -84,18 +84,28 @@ begin
     **/
     new.pstatus_alias   = 'offline';
     new.pstatus_id      =
-        (select id from pstatus   where alias = new.pstatus_alias);
+        (select pstatus.id
+            from pstatus
+                where alias = new.pstatus_alias);
     /**
         Авторитет пользователя
     **/
     new.authority_alias = 'noob';
     new.authority_id    =
-        (select id from authority where alias = new.authority_alias);
+        (select authority.id
+            from authority
+                where alias = new.authority_alias);
+    new.authority_level    =
+        (select authority.level
+            from authority
+                where alias = new.authority_alias);
     /**
         Опыт пользователя
     **/
     new.exper    =
-        (select level from authority where alias = new.authority_alias);
+        (select authority.level
+            from authority
+                where alias = new.authority_alias);
     /**
         Сколько еще нужно опыта
         для перехода на следующий уровень.
@@ -376,10 +386,22 @@ begin
                     authority
                 where
                     authority.id = new.authority_id);
+        new.authority_level =
+            (select authority.level
+                from
+                    authority
+                where
+                    authority.id = new.authority_id);
     end if;
     if new.authority_alias != old.authority_alias then
         new.authority_id =
             (select authority.id
+                from
+                    authority
+                where
+                    authority.alias = new.authority_alias);
+        new.authority_level =
+            (select authority.level
                 from
                     authority
                 where

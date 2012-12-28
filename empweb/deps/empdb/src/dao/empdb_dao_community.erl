@@ -87,9 +87,11 @@ table({fields, all})->
         communitytype_id,
         communitytype_alias,
         read_gte_authority_id,
+        read_gte_authority_level,
         read_gte_authority_alias,
         cands_gte_authority_id,
         cands_gte_authority_alias,
+        cands_gte_authority_level,
         slogan,
         treas,
         fee

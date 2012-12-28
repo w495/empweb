@@ -583,7 +583,7 @@
 
 -- 2012.12.25 17:22:06:355620587 ---------------------------------------------
 
-
+/*
     alter table community add column read_gte_authority_id
         decimal references authority(id) default null;
     alter table community add column read_gte_authority_alias
@@ -596,101 +596,91 @@
         numeric default null;
     alter table community add column cands_gte_authority_level
         numeric default null;
-
-
     alter table pers add column authority_level
         numeric default null;
+    create sequence seq_actiontype_id;
+    create table actiontype(
+        id          decimal primary key default nextval('seq_actiontype_id'),
+        name_ti     decimal unique  default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        ispaid      boolean         default false,
+        price       decimal         default 0,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+    insert into doctype(alias)
+        values  ('claim');
+    alter table room add column back_file_id
+        decimal references file(id)     default null;
+    alter table room add column back_path
+        varchar(1024)                   default null;
+    alter table room add column wall_file_id
+        decimal references file(id)     default null;
+    alter table room add column wall_path
+        varchar(1024)                   default null;
+    alter table room add column flag_file_id
+        decimal references file(id)     default null;
+    alter table room add column flag_path
+        varchar(1024)                   default null;
+    alter table room add column arms_file_id
+        decimal references file(id)     default null;
+    alter table room add column arms_path
+        varchar(1024)                   default null;
+    alter table community add column back_file_id
+        decimal references file(id)     default null;
+    alter table community add column back_path
+        varchar(1024)                   default null;
+    alter table community add column wall_file_id
+        decimal references file(id)     default null;
+    alter table community add column wall_path
+        varchar(1024)                   default null;
+    alter table community add column flag_file_id
+        decimal references file(id)     default null;
+    alter table community add column flag_path
+        varchar(1024)                   default null;
+    alter table community add column arms_file_id
+        decimal references file(id)     default null;
+    alter table community add column arms_path
+        varchar(1024)                   default null;
+    create sequence seq_community2topic_id;
+    create table community2topic (
+        id
+            decimal primary key default
+                nextval('seq_community2topic_id'),
+        topic_id
+            decimal references topic(id)    not null,
+        community_id
+            decimal references community(doc_id) not null,
+        isdeleted
+            bool    default false,
+        created
+            timestamp without time zone not null default utcnow(),
+        constraint
+            community2topic_topic_id_community_id_many_key
+                unique (topic_id, community_id)
+    );
+*/
 
 
-/**
- *  Действия пользователя
-**/
-create sequence seq_actiontype_id;
-create table actiontype(
-    id          decimal primary key default nextval('seq_actiontype_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique  default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    ispaid      boolean         default false,
-    price       decimal         default 0,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
+-- 2012.12.28 16:55:45:155698946 ---------------------------------------------
+
+
+create table wall(
+    doc_id              decimal unique references doc(id),
+    file_id             decimal references file(id)     default null,
 );
 
+create table back(
+    doc_id              decimal unique references doc(id),
+    file_id             decimal references file(id)     default null,
+);
 
+create table flag(
+    doc_id              decimal unique references doc(id),
+    file_id             decimal references file(id)     default null,
+);
 
-
-insert into doctype(alias)
-    values  ('claim');
-
-
-
-alter table room add column back_file_id
-    decimal references file(id)     default null;
-
-alter table room add column back_path
-    varchar(1024)                   default null;
-
-alter table room add column wall_file_id
-    decimal references file(id)     default null;
-
-alter table room add column wall_path
-    varchar(1024)                   default null;
-
-alter table room add column flag_file_id
-    decimal references file(id)     default null;
-
-alter table room add column flag_path
-    varchar(1024)                   default null;
-
-alter table room add column arms_file_id
-    decimal references file(id)     default null;
-
-alter table room add column arms_path
-    varchar(1024)                   default null;
-
-alter table community add column back_file_id
-    decimal references file(id)     default null;
-
-alter table community add column back_path
-    varchar(1024)                   default null;
-
-alter table community add column wall_file_id
-    decimal references file(id)     default null;
-
-alter table community add column wall_path
-    varchar(1024)                   default null;
-
-alter table community add column flag_file_id
-    decimal references file(id)     default null;
-
-alter table community add column flag_path
-    varchar(1024)                   default null;
-
-alter table community add column arms_file_id
-    decimal references file(id)     default null;
-
-alter table community add column arms_path
-    varchar(1024)                   default null;
-
-
-
-
-
-create sequence seq_community2topic_id;
-create table community2topic (
-    id
-        decimal primary key default     nextval('seq_community2topic_id'),
-    topic_id
-        decimal references topic(id)    not null,
-    community_id
-        decimal references community(doc_id) not null,
-    isdeleted
-        bool    default false,
-    created
-        timestamp without time zone not null default utcnow(),
-    constraint
-        community2topic_topic_id_community_id_many_key    unique (topic_id, community_id)
+create table arms(
+    doc_id              decimal unique references doc(id),
+    file_id             decimal references file(id)     default null,
 );

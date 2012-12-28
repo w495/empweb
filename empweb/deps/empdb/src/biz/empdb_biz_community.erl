@@ -40,10 +40,13 @@ create(Params)->
                 {fields, [
                     id,
                     nick,
-                    money
+                    money,
+                    authority_id,
+                    authority_level
                 ]},
                 {limit, 1}
             ]),
+
         %%
         %% Здесь надо вводить, дополнительное ограничение на уровне базы.
         %% Это делать не хочется, так как
@@ -57,22 +60,53 @@ create(Params)->
         %% WARNING: В текущей реализации, мы действуем не очень эффективно.
         %%
         Head = proplists:get_value(head, Params),
-        {ok, Mbcommobjs} = empdb_dao_community:get(Con, [
-            {'or', [
-                {owner_id, Owner_id},
-                {head, Head}
-            ]},
-            {fields, [
-                head,
-                owner_id
-            ]},
-            {limit, 1},
-            {isdeleted, false}
-        ]),
+        {ok, Mbcommobjs} =
+            empdb_dao_community:get(Con, [
+                {'or', [
+                    {owner_id, Owner_id},
+                    {head, Head}
+                ]},
+                {fields, [
+                    head,
+                    owner_id
+                ]},
+                {limit, 1},
+                {isdeleted, false}
+            ]),
         Price = ?CREATE_COMMUNITY_PRICE,
         Money = proplists:get_value(money, Mbownerpl),
-         case {Price =< Money, Mbcommobjs} of
-            {true, []} ->
+        {ok, [{Readgteauthoritypl}]} =
+            empdb_dao_authority:get(Con, [
+                {'or',[
+                    {id, proplists:get_value(read_gte_authority_id, Params)},
+                    {alias,
+                        proplists:get_value(read_gte_authority_alias, Params, noob)}
+                ]},
+                {limit, 1}
+            ]),
+        {ok, [{Candsgteauthoritypl}]} =
+            empdb_dao_authority:get(Con, [
+                {'or',[
+                    {id, proplists:get_value(cands_gte_authority_id, Params)},
+                    {alias,
+                        proplists:get_value(cands_gte_authority_alias, Params, noob)}
+                ]},
+                {limit, 1}
+            ]),
+        Authority_level =
+            proplists:get_value(authority_level, Mbownerpl),
+        Readgteauthority_level =
+            proplists:get_value(level, Readgteauthoritypl),
+        Candsgteauthority_level =
+            proplists:get_value(level, Candsgteauthoritypl),
+        case {
+            Price =< Money,
+            Mbcommobjs,
+            (Authority_level >= Readgteauthority_level)
+                and
+            (Authority_level >= Candsgteauthority_level)
+        } of
+            {true, [], true} ->
                 case empdb_dao_community:create(Con, [{nmembs, 1}|Params]) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
@@ -103,7 +137,7 @@ create(Params)->
                     Error ->
                         Error
                 end;
-            {true, [{Mbcommpl}|_]} ->
+            {true, [{Mbcommpl}|_], true} ->
                 case {
                     proplists:get_value(head, Mbcommpl),
                     proplists:get_value(owner_id, Mbcommpl)
@@ -114,10 +148,19 @@ create(Params)->
                         Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
                         {error,{not_unique_head,Sugs}}
                 end;
-            {false, _ }->
+            {false, _ ,true}->
                 {error, {not_enough_money, {[
                     {money, Money},
                     {price, Price}
+                ]}}};
+            {_, _, false}->
+                {error, {not_enough_level, {[
+                    {cands_gte_authority_level,
+                        Candsgteauthority_level},
+                    {read_gte_authority_level,
+                        Readgteauthority_level},
+                    {authority_level,
+                        Authority_level}
                 ]}}};
             Error ->
                 Error

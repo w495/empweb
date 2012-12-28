@@ -170,6 +170,7 @@ table({fields, all})->
         pstatus_alias,
         authority_id,
         authority_alias,
+        authority_level,
         position,
         
         exper,

@@ -49,19 +49,19 @@ update(Params)->
 
 get(Params)->
     nviewsup(fun empdb_dao_photo:update/2, [Params]),
-
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:get_adds(Con,
-            empdb_dao_photo:get(Con, [{isdeleted, false}|Params])
+            empdb_dao_photo:get(Con, [{isdeleted, false}|Params]),
+            Params
         )
     end).
 
-get(Params, Fileds)->
+get(Params, Fields)->
     nviewsup(fun empdb_dao_photo:update/2, [Params]),
-    
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:get_adds(Con,
-            empdb_dao_photo:get(Con, [{isdeleted, false}|Params], Fileds)
+            empdb_dao_photo:get(Con, [{isdeleted, false}|Params], Fields),
+            [{fields, Fields}|Params]
         )
     end).
 

@@ -17,7 +17,7 @@
     create/2,
     update/2,
     count_comments/2,
-    get_adds/2,
+    get_adds/3,
     get/2,
     get/3
 ]).
@@ -103,14 +103,14 @@ get(Con, What) ->
         {fields, [
             {as, {fileinfo.path, fileinfopath}},
             {as, {fileinfo.dir,  fileinfodir}}
-            | Fields
+            | proplists:delete(path, Fields)
         ]}
         |proplists:delete(fields, What)
     ]) of
         {ok,Phobjs} ->
             {ok,
                 lists:map(fun({Phpl})->
-                    case lists:member(path, Fields) of
+                    case (lists:member(path, Fields) or (Fields =:= [])) of
                         true ->
                             {[
                                 {path,
@@ -162,12 +162,12 @@ get(Con, What, Afields)->
     ], [
         {as, {fileinfo.path, fileinfopath}},
         {as, {fileinfo.dir,  fileinfodir}}
-        | Fields
+        | proplists:delete(path, Fields)
     ]) of
         {ok,Phobjs} ->
             {ok,
                 lists:map(fun({Phpl})->
-                    case lists:member(path, Fields) of
+                    case (lists:member(path, Fields) or (Fields =:= [])) of
                         true ->
                             {[
                                 {path,
@@ -212,21 +212,22 @@ count_comments(Con, Params)->
         Params
     ).
 
-get_adds(Con, Getresult) ->
-    case Getresult of
-        {ok, List} ->
-            {ok, lists:map(fun({Itempl})->
-                case proplists:get_value(id, Itempl) of
-                    undefined ->
-                        {Itempl};
-                    Id ->
-                        {ok, Comments}     = ?MODULE:count_comments(Con, [{id, Id}]),
-                        Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
-                            [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
-                        end, [], Comments),
-                        {lists:append([Ncommentspl, Itempl])}
-                end
-            end, List)};
-        {Eclass, Error} ->
-            {Eclass, Error}
-    end.
+
+get_adds(Con, {ok, List}, Params) ->
+    {ok, lists:map(fun({Itempl})->
+        case proplists:get_value(id, Itempl)  of
+            undefined ->
+                {Itempl};
+            Id ->
+                {ok, Comments}     = ?MODULE:count_comments(Con, [{id, Id}]),
+                Ncommentspl = lists:foldl(fun({Commentspl}, Acc)->
+                    [{ncomments, proplists:get_value(count, Commentspl)}|Acc]
+                end, [], Comments),
+                {lists:append([Ncommentspl, Itempl])}
+        end
+    end, List)};
+
+
+
+get_adds(_con, Result, _params) ->
+    Result.

@@ -192,7 +192,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_photo:create([
+                    empweb_biz_photo:repost([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
