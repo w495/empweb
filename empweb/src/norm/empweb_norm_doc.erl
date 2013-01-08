@@ -294,22 +294,22 @@ norm('create') ->
 
 norm('update') ->
     [
-%         #norm_rule{
-%             key         = id,
-%             types       = [integer]
-%         },
+        #norm_rule{
+            key         = id,
+            types       = [integer]
+        },
 %         #norm_rule{
 %             key         = owner_id,
 %             required    = false,
 %             types       = [nullable, allable, integer],
 %             default     = null
 %         },
-        #norm_rule{
-            key         = owner_nick,
-            required    = false,
-            types       = [nullable, string],
-            default     = null
-        },
+%         #norm_rule{
+%             key         = owner_nick,
+%             required    = false,
+%             types       = [nullable, string],
+%             default     = null
+%         },
         #norm_rule{
             key         = orig_id,
             required    = false,
