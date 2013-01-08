@@ -152,18 +152,18 @@ norm('get') ->
 
 norm('create') ->
     [
-        #norm_rule{
-            key         = owner_id,
-            required    = false,
-            types       = [nullable, allable, integer],
-            default     = null
-        },
-        #norm_rule{
-            key         = owner_nick,
-            required    = false,
-            types       = [nullable, string],
-            default     = null
-        },
+%         #norm_rule{
+%             key         = owner_id,
+%             required    = false,
+%             types       = [nullable, allable, integer],
+%             default     = null
+%         },
+%         #norm_rule{
+%             key         = owner_nick,
+%             required    = false,
+%             types       = [nullable, string],
+%             default     = null
+%         },
         #norm_rule{
             key         = orig_id,
             required    = false,
@@ -197,8 +197,7 @@ norm('create') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer],
-            default     = null
+            types       = [integer]
         },
         #norm_rule{
             key         = read_acctype_id,
@@ -295,16 +294,16 @@ norm('create') ->
 
 norm('update') ->
     [
-        #norm_rule{
-            key         = id,
-            types       = [integer]
-        },
-        #norm_rule{
-            key         = owner_id,
-            required    = false,
-            types       = [nullable, allable, integer],
-            default     = null
-        },
+%         #norm_rule{
+%             key         = id,
+%             types       = [integer]
+%         },
+%         #norm_rule{
+%             key         = owner_id,
+%             required    = false,
+%             types       = [nullable, allable, integer],
+%             default     = null
+%         },
         #norm_rule{
             key         = owner_nick,
             required    = false,
@@ -344,8 +343,7 @@ norm('update') ->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = [integer],
-            default     = null
+            types       = [integer]
         },
         #norm_rule{
             key         = read_acctype_id,
@@ -500,8 +498,7 @@ norm([])->
         #norm_rule{
             key         = parent_id,
             required    = false,
-            types       = empweb_norm:filter([integer]),
-            default     = null
+            types       = empweb_norm:filter([integer])
         },
         #norm_rule{
             key         = read_acctype_id,
