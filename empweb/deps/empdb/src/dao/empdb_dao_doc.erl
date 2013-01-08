@@ -104,6 +104,7 @@ table({fields, all})->
 
         isrepost,
         isrepostable,
+        isnoticeable,
 
         parent_id,
 

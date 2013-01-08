@@ -841,7 +841,7 @@ create table doc(
     /**
         Оповещение комментов
     **/
-    commnotice          boolean default false,
+    isnoticeable          boolean default false,
     /**
         количество детей (дочерних элементов)
     **/

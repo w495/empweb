@@ -724,7 +724,7 @@ insert into actiontype(alias, ispaid, price, istoall)
         ('kick',                    true,  0.01, false),
         ('kick_all',                true,  1.00, true ),
         ('kiss',                    false, null, false),
-        ('kiss_all',                true,  0.50, true ,
+        ('kiss_all',                true,  0.50, true ),
         ('kisscheek',               false, null, false),
         ('kisspassionately',        false, null, false),
         ('kisstenderly',            false, null, false),
@@ -737,15 +737,15 @@ insert into actiontype(alias, ispaid, price, istoall)
         ('sendkiss',                false, null, false),
         ('sendall',                 false, null, false),
         ('shakehands',              false, null, false),
-        ('shakehands_all',          false, 0.40, true),
+        ('shakehands_all',          false, 0.40, true ),
         ('shutup',                  true,  0.03, false),
-        ('shutup_all',              true,  0.30, true)
+        ('shutup_all',              true,  0.30, true ),
         ('slap',                    true,  0.01, false),
         ('takehandle',              true,  0.02, false),
         ('takeumbrage',             false, null, false),
         ('unfastenbra',             true,  0.03, false),
-        ('welcome',                 true,  null, false);
-        ('welcome_all',             true,  0.01, true);
+        ('welcome',                 true,  null, false),
+        ('welcome_all',             true,  0.01, true );
 
 
 create sequence seq_action_id;
@@ -767,3 +767,9 @@ create table action(
         default utcnow() + interval '1 week',
     isdeleted   boolean         default false
 );
+
+
+
+
+    alter table doc add column isnoticeable
+         boolean default false;

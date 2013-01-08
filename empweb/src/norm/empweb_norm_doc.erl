@@ -143,6 +143,11 @@ norm('get') ->
             types       = empweb_norm:filter([nullable, boolean])
         },
         #norm_rule{
+            key         = isnoticeable,
+            required    = false,
+            types       = empweb_norm:filter([nullable, boolean])
+        },
+        #norm_rule{
             key         = isrepostable,
             required    = false,
             types       = empweb_norm:filter([nullable, boolean])
@@ -280,6 +285,12 @@ norm('create') ->
 
         #norm_rule{
             key         = isrepost,
+            required    = false,
+            types       = [nullable, boolean],
+            default     = false
+        },
+        #norm_rule{
+            key         = isnoticeable,
             required    = false,
             types       = [nullable, boolean],
             default     = false
@@ -426,6 +437,12 @@ norm('update') ->
 
         #norm_rule{
             key         = isrepost,
+            required    = false,
+            types       = [nullable, boolean],
+            default     = false
+        },
+        #norm_rule{
+            key         = isnoticeable,
             required    = false,
             types       = [nullable, boolean],
             default     = false
