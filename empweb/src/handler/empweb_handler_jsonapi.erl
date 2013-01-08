@@ -1338,6 +1338,62 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+            %% ==================================================
+            <<"get_actiontype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_actiontype,
+                    action          =   'get'
+                };
+            <<"get_all_actiontypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_actiontype,
+                    action          =   'get'
+                };
+            <<"create_actiontype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_actiontype,
+                    action          =   create
+                };
+            <<"update_actiontype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_actiontype,
+                    action          =   update
+                };
+            <<"delete_actiontype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_actiontype,
+                    action          =   delete
+                };
+
+
+            %% ==================================================
+            <<"get_action">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_action,
+                    action          =   'get'
+                };
+            <<"get_all_actions">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_action,
+                    action          =   'get'
+                };
+            <<"create_action">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_action,
+                    action          =   create
+                };
+            <<"update_action">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_action,
+                    action          =   update
+                };
+            <<"delete_action">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_action,
+                    action          =   delete
+                };
+                
             %% ==================================================
             <<"get_paytype">> ->
                 Eh#empweb_hap{

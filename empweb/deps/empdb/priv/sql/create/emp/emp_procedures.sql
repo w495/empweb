@@ -164,3 +164,9 @@ drop function make_plpgsql();
 \set FILE :SECTIONPATH /emp_procedures_communityhist.sql \i :FILE
 
 
+/**
+    @doc Действия пользователя
+**/
+\set FILE :SECTIONPATH /emp_procedures_action.sql \i :FILE
+
+

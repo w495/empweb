@@ -87,7 +87,12 @@ get_adds(Con, {ok, Res}, Params) ->
                                 {id,    proplists:get_value(owner_id,   Itempl)},
                                 {nick,  proplists:get_value(owner_nick, Itempl)}
                             ]},
-                            {fields, [authority_id, authority_alias]}
+                            {fields, [
+                                authority_id,
+                                authority_alias,
+                                live_room_id,
+                                live_room_head
+                            ]}
                         ]
                     ),
                 {ok, [{Perspl}]} =
@@ -98,7 +103,12 @@ get_adds(Con, {ok, Res}, Params) ->
                                 {id,    proplists:get_value(pers_id,   Itempl)},
                                 {nick,  proplists:get_value(pers_nick, Itempl)}
                             ]},
-                            {fields, [authority_id, authority_alias]}
+                            {fields, [
+                                authority_id,
+                                authority_alias,
+                                live_room_id,
+                                live_room_head
+                            ]}
                         ]
                     ),
                 {
@@ -119,11 +129,23 @@ get_adds(Con, {ok, Res}, Params) ->
                             {owner_authority_alias,
                                 proplists:get_value(authority_alias, Ownerpl)
                             },
+                            {owner_live_room_id,
+                                proplists:get_value(live_room_id, Ownerpl)
+                            },
+                            {owner_live_room_head,
+                                proplists:get_value(live_room_head, Ownerpl)
+                            },
                             {pers_authority_id,
                                 proplists:get_value(authority_id, Perspl)
                             },
                             {pers_authority_alias,
                                 proplists:get_value(authority_alias, Perspl)
+                            },
+                            {pers_live_room_id,
+                                proplists:get_value(live_room_id, Perspl)
+                            },
+                            {pers_live_room_head,
+                                proplists:get_value(live_room_head, Perspl)
                             }
                         ]
                     )

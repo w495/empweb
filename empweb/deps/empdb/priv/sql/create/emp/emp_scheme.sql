@@ -195,24 +195,21 @@ alter table fileinfo add column
                                 ПОЛЬЗОВАТЕЛЬ
     =====================================================================
 ****************************************************************************/
-/*
+
 /**
- *  Действия пользователя
+ *  Типы действий пользователя
 **/
 create sequence seq_actiontype_id;
 create table actiontype(
     id          decimal primary key default nextval('seq_actiontype_id'),
-    /**
-        Номер языковой сущности
-    **/
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     ispaid      boolean         default false,
     price       decimal         default 0,
-    created     timestamp without time zone not null default utcnow(),
+    created     timestamp without time zone not null
+        default utcnow(),
     isdeleted   boolean default false
 );
-*/
 
 /**
  *  Эмоция пользователя
@@ -1059,11 +1056,6 @@ create table vote(
     constraint          room2topic_doc_id_pers_id_many_key    unique (doc_id, pers_id)
 );
 
-
-
-
-
-
 ------------------------------------------------------------------------------
 -- Чат комнаты \ страны
 ------------------------------------------------------------------------------
@@ -1094,7 +1086,6 @@ alter table pers add column live_roomtype_alias
 
 alter table pers add column isprisoner
     boolean default false;
-     
 
 /**
  *  Список языков чата. Не обязан пересекаться с таблицей lang.
@@ -1110,7 +1101,6 @@ create table chatlang(
     created     timestamp without time zone not null default utcnow(),
     isdeleted   boolean default false
 );
-
 
 /**
  *  Дерево тем чата. Редактируется администраторами и пользователями. 
@@ -1137,8 +1127,6 @@ create table topic(
         целевых ссылок на эту сущность
     **/
     nchildtargets   decimal default 0,
-
-
 
     /**
         ссылок на эту сущность из комнаты
@@ -1348,7 +1336,7 @@ create table communityhisttype(
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp       without time zone not null default utcnow(),
-    isdeleted   boolean            default false
+    isdeleted   boolean         default false
 );
 
 
@@ -1419,10 +1407,30 @@ create table notice(
     datetime            timestamp without time zone             default utcnow()
 );
 
-    alter table notice add column pers_id   decimal
-        references pers(id) default null;
-    alter table notice add column pers_nick varchar(1024)
-        references pers(nick) default null;
+alter table notice add column pers_id   decimal
+    references pers(id) default null;
+alter table notice add column pers_nick varchar(1024)
+    references pers(nick) default null;
+
+
+create sequence seq_action_id;
+create table action(
+    id                  decimal primary key default nextval('seq_action_id'),
+    actiontype_id       decimal references actiontype(id)       default null,
+    actiontype_alias    decimal references actiontype(alias)    default null,
+    pers_id             decimal references pers(id)             default null,
+    pers_nick           varchar(1024)                           default null,
+    owner_id    decimal references pers(id)            default null,
+    owner_nick  varchar(1024)                          default null,
+    ispaid      boolean         default false,
+    price       decimal         default 0,
+    created     timestamp       without time zone not null
+        default utcnow(),
+    expired     timestamp without time zone not null
+        default utcnow() + interval '1 week',
+    isdeleted   boolean         default false
+);
+
 
 ------------------------------------------------------------------------------
 -- События
