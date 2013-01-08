@@ -95,9 +95,19 @@ create(Params)->
                     Else ->
                         Else
                 end;
-            {true, _} ->
-                Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
-                {error,{not_unique_head,Sugs}};
+            {true, [{Mbcommpl}|_]} ->
+%                 Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
+%                 {error,{not_unique_head,Sugs}};
+                case {
+                    proplists:get_value(head, Mbcommpl),
+                    proplists:get_value(owner_id, Mbcommpl)
+                } of
+                    {_, Owner_id } ->
+                        {error,{not_unique_owner,Owner_id}};
+                    {Head, _} ->
+                        Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
+                        {error,{not_unique_head,Sugs}}
+                end;
             {false, _ }->
                 {error, {not_enough_money, {[
                     {money, Money},
