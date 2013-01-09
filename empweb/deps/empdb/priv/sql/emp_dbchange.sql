@@ -773,3 +773,7 @@ create table action(
 
     alter table doc add column isnoticeable
          boolean default false;
+
+
+    insert into paytype(alias, isincome)
+        values  ('action_out',     false);
