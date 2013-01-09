@@ -28,21 +28,21 @@ begin
             (select pers.id from pers where pers.nick = new.owner_nick);
     end if;
 
-    if (new.actiontype_nick is null) then
+    if (new.actiontype_alias is null) then
         if not (new.actiontype_id is null) then
-            new.actiontype_nick =
-                (select actiontype.nick
+            new.actiontype_alias =
+                (select actiontype.alias
                     from actiontype
                         where actiontype.id = new.actiontype_id);
         else
-            new.actiontype_nick        = null;
+            new.actiontype_alias        = null;
         end if;
     end if;
     if (new.actiontype_id is null) then
         new.actiontype_id           =
             (select actiontype.id
                 from actiontype
-                    where actiontype.nick = new.actiontype_nick);
+                    where actiontype.alias = new.actiontype_alias);
     end if;
     
     return new;
@@ -74,16 +74,16 @@ begin
     end if;
 
     if new.actiontype_id != old.actiontype_id then
-        new.actiontype_nick =
-            (select actiontype.nick
+        new.actiontype_alias =
+            (select actiontype.alias
                 from actiontype
                     where actiontype.id = new.actiontype_id);
     end if;
-    if new.actiontype_nick != old.actiontype_nick then
+    if new.actiontype_alias != old.actiontype_alias then
         new.actiontype_id =
             (select actiontype.id
                 from actiontype
-                    where actiontype.nick = new.actiontype_nick);
+                    where actiontype.alias = new.actiontype_alias);
     end if;
 
     
