@@ -98,7 +98,7 @@ create(Con, Params, {ispaid, true}) ->
                     {money, {decr, Price}}
                 ]}
             ]),
-            empdb_dao_action:create(Con, Params);
+            empdb_dao_action:create(Con, [{price, Price}, {ispaid, true}|Params]);
         false ->
             {error, {not_enough_money, {[
                 {money, Money},
@@ -106,8 +106,8 @@ create(Con, Params, {ispaid, true}) ->
             ]}}}
     end;
 
-create(Con, Params, {ispaid, false}) ->
-    empdb_dao_action:create(Con, Params).
+create(Con, Params, {ispaid, _}) ->
+    empdb_dao_action:create(Con, [{ispaid, false}|Params]).
 
 
 update(Params)->
