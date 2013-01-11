@@ -251,6 +251,22 @@ create table authority(
 
 
 /**
+ *  Официальный статус пользователя: по сути должность
+**/
+create sequence seq_ostatus_id;
+create table ostatus(
+    id          decimal primary key default nextval('seq_pstatus_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+
+
+/**
  *  Статус пользователя: оnline/offline/забанен
 **/
 create sequence seq_pstatus_id;
@@ -438,7 +454,7 @@ create table pers(
     
     birthday    timestamp       without time zone not null default utcnow(),
     -- gender_id           decimal references gender(id)      default null,
-    ismale      boolean    default false,
+    ismale      boolean    default true,
     /**
         ------------------------------------------------------------
             Информация о персоонаже
@@ -450,6 +466,13 @@ create table pers(
     **/
     pstatus_id          decimal         references pstatus(id),
     pstatus_alias       varchar(1024)   references pstatus(alias),
+
+    /**
+        Чиновничий статус пользователя
+    **/
+    ostatus_id          decimal         references ostatus(id)    default null,
+    ostatus_alias       varchar(1024)   references ostatus(alias) default null,
+
     /**
         Авторитет пользователя
     **/

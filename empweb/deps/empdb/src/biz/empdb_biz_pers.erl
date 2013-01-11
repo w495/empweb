@@ -48,6 +48,15 @@
 ]).
 
 %%
+%% Чиновничий Статус пользователя
+%%
+-export([
+    get_ostatus/1,
+    get_ostatus/2,
+    update_ostatus/1
+]).
+
+%%
 %% Статус пользователя
 %%
 -export([
@@ -1202,6 +1211,26 @@ update_pgroup(Params)->
         empdb_dao_pers:update_pgroup(Con, Params)
     end).
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Чиновничий статус пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_ostatus(Params)->
+    empdb_dao:with_connection(emp, fun(Con)->
+        empdb_dao_pers:get_ostatus(Con, [{isdeleted, false}|Params])
+    end).
+
+get_ostatus(Params, Fields)->
+    empdb_dao:with_connection(emp, fun(Con)->
+        empdb_dao_pers:get_ostatus(Con, [{isdeleted, false}|Params], Fields)
+    end).
+
+update_ostatus(Params)->
+    empdb_dao:with_connection(emp, fun(Con)->
+        empdb_dao_pers:update_ostatus(Con, Params)
+    end).
+
+    
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Семейное положение пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

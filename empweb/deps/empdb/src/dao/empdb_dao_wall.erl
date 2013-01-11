@@ -84,12 +84,18 @@ get(Con, What) ->
     %         "   where (fileinfo.fileinfotype_alias "
     %         "       = $`fileinfo.fileinfotype_alias@filter`)"   >>
 
+    Truefields = proplists:get_value(fields,What,[]),
+
     Fields =
-        proplists:get_value(
-            fields,
-            What,
-            lists:append([empdb_dao_wall:table({fields, select}), empdb_dao_doc:table({fields, select})])
-        ),
+        case Truefields of
+            [] ->
+                lists:append([
+                    empdb_dao_wall:table({fields, select}),
+                    empdb_dao_doc:table({fields, select})
+                ]);
+            _ ->
+                Truefields
+        end,
 
     case empdb_dao:get([
         {empdb_dao_doc, id},
@@ -108,7 +114,7 @@ get(Con, What) ->
         {ok,Phobjs} ->
             {ok,
                 lists:map(fun({Phpl})->
-                    case (lists:member(path, Fields) or (Fields =:= [])) of
+                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
                         true ->
                             {[
                                 {path,
@@ -131,14 +137,17 @@ get(Con, What) ->
 
     %empdb_dao_doc:get(?MODULE, Con, What).
 
-get(Con, What, Afields)->
+get(Con, What, Truefields)->
 
     Fields =
-        case Afields of
+        case Truefields of
             [] ->
-                lists:append([empdb_dao_wall:table({fields, select}), empdb_dao_doc:table({fields, select})]);
-            Afields1 ->
-                Afields1
+                lists:append([
+                    empdb_dao_wall:table({fields, select}),
+                    empdb_dao_doc:table({fields, select})
+                ]);
+            _ ->
+                Truefields
         end,
 
     case empdb_dao:get([
@@ -157,7 +166,7 @@ get(Con, What, Afields)->
         {ok,Phobjs} ->
             {ok,
                 lists:map(fun({Phpl})->
-                    case (lists:member(path, Fields) or (Fields =:= [])) of
+                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
                         true ->
                             {[
                                 {path,

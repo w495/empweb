@@ -2210,6 +2210,59 @@ insert into geo(alias, parent_id) values
     ('kiev',        (select id from geo where alias = 'ua')),
     ('odessa',      (select id from geo where alias = 'ua'));
 
+
+ insert into actiontype(alias, ispaid, price, istoall)
+        values
+            ('advertisement',           false, null, false),
+            ('apologize',               false, null, false),
+            ('cheerup',                 true,  0.01, false),
+            ('compliment',              false, null, false),
+            ('congratulate',            false, null, false),
+            ('congratulate_all',        false, 0.90, true),
+            ('declarelove',             false, null, false),
+            ('embrace_all',             true,  0.01, false),
+            ('embracepassionately',     false, null, false),
+            ('enjoy',                   false, null, false),
+            ('fireworks',               false, null, false),
+            ('hello',                   false, null, false),
+            ('hello_all',               false, null, true ),
+            ('goodbye',                 false, null, false),
+            ('goodbye_all',             true,  0.01, true ),
+            ('goodnight',               false, null, false),
+            ('handson',                 true,  0.01, false),
+            ('hug',                     true,  0.01, false),
+            ('hug_all',                 true,  0.01, true ),
+            ('hugfriendly',             false, null, false),
+            ('kick',                    true,  0.01, false),
+            ('kick_all',                true,  1.00, true ),
+            ('kiss',                    false, null, false),
+            ('kiss_all',                true,  0.50, true ),
+            ('kisscheek',               false, null, false),
+            ('kisspassionately',        false, null, false),
+            ('kisstenderly',            false, null, false),
+            ('lisp',                    true,  0.01, false),
+            ('ogle',                    false, null, false),
+            ('peck',                    false, null, false),
+            ('pullpants',               true,  0.03, false),
+            ('put',                     false, null, false),
+            ('sendflower',              true,  0.01, false),
+            ('sendkiss',                false, null, false),
+            ('sendall',                 false, null, false),
+            ('shakehands',              false, null, false),
+            ('shakehands_all',          false, 0.40, true ),
+            ('shutup',                  true,  0.03, false),
+            ('shutup_all',              true,  0.30, true ),
+            ('slap',                    true,  0.01, false),
+            ('takehandle',              true,  0.02, false),
+            ('takeumbrage',             false, null, false),
+            ('unfastenbra',             true,  0.03, false),
+            ('welcome',                 true,  null, false),
+            ('welcome_all',             true,  0.01, true );
+
+insert into ostatus(alias)
+    values ('citizen'),('police'),('officer');
+
+    
 /**
     При создании пользователя помещаем его в комнату для новичков
     @depricated перенесено в триггеры

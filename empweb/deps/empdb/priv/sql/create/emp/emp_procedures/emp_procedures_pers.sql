@@ -135,6 +135,13 @@ begin
     new.emotion_alias   = 'indifferent';
     new.emotion_id      =
         (select id from emotion   where alias = new.emotion_alias);
+
+    /**
+        Чиновничий статус пользователя
+    **/
+    new.ostatus_alias   = 'citizen';
+    new.ostatus_id      = (select id from ostatus   where alias = new.ostatus_alias);
+        
     /**
         Семейное положения пользователя
     **/
@@ -293,6 +300,25 @@ begin
 --         new.live_community_id = new.own_community_id;
 -- --      end if;
 --     end if;
+
+
+
+    /**
+        Чиновничий статус пользователя
+    **/
+
+    if new.ostatus_id != old.ostatus_id then
+        new.ostatus_alias =
+            (select ostatus.alias
+                from ostatus
+                    where ostatus.id = new.ostatus_id);
+    end if;
+    if new.ostatus_alias != old.ostatus_alias then
+        new.ostatus_id =
+            (select ostatus.id
+                from ostatus
+                    where ostatus.alias = new.ostatus_alias);
+    end if;
 
     /**
         Статус online \ offline

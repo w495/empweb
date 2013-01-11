@@ -661,119 +661,134 @@
     );
 */
 
-
 -- 2012.12.28 16:55:45:155698946 ---------------------------------------------
 
-
-create table wall(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null
-);
-
-create table back(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null
-);
-
-create table flag(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null
-);
-
-create table arms(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null
-);
-
-
-
-create sequence seq_actiontype_id;
-create table actiontype(
-    id          decimal primary key default nextval('seq_actiontype_id'),
-    name_ti     decimal unique      default nextval('seq_any_ti'),
-    alias       varchar(1024)       unique,
-    ispaid      boolean             default false,
-    istoall     boolean             default false,
-    price       numeric(1000, 2)    default 0,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
-);
-
-insert into actiontype(alias, ispaid, price, istoall)
-    values
-        ('advertisement',           false, null, false),
-        ('apologize',               false, null, false),
-        ('cheerup',                 true,  0.01, false),
-        ('compliment',              false, null, false),
-        ('congratulate',            false, null, false),
-        ('congratulate_all',        false, 0.90, true),
-        ('declarelove',             false, null, false),
-        ('embrace_all',             true,  0.01, false),
-        ('embracepassionately',     false, null, false),
-        ('enjoy',                   false, null, false),
-        ('fireworks',               false, null, false),
-        ('hello',                   false, null, false),
-        ('hello_all',               false, null, true ),
-        ('goodbye',                 false, null, false),
-        ('goodbye_all',             true,  0.01, true ),
-        ('goodnight',               false, null, false),
-        ('handson',                 true,  0.01, false),
-        ('hug',                     true,  0.01, false),
-        ('hug_all',                 true,  0.01, true ),
-        ('hugfriendly',             false, null, false),
-        ('kick',                    true,  0.01, false),
-        ('kick_all',                true,  1.00, true ),
-        ('kiss',                    false, null, false),
-        ('kiss_all',                true,  0.50, true ),
-        ('kisscheek',               false, null, false),
-        ('kisspassionately',        false, null, false),
-        ('kisstenderly',            false, null, false),
-        ('lisp',                    true,  0.01, false),
-        ('ogle',                    false, null, false),
-        ('peck',                    false, null, false),
-        ('pullpants',               true,  0.03, false),
-        ('put',                     false, null, false),
-        ('sendflower',              true,  0.01, false),
-        ('sendkiss',                false, null, false),
-        ('sendall',                 false, null, false),
-        ('shakehands',              false, null, false),
-        ('shakehands_all',          false, 0.40, true ),
-        ('shutup',                  true,  0.03, false),
-        ('shutup_all',              true,  0.30, true ),
-        ('slap',                    true,  0.01, false),
-        ('takehandle',              true,  0.02, false),
-        ('takeumbrage',             false, null, false),
-        ('unfastenbra',             true,  0.03, false),
-        ('welcome',                 true,  null, false),
-        ('welcome_all',             true,  0.01, true );
-
-
-create sequence seq_action_id;
-create table action(
-    id                  decimal primary key default nextval('seq_action_id'),
-    actiontype_id       decimal references actiontype(id)
-        default null,
-    actiontype_alias    varchar(1024) references actiontype(alias)
-        default null,
-    pers_id             decimal references pers(id)     default null,
-    pers_nick           varchar(1024)                   default null,
-    owner_id            decimal references pers(id)     default null,
-    owner_nick          varchar(1024)                   default null,
-    ispaid      boolean         default false,
-    price       numeric(1000, 2)    default 0,
-    created     timestamp       without time zone not null
-        default utcnow(),
-    expired     timestamp without time zone not null
-        default utcnow() + interval '1 week',
-    isdeleted   boolean         default false
-);
-
-
-
-
+/*
+    create table wall(
+        doc_id              decimal unique references doc(id),
+        file_id             decimal references file(id)     default null
+    );
+    create table back(
+        doc_id              decimal unique references doc(id),
+        file_id             decimal references file(id)     default null
+    );
+    create table flag(
+        doc_id              decimal unique references doc(id),
+        file_id             decimal references file(id)     default null
+    );
+    create table arms(
+        doc_id              decimal unique references doc(id),
+        file_id             decimal references file(id)     default null
+    );
+    create sequence seq_actiontype_id;
+    create table actiontype(
+        id          decimal primary key default nextval('seq_actiontype_id'),
+        name_ti     decimal unique      default nextval('seq_any_ti'),
+        alias       varchar(1024)       unique,
+        ispaid      boolean             default false,
+        istoall     boolean             default false,
+        price       numeric(1000, 2)    default 0,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+    insert into actiontype(alias, ispaid, price, istoall)
+        values
+            ('advertisement',           false, null, false),
+            ('apologize',               false, null, false),
+            ('cheerup',                 true,  0.01, false),
+            ('compliment',              false, null, false),
+            ('congratulate',            false, null, false),
+            ('congratulate_all',        false, 0.90, true),
+            ('declarelove',             false, null, false),
+            ('embrace_all',             true,  0.01, false),
+            ('embracepassionately',     false, null, false),
+            ('enjoy',                   false, null, false),
+            ('fireworks',               false, null, false),
+            ('hello',                   false, null, false),
+            ('hello_all',               false, null, true ),
+            ('goodbye',                 false, null, false),
+            ('goodbye_all',             true,  0.01, true ),
+            ('goodnight',               false, null, false),
+            ('handson',                 true,  0.01, false),
+            ('hug',                     true,  0.01, false),
+            ('hug_all',                 true,  0.01, true ),
+            ('hugfriendly',             false, null, false),
+            ('kick',                    true,  0.01, false),
+            ('kick_all',                true,  1.00, true ),
+            ('kiss',                    false, null, false),
+            ('kiss_all',                true,  0.50, true ),
+            ('kisscheek',               false, null, false),
+            ('kisspassionately',        false, null, false),
+            ('kisstenderly',            false, null, false),
+            ('lisp',                    true,  0.01, false),
+            ('ogle',                    false, null, false),
+            ('peck',                    false, null, false),
+            ('pullpants',               true,  0.03, false),
+            ('put',                     false, null, false),
+            ('sendflower',              true,  0.01, false),
+            ('sendkiss',                false, null, false),
+            ('sendall',                 false, null, false),
+            ('shakehands',              false, null, false),
+            ('shakehands_all',          false, 0.40, true ),
+            ('shutup',                  true,  0.03, false),
+            ('shutup_all',              true,  0.30, true ),
+            ('slap',                    true,  0.01, false),
+            ('takehandle',              true,  0.02, false),
+            ('takeumbrage',             false, null, false),
+            ('unfastenbra',             true,  0.03, false),
+            ('welcome',                 true,  null, false),
+            ('welcome_all',             true,  0.01, true );
+    create sequence seq_action_id;
+    create table action(
+        id                  decimal primary key
+            default nextval('seq_action_id'),
+        actiontype_id       decimal references actiontype(id)
+            default null,
+        actiontype_alias    varchar(1024) references actiontype(alias)
+            default null,
+        pers_id             decimal references pers(id)     default null,
+        pers_nick           varchar(1024)                   default null,
+        owner_id            decimal references pers(id)     default null,
+        owner_nick          varchar(1024)                   default null,
+        ispaid      boolean         default false,
+        price       numeric(1000, 2)    default 0,
+        created     timestamp       without time zone not null
+            default utcnow(),
+        expired     timestamp without time zone not null
+            default utcnow() + interval '1 week',
+        isdeleted   boolean         default false
+    );
     alter table doc add column isnoticeable
          boolean default false;
-
-
     insert into paytype(alias, isincome)
         values  ('action_out',     false);
+*/
+
+
+-- 2013.01.11 14:43:20:318454342 ---------------------------------------------
+
+    create sequence seq_ostatus_id;
+    create table ostatus(
+        id          decimal primary key default nextval('seq_pstatus_id'),
+        name_ti     decimal unique default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+
+    alter table pers add column  ostatus_id
+        decimal         references ostatus(id)    default null;
+
+    alter table pers add column ostatus_alias
+        varchar(1024)   references ostatus(alias) default null;
+
+    insert into ostatus(alias)
+        values ('citizen'),('police'),('officer');
+
+    update pers set ostatus_alias = 'citizen';
+    update pers set ostatus_id = (select id from ostatus where alias = 'citizen');
+    
+    update pers set ismale = true;
+
+    alter table pers alter column ismale set default true;
+

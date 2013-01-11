@@ -309,47 +309,30 @@ norm('update') ->
             key         = id,
             types       = [integer]
         },
-%         #norm_rule{
-%             key         = owner_id,
-%             required    = false,
-%             types       = [nullable, allable, integer],
-%             default     = null
-%         },
-%         #norm_rule{
-%             key         = owner_nick,
-%             required    = false,
-%             types       = [nullable, string],
-%             default     = null
-%         },
         #norm_rule{
             key         = orig_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = orig_owner_id,
             required    = false,
-            types       = [nullable, allable, integer],
-            default     = null
+            types       = [nullable, allable, integer]
         },
         #norm_rule{
             key         = orig_owner_nick,
             required    = false,
-            types       = [nullable, string],
-            default     = null
+            types       = [nullable, string]
         },
         #norm_rule{
             key         = head,
             required    = false,
-            types       = [nullable, string],
-            default     = null
+            types       = [nullable, string]
         },
         #norm_rule{
             key         = body,
             required    = false,
-            types       = [nullable, string],
-            default     = null
+            types       = [nullable, string]
         },
         #norm_rule{
             key         = parent_id,
@@ -359,99 +342,83 @@ norm('update') ->
         #norm_rule{
             key         = read_acctype_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = read_acctype_alias,
             required    = false,
-            types       = [nullable, atom],
-            default     = null
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = comm_acctype_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = comm_acctype_alias,
             required    = false,
-            types       = [nullable, atom],
-            default     = null
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = doctype_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = doctype_alias,
             required    = false,
-            types       = [nullable, atom],
-            default     = null
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = oktype_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = oktype_alias,
             required    = false,
-            types       = [nullable, atom],
-            default     = null
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = contype_id,
             required    = false,
-            types       = [nullable, integer],
-            default     = null
+            types       = [nullable, integer]
         },
         #norm_rule{
             key         = contype_alias,
             required    = false,
-            types       = [nullable, atom],
-            default     = null
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = position,
             required    = false,
-            types       = [integer],
-            default     = 0
+            types       = [integer]
         },
         #norm_rule{
             key         = nviews,
             required    = false,
-            types       = [float],
-            default     = 0
+            types       = [float]
         },
         #norm_rule{
             key         = nvotes,
             required    = false,
-            types       = [float],
-            default     = 0
+            types       = [float]
         },
 
         #norm_rule{
             key         = isrepost,
             required    = false,
-            types       = [nullable, boolean],
-            default     = false
+            types       = [nullable, boolean]
         },
         #norm_rule{
             key         = isnoticeable,
             required    = false,
-            types       = [nullable, boolean],
-            default     = false
+            types       = [nullable, boolean]
         },
         #norm_rule{
             key         = isrepostable,
             required    = false,
-            types       = [nullable, boolean],
-            default     = true
+            types       = [nullable, boolean]
         }
     ];
 

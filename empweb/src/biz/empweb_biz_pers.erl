@@ -83,6 +83,17 @@
 ]).
 
 %%
+%% Чиновничий статус пользователя
+%%
+-export([
+    get_ostatus/1,
+    create_ostatus/1,
+    update_ostatus/1,
+    delete_ostatus/1
+]).
+
+
+%%
 %% Статус пользователя
 %%
 -export([
@@ -460,6 +471,27 @@ update_pgroup(Params) ->
 delete_pgroup(Params) ->
     ?evman_args(Params, <<"update pgroup">>),
     empdb_biz_pers:delete_pgroup(Params).
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Чиновничий Статус пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_ostatus(Params) ->
+    ?evman_args(Params, <<"get ostatus">>),
+    empdb_biz_pers:get_ostatus(Params).
+
+create_ostatus(Params) ->
+    ?evman_args(Params, <<"create ostatus">>),
+    empdb_biz_pers:create_ostatus(Params).
+
+update_ostatus(Params) ->
+    ?evman_args(Params, <<"update ostatus">>),
+    empdb_biz_pers:update_ostatus(Params).
+
+delete_ostatus(Params) ->
+    ?evman_args(Params, <<"delete ostatus">>),
+    empdb_biz_pers:delete_ostatus(Params).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Семейное положение пользователя

@@ -51,6 +51,16 @@
 % ]).
 
 %%
+%% Чиновничий Статус пользователя
+%%
+-export([
+    get_ostatus/2,
+    get_ostatus/3,
+    create_ostatus/2,
+    update_ostatus/2
+]).
+
+%%
 %% Статус пользователя
 %%
 -export([
@@ -168,6 +178,11 @@ table({fields, all})->
         money,
         pstatus_id,
         pstatus_alias,
+
+        %% Чиновничий
+        ostatus_id,
+        ostatus_alias,
+        
         authority_id,
         authority_alias,
         authority_level,
@@ -420,6 +435,21 @@ update_pgroup(Con, Proplist)->
 %             Res
 %     end.
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Чиновничий статус посльзователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_ostatus(Con, What) ->
+    get_ostatus(Con, What, []).
+
+get_ostatus(Con, What, Fields)->
+    empdb_dao:get(ostatus(), Con, What, Fields).
+
+create_ostatus(Con, Proplist)->
+    empdb_dao:create(ostatus(), Con, Proplist).
+
+update_ostatus(Con, Proplist)->
+    empdb_dao:update(ostatus(), Con, Proplist).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Статус пользователя пользователя: в сети \ не в сети.
@@ -515,6 +545,36 @@ pgroup() ->
         %% Список всех полей.
         {{table, fields, all},                [
             id, alias, name_ti, issystem, isdeleted
+        ]},
+        %% Список полей по которым можно проводить выборку.
+        {{table, fields, select},             [
+            id, alias, name_ti
+        ]},
+        %% Список полей таблицы для создания.
+        {{table, fields, insert},             [
+            alias, name_ti
+        ]},
+        %% Список полей таблицы для обновления.
+        {{table, fields, update},             [
+            id, alias, name_ti
+        ]},
+        %% Cписок обязательных полей таблицы для создания.
+        {{table, fields, insert, required},   [
+            alias
+        ]}
+    ].
+
+
+%%
+%% @doc Чиновничий статус пользователя
+%%
+ostatus() ->
+    [
+        %% Имя таблицы.
+        {{table, name},                       ostatus},
+        %% Список всех полей.
+        {{table, fields, all},                [
+            id, alias, name_ti, isdeleted
         ]},
         %% Список полей по которым можно проводить выборку.
         {{table, fields, select},             [

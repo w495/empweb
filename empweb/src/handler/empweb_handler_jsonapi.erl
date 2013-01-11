@@ -999,6 +999,17 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   get_authority
                 };
 
+          <<"get_all_ostatuses">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pers,
+                    action          =   'get_ostatus'
+                };
+            <<"get_ostatus">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pers,
+                    action          =   'get_ostatus'
+                };
+                
             <<"get_all_mstatuses">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
@@ -1009,6 +1020,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_pers,
                     action          =   'get_mstatus'
                 };
+                
 
             <<"get_all_pstatuses">> ->
                 Eh#empweb_hap{

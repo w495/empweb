@@ -559,7 +559,18 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-        %%
+        %% Чиновничий статус пользователя
+            #norm_rule{
+                key         = ostatus_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = ostatus_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Статус пользователя
             #norm_rule{
                 key         = pstatus_id,
                 required    = false,
@@ -743,7 +754,18 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-        %% 
+        %% Чиновничий статус пользователя
+            #norm_rule{
+                key         = ostatus_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = ostatus_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+        %% Статус пользователя
             #norm_rule{
                 key         = pstatus_id,
                 required    = false,
@@ -937,6 +959,18 @@ handle(_req, #empweb_hap{
                         key = emotion_alias,
                         types = [nullable, string]
                     },
+
+                %% Чиновничий статус пользователя
+                    #norm_rule{
+                        key         = ostatus_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key         = ostatus_alias,
+                        required    = false,
+                        types       = [nullable, string]
+                    },
                 %%
                     #norm_rule{
                         key         = pstatus_id,
@@ -1018,6 +1052,31 @@ handle(_req, #empweb_hap{action='get_authority', params=Params} = Hap) ->
         ]),
         fun(Data)->
             {ok,empweb_jsonapi:resp(empweb_biz_pers:get_authority(Data#norm.return)),Hap}
+        end,
+        Hap
+    );
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Чиновничий статус пользователя
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% handle(_req, #empweb_hap{action='get_all_mstatuses'} = Hap) ->
+%     ?evman_args(Hap, <<" = get all mstatuses">>),
+%     {ok,empweb_jsonapi:resp(empweb_biz_pers:get_mstatus([])),Hap};
+
+handle(_req, #empweb_hap{action='get_ostatus', params=Params} = Hap) ->
+    ?evman_args(Hap, <<" = get ostatus">>),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, opt_norm('get')),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:get_ostatus(Data#norm.return)
+                ),
+                Hap
+            }
         end,
         Hap
     );
