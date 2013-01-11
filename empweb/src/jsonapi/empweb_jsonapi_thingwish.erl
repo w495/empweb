@@ -85,6 +85,55 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
+        action  =   'count',
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = count buy">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer],
+                default     = Pers_id
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = thing_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = thing_alias,
+                required    = false,
+                types       = [nullable, string]
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_thingwish:count(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
         action  =   'get',
         params  =   Params,
         pers_id =   Pers_id
