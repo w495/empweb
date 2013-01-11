@@ -196,6 +196,11 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
                 key         = owner_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -221,7 +226,7 @@ handle(_req, #empweb_hap{
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_thingbuy:update([
-                        {buyer_id, Pers_id}
+                        {pers_id@check, Pers_id}
                         |Data#norm.return
                     ])
                 ),

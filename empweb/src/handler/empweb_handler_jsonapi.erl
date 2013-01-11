@@ -1177,6 +1177,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
             %% ==================================================
 
+            <<"count_thingbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingbuy,
+                    action          =   count
+                };
             <<"get_thingbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingbuy,
@@ -1279,6 +1284,22 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
             %% ==================================================
 
+            <<"count_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   count
+                };
+                
+            <<"get_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   'get'
+                };
+            <<"get_roomexperbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomexperbuy,
+                    action          =   'get'
+                };
             <<"get_roomexperbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomexperbuy,
@@ -1306,6 +1327,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 };
             
             %% ==================================================
+            <<"count_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   count
+                };
             <<"get_roomlot">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomlot,
