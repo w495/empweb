@@ -223,7 +223,8 @@ table({fields, all})->
         citizen_room_fromdatetime,
   
         own_room_id,
-        % own_room_head,
+        own_room_head,
+        
         % allowauctoffer,
         perspicbody_id,
         perspichead_id,

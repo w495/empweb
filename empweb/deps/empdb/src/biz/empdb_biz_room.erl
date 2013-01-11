@@ -63,7 +63,10 @@ create(Params)->
         Head = proplists:get_value(head, Params),
         {ok, Mbroomobjs} =
             empdb_dao_room:get(Con, [
-                {head, Head},
+                {'or', [
+                    {owner_id, Owner_id},
+                    {head, Head}
+                ]},
                 {fields, [
                     id,
                     head,
