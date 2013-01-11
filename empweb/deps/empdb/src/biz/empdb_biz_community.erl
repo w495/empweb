@@ -122,8 +122,10 @@ create(Params)->
                             ]},
                             {values, [
                                 {money, {decr, Price}},
-                                {own_community_id, proplists:get_value(id, Respl)},
-                                {live_community_id, proplists:get_value(id, Respl)},
+                                {own_community_id,      proplists:get_value(id, Respl)},
+                                {own_community_head,    Head},
+                                {live_community_id,     proplists:get_value(id, Respl)},
+                                {live_community_head,   Head},
                                 {live_community_approved, true}
                             ]}
                         ]),
