@@ -61,7 +61,7 @@ table({fields, all})->
         price,
         isincome,
         treastype_id,
-        reastype_alias,
+        treastype_alias,
         pers_id,
         pers_nick,
         info,
