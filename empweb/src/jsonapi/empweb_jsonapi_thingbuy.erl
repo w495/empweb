@@ -87,6 +87,56 @@ init(_, Req, #empweb_hap{
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
+handle(_req, #empweb_hap{
+        action      =   count,
+        params      =   Params,
+        pers_id     =   Pers_id,
+        pers_nick   =   Pers_nick
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get buy">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = thing_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = thing_alias,
+                required    = false,
+                types       = [nullable, string]
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_thingbuy:count(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
 handle(_req, #empweb_hap{
         action      =   'get',
         params      =   Params,
@@ -129,10 +179,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_thingbuy:get([
-                        {buyer_id, Pers_id}
-                        |Data#norm.return
-                    ])
+                    empweb_biz_thingbuy:get(Data#norm.return)
                 ),
                 Hap
             }

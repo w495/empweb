@@ -12,6 +12,7 @@
 -export([
     update/1,
     create/1,
+    count/1,
     get/1,
     get/2
 ]).
@@ -30,6 +31,9 @@ create(Params)->
 
 update(Params)->
     empdb_biz_thingbuy:update(Params).
+
+count(Params)->
+    empdb_biz_thingbuy:count(Params).
 
 get(Params)->
     empdb_biz_thingbuy:get(Params).
