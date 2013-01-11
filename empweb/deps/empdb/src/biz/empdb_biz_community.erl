@@ -60,7 +60,7 @@ create(Params)->
         %% WARNING: В текущей реализации, мы действуем не очень эффективно.
         %%
         Head = proplists:get_value(head, Params),
-        {ok, Mbcommobjs} =
+        {ok, Mbcommunityobjs} =
             empdb_dao_community:get(Con, [
                 {'or', [
                     {owner_id, Owner_id},
@@ -101,7 +101,7 @@ create(Params)->
             proplists:get_value(level, Candsgteauthoritypl),
         case {
             Price =< Money,
-            Mbcommobjs,
+            Mbcommunityobjs,
             (Authority_level >= Readgteauthority_level)
                 and
             (Authority_level >= Candsgteauthority_level)
@@ -139,16 +139,27 @@ create(Params)->
                     Error ->
                         Error
                 end;
-            {true, [{Mbcommpl}|_], true} ->
-                case {
-                    proplists:get_value(head, Mbcommpl),
-                    proplists:get_value(owner_id, Mbcommpl)
-                } of
-                    {_, Owner_id } ->
-                        {error,{not_unique_owner,Owner_id}};
-                    {Head, _} ->
+            {true, Mbcommunityobjs, true} ->
+                case lists:foldl(
+                    fun
+                        (_, {error,{not_unique_owner,Owner_id}})->
+                            {error,{not_unique_owner,Owner_id}};
+                        ({Mbcommunityplownerid}, undefined)->
+                            case proplists:get_value(owner_id, Mbcommunityplownerid) of
+                                Owner_id ->
+                                    {error,{not_unique_owner,Owner_id}};
+                                _ ->
+                                    undefined
+                            end
+                    end,
+                    undefined,
+                    Mbcommunityobjs
+                ) of
+                    undefined ->
                         Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
-                        {error,{not_unique_head,Sugs}}
+                        {error,{not_unique_head,Sugs}};
+                    Not_unique_owner ->
+                        Not_unique_owner
                 end;
             {false, _ ,true}->
                 {error, {not_enough_money, {[
@@ -263,7 +274,7 @@ update(Params)->
         %% WARNING: В текущей реализации, мы действуем не очень эффективно.
         %%
         Head = proplists:get_value(head, Params),
-        {ok, Mbcommobjs} =
+        {ok, Mbcommunityobjs} =
             empdb_dao_community:get(Con, [
                 {'or', [
                     {owner_id, Owner_id},

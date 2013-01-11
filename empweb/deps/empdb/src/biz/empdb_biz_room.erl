@@ -71,8 +71,7 @@ create(Params)->
                     id,
                     head,
                     owner_id
-                ]},
-                {limit, 1}
+                ]}
             ]),
 
         io:format("~n~n~n Mbroomobjs  = ~p~n~n~n", [Mbroomobjs ]),
@@ -106,19 +105,27 @@ create(Params)->
                     Else ->
                         Else
                 end;
-            {true, [{Mbcommpl}|_]} ->
-%                 Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
-%                 {error,{not_unique_head,Sugs}};
-                case {
-                    proplists:get_value(head, Mbcommpl),
-                    proplists:get_value(owner_id, Mbcommpl)
-                } of
-                    {_, Owner_id } ->
-                        io:format("~n~n~nOwner_id  = ~p~n~n~n", [Owner_id ]),
-                        {error,{not_unique_owner,Owner_id}};
-                    {Head, _} ->
+            {true, Mbroomobjs} ->
+                case lists:foldl(
+                    fun
+                        (_, {error,{not_unique_owner,Owner_id}})->
+                            {error,{not_unique_owner,Owner_id}};
+                        ({Mbroomplownerid}, undefined)->
+                            case proplists:get_value(owner_id, Mbroomplownerid) of
+                                Owner_id ->
+                                    {error,{not_unique_owner,Owner_id}};
+                                _ ->
+                                    undefined
+                            end
+                    end,
+                    undefined,
+                    Mbroomobjs
+                ) of
+                    undefined ->
                         Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),
-                        {error,{not_unique_head,Sugs}}
+                        {error,{not_unique_head,Sugs}};
+                    Not_unique_owner ->
+                        Not_unique_owner
                 end;
             {false, _ }->
                 {error, {not_enough_money, {[
