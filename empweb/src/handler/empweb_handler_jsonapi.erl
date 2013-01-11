@@ -1212,6 +1212,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
             %% ==================================================
 
+            <<"count_thingwish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   count
+                };
             <<"get_thingwish">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingwish,
@@ -1240,7 +1245,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
 
             %% ==================================================
-            
+            <<"count_experbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_experbuy,
+                    action          =   'get'
+                };
             <<"get_experbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_experbuy,

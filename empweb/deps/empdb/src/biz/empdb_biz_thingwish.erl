@@ -21,6 +21,7 @@
 %% Блоги
 %%
 -export([
+    count/1,
     get/1,
     get/2,
     create/1,
@@ -79,6 +80,12 @@ delete(Params)->
                 {isdeleted, true}
             ]}
         ])
+    end).
+
+
+count(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao_thingwish:count(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params)->
