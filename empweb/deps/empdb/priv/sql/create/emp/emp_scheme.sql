@@ -255,7 +255,7 @@ create table authority(
 **/
 create sequence seq_ostatus_id;
 create table ostatus(
-    id          decimal primary key default nextval('seq_pstatus_id'),
+    id          decimal primary key default nextval('seq_ostatus_id'),
     /**
         Номер языковой сущности
     **/

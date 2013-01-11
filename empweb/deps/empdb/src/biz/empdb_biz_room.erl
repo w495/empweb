@@ -47,6 +47,7 @@ create(Params)->
                 ]},
                 {limit, 1}
             ]),
+        Owner_id = proplists:get_value(id,   Mbownerpl),
         %%
         %% Здесь надо вводить, дополнительное ограничение на уровне базы.
         %% Это делать не хочется, так как
@@ -64,10 +65,15 @@ create(Params)->
             empdb_dao_room:get(Con, [
                 {head, Head},
                 {fields, [
-                    id
+                    id,
+                    head,
+                    owner_id
                 ]},
                 {limit, 1}
             ]),
+
+        io:format("~n~n~n Mbroomobjs  = ~p~n~n~n", [Mbroomobjs ]),
+        
         Price = ?CREATE_ROOM_PRICE,
         Money = proplists:get_value(money, Mbownerpl),
         case {Price =< Money, Mbroomobjs} of
@@ -75,7 +81,7 @@ create(Params)->
                 case empdb_dao_room:create(Con, Params) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
-                            {pers_id,           proplists:get_value(owner_id,   Params)},
+                            {pers_id,           Owner_id},
                             {paytype_alias,     room_out},
                             {isincome,          false},
                             {price,             Price}
@@ -83,6 +89,7 @@ create(Params)->
                         Newmoney = Money - Price,
                         empdb_dao_pers:update(Con,[
                             {id,    proplists:get_value(id,   Mbownerpl)},
+                            {own_room_id, proplists:get_value(id, Respl)},
                             {money, {decr, Price}}
                         ]),
                         {ok, [
@@ -103,6 +110,7 @@ create(Params)->
                     proplists:get_value(owner_id, Mbcommpl)
                 } of
                     {_, Owner_id } ->
+                        io:format("~n~n~nOwner_id  = ~p~n~n~n", [Owner_id ]),
                         {error,{not_unique_owner,Owner_id}};
                     {Head, _} ->
                         Sugs = suggest_head(Con, Head, [{owner, Mbownerpl}]),

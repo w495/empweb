@@ -769,7 +769,7 @@
 
     create sequence seq_ostatus_id;
     create table ostatus(
-        id          decimal primary key default nextval('seq_pstatus_id'),
+        id          decimal primary key default nextval('seq_ostatus_id'),
         name_ti     decimal unique default nextval('seq_any_ti'),
         alias       varchar(1024)   unique,
         created     timestamp without time zone not null default utcnow(),
