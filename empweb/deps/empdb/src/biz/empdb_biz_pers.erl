@@ -789,8 +789,9 @@ login({Uf, Uv}, Params) ->
     
 logout(Params)->
     empdb_dao:with_transaction(emp, fun(Con)->
-        {ok,[{[{id,Pstatus_id}]}]} = 
+        {ok,[{Pstatuspl}]} =
             empdb_dao_pers:get_pstatus(Con, [{alias, offline}], [id]),
+        Pstatus_id = proplists:get_value(id, Pstatuspl),
         empdb_dao_pers:update(Con, [{pstatus_id, Pstatus_id}|Params]),
         empdb_dao_pers:get(Con, [{isdeleted, false}|Params])
     end).

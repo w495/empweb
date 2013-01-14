@@ -88,6 +88,9 @@ get_adds(Con, {ok, Res}, Params) ->
                                 {nick,  proplists:get_value(owner_nick, Itempl)}
                             ]},
                             {fields, [
+                                citizen_room_id,
+                                citizen_room_head,
+                                citizen_room_fromdatetime,
                                 authority_id,
                                 authority_alias,
                                 live_room_id,
@@ -104,6 +107,9 @@ get_adds(Con, {ok, Res}, Params) ->
                                 {nick,  proplists:get_value(pers_nick, Itempl)}
                             ]},
                             {fields, [
+                                citizen_room_id,
+                                citizen_room_head,
+                                citizen_room_fromdatetime,
                                 authority_id,
                                 authority_alias,
                                 live_room_id,
