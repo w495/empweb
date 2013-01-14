@@ -766,6 +766,7 @@
 
 
 -- 2013.01.11 14:43:20:318454342 ---------------------------------------------
+/*
 
     create sequence seq_ostatus_id;
     create table ostatus(
@@ -775,20 +776,34 @@
         created     timestamp without time zone not null default utcnow(),
         isdeleted   boolean default false
     );
-
     alter table pers add column  ostatus_id
         decimal         references ostatus(id)    default null;
-
     alter table pers add column ostatus_alias
         varchar(1024)   references ostatus(alias) default null;
-
     insert into ostatus(alias)
         values ('citizen'),('police'),('officer');
-
     update pers set ostatus_alias = 'citizen';
     update pers set ostatus_id = (select id from ostatus where alias = 'citizen');
-    
     update pers set ismale = true;
-
     alter table pers alter column ismale set default true;
+*/
 
+    create sequence seq_cstatus_id;
+    create table cstatus(
+        id          decimal primary key default nextval('seq_cstatus_id'),
+        name_ti     decimal unique default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+    alter table pers add column  cstatus_id
+        decimal         references cstatus(id)    default null;
+    alter table pers add column cstatus_alias
+        varchar(1024)   references cstatus(alias) default null;
+    insert into cstatus(alias)
+        values ('citizen'),('police'),('officer');
+    update pers set cstatus_alias = 'citizen';
+    update pers set cstatus_id = (select id from cstatus where alias = 'citizen');
+    
+
+    

@@ -794,6 +794,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% флаги
             %%
+            <<"count_flag">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_flag,
+                    action          =   'count'
+                };
             <<"get_flag">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_flag,
@@ -827,6 +832,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% Фоны
             %%
+            <<"count_back">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_back,
+                    action          =   'count'
+                };
             <<"get_back">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_back,
@@ -860,6 +870,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% Обои
             %%
+            <<"count_wall">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_wall,
+                    action          =   'count'
+                };
             <<"get_wall">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_wall,
@@ -893,6 +908,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% гербы
             %%
+            <<"count_arms">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_arms,
+                    action          =   'count'
+                };
             <<"get_arms">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_arms,

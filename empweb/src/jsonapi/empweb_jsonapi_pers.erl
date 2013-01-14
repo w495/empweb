@@ -299,6 +299,7 @@ handle(_req, #empweb_hap{
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
+            io:format("~n~nData#norm.return = ~p~n~n", [Data#norm.return]),
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_pers:get_friend([
@@ -306,8 +307,8 @@ handle(_req, #empweb_hap{
                             case proplists:get_value(pers_id, Data#norm.return) of
                                 undefined ->
                                     Pers_id;
-                                Pers_id ->
-                                    Pers_id
+                                Pers_id_ ->
+                                    Pers_id_
                             end
                         } |Data#norm.return
                     ])
