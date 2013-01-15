@@ -86,7 +86,7 @@ create(Params)->
                             {pers_id,           Pers_id},
                             {room_id,           Room_id},
                             {isincome,          true},
-                            {treastype_alias,   in},
+                            {treastype_alias,   transfer_in},
                             {price,             Price}
                         ]),
                         %% Обновляем комнату
