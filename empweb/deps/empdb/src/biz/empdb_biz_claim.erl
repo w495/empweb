@@ -48,7 +48,8 @@ create(Params)->
                     {fields, [id]},
                     {limit, 1}
                 ]) of
-                    {ok, [{[{id, Id}]}]} ->
+                    {ok, [{Perspl}]} ->
+                        Id = proplists:get_value(id, Perspl),
                         empdb_dao_claim:create(Con, [
                             {pers_id, Id}
                             |proplists:delete(pers_nick, Params)
