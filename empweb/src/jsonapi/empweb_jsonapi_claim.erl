@@ -330,10 +330,15 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_claim:update([
-                        {owner_id, Pers_id}
-                        | Data#norm.return
-                    ])
+                    empweb_biz_claim:update(
+                        empweb_norm:filter_owner([
+                            {pers_id_, Pers_id}
+                            |Data#norm.return
+                        ], {
+                            pers_id_,
+                            owner_id
+                        })
+                    )
                 ),
                 Hap
             }

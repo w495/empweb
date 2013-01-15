@@ -306,6 +306,16 @@ norm('create') ->
 norm('update') ->
     [
         #norm_rule{
+            key         = owner_id,
+            required    = false,
+            types       = [nullable, integer]
+        },
+        #norm_rule{
+            key         = owner_nick,
+            required    = false,
+            types       = [nullable, string]
+        },
+        #norm_rule{
             key         = id,
             types       = [integer]
         },
