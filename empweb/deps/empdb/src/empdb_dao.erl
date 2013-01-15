@@ -1099,8 +1099,10 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     end),
     case empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)) of
         {ok, List}->
+            io:format("~n~n~n List = ~p ~n~n~n", [List]),
             case empdb_dao:pgret(empdb_dao:equery(Con, Querycnt, Pfields)) of
                 {ok,[{[{count,Count}]}]} ->
+                     io:format("~n~n~n Count = ~p ~n~n~n", [Count]),
                     {ok,
                         begin
                             {_, Res_} =
@@ -1121,6 +1123,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                     {1, []},
                                     List
                                 ),
+                            io:format("~n~n~n Res_ = ~p ~n~n~n", [Res_]),
                             lists:reverse(Res_)
                         end
                     };
@@ -1129,6 +1132,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                     Else1
             end;
         Else2 ->
+            io:format("~n~n~n Else2 = ~p ~n~n~n", [Else2]),
             Else2
     end;
 
@@ -2202,17 +2206,17 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
             fields =[Current_field]
         }),
 
-    Current_field_vals = lists:foldl(
-        fun ({[{Current_field, Current_field_val}]}, Acc)->
-                [Current_field_val|Acc];
-            (_, Acc)->
-                Acc
-        end,
-        [],
-        Glst
-    ),
+    Current_field_vals =
+        lists:foldl(
+            fun ({Gpl}, Acc)->
+                [proplists:get_value(Current_field, Gpl)|Acc]
+            end,
+            [],
+            Glst
+        ),
     case Current_field_vals of
         [] ->
+            io:format("~n~n~n Current_field_vals  = ~p  ~n~n~n", [Current_field_vals ]),
             {ok,[]};
         _ ->
             case update(Parent,Con,Queryobj#queryobj{
@@ -2220,6 +2224,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                 filter=[{Parent_field, {in, Current_field_vals}}|Filter]
             }) of
                 {ok, [{[]}]} ->
+                    io:format("~n~n~nParent_pl = XSDDD~n~n~n", []),
                     Pid_pl =
                         case proplists:get_value(Parent_field, Filter) of
                             undefined ->
@@ -2236,6 +2241,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {ok, [{Parent_pl}]} ->
+                    io:format("~n~n~nParent_pl = ~p~n~n~n", [Parent_pl]),
                     Pid = proplists:get_value(Parent_field, Parent_pl),
                     case update(Current, Con, Queryobj#queryobj{
                         filter=[{Current_field, Pid}|Filter],
@@ -2247,6 +2253,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {ok, Parent_pls} ->
+                    io:format("~n~n~n Parent_pls = ~p~n~n~n", [Parent_pls]),
                     Pids = lists:foldl(fun({Parent_pl}, Acc) ->
                         [proplists:get_value(Parent_field, Parent_pl)|Acc]
                     end, [], Parent_pls),
@@ -2286,6 +2293,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {Eclass, Error} ->
+                    io:format("~n~n~n {Eclass, Error} = ~p~n~n~n", [{Eclass, Error}]),
                     % ?empdb_debug("Eclass ~n~n~n"),
                     {Eclass, Error}
             end
@@ -2352,6 +2360,8 @@ update(Current, Con, #queryobj{
 
                     % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
                     % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
+
+                    io:format("~n~n~n !!!! ~n~n~n", []),
     
                     get(Current, Con, #queryobj{
                         filter=Filter, 
