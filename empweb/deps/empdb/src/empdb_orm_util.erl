@@ -14,7 +14,29 @@ current_select_fields(Filtername, Op) ->
             Filtername;
         _ ->
             case lists:foldl(
-                fun ({Tab, _}, [])->
+                fun
+                    ({{T1, T2}, _}, [])->
+                        case
+                            lists:member(
+                                Filtername,
+                                table_options(
+                                    {table, fields, select},
+                                    T1
+                                )
+                            )
+                        of
+                            true ->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(
+                                        T2
+                                    )
+                                    ++ "." ++
+                                    Filternamestr
+                                );
+                            _ ->
+                                []
+                        end;
+                    ({Tab, _}, [])->
                         case
                             lists:member(
                                 Filtername,
@@ -53,11 +75,42 @@ current_all_fields(Current_all_fields_, Op) ->
                 Filternamestr = empdb_convert:to_list(Filtername),
                 case lists:member($., empdb_convert:to_list(Filtername)) of
                     true ->
+                        io:format("~n~n~n Filtername 2 = ~p ~n~n~n", [Filtername]),
                         {Filtername, Filterval};
                     _ ->
-
+                         io:format("~n~n~n Filtername 3 = ~p ~n~n~n", [Filtername]),
                         case lists:foldl(
-                            fun ({Tab, _}, [])->
+                            fun
+                                ({{T1, T2}, _}, [])->
+                                    io:format("~n~n~n Filtername = ~p ~n~n~n", [Filtername]),
+                                    case
+                                        lists:member(
+                                            Filtername,
+                                            table_options(
+                                                {table, fields, all},
+                                                T1
+                                            )
+                                        )
+                                    of
+                                        true ->
+                                            case lists:member(Filtername, table_expressions()) of
+                                                true ->
+                                                    {Filtername, current_all_fields(Filterval, Op)};
+                                                _ ->
+                                                    {   empdb_convert:to_atom(
+                                                            empdb_convert:to_list(
+                                                                T2
+                                                            )
+                                                            ++ "." ++
+                                                            Filternamestr
+                                                        ),
+                                                        Filterval
+                                                    }
+                                            end;
+                                        _ ->
+                                            []
+                                    end;
+                                ({Tab, _}, [])->
                                     case
                                         lists:member(
                                             Filtername,
@@ -110,6 +163,33 @@ table_expressions()->
         'not'
     ].
 
+
+table_name({Current, _}) ->
+    Current;
+
+table_name(Current) ->
+    Current.
+
+table_name_as_alias({Current, As}) ->
+    [
+        empdb_convert:to_binary(table_options({table, name},Current)),
+        <<" as ">>,
+        empdb_convert:to_binary(As)
+    ];
+
+table_name_as_alias(Current) ->
+    empdb_convert:to_binary(table_options({table, name},Current)).
+
+table_alias({Current, As}) ->
+    empdb_convert:to_binary(As);
+
+table_alias(Current) ->
+    empdb_convert:to_binary(table_options({table, name},Current)).
+
+
+table_options({Current, _}) ->
+    table_options(Current);
+
 table_options(Current) when erlang:is_atom(Current) ->
     [
         {   {table, name},
@@ -137,9 +217,9 @@ table_options(Current) ->
 
 table_options({table, fields, all},      Current) ->
     [   'and', 'or'
-        | proplists:get_value({table, fields, all}, Current, [])
+        | proplists:get_value({table, fields, all}, table_options(Current), [])
     ];
 
 table_options(Oname,      Current) ->
-    proplists:get_value(Oname, Current).
+    proplists:get_value(Oname, table_options(Current)).
 

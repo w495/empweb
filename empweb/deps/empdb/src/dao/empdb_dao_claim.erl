@@ -80,10 +80,84 @@ table()->
     table(name).
 
 get(Con, What) ->
-    empdb_dao_doc:get(?MODULE, Con, What).
+    Fields =
+        case proplists:get_value(fields, What, []) of
+            [] ->
+                lists:append(
+                    [
+                        empdb_dao_photo:table({fields, select}),
+                        empdb_dao_doc:table({fields, select}),
+                        [
+                            owner_citizen_room_id,
+                            owner_citizen_room_head,
+                            pers_citizen_room_id,
+                            judge_citizen_room_head,
+                            judge_citizen_room_id,
+                            judge_citizen_room_head,
+                            owner_authority_id,
+                            owner_authority_alias,
+                            pers_authority_id,
+                            pers_authority_alias,
+                            judge_authority_id,
+                            judge_authority_alias
+                        ]
 
-get(Con, What, Fields)->
-    empdb_dao_doc:get(?MODULE, Con, What, Fields).
+                    ]
+                );
+            F ->
+                F
+        end,
+
+
+    empdb_dao:get([
+        {empdb_dao_doc,     id},
+        {empdb_dao_claim,   doc_id},
+        {{empdb_dao_pers, owner },   {id, {empdb_dao_doc,    owner_id}}},
+        {{empdb_dao_pers, pers  },   {id, {empdb_dao_claim,  pers_id}}},
+        {{empdb_dao_pers, judge },   {left, {id, {empdb_dao_claim,  judge_id}}}}
+    ],Con,[
+        {fields, Fields}
+        |proplists:delete(fields, What)
+    ]).
+
+get(Con, What, Afields)->
+     Fields =
+        case Afields of
+            [] ->
+                lists:append(
+                    [
+                        empdb_dao_photo:table({fields, select}),
+                        empdb_dao_doc:table({fields, select}),
+                        [
+                            owner_citizen_room_id,
+                            owner_citizen_room_head,
+                            pers_citizen_room_id,
+                            pers_citizen_room_head,
+                            judge_citizen_room_id,
+                            judge_citizen_room_head,
+                            owner_authority_id,
+                            owner_authority_alias,
+                            pers_authority_id,
+                            pers_authority_alias,
+                            judge_authority_id,
+                            judge_authority_alias
+                        ]
+
+                    ]
+                );
+            F ->
+                F
+        end,
+    empdb_dao:get([
+        {empdb_dao_doc,     id},
+        {empdb_dao_claim,   doc_id},
+        {{empdb_dao_pers, owner },   {id, {empdb_dao_doc,    owner_id}}},
+        {{empdb_dao_pers, pers  },   {id, {empdb_dao_claim,  pers_id}}},
+        {{empdb_dao_pers, judge },   {left, {id, {empdb_dao_claim,  judge_id}}}}
+    ],Con,[
+        {fields, Fields}
+        |proplists:delete(fields, What)
+    ]).
 
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).

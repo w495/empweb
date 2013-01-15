@@ -66,11 +66,7 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        get_adds(
-            Con,
-            empdb_dao_claim:get(Con, [{isdeleted, false}|Params]),
-            Params
-        )
+        empdb_dao_claim:get(Con, [{isdeleted, false}|Params])
     end).
 
 get_adds(Con, {ok, Res}, Params) ->

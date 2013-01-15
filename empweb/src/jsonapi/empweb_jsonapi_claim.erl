@@ -110,12 +110,72 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = judge_id,
                 required    = false,
-                types       = empweb_norm:filter([integer])
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = judge_nick,
                 required    = false,
-                types       = empweb_norm:filter([string])
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = owner_citizen_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = owner_citizen_room_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = pers_citizen_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_citizen_room_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = judge_citizen_room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = judge_citizen_room_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = owner_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = owner_authority_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = pers_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_authority_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = judge_authority_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = judge_authority_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             }
             |empweb_norm_doc:norm('get')
         ]),
