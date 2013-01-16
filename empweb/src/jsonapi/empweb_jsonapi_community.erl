@@ -185,6 +185,11 @@ handle(_req, #empweb_hap{
                 key         = slogan,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = isclosed,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -302,6 +307,11 @@ handle(_req, #empweb_hap{
                 key         = slogan,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = isclosed,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -418,6 +428,11 @@ handle(_req, #empweb_hap{
                 key         = slogan,
                 required    = false,
                 types       = [string]
+            },
+            #norm_rule{
+                key         = isclosed,
+                required    = false,
+                types       = [nullable, boolean]
             }
             |empweb_norm_doc:norm('create')
         ]),
@@ -533,6 +548,11 @@ handle(_req, #empweb_hap{
                 key         = slogan,
                 required    = false,
                 types       = [string]
+            },
+            #norm_rule{
+                key         = isclosed,
+                required    = false,
+                types       = [nullable, boolean]
             }
             |empweb_norm_doc:norm('update')
         ]),

@@ -829,8 +829,8 @@
         boolean  default true;
 */
 
-    alter table claim add column isclosed
-        boolean default false,
+alter table community add column isclosed
+    boolean default false;
 
 create sequence seq_roomlisttype_id;
 create table roomlisttype(

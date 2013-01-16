@@ -94,6 +94,7 @@ table({fields, all})->
         cands_gte_authority_level,
         slogan,
         treas,
+        isclosed,
         fee
     ];
 
