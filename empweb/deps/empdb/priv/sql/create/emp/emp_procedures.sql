@@ -58,6 +58,15 @@ drop function make_plpgsql();
 **/
 \set FILE :SECTIONPATH /emp_procedures_room.sql \i :FILE
 
+
+
+/**
+    @doc Действия пользователя
+**/
+\set FILE :SECTIONPATH /emp_procedures_roomlist.sql \i :FILE
+
+
+
 /**
     @doc 
 **/

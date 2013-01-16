@@ -841,11 +841,17 @@ create table roomlisttype(
     isdeleted   boolean default false
 );
 
+
+insert into roomlisttype (alias) values ('black');
+
+
 create sequence seq_roomlist_id;
+
+drop table roomlist;
 create table roomlist(
     id          decimal primary key default nextval('seq_roomlist_id'),
-    owner_id    decimal        references pers(id)       default null,
-    owner_nick  varchar(1024)                            default null,
+    pers_id     decimal        references pers(id)       default null,
+    pers_nick   varchar(1024)                            default null,
 
     room_id     decimal         references room(doc_id)  default null,
     room_head   varchar(1024)                            default null,
@@ -853,7 +859,8 @@ create table roomlist(
     roomlisttype_id        decimal         references roomlisttype(id)        default null,
     roomlisttype_alias     varchar(1024)   references roomlisttype(alias)     default null,
 
-    text default null,
+    reason      text default null,
     created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
+    isdeleted   boolean default false,
+    constraint  roomlist_pers_id_room_id_roomlisttype_id_many_key unique (pers_id, room_id, roomlisttype_id)
 );

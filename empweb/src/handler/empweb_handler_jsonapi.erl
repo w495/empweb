@@ -432,6 +432,69 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_doc,
                     action          =   delete_topic
                 };
+
+            <<"count_roomlisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   count
+                };
+            <<"get_roomlisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   'get'
+                };
+            <<"get_all_roomlisttypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   'get'
+                };
+            <<"create_roomlisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   create
+                };
+            <<"update_roomlisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   update
+                };
+            <<"delete_roomlisttype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlisttype,
+                    action          =   delete
+                };
+
+
+            <<"count_roomlist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   count
+                };
+            <<"get_roomlist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   'get'
+                };
+            <<"get_all_roomlists">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   'get'
+                };
+            <<"create_roomlist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   create
+                };
+            <<"update_roomlist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   update
+                };
+            <<"delete_roomlist">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlist,
+                    action          =   delete
+                };
             %%
             %% Типы сообществ (обычные, тайные)
             %%
