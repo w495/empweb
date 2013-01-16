@@ -41,7 +41,10 @@ create(Params)->
     empdb_dao:with_connection(fun(Con)->
         case proplists:get_value(pers_nick, Params) of
             undefined ->
-                empdb_dao_claim:create(Con, Params);
+                empdb_dao_claim:create(Con, [
+                    {claimtype_alias, open}
+                    |Params
+                ]);
             Nick ->
                 case empdb_dao_pers:get(Con, [
                     {nick, Nick},

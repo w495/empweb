@@ -87,7 +87,7 @@ get(Con, What) ->
             [] ->
                 lists:append(
                     [
-                        empdb_dao_photo:table({fields, select}),
+                        empdb_dao_claim:table({fields, select}),
                         empdb_dao_doc:table({fields, select}),
                         [
                             owner_citizen_room_id,
@@ -128,7 +128,7 @@ get(Con, What, Afields)->
             [] ->
                 lists:append(
                     [
-                        empdb_dao_photo:table({fields, select}),
+                        empdb_dao_claim:table({fields, select}),
                         empdb_dao_doc:table({fields, select}),
                         [
                             owner_citizen_room_id,
