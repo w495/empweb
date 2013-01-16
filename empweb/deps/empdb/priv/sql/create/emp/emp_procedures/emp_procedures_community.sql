@@ -126,64 +126,64 @@ begin
     if (not (new.cands_gte_authority_id is null))
         and (new.cands_gte_authority_alias is null) then
         new.cands_gte_authority_alias =
-            (select communitytype.alias
+            (select authority.alias
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.id = new.cands_gte_authority_id);
+                    authority.id = new.cands_gte_authority_id);
         new.cands_gte_authority_level =
-            (select communitytype.level
+            (select authority.level
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.id = new.cands_gte_authority_id);
+                    authority.id = new.cands_gte_authority_id);
     end if;
     if (new.cands_gte_authority_id is null)
         and (not (new.cands_gte_authority_alias is null)) then
         new.cands_gte_authority_id =
-            (select communitytype.id
+            (select authority.id
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.alias = new.cands_gte_authority_alias);
+                    authority.alias = new.cands_gte_authority_alias);
         new.cands_gte_authority_level =
-            (select communitytype.level
+            (select authority.level
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.alias = new.cands_gte_authority_alias);
+                    authority.alias = new.cands_gte_authority_alias);
     end if;
 
 
     if (not (new.read_gte_authority_id is null))
         and (new.read_gte_authority_alias is null) then
         new.read_gte_authority_alias =
-            (select communitytype.alias
+            (select authority.alias
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.id = new.read_gte_authority_id);
+                    authority.id = new.read_gte_authority_id);
         new.read_gte_authority_level =
-            (select communitytype.level
+            (select authority.level
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.id = new.read_gte_authority_id);
+                    authority.id = new.read_gte_authority_id);
     end if;
     if (new.read_gte_authority_id is null)
         and (not (new.read_gte_authority_alias is null)) then
         new.read_gte_authority_id =
-            (select communitytype.id
+            (select authority.id
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.alias = new.read_gte_authority_alias);
+                    authority.alias = new.read_gte_authority_alias);
         new.read_gte_authority_level =
-            (select communitytype.level
+            (select authority.level
                 from
-                    communitytype
+                    authority
                 where
-                    communitytype.alias = new.read_gte_authority_alias);
+                    authority.alias = new.read_gte_authority_alias);
     end if;
     
     return new;

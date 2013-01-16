@@ -50,7 +50,7 @@ table({fields, all})->
         id,
         pers_id,
         pers_nick,
-        room_id,
+        community_id,
         transtype_id,
         transtype_alias,
         price,

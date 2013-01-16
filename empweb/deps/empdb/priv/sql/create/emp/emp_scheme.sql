@@ -986,13 +986,32 @@ create table post(
 );
 
 
+/**
+ *  Состояние жалобы
+**/
+create sequence seq_claimtype_id;
+create table claimtype(
+    id          decimal primary key default nextval('seq_claimtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+
 
 create table claim(
     doc_id              decimal unique references doc(id),
     pers_id             decimal         references pers(id),
     pers_nick           varchar(1024)   default null,
     judge_id            decimal         references pers(id),
-    judge_nick          varchar(1024)   default null
+    judge_nick          varchar(1024)   default null,
+    claimtype_id        decimal
+        references claimtype(id)        default null,
+    claimtype_alias     varchar(1024)
+        references claimtype(alias)     default null
 );
 
 

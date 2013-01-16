@@ -61,7 +61,9 @@ table({fields, all})->
         pers_id,
         pers_nick,
         judge_id,
-        judge_nick
+        judge_nick,
+        claimtype_id,
+        claimtype_alias
     ];
 
 %%
@@ -160,7 +162,10 @@ get(Con, What, Afields)->
     ]).
 
 create(Con, Proplist)->
-    empdb_dao_doc:create(?MODULE, Con, Proplist).
+    empdb_dao_doc:create(?MODULE, Con, [
+        {claimtype_alias, open}
+        |Proplist
+    ]).
 
 update(Con, Proplist)->
     empdb_dao_doc:update(?MODULE, Con, Proplist).

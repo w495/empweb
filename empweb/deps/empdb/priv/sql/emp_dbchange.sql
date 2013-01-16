@@ -787,7 +787,7 @@
     update pers set ismale = true;
     alter table pers alter column ismale set default true;
 */
-
+/*
     create sequence seq_cstatus_id;
     create table cstatus(
         id          decimal primary key default nextval('seq_cstatus_id'),
@@ -804,6 +804,36 @@
         values ('citizen'),('police'),('officer');
     update pers set cstatus_alias = 'citizen';
     update pers set cstatus_id = (select id from cstatus where alias = 'citizen');
-    
 
-    
+*/
+
+
+create sequence seq_claimtype_id;
+create table claimtype(
+    id          decimal primary key default nextval('seq_claimtype_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+
+
+insert into claimtype(alias)
+    values  ('open'),
+            ('progress'),
+            ('fixed'),
+            ('wontfix'),
+            ('closed');
+
+alter table claim add column claimtype_id
+    decimal references claimtype(id)     default null;
+
+alter table claim add column claimtype_alias
+    varchar(1024) references claimtype(alias)     default null;
+
+
+
+                

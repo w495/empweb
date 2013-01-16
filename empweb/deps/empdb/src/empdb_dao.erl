@@ -2241,8 +2241,7 @@ create(Current, Con, #queryobj{
     Common_required_fields =
         table_options({table, fields, insert, required}, Current),
         
-    ?empdb_debug("Common_select_fields = ~p~n~n", [Common_select_fields]),
-    ?empdb_debug("Returning = ~p~n~n", [Returning]),
+    io:format("Common_insert_fields = ~p~n~n", [Common_insert_fields]),
     
     Current_select_fields =
         lists:filter(
@@ -2278,9 +2277,7 @@ create(Current, Con, #queryobj{
             Common_required_fields
         ),
 
-    ?empdb_debug("Current_insert_fields = ~p~n~n", [Current_insert_fields]),
-    ?empdb_debug("Common_required_fields = ~p~n~n", [Common_required_fields]),
-    
+ 
     case {Has_required, Current_insert_fields_keys} of
         {true, []} ->
             {error, {empty, Common_required_fields}};

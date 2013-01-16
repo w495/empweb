@@ -109,7 +109,7 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
-                key         = room_id,
+                key         = community_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
@@ -172,7 +172,7 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
-                key         = room_id,
+                key         = community_id,
                 required    = false,
                 types       = [nullable, integer]
             },
@@ -234,7 +234,7 @@ handle(_req, #empweb_hap{
                 default     = Pers_id
             },
             #norm_rule{
-                key         = room_id,
+                key         = community_id,
                 required    = false,
                 types       = [nullable, integer]
             },
