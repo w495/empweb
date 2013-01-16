@@ -4,7 +4,7 @@
 %%          языками, и связанными с ними объектами.
 %%
 
--module(empweb_jsonapi_noticetype).
+-module(empweb_jsonapi_claimtype).
 -behavior(empweb_http_hap).
 
 %% ===========================================================================
@@ -96,7 +96,7 @@ init(_, Req, #empweb_hap{
 handle(_req, #empweb_hap{
         action='get', params=Params, pers_id=Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = get noticetype">>),
+    ?evman_args([Hap], <<" = get claimtype">>),
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -105,7 +105,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_noticetype:get(
+                    empweb_biz_claimtype:get(
                         empweb_norm:filter_owner([
                             {pers_id, Pers_id}
                             |Data#norm.return
@@ -121,7 +121,7 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         action=create, params=Params, pers_id=Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = create noticetype">>),
+    ?evman_args([Hap], <<" = create claimtype">>),
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, empweb_norm_opt:norm('create')),
@@ -129,7 +129,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_noticetype:create([
+                    empweb_biz_claimtype:create([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
@@ -142,7 +142,7 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         action=update, params=Params, pers_id=Pers_id
     } = Hap) ->
-    ?evman_args([Hap], <<" = update noticetype">>),
+    ?evman_args([Hap], <<" = update claimtype">>),
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
@@ -151,7 +151,7 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_noticetype:update([
+                    empweb_biz_claimtype:update([
                         {owner_id, Pers_id}
                         |Data#norm.return
                     ])
