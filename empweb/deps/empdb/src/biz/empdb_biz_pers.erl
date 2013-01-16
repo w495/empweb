@@ -885,13 +885,26 @@ get_opt(Con, Params, [], Proplist)
 
 get_opt(Con,Params, [Option|Options], [{Acc}])->
     Fields = proplists:get_value(fields, Params, []),
+    io:format(" ~n~n~nOption = ~p ~p ~n~n~n", [Option, Fields]),
     case lists:member(Option, Fields) or (Fields =:= []) of
         true ->
+            io:format(" ~n~n~n Option = ~p  ~n~n~n", [Option]),
             case Option of
                 friendtype_alias ->
+                    io:format(
+                        " ~n~n~n                                       "
+                        "                       friendtype_alias ~n~n~n", []
+                    ),
+                    
                     Selfpersid = proplists:get_value(self@pers_id, Params),
                     Friendid = proplists:get_value(id, Acc),
                     Friendnick = proplists:get_value(nick, Acc),
+                    io:format(" ~n~n~n _    = ~p  ~n~n~n", [{
+                        Selfpersid,
+                        Friendid,
+                        Friendnick
+                    }]),
+                     
                     case {Selfpersid, Friendid, Friendnick} of
                         {undefined,
                             _,
@@ -919,14 +932,18 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 ]}
                             ]) of
                                 {ok,[]} ->
-                                    get_opt(Con, Params, Options, [{Acc}]);
+                                    get_opt(Con, Params, Options, [{[
+                                        % {friendtype_id,     Friendtype_id},
+                                        {friendtype_alias,  null}
+                                        |Acc
+                                    ]}]);
                                 {ok,[{Friend}]} ->
                                     Friendtype_id =
                                         proplists:get_value(friendtype_id, Friend),
                                     Friendtype_alias =
                                         proplists:get_value(friendtype_alias, Friend),
                                     get_opt(Con, Params, Options, [{[
-%                                         {friendtype_id,     Friendtype_id},
+                                        % {friendtype_id,     Friendtype_id},
                                         {friendtype_alias,  Friendtype_alias}
                                         |Acc
                                     ]}])

@@ -1393,7 +1393,8 @@ create table community(
     **/
     arms_file_id        decimal references file(id)     default null,
     arms_path           varchar(1024)                   default null,
-    
+
+    isclosed                boolean default false,
     ncands                  decimal default 0,
     nmembs                  decimal default 0,
     slogan                  text default null,

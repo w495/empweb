@@ -770,7 +770,7 @@ table_name_as_alias(Current) ->
 table_alias({Current, As}) ->
     empdb_convert:to_binary(As);
 
-table_alias(Current) ->
+table_alias(Current)  ->
     empdb_convert:to_binary(table_options({table, name},Current)).
 
     
@@ -1139,7 +1139,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         {_, Joinlist} = lists:foldl(
                             fun
                                 ({Current1, {left, {Current_field1, {Parent1, Parent_field1}}}}, {{_parent1, _parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+                                    {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" left join ">>,
@@ -1157,7 +1157,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {left, {Current_field1, Current_field2}}}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field2},
+                                    {{table_name(Current1), Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" left join ">>,
@@ -1175,7 +1175,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+                                    {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
@@ -1193,7 +1193,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {left, Current_field1}}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+                                    {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" left join ">>,
@@ -1211,7 +1211,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field2},
+                                    {{table_name(Current1), Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
@@ -1229,7 +1229,10 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+
+                                    io:format("Current1 = ~p ~n~n~n", [Current1]),
+                                    
+                                    {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
