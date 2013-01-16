@@ -602,7 +602,15 @@ handle(_req, #empweb_hap{
             |empweb_norm:norm('get')
         ]),
         fun(Data)->
-            {ok,empweb_jsonapi:resp(empweb_biz_pers:get(Data#norm.return)),Hap}
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:get([
+                        {self@pers_id, Pers_id}
+                        | Data#norm.return
+                    ])
+                ),
+                Hap
+            }
         end,
         Hap
     );

@@ -766,8 +766,8 @@
 
 
 -- 2013.01.11 14:43:20:318454342 ---------------------------------------------
-/*
 
+/*
     create sequence seq_ostatus_id;
     create table ostatus(
         id          decimal primary key default nextval('seq_ostatus_id'),
@@ -786,8 +786,6 @@
     update pers set ostatus_id = (select id from ostatus where alias = 'citizen');
     update pers set ismale = true;
     alter table pers alter column ismale set default true;
-*/
-/*
     create sequence seq_cstatus_id;
     create table cstatus(
         id          decimal primary key default nextval('seq_cstatus_id'),
@@ -806,34 +804,55 @@
     update pers set cstatus_id = (select id from cstatus where alias = 'citizen');
 
 */
+-- 2013.01.16 13:50:06:579642727 ---------------------------------------------
+
+/*
+    create sequence seq_claimtype_id;
+    create table claimtype(
+        id          decimal primary key default nextval('seq_claimtype_id'),
+        name_ti     decimal unique      default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+    insert into claimtype(alias)
+        values  ('open'),
+                ('progress'),
+                ('fixed'),
+                ('wontfix'),
+                ('closed');
+    alter table claim add column claimtype_id
+        decimal references claimtype(id)     default null;
+    alter table claim add column claimtype_alias
+        varchar(1024) references claimtype(alias)     default null;
+    alter table claim add column live_room_approved
+        boolean  default true;
+*/
 
 
-create sequence seq_claimtype_id;
-create table claimtype(
-    id          decimal primary key default nextval('seq_claimtype_id'),
-    /**
-        Номер языковой сущности
-    **/
+
+create sequence seq_roomlisttype_id;
+create table roomlisttype(
+    id          decimal primary key default nextval('seq_roomlisttype_id'),
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     created     timestamp without time zone not null default utcnow(),
     isdeleted   boolean default false
 );
 
+create sequence seq_roomlist_id;
+create table roomlist(
+    id          decimal primary key default nextval('seq_roomlist_id'),
+    owner_id    decimal        references pers(id)       default null,
+    owner_nick  varchar(1024)                            default null,
 
-insert into claimtype(alias)
-    values  ('open'),
-            ('progress'),
-            ('fixed'),
-            ('wontfix'),
-            ('closed');
+    room_id     decimal         references room(doc_id)  default null,
+    room_head   varchar(1024)                            default null,
 
-alter table claim add column claimtype_id
-    decimal references claimtype(id)     default null;
+    roomlisttype_id        decimal         references roomlisttype(id)        default null,
+    roomlisttype_alias     varchar(1024)   references roomlisttype(alias)     default null,
 
-alter table claim add column claimtype_alias
-    varchar(1024) references claimtype(alias)     default null;
-
-
-
-                
+    text default null,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);

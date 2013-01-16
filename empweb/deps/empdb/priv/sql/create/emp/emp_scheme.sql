@@ -530,7 +530,8 @@ create table pers(
     /** Страна \ рай \ aд, где он сейчас находится
         [см далее]: live_room_id decimal references room(id) default null,
     **/ 
-    live_room_head      varchar(1024) /*references doc(head)*/ default null,
+    live_room_head          varchar(1024) /*references doc(head)*/ default null,
+    live_room_approved      boolean  default true,
 
     /** Страна \ рай \ aд, гражданином которой он является
         [см далее]: citizen_room_id decimal references room(id) default null,
@@ -1301,6 +1302,34 @@ alter table pers add  column citizen_room_id
 
 alter table pers add  column own_room_id
     decimal references room(doc_id) default null;
+
+
+create sequence seq_roomlisttype_id;
+create table roomlisttype(
+    id          decimal primary key default nextval('seq_roomlisttype_id'),
+    name_ti     decimal unique      default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+
+create sequence seq_roomlist_id;
+create table roomlist(
+    id          decimal primary key default nextval('seq_roomlist_id'),
+    owner_id    decimal        references pers(id)       default null,
+    owner_nick  varchar(1024)                            default null,
+
+    room_id     decimal         references room(doc_id)  default null,
+    room_head   varchar(1024)                            default null,
+
+    roomlisttype_id        decimal         references roomlisttype(id)        default null,
+    roomlisttype_alias     varchar(1024)   references roomlisttype(alias)     default null,
+    
+    text default null,
+    created     timestamp without time zone not null default utcnow(),
+    isdeleted   boolean default false
+);
+
 
 ------------------------------------------------------------------------------
 -- Сообщество
