@@ -391,7 +391,10 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_roomlist:delete(Data#norm.return)
+                    empweb_biz_roomlist:delete([
+                        {self@pers_id, Pers_id}
+                        |Data#norm.return
+                    ])
                 ),
                 Hap
             }

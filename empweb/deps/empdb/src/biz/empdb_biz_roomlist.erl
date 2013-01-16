@@ -66,15 +66,12 @@ get(Params, Fileds)->
 
 delete(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_roomlist:update(Con, [
-            {filter, [
-                {isdeleted, false}
-                |Params
-            ]},
-            {values, [
-                {isdeleted, true}
-            ]}
-        ])
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                empdb_dao_roomlist:delete(Con, Params);
+            Pers_id ->
+                empdb_dao_roomlist:delete(Con, Params)
+        end
     end).
 
 is_owner(Uid, Oid)->

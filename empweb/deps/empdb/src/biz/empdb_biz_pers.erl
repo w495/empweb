@@ -448,7 +448,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                                     {pers_id,           Pers_id},
                                     {community_id,      Community_id},
                                     {isincome,          true},
-                                    {treastype_alias,   in},
+                                    {treastype_alias,   fee_in},
                                     {price,             Price}
                                 ]),
                             %% Создаем запись в лог кошелька пользователя
