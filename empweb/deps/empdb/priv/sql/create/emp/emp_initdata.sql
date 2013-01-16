@@ -2163,7 +2163,8 @@ insert into paytype(alias, isincome)
 select 'log:treastype' as log;
 
 insert into treastype (alias, isincome)
-    values  ('transfer_in',     true),
+    values  ('fee_in',          true),
+            ('transfer_in',     true),
             ('exper_out',       false),
             ('transfer_out',    false);
 
@@ -2261,6 +2262,9 @@ insert into geo(alias, parent_id) values
 
 insert into ostatus(alias)
     values ('citizen'),('police'),('officer');
+
+
+insert into roomlisttype (alias) values ('black');
 
     
 /**

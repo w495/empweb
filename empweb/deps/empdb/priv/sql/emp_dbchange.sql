@@ -864,3 +864,10 @@ create table roomlist(
     isdeleted   boolean default false,
     constraint  roomlist_pers_id_room_id_roomlisttype_id_many_key unique (pers_id, room_id, roomlisttype_id)
 );
+
+insert into treastype (isincome,    alias) values (true, 'fee_in');
+
+insert into paytype (isincome,    alias) values (false, 'roomlist_delete');
+
+
+ALTER TABLE roomlist DROP CONSTRAINT roomlist_pers_id_room_id_roomlisttype_id_many_key;
