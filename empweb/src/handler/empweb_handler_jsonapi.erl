@@ -1309,17 +1309,6 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_roomexperbuy,
                     action          =   count
                 };
-                
-            <<"get_roomexperbuy">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomexperbuy,
-                    action          =   'get'
-                };
-            <<"get_roomexperbuy">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomexperbuy,
-                    action          =   'get'
-                };
             <<"get_roomexperbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roomexperbuy,
@@ -1905,6 +1894,32 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+            <<"get_claimtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_claimtype,
+                    action          =   'get'
+                };
+            <<"get_all_claimtypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_claimtype,
+                    action          =   'get'
+                };
+            <<"create_claimtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_claimtype,
+                    action          =   create
+                };
+            <<"update_claimtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_claimtype,
+                    action          =   update
+                };
+            <<"delete_claimtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_claimtype,
+                    action          =   delete
+                };
+                
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),

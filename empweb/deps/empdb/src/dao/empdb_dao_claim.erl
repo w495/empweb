@@ -162,10 +162,7 @@ get(Con, What, Afields)->
     ]).
 
 create(Con, Proplist)->
-    empdb_dao_doc:create(?MODULE, Con, [
-        {claimtype_alias, open}
-        |Proplist
-    ]).
+    empdb_dao_doc:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
     empdb_dao_doc:update(?MODULE, Con, Proplist).

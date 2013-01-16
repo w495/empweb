@@ -51,7 +51,8 @@ create(Params)->
                     {ok, [{Perspl}]} ->
                         Id = proplists:get_value(id, Perspl),
                         empdb_dao_claim:create(Con, [
-                            {pers_id, Id}
+                            {pers_id, Id},
+                            {claimtype_alias, open}
                             |proplists:delete(pers_nick, Params)
                         ]);
                     Else ->
@@ -62,7 +63,16 @@ create(Params)->
 
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_claim:update(Con, Params)
+        Judge_id    = proplists:get_value(judge_id, Params),
+        Judge_nick  = proplists:get_value(judge_nick, Params),
+        Params1 =
+            case ((Judge_id == undefined) and (Judge_nick == undefined)) of
+                true ->
+                    Params;
+                _ ->
+                    [{claimtype_alias, progress}|Params]
+            end,
+        empdb_dao_claim:update(Con, Params1)
     end).
 
 get(Params)->
