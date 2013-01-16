@@ -25,7 +25,8 @@
     get/1,
     get/2,
     create/1,
-    update/1
+    update/1,
+    delete/1
 ]).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,6 +62,19 @@ get(Params)->
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_roomlist:get(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+delete(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_roomlist:update(Con, [
+            {filter, [
+                {isdeleted, false}
+                |Params
+            ]},
+            {values, [
+                {isdeleted, true}
+            ]}
+        ])
     end).
 
 is_owner(Uid, Oid)->

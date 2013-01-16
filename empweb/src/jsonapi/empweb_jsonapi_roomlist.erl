@@ -337,6 +337,68 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+handle(_req, #empweb_hap{
+        action=delete, params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = update roomlist">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = pers_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = roomlisttype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = roomlisttype_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = reason,
+                required    = false,
+                types       = [nullable, string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_roomlist:delete(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+    
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
     } = Hap) ->

@@ -25,7 +25,8 @@
     create/1,
     count/1,
     get/1,
-    get/2
+    get/2,
+    delete/1
 ]).
 
 
@@ -51,3 +52,8 @@ get(Params)->
 
 get(Params, Fields)->
     empdb_biz_roomlist:get(Params, Fields).
+
+delete(Params)->
+    empdb_biz_roomlist:delete(Params).
+
+    
