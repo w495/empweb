@@ -691,6 +691,9 @@
         created     timestamp without time zone not null default utcnow(),
         isdeleted   boolean default false
     );
+
+
+            
     insert into actiontype(alias, ispaid, price, istoall)
         values
             ('advertisement',           false, null, false),
@@ -871,3 +874,14 @@ insert into paytype (isincome,    alias) values (false, 'roomlist_delete');
 
 
 ALTER TABLE roomlist DROP CONSTRAINT roomlist_pers_id_room_id_roomlisttype_id_many_key;
+
+ALTER TABLE roomlist ALTER  pers_id SET NOT NULL;
+ALTER TABLE roomlist ALTER  room_id SET NOT NULL;
+ALTER TABLE roomlist ALTER  roomlisttype_id SET NOT NULL;
+
+
+
+alter table actiontype add column isclosed
+    boolean default false
+
+insert into actiontype(isincome,    alias) values (true, 'fee_in');
