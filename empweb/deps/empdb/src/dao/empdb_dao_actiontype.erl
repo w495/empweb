@@ -60,6 +60,9 @@ table({fields, all})->
         alias, 
         name_ti,
         ispaid,
+        isforme,
+        isfake,
+        istoall,
         price,
         isdeleted
     ];

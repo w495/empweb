@@ -2353,20 +2353,34 @@ create(Current, Con, Opts, Fields) when erlang:is_list(Opts) ->
 %% Обновление старого
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+update(Current, Con, #queryobj{values={Values}}=Obj)
+    when erlang:is_list(Values) ->
+    ?empdb_debug("Values X = ~p s~n~n", [Values]),
+    update(Current, Con, Obj#queryobj{values=Values});
+
+update(Current, Con, #queryobj{filter={Filter}}=Obj)
+    when erlang:is_list(Filter) ->
+    ?empdb_debug("Filter X = ~p~n~n", [Filter]),
+    update(Current, Con, Obj#queryobj{filter=Filter});
+
+update(Current, Con, #queryobj{fields={Fields}}=Obj)
+    when erlang:is_list(Fields) ->
+    ?empdb_debug("Fields X = ~p~n~n", [Fields]),
+    update(Current, Con, Obj#queryobj{fields=Fields});
 
 update(Current, Con, #queryobj{values=Values}=Obj)
     when erlang:is_atom(Values) orelse erlang:is_tuple(Values) ->
-    ?empdb_debug("Values = ~p~n~n", [Values]),
-    update(Current, Con, Obj#queryobj{order=[Values]});
+    ?empdb_debug("Values X = ~p s~n~n", [Values]),
+    update(Current, Con, Obj#queryobj{values=[Values]});
 
 update(Current, Con, #queryobj{filter=Filter}=Obj)
     when erlang:is_atom(Filter) orelse erlang:is_tuple(Filter) ->
-    ?empdb_debug("Filter = ~p~n~n", [Filter]),
+    ?empdb_debug("Filter X = ~p~n~n", [Filter]),
     update(Current, Con, Obj#queryobj{filter=[Filter]});
 
 update(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
-    ?empdb_debug("Fields = ~p~n~n", [Fields]),
+    ?empdb_debug("Fields X = ~p~n~n", [Fields]),
     update(Current, Con, Obj#queryobj{fields=[Fields]});
 
 update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
@@ -2374,9 +2388,11 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     filter  =   Filter,
     fields  =   Returning
 } = Queryobj)->
+    io:format("Filter Y = ~p ~n~n~n", [Filter]),
+    
     {ok, Glst} =
         get(Current, Con,  #queryobj{
-            filter  =   Filter,
+            filter  = Filter,
             fields =[Current_field]
         }),
 

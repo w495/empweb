@@ -881,7 +881,19 @@ ALTER TABLE roomlist ALTER  roomlisttype_id SET NOT NULL;
 
 
 
-alter table actiontype add column isclosed
-    boolean default false
+alter table actiontype add column isforme
+    boolean default false;
+
+alter table actiontype add column isfake
+    boolean default false;
+
 
 insert into actiontype(isincome,    alias) values (true, 'fee_in');
+
+
+    insert into actiontype(alias, ispaid, price, istoall, isforme, isfake)
+        values
+            ('add_roomblacklist',           true, 3.0, false, false, true),
+            ('delete_roomblacklist',        true, 2.0, false, true,  true);
+
+            

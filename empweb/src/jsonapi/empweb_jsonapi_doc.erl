@@ -1921,6 +1921,11 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update message">>),
 
+
+
+            io:format(" ~n~n~n Params = ~p ~n~n~n", [Params]),
+
+            
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -1943,6 +1948,7 @@ handle(_req, #empweb_hap{
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
+            io:format(" ~n~n~n~n             empweb_biz_doc:update_message(~p) ~n~n~n~n ", [Data#norm.return]),
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_doc:update_message(Data#norm.return)

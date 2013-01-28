@@ -317,9 +317,10 @@ norm('update') ->
         },
         #norm_rule{
             key         = fields,
+            nkey        = fields,
             required    = false,
-            types       = any
-        },
+            types       = [enpweb_norm:normlist([atom])]
+        }
         #norm_rule{
             key         = owner_id,
             required    = false,
@@ -332,6 +333,7 @@ norm('update') ->
         },
         #norm_rule{
             key         = id,
+            required    = false,
             types       = [integer]
         },
         #norm_rule{

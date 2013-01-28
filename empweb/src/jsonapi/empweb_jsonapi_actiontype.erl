@@ -110,6 +110,21 @@ handle(_req, #empweb_hap{
                 key         = ispaid,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = isforme,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = isfake,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = istoall,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_opt:norm('get')
         ]),
@@ -142,6 +157,21 @@ handle(_req, #empweb_hap{
                 key         = ispaid,
                 required    = false,
                 types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = isforme,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = isfake,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = istoall,
+                required    = false,
+                types       = [nullable, boolean]
             }
             |empweb_norm_opt:norm('create')
         ]),
@@ -171,6 +201,21 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = ispaid,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = isforme,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = isfake,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = istoall,
                 required    = false,
                 types       = [nullable, boolean]
             }
