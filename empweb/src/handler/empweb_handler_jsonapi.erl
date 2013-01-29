@@ -642,7 +642,36 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
                     action          =   delete_comment
-                };  
+                };
+
+            %%
+            %% Ccылка (изгнание)
+            %%
+            <<"get_exile">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_exile,
+                    action          =   get
+                };
+            <<"get_all_exiles">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_exile,
+                    action          =   get
+                };
+            <<"create_exile">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_exile,
+                    action          =   create
+                };
+            <<"update_exile">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_exile,
+                    action          =   update
+                };
+            <<"delete_exile">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_exile,
+                    action          =   delete
+                };
             %%
             %% Чат-комнаты (страны)
             %%

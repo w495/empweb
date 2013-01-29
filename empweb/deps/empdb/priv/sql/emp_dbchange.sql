@@ -807,6 +807,7 @@
     update pers set cstatus_id = (select id from cstatus where alias = 'citizen');
 
 */
+
 -- 2013.01.16 13:50:06:579642727 ---------------------------------------------
 
 /*
@@ -832,68 +833,86 @@
         boolean  default true;
 */
 
-alter table community add column isclosed
-    boolean default false;
+-- 2013.01.28 13:38:10:998016462 ---------------------------------------------
 
-create sequence seq_roomlisttype_id;
-create table roomlisttype(
-    id          decimal primary key default nextval('seq_roomlisttype_id'),
-    name_ti     decimal unique      default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
-);
+/*
+    alter table community add column isclosed
+        boolean default false;
+    create sequence seq_roomlisttype_id;
+    create table roomlisttype(
+        id          decimal primary key default nextval('seq_roomlisttype_id'),
+        name_ti     decimal unique      default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+    insert into roomlisttype (alias) values ('black');
+    create sequence seq_roomlist_id;
+    drop table roomlist;
+    create table roomlist(
+        id          decimal primary key default nextval('seq_roomlist_id'),
+        pers_id     decimal        references pers(id)       default null,
+        pers_nick   varchar(1024)                            default null,
 
+        room_id     decimal         references room(doc_id)  default null,
+        room_head   varchar(1024)                            default null,
 
-insert into roomlisttype (alias) values ('black');
+        roomlisttype_id        decimal
+            references roomlisttype(id)        default null,
+        roomlisttype_alias     varchar(1024)
+            references roomlisttype(alias)     default null,
 
-
-create sequence seq_roomlist_id;
-
-drop table roomlist;
-create table roomlist(
-    id          decimal primary key default nextval('seq_roomlist_id'),
-    pers_id     decimal        references pers(id)       default null,
-    pers_nick   varchar(1024)                            default null,
-
-    room_id     decimal         references room(doc_id)  default null,
-    room_head   varchar(1024)                            default null,
-
-    roomlisttype_id        decimal         references roomlisttype(id)        default null,
-    roomlisttype_alias     varchar(1024)   references roomlisttype(alias)     default null,
-
-    reason      text default null,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false,
-    constraint  roomlist_pers_id_room_id_roomlisttype_id_many_key unique (pers_id, room_id, roomlisttype_id)
-);
-
-insert into treastype (isincome,    alias) values (true, 'fee_in');
-
-insert into paytype (isincome,    alias) values (false, 'roomlist_delete');
-
-
-ALTER TABLE roomlist DROP CONSTRAINT roomlist_pers_id_room_id_roomlisttype_id_many_key;
-
-ALTER TABLE roomlist ALTER  pers_id SET NOT NULL;
-ALTER TABLE roomlist ALTER  room_id SET NOT NULL;
-ALTER TABLE roomlist ALTER  roomlisttype_id SET NOT NULL;
-
-
-
-alter table actiontype add column isforme
-    boolean default false;
-
-alter table actiontype add column isfake
-    boolean default false;
-
-
-insert into actiontype(isincome,    alias) values (true, 'fee_in');
-
-
+        reason      text default null,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false,
+        constraint  roomlist_pers_id_room_id_roomlisttype_id_many_key
+            unique (pers_id, room_id, roomlisttype_id)
+    );
+    insert into treastype (isincome,    alias) values (true, 'fee_in');
+    insert into paytype (isincome,    alias) values (false, 'roomlist_delete');
+    ALTER TABLE roomlist DROP CONSTRAINT
+        roomlist_pers_id_room_id_roomlisttype_id_many_key;
+    ALTER TABLE roomlist ALTER  pers_id SET NOT NULL;
+    ALTER TABLE roomlist ALTER  room_id SET NOT NULL;
+    ALTER TABLE roomlist ALTER  roomlisttype_id SET NOT NULL;
+    alter table actiontype add column isforme
+        boolean default false;
+    alter table actiontype add column isfake
+        boolean default false;
+    insert into actiontype(isincome,    alias) values (true, 'fee_in');
     insert into actiontype(alias, ispaid, price, istoall, isforme, isfake)
         values
             ('add_roomblacklist',           true, 3.0, false, false, true),
             ('delete_roomblacklist',        true, 2.0, false, true,  true);
+*/
 
-            
+
+
+create sequence seq_exile_id;
+create table exile(
+    id              decimal primary key default nextval('seq_exile_id'),
+    pers_id         decimal        references pers(id)          default null,
+    pers_nick       varchar(1024)                               default null,
+
+    savior_id        decimal        references pers(id)          default null,
+    savior_nick      varchar(1024)                               default null,
+    
+    sender_id       decimal        references pers(id)          default null,
+    sender_nick     varchar(1024)                               default null,
+    room_id         decimal        references room(doc_id)      default null,
+    room_head       varchar(1024)                               default null,
+    roomtype_id     decimal         references roomtype(id)     default null,
+    roomtype_alias  varchar(1024)   references roomtype(alias)  default null,
+    reason          text default null,
+    created         timestamp       without time zone not null
+        default utcnow(),
+    expired         timestamp without time zone not null
+        default utcnow() + interval '1 week',
+    isdeleted       boolean default false
+);
+
+
+insert into paytype(alias, isincome) values  ('exile_delete',    false);
+
+insert into paytype(alias, isincome) values  ('roomlist_delete', false);
+
