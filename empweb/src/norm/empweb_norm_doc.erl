@@ -319,7 +319,7 @@ norm('update') ->
             key         = fields,
             nkey        = fields,
             required    = false,
-            types       = [enpweb_norm:normlist([atom])]
+            types       = [empweb_norm:normlist([atom])]
         },
         #norm_rule{
             key         = owner_id,
