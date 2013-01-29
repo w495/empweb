@@ -162,12 +162,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = empweb_norm:filter([float])
+                types       = empweb_norm:filter([unixdatetime])
             },
             #norm_rule{
                 key         = created,
                 required    = false,
-                types       = empweb_norm:filter([float])
+                types       = empweb_norm:filter([unixdatetime])
             }
         ]),
         fun(Data)->
@@ -254,12 +254,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = empweb_norm:filter([float])
+                types       = empweb_norm:filter([unixdatetime])
             },
             #norm_rule{
                 key         = created,
                 required    = false,
-                types       = empweb_norm:filter([float])
+                types       = empweb_norm:filter([unixdatetime])
             }
         ]),
         fun(Data)->
@@ -313,12 +313,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             },
             #norm_rule{
                 key         = created,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->
@@ -406,12 +406,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             },
             #norm_rule{
                 key         = created,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->
@@ -497,12 +497,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             },
             #norm_rule{
                 key         = created,
                 required    = false,
-                types       = [float]
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->
