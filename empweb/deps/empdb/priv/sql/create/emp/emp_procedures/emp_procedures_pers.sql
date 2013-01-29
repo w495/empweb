@@ -218,15 +218,19 @@ begin
     if new.live_room_id != old.live_room_id then
         new.live_room_head =
             (select doc.head from doc
-                where doc.id = new.live_room_id
-                    and doc.doctype_alias = 'room');
+                where doc.id = new.live_room_id);
+        new.live_roomtype_id =
+            (select room.roomtype_id from room
+                where room.doc_id = new.live_room_id);
+        new.live_roomtype_alias =
+            (select room.roomtype_alias from room
+                where room.doc_id = new.live_room_id);
     end if;
     
     if new.citizen_room_id != old.citizen_room_id then
         new.citizen_room_head =
             (select doc.head from doc
-                where doc.id = new.citizen_room_id
-                    and doc.doctype_alias = 'room');
+                where doc.id = new.citizen_room_id);
         new.citizen_room_fromdatetime = utcnow();
     end if;
 

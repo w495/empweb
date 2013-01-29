@@ -110,6 +110,7 @@ begin
         new.room_id = noobsroom();
     end if;
 
+    
     if new.room_id != old.room_id then
         new.room_head =
             (select doc.head
@@ -138,9 +139,19 @@ begin
                 from room
                     where room.doc_id = new.room_id );
     end if;
-    
-    update pers set live_room_id = new.room_id where pers.id = new.pers_id;
 
+    if new.isdeleted then
+        update pers set
+            live_room_id = noobsroom(),
+            isprisoner = false
+        where pers.id = new.pers_id;
+    else
+        update pers set
+            live_room_id = new.room_id,
+            isprisoner = true
+        where pers.id = new.pers_id;
+    end if;
+    
     return new;
 end;
 $$ language plpgsql;

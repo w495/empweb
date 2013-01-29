@@ -85,7 +85,7 @@ delete(Params)->
     end).
 
 
-delete_by_pers_id(Con, {ok, []}, _)->
+delete_by_pers_id(_con, {ok, []}, _)->
     {ok, []};
 
 delete_by_pers_id(Con, {ok, [{Params}]}, Savior_id)->
