@@ -70,7 +70,7 @@ begin
                 from room
                     where room.doc_id = new.room_id );
     end if;
-    update pers set pers.live_room_id = new.room_id where pers.id = new.pers_id;
+    update pers set live_room_id = new.room_id where pers.id = new.pers_id;
     return new;
 end;
 $$ language plpgsql;
@@ -139,7 +139,7 @@ begin
                     where room.doc_id = new.room_id );
     end if;
     
-    update pers set pers.live_room_id = new.room_id where pers.id = new.pers_id;
+    update pers set live_room_id = new.room_id where pers.id = new.pers_id;
 
     return new;
 end;
