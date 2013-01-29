@@ -106,7 +106,7 @@ begin
             (select pers.id from pers where pers.nick = new.savior_nick);
     end if;
 
-    if (new.isdelete == true) then
+    if (new.isdeleted == true) then
         new.room_id = noobsroom();
     end if;
 
