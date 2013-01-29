@@ -102,6 +102,7 @@ handle_info(Info, State) ->
 
 timeouts()->
     empdb_biz_roomlot:timeout(),
+    empdb_biz_exile:timeout(),
     ok.
 
 

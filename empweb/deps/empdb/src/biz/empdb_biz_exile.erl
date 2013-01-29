@@ -25,6 +25,8 @@
 %% Блоги
 %%
 -export([
+    remove_expired/0,
+    timeout/0,
     count/1,
     get/1,
     get/2,
@@ -181,9 +183,28 @@ delete_by_pers_id(Con, {ok, [{Params}]}, Savior_id)->
     end.
 
 
-% remove_expired()
+
+timeout()->
+    remove_expired().
+
+remove_expired()->
+    empdb_dao:with_transaction(fun(Con)->
+        Nowdt = {date(), time()},
+        {ok, Dexiles} =
+            empdb_dao_roomlot:update(Con,[
+                {filter, [
+                    {isdeleted, false},
+                    {expired, {lt, Nowdt}}
+                ]},
+                {values, [
+                    {isdeleted, true}
+                ]}
+            ]),
+        {ok, Dexiles}
+    end).
 
 is_owner(Uid, Oid)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_exile:is_owner(Con, Uid, Oid)
     end).
+ 
