@@ -66,16 +66,24 @@ create(Params)->
 
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
+        Id          = proplists:get_value(id, Params),
         Judge_id    = proplists:get_value(judge_id, Params),
         Judge_nick  = proplists:get_value(judge_nick, Params),
-        Params1 =
-            case ((Judge_id == undefined) and (Judge_nick == undefined)) of
-                true ->
-                    Params;
-                _ ->
-                    [{claimtype_alias, progress}|Params]
-            end,
-        empdb_dao_claim:update(Con, Params1)
+        case ((Judge_id == undefined) and (Judge_nick == undefined)) of
+            true ->
+                empdb_dao_claim:update(Con, Params);
+            _ ->
+                empdb_dao_claim:update(Con, [
+                    {filter, [
+                        {id, null},
+                        {judge_id, null}
+                    ]},
+                    {values, [
+                        {claimtype_alias, progress}
+                        |Params
+                    ]}
+                ])
+        end
     end).
 
 get(Params)->

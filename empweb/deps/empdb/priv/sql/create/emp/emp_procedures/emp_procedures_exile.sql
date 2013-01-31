@@ -70,7 +70,7 @@ begin
                 from room
                     where room.doc_id = new.room_id );
     end if;
-    update pers set live_room_id = new.room_id where pers.id = new.pers_id;
+    update pers set live_room_id = new.room_id, isprisoner = true where pers.id = new.pers_id;
     return new;
 end;
 $$ language plpgsql;

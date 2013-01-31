@@ -886,33 +886,59 @@
             ('delete_roomblacklist',        true, 2.0, false, true,  true);
 */
 
-
-
 create sequence seq_exile_id;
 create table exile(
-    id              decimal primary key default nextval('seq_exile_id'),
-    pers_id         decimal        references pers(id)          default null,
-    pers_nick       varchar(1024)                               default null,
-
-    savior_id        decimal        references pers(id)          default null,
-    savior_nick      varchar(1024)                               default null,
+    id              decimal
+        primary key default nextval('seq_exile_id'),
+    pers_id         decimal
+        references pers(id)             default null,
+    pers_nick       varchar(1024)       default null,
+    savior_id        decimal
+        references pers(id)             default null,
+    savior_nick      varchar(1024)      default null,
     
-    sender_id       decimal        references pers(id)          default null,
-    sender_nick     varchar(1024)                               default null,
-    room_id         decimal        references room(doc_id)      default null,
-    room_head       varchar(1024)                               default null,
-    roomtype_id     decimal         references roomtype(id)     default null,
-    roomtype_alias  varchar(1024)   references roomtype(alias)  default null,
-    reason          text default null,
-    created         timestamp       without time zone not null
+    sender_id       decimal
+        references pers(id)             default null,
+    sender_nick     varchar(1024)       default null,
+    room_id         decimal
+        references room(doc_id)         default null,
+    room_head       varchar(1024)       default null,
+    roomtype_id     decimal
+        references roomtype(id)         default null,
+    roomtype_alias  varchar(1024)
+        references roomtype(alias)      default null,
+    reason          text                default null,
+    created         timestamp           without time zone not null
         default utcnow(),
     expired         timestamp without time zone not null
         default utcnow() + interval '1 week',
     isdeleted       boolean default false
 );
 
-
 insert into paytype(alias, isincome) values  ('exile_delete',    false);
 
 insert into paytype(alias, isincome) values  ('roomlist_delete', false);
+
+create sequence seq_zprotbuy_id;
+create table zprotbuy(
+    id                  decimal
+        primary key default nextval('seq_experbuy_id'),
+    buyer_id            decimal
+        references pers(id)                 default null,
+    buyer_nick          varchar(1024)       default null,
+    owner_id            decimal
+        references pers(id)                 default null,
+    owner_nick          varchar(1024)       default null,
+    price               numeric(1000, 2)    default null,
+    created timestamp without time zone not null default utcnow(),
+    expired timestamp without time zone not null
+            default utcnow() + interval '1 week',
+    isdeleted           boolean default false
+);
+
+
+insert into paytype(alias, isincome) values  ('zprotbuy',    false);
+
+
+
 

@@ -172,7 +172,6 @@ drop function make_plpgsql();
 **/
 \set FILE :SECTIONPATH /emp_procedures_communityhist.sql \i :FILE
 
-
 /**
     @doc Действия пользователя
 **/
@@ -182,6 +181,13 @@ drop function make_plpgsql();
     @doc Действия пользователя
 **/
 \set FILE :SECTIONPATH /emp_procedures_exile.sql \i :FILE
+
+/**
+    @doc Действия пользователя
+**/
+\set FILE :SECTIONPATH /emp_procedures_zprotbuy.sql \i :FILE
+
+
 
 
 

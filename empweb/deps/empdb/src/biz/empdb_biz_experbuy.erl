@@ -12,6 +12,8 @@
 %%
 -include("empdb.hrl").
 
+-define(EXPER_COEF,  0.5).
+
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -161,7 +163,7 @@ create(Params)->
     end).
 
 exper2price(Exper) ->
-    erlang:abs(0.5 * Exper).
+    erlang:abs(?EXPER_COEF * Exper).
 
 update(Params)->
     empdb_dao:with_transaction(fun(Con)->

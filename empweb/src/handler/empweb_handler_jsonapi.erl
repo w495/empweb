@@ -672,6 +672,41 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_exile,
                     action          =   delete
                 };
+
+            %%
+            %% Ccылка (изгнание)
+            %%
+            <<"count_zprotbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   count
+                };
+            <<"get_zprotbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   get
+                };
+            <<"get_all_zprotbuys">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   get
+                };
+            <<"create_zprotbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   create
+                };
+            <<"update_zprotbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   update
+                };
+            <<"delete_zprotbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   delete
+                };
+                
             %%
             %% Чат-комнаты (страны)
             %%

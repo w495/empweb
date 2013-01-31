@@ -2160,6 +2160,14 @@ insert into paytype(alias, isincome)
             ('room_out',        false),
             ('room_in',         true );
 
+
+
+insert into paytype(alias, isincome) values  ('exile_delete',    false);
+
+insert into paytype(alias, isincome) values  ('roomlist_delete', false);
+
+
+
 select 'log:treastype' as log;
 
 insert into treastype (alias, isincome)
@@ -2265,6 +2273,7 @@ insert into ostatus(alias)
 
 
 insert into roomlisttype (alias) values ('black');
+
 
     
 /**

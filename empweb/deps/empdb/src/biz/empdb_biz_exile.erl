@@ -191,7 +191,7 @@ remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
         Nowdt = {date(), time()},
         {ok, Dexiles} =
-            empdb_dao_roomlot:update(Con,[
+            empdb_dao_exile:update(Con,[
                 {filter, [
                     {isdeleted, false},
                     {expired, {lt, Nowdt}}
