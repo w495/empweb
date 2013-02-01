@@ -886,59 +886,119 @@
             ('delete_roomblacklist',        true, 2.0, false, true,  true);
 */
 
-create sequence seq_exile_id;
-create table exile(
-    id              decimal
-        primary key default nextval('seq_exile_id'),
-    pers_id         decimal
-        references pers(id)             default null,
-    pers_nick       varchar(1024)       default null,
-    savior_id        decimal
-        references pers(id)             default null,
-    savior_nick      varchar(1024)      default null,
-    
-    sender_id       decimal
-        references pers(id)             default null,
-    sender_nick     varchar(1024)       default null,
-    room_id         decimal
-        references room(doc_id)         default null,
-    room_head       varchar(1024)       default null,
-    roomtype_id     decimal
-        references roomtype(id)         default null,
-    roomtype_alias  varchar(1024)
-        references roomtype(alias)      default null,
-    reason          text                default null,
-    created         timestamp           without time zone not null
-        default utcnow(),
-    expired         timestamp without time zone not null
-        default utcnow() + interval '1 week',
-    isdeleted       boolean default false
-);
+-- 2013.01.30 18:50:23:043426130 ---------------------------------------------
 
-insert into paytype(alias, isincome) values  ('exile_delete',    false);
+/*
+    create sequence seq_exile_id;
+    create table exile(
+        id              decimal
+            primary key default nextval('seq_exile_id'),
+        pers_id         decimal
+            references pers(id)             default null,
+        pers_nick       varchar(1024)       default null,
+        savior_id        decimal
+            references pers(id)             default null,
+        savior_nick      varchar(1024)      default null,
 
-insert into paytype(alias, isincome) values  ('roomlist_delete', false);
-
-create sequence seq_zprotbuy_id;
-create table zprotbuy(
-    id                  decimal
-        primary key default nextval('seq_experbuy_id'),
-    buyer_id            decimal
-        references pers(id)                 default null,
-    buyer_nick          varchar(1024)       default null,
-    owner_id            decimal
-        references pers(id)                 default null,
-    owner_nick          varchar(1024)       default null,
-    price               numeric(1000, 2)    default null,
-    created timestamp without time zone not null default utcnow(),
-    expired timestamp without time zone not null
+        sender_id       decimal
+            references pers(id)             default null,
+        sender_nick     varchar(1024)       default null,
+        room_id         decimal
+            references room(doc_id)         default null,
+        room_head       varchar(1024)       default null,
+        roomtype_id     decimal
+            references roomtype(id)         default null,
+        roomtype_alias  varchar(1024)
+            references roomtype(alias)      default null,
+        reason          text                default null,
+        created         timestamp           without time zone not null
+            default utcnow(),
+        expired         timestamp without time zone not null
             default utcnow() + interval '1 week',
-    isdeleted           boolean default false
-);
+        isdeleted       boolean default false
+    );
+    insert into paytype(alias, isincome) values  ('exile_delete',    false);
+    insert into paytype(alias, isincome) values  ('roomlist_delete', false);
+    create sequence seq_zprotbuy_id;
+    create table zprotbuy(
+        id                  decimal
+            primary key default nextval('seq_zprotbuy_id'),
+        buyer_id            decimal
+            references pers(id)                 default null,
+        buyer_nick          varchar(1024)       default null,
+        owner_id            decimal
+            references pers(id)                 default null,
+        owner_nick          varchar(1024)       default null,
+        price               numeric(1000, 2)    default null,
+        created timestamp without time zone not null default utcnow(),
+        expired timestamp without time zone not null
+                default utcnow() + interval '1 week',
+        isdeleted           boolean default false
+    );
 
 
-insert into paytype(alias, isincome) values  ('zprotbuy',    false);
+    insert into paytype(alias, isincome) values  ('zprotbuy',    false);
+*/
+
+-- 2013.01.31 18:50:23:043426130 ---------------------------------------------
+
+/*
+
+    create sequence seq_invistype_id;
+    create table invistype(
+        id          decimal
+            primary key default nextval('seq_invistype_id'),
+        name_ti     decimal
+            unique default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        price       numeric(1000, 2) default 0,
+        created     timestamp
+            without time zone not null default utcnow(),
+        isdeleted   boolean    default false
+    );
+    insert into invistype(alias, price) values  ('visible',         0.00);
+    insert into invistype(alias, price) values  ('partly_visible',  1.00);
+    insert into invistype(alias, price) values  ('invisible',       2.00);
+    update pers set invistype_alias = 'visible';
+    update pers set invistype_id =
+        (select id from invistype where alias = 'visible');
+    alter table pers add column invistype_id
+        decimal         references invistype(id)  default null;
+    alter table pers add column invistype_alias
+        varchar(1024)   references invistype(alias)  default null;
+    create sequence seq_invisbuy_id;
+    create table invisbuy(
+        id                  decimal
+            primary key default nextval('seq_invisbuy_id'),
+        buyer_id            decimal
+            references pers(id)                 default null,
+        buyer_nick          varchar(1024)       default null,
+        owner_id            decimal
+            references pers(id)                 default null,
+        owner_nick          varchar(1024)       default null,
+        invistype_id        decimal
+            references invistype(id)  default null,
+        invistype_alias     varchar(1024)
+            references invistype(alias)  default null,
+        price               numeric(1000, 2)    default null,
+        created timestamp without time zone not null default utcnow(),
+        isdeleted           boolean default false
+    );
+    insert into paytype(alias, isincome) values  ('invisbuy',    false);
+*/
+
+-- 2013.02.01 13:54:32:927137381 ---------------------------------------------
 
 
 
+    alter table pers add column invistype_level decimal default 0;
 
+    alter table invistype add column level decimal default 0;
+
+    update invistype set level = 0 where alias = 'visible';
+
+    update invistype set level = 50 where alias = 'partly_visible';
+
+    update invistype set level = 100 where alias = 'invisible';
+
+ 

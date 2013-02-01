@@ -166,10 +166,17 @@ begin
             where doc.id = new.citizen_room_id and doc.doctype_alias = 'room');
 
             
-    new.live_roomtype_alias         = 'noobs';
+    new.live_roomtype_alias   = 'noobs';
     new.live_roomtype_id      =
         (select id from roomtype where roomtype.alias = new.live_roomtype_alias);
 
+    new.invistype_alias   = 'visible';
+    new.invistype_id      =
+        (select id from invistype where invistype.alias = new.invistype_alias);
+    new.invistype_level      =
+        (select level from invistype where invistype.alias = new.invistype_alias);
+
+        
     /**
         Положение пользователя в стране
     **/
@@ -243,7 +250,9 @@ begin
     ) then
         raise exception 'exists_live_community';
     else
-        if(new.own_community_id != new.live_community_id) or ((new.own_community_id is null) and (old.live_community_id is null)) then
+        if(new.own_community_id != new.live_community_id)
+        or ((new.own_community_id is null)
+        and (old.live_community_id is null)) then
             new.live_community_approved = false;
             update community set ncands = ncands + 1
                 where community.doc_id = new.live_community_id;
@@ -497,6 +506,47 @@ begin
                     lang.alias = new.lang_alias);
     end if;
 
+
+    /**
+        Видимость пользователя
+    **/
+    if (
+        (new.invistype_id != old.invistype_id)
+        or (old.invistype_id is null)
+        or (old.invistype_alias is null)
+    ) then
+        new.invistype_alias =
+            (select invistype.alias
+                from
+                    invistype
+                where
+                    invistype.id = new.invistype_id);
+        new.invistype_level =
+            (select invistype.level
+                from
+                    invistype
+                where
+                    invistype.id = new.invistype_id);
+    end if;
+    if (
+        (new.invistype_alias != old.invistype_alias)
+        or (new.invistype_id is null)
+        or (new.invistype_alias is null)
+    ) then
+        new.invistype_id =
+            (select invistype.id
+                from
+                    invistype
+                where
+                    invistype.alias = new.invistype_alias);
+        new.invistype_level =
+            (select invistype.level
+                from
+                    invistype
+                where
+                    invistype.id = new.invistype_id);
+    end if;
+    
     if new.live_room_pos != old.live_room_pos then
         if (new.live_room_pos  is null) then
             new.live_room_pos = cast(
@@ -511,7 +561,6 @@ begin
             );
         end if;
     end if;
-
 
     if new.geo_id != old.geo_id then
         update geo set

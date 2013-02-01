@@ -560,6 +560,17 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
+        %% Невидимость пользователя
+            #norm_rule{
+                key         = invistype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = invistype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
         %% Чиновничий статус пользователя
             #norm_rule{
                 key         = ostatus_id,

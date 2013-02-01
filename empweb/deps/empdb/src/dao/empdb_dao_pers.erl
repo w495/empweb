@@ -195,6 +195,10 @@ table({fields, all})->
         emotion_id,
         emotion_alias,
 
+        invistype_id,
+        invistype_level,
+        invistype_alias,
+
         mstatus_id,
         mstatus_alias,
 

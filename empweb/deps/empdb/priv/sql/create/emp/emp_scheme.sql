@@ -205,7 +205,7 @@ create table actiontype(
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
     ispaid      boolean         default false,
-    price       decimal         default 0,
+    price       numeric(1000, 2)          default 0,
     created     timestamp without time zone not null
         default utcnow(),
     isdeleted   boolean default false
@@ -1495,7 +1495,7 @@ create table action(
     owner_id    decimal references pers(id)            default null,
     owner_nick  varchar(1024)                          default null,
     ispaid      boolean         default false,
-    price       decimal         default 0,
+    price       numeric(1000, 2)          default 0,
     created     timestamp       without time zone not null
         default utcnow(),
     expired     timestamp without time zone not null
@@ -2140,13 +2140,17 @@ create table experbuy (
 
 
 
+
 create sequence seq_zprotbuy_id;
 create table zprotbuy(
-    id                  decimal primary key default nextval('seq_experbuy_id'),
-    buyer_id            decimal         references pers(id)     not null,
-    buyer_nick          varchar(1024)   default null   not null,
-    owner_id            decimal         references pers(id)     not null,
-    owner_nick          varchar(1024)   default null   not null,
+    id                  decimal
+        primary key default nextval('seq_zprotbuy_id'),
+    buyer_id            decimal
+        references pers(id)                 default null,
+    buyer_nick          varchar(1024)       default null,
+    owner_id            decimal
+        references pers(id)                 default null,
+    owner_nick          varchar(1024)       default null,
     price               numeric(1000, 2)    default null,
     created timestamp without time zone not null default utcnow(),
     expired timestamp without time zone not null

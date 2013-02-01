@@ -51,7 +51,7 @@ begin
     if new.buyer_nick != old.buyer_nick then
         new.buyer_id =
             (select pers.id from pers where pers.nick = new.buyer_nick);
-    end if;s
+    end if;
     return new;
 end;
 $$ language plpgsql;

@@ -674,7 +674,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 };
 
             %%
-            %% Ccылка (изгнание)
+            %% Защита от обнуления
             %%
             <<"count_zprotbuy">> ->
                 Eh#empweb_hap{
@@ -704,6 +704,75 @@ empweb_jsonapi_map(Req, {List}, State) ->
             <<"delete_zprotbuy">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_zprotbuy,
+                    action          =   delete
+                };
+
+
+            %%
+            %% Уровни невидимости пользователей
+            %%
+            <<"count_invistype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   count
+                };
+            <<"get_invistype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   get
+                };
+            <<"get_all_invistypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   get
+                };
+            <<"create_invistype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   create
+                };
+            <<"update_invistype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   update
+                };
+            <<"delete_invistype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invistype,
+                    action          =   delete
+                };
+
+            %%
+            %% Покупки невидимости
+            %%
+            <<"count_invisbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
+                    action          =   count
+                };
+            <<"get_invisbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
+                    action          =   get
+                };
+            <<"get_all_invisbuys">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
+                    action          =   get
+                };
+            <<"create_invisbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
+                    action          =   create
+                };
+            <<"update_invisbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
+                    action          =   update
+                };
+            <<"delete_invisbuy">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_invisbuy,
                     action          =   delete
                 };
                 

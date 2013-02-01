@@ -112,6 +112,11 @@ handle(_req, #empweb_hap{
                 key         = expired,
                 required    = false,
                 types       = empweb_norm:filter([unixdatetime])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([float])
             }
             |empweb_norm:norm('get')
         ]),
@@ -157,6 +162,11 @@ handle(_req, #empweb_hap{
                 key         = expired,
                 required    = false,
                 types       = empweb_norm:filter([unixdatetime])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([float])
             }
             |empweb_norm:norm('get')
         ]),
