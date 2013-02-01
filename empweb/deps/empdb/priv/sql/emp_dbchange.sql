@@ -989,11 +989,11 @@
 
 -- 2013.02.01 13:54:32:927137381 ---------------------------------------------
 
-
-
     alter table pers add column invistype_level decimal default 0;
 
     alter table invistype add column level decimal default 0;
+
+    alter table invisbuy add column invistype_level decimal default 0;
 
     update invistype set level = 0 where alias = 'visible';
 
@@ -1001,4 +1001,4 @@
 
     update invistype set level = 100 where alias = 'invisible';
 
- 
+

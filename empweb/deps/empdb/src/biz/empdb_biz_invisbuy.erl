@@ -40,7 +40,6 @@
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
         %% Берем покупателя, и смотрим сколько у него денег
-        io:format("Params = ~p~n", [Params]),
         {ok, [{Mbbuyerpl}]} =
             empdb_dao_pers:get(Con, [
                 {'or', [
@@ -57,8 +56,8 @@ create(Params)->
         {ok, [{Mbperspl}]} =
             empdb_dao_pers:get(Con, [
                 {'or', [
-                    {id,    proplists:get_value(pers_id,   Params)},
-                    {nick,  proplists:get_value(pers_nick, Params)}
+                    {id,    proplists:get_value(owner_id,   Params)},
+                    {nick,  proplists:get_value(owner_nick, Params)}
                 ]},
                 {fields, [
                     id,
@@ -71,10 +70,11 @@ create(Params)->
             empdb_dao_invistype:get(Con, [
                 {'or', [
                     {id,    proplists:get_value(invistype_id,    Params)},
-                    {nick,  proplists:get_value(invistype_alias, Params)}
+                    {alias,  proplists:get_value(invistype_alias, Params)}
                 ]},
                 {fields, [
-                    invistype_level,
+                    level,
+                    price,
                     id
                 ]},
                 {limit, 1}
@@ -94,13 +94,14 @@ create(Params)->
             end,
                 
         Typeil =
-            case proplists:get_value(invistype_level, Invistypepl, 0) of
+            case proplists:get_value(level, Invistypepl, 0) of
                 null ->
                     0;
                 Til ->
                     Til
             end,
 
+ 
         case {Mbinvisbuys, Typeil > Persil , Price =< Money} of
             {{ok, []}, false, _} ->
                 {error, {wrong_expired, {[
@@ -108,7 +109,7 @@ create(Params)->
                     {price,     Price}
                 ]}}};
             {{ok, []}, _, true} ->
-                {ok, [{Newpers}]} =
+                {ok, [{Newbuyer}]} =
                     empdb_dao_pers:update(Con,[
                         {id,
                             proplists:get_value(id,   Mbbuyerpl)
@@ -116,12 +117,18 @@ create(Params)->
                         {money,
                             {decr, Price}
                         },
-                        {invistype_id,
-                            proplists:get_value(invistype_id, Invistypepl)
-                        },
                         {fields, [
                             money
                         ]}
+                    ]),
+                {ok, [{Newpers}]} =
+                    empdb_dao_pers:update(Con,[
+                        {id,
+                            proplists:get_value(id,   Mbperspl)
+                        },
+                        {invistype_id,
+                            proplists:get_value(id, Invistypepl)
+                        }
                     ]),
                 case empdb_dao_invisbuy:create(Con,Params) of
                     {ok, [{Respl}]} ->
@@ -135,6 +142,7 @@ create(Params)->
                         ]),
                         {ok, [
                             {[
+                                {invistype_id,  proplists:get_value(id, Invistypepl)},
                                 {money, Money - Price},
                                 {price, Price}
                                 |Respl
