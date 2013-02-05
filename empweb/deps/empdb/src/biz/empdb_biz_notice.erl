@@ -68,7 +68,10 @@ get(Params, Fileds)->
 
 delete(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_notice:delete(Con, Params)
+        empdb_dao_notice:delete(Con, [
+            {filter, [{isdeleted, false}|Params]},
+            {values, [{isdeleted, true}]}
+        ])
     end).
 
 is_owner(Uid, Oid)->

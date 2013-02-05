@@ -452,7 +452,7 @@ create table pers(
     geo_id  decimal references  geo(id)     default null,
 
     
-    birthday    timestamp       without time zone not null default utcnow(),
+    birthday    timestamp       without time zone default null,
     -- gender_id           decimal references gender(id)      default null,
     ismale      boolean    default true,
     /**
@@ -931,10 +931,8 @@ create table attachtype(
 
 create table attach(
     doc_id          decimal unique references doc(id)   default null,
-    
-    attachtype_id      decimal         references attachtype(id)      default null,
-    attachtype_alias   varchar(1024)   references attachtype(alias)   default null,
-    
+    attachtype_id      decimal         references attachtype(id)    default null,
+    attachtype_alias   varchar(1024)                                default null,
     file_id         decimal references file(id)         default null
 );
 
@@ -1507,7 +1505,7 @@ create table action(
 ------------------------------------------------------------------------------
 -- События
 ------------------------------------------------------------------------------
-
+    
 create sequence seq_eventtype_id;
 create table eventtype(
     id          decimal primary key default nextval('seq_eventtype_id'),
@@ -1525,7 +1523,8 @@ create table event(
     doc_id              decimal unique references doc(id),
     eventtype_id        decimal         references eventtype(id)    default null,
     eventtype_alias     varchar(1024)   references eventtype(alias) default null,
-    pers_id             decimal references pers(id) default null
+    pers_id             decimal references pers(id) default null,
+    pers_nick           varchar(1024)               default null
 );
 
 

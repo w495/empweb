@@ -89,8 +89,11 @@ BIZ_SESSION_EXPIRE_TIMEOUT
 	ls | sed s/demo_//g |  xargs -i echo ./demo_{} ./udptv_{}
 
 
+	ls | sed s/diplom//g |  xargs -i echo ./diplom{} ./udptv_{}
+
+
 	
-	find ./ -type f -exec sh -c 'mv {} `echo {} | sed "s/demo/udptv/"` ' \ ;
+	find ./ -type f -exec sh -c 'mv {} `echo {} | sed "s/diplom/scref/"` ' \ ;
 
 
 

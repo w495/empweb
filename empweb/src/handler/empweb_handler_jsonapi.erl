@@ -2003,6 +2003,115 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
 
         %% ==================================================
+            <<"get_attachtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attachtype,
+                    action          =   'get'
+                };
+            <<"get_all_attachtypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attachtype,
+                    action          =   'get'
+                };
+            <<"create_attachtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attachtype,
+                    action          =   create
+                };
+            <<"update_attachtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attachtype,
+                    action          =   update
+                };
+            <<"delete_attachtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attachtype,
+                    action          =   delete
+                };
+
+        %% ==================================================
+            <<"get_attach">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attach,
+                    action          =   'get'
+                };
+            <<"get_all_attachs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attach,
+                    action          =   'get'
+                };
+            <<"create_attach">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attach,
+                    action          =   create
+                };
+            <<"update_attach">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attach,
+                    action          =   update
+                };
+            <<"delete_attach">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_attach,
+                    action          =   delete
+                };
+
+
+        %% ==================================================
+            <<"get_eventtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   'get'
+                };
+            <<"get_all_eventtypes">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   'get'
+                };
+            <<"create_eventtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   create
+                };
+            <<"update_eventtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   update
+                };
+            <<"delete_eventtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   delete
+                };
+
+        %% ==================================================
+            <<"get_event">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   'get'
+                };
+            <<"get_all_events">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   'get'
+                };
+            <<"create_event">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   create
+                };
+            <<"update_event">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   update
+                };
+            <<"delete_event">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   delete
+                };
+                
+        %% ==================================================
             <<"count_communityhist">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_communityhist,

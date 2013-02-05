@@ -23,6 +23,8 @@
 -export([
     update/1,
     create/1,
+    delete/1,
+    count/1,
     get/1,
     get/2
 ]).
@@ -45,5 +47,11 @@ update(Params)->
 get(Params)->
     empdb_biz_noticetype:get(Params).
 
+count(Params)->
+    empdb_biz_noticetype:count(Params).
+
 get(Params, Fields)->
     empdb_biz_noticetype:get(Params, Fields).
+
+delete(Params)->
+    empdb_biz_noticetype:delete(Params).

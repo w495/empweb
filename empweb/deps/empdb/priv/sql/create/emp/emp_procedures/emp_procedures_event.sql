@@ -8,9 +8,6 @@
 
 create or replace function event_util_fields_on_update() returns "trigger" as $$
 begin
-    /**
-    *  Типы сообщества
-    **/
     if new.eventtype_id != old.eventtype_id then
         new.eventtype_alias =
             (select eventtype.alias
@@ -27,6 +24,19 @@ begin
                 where
                     eventtype.alias = new.eventtype_alias);
     end if;
+    if (new.pers_nick is null) then
+        if not (new.pers_id is null) then
+            new.pers_nick =
+                (select pers.nick from pers where pers.id = new.pers_id);
+        else
+            new.pers_nick        = null;
+        end if;
+    end if;
+    if (new.pers_id is null) then
+        new.pers_id           =
+            (select pers.id from pers where pers.nick = new.pers_nick);
+    end if;
+    
     return new;
 end;
 $$ language plpgsql;
@@ -57,6 +67,14 @@ begin
                     eventtype
                 where
                     eventtype.alias = new.eventtype_alias);
+    end if;
+    if new.pers_id != old.pers_id then
+        new.pers_nick =
+            (select pers.nick from pers where pers.id = new.pers_id);
+    end if;
+    if new.pers_nick != old.pers_nick then
+        new.pers_id =
+            (select pers.id from pers where pers.nick = new.pers_nick);
     end if;
     return new;
 end;

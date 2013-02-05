@@ -3,7 +3,7 @@
 %%          Бизнес логика по работе с системными настройками,
 %%          языками, и связанными с ними объектами.
 %%
-%%          Зависит от модуля empdb_biz_notice. Все внешние функуции принимают
+%%          Зависит от модуля empdb_biz_eventtype. Все внешние функуции принимают
 %%              proplist()
 %%          и возвращают:
 %%              {ok, [Obj::{proplist()}]}
@@ -11,7 +11,7 @@
 %%              |   {error, {Reason::atom(), Info::atom()}}
 %%              |   {error, {Reason::atom(), Info::[Obj::{proplist()}]}}
 %%
--module(empweb_biz_notice).
+-module(empweb_biz_eventtype).
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -25,7 +25,7 @@
     create/1,
     get/1,
     get/2,
-    delete/1
+    count/1
 ]).
 
 
@@ -38,17 +38,17 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create(Params)->
-    empdb_biz_notice:create(Params).
+    empdb_biz_eventtype:create(Params).
 
 update(Params)->
-    empdb_biz_notice:update(Params).
+    empdb_biz_eventtype:update(Params).
+
+count(Params)->
+    empdb_biz_eventtype:count(Params).
 
 get(Params)->
-    empdb_biz_notice:get(Params).
+    empdb_biz_eventtype:get(Params).
 
 get(Params, Fields)->
-    empdb_biz_notice:get(Params, Fields).
-
-delete(Params)->
-    empdb_biz_notice:update(Params).
+    empdb_biz_eventtype:get(Params, Fields).
 

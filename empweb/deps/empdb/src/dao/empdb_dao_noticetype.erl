@@ -77,6 +77,9 @@ table(name)->
 table()->
     table(name).
 
+count(Con, What) ->
+    empdb_dao:count(?MODULE, Con, What).
+
 get(Con, What) ->
     empdb_dao:get(?MODULE, Con, What).
 

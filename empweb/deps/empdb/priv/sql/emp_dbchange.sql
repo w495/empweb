@@ -989,6 +989,8 @@
 
 -- 2013.02.01 13:54:32:927137381 ---------------------------------------------
 
+
+/*
     alter table pers add column invistype_level decimal default 0;
 
     alter table invistype add column level decimal default 0;
@@ -1002,3 +1004,15 @@
     update invistype set level = 100 where alias = 'invisible';
 
 
+    */
+
+-- 2013.02.04 16:43:50:192810755 ---------------------------------------------
+
+
+alter table pers drop column birthday;
+
+alter table pers add column birthday timestamp without time zone default null;
+
+
+
+alter table event add column pers_nick varchar(1024) default null;

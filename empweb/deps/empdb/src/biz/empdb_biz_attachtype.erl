@@ -1,7 +1,7 @@
 %% Author: w-495
 %% Created: 25.07.2012
 %% Description: TODO: Add description to biz_user
--module(empdb_biz_noticetype).
+-module(empdb_biz_attachtype).
 
 %% ===========================================================================
 %% Заголовочные файлы
@@ -40,30 +40,30 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:create(Con, Params)
+        empdb_dao_attachtype:create(Con, Params)
     end).
 
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:update(Con, Params)
+        empdb_dao_attachtype:update(Con, Params)
     end).
 
 count(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:count(Con, [{isdeleted, false}|Params])
+        empdb_dao_attachtype:count(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_attachtype:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:get(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_attachtype:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
 is_owner(Uid, Oid)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_noticetype:is_owner(Con, Uid, Oid)
+        empdb_dao_attachtype:is_owner(Con, Uid, Oid)
     end).
