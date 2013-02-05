@@ -1008,11 +1008,13 @@
 
 -- 2013.02.04 16:43:50:192810755 ---------------------------------------------
 
+/*
+    alter table pers drop column birthday;
+    alter table pers add column
+        birthday timestamp without time zone default null;
+    alter table event add column
+        pers_nick varchar(1024) default null;
+*/
 
-alter table pers drop column birthday;
-
-alter table pers add column birthday timestamp without time zone default null;
-
-
-
-alter table event add column pers_nick varchar(1024) default null;
+alter table post add column
+    pic_file_id             decimal references file(id)     default null;

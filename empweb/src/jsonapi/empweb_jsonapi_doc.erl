@@ -737,7 +737,19 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = get post[s]">>),
     empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('get')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pic_file_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
@@ -762,7 +774,19 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = get post[s]">>),
     empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('get')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pic_file_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
         fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
@@ -787,7 +811,14 @@ handle(_req, #empweb_hap{
     ?evman_args([Hap], <<" = create post">>),
     ?debug("Params = ~p~n", [Params]),
     empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('create')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            }
+            |empweb_norm_doc:norm('create')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -852,7 +883,14 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update post">>),
     empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('update')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            }
+            |empweb_norm_doc:norm('update')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,
@@ -875,7 +913,14 @@ handle(_req, #empweb_hap{
     } = Hap) ->
     ?evman_args([Hap], <<" = update post">>),
     empweb_jsonapi:handle_params(
-        norm:norm(Params, empweb_norm_doc:norm('delete')),
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = [nullable, integer]
+            }
+            |empweb_norm_doc:norm('delete')
+        ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,

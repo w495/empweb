@@ -1138,11 +1138,19 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         %% 1020
                         {_, Joinlist} = lists:foldl(
                             fun
-                                ({Current1, {left, {Current_field1, {Parent1, Parent_field1}}}}, {{_parent1, _parent_field1}, Prev})->
+                                ({Current1, {Jointype, {Current_field1, {Parent1, Parent_field1}}}}, {{_parent1, _parent_field1}, Prev})
+                                    when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
                                     {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
-                                            <<" left join ">>,
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
                                                table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
@@ -1156,11 +1164,19 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             ]
                                         ]
                                     };
-                                ({Current1, {left, {Current_field1, Current_field2}}}, {{Parent1, Parent_field1}, Prev})->
+                                ({Current1, {Jointype, {Current_field1, Current_field2}}}, {{Parent1, Parent_field1}, Prev})
+                                   when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
                                     {{table_name(Current1), Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
-                                            <<" left join ">>,
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
@@ -1192,11 +1208,19 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             ]
                                         ]
                                     };
-                                ({Current1, {left, Current_field1}}, {{Parent1, Parent_field1}, Prev})->
+                                ({Current1, {Jointype, Current_field1}}, {{Parent1, Parent_field1}, Prev})
+                                   when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
                                     {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
-                                            <<" left join ">>,
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
@@ -1229,9 +1253,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
-
-                                    io:format("Current1 = ~p ~n~n~n", [Current1]),
-                                    
                                     {{table_name(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц

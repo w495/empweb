@@ -857,7 +857,7 @@ create table doc(
     orig_owner_id     decimal         references pers(id)     default null,
     orig_owner_nick   varchar(1024)                           default null,
 
-    
+
     /**
         Родительский элемент
     **/
@@ -981,6 +981,7 @@ create table blog(
 **/
 create table post(
     doc_id              decimal unique references doc(id),
+    pic_file_id         decimal references file(id)     default null,
     ncomments           decimal default 0
 );
 
