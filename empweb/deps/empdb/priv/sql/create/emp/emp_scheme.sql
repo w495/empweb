@@ -898,12 +898,14 @@ create table doc(
         количество обновлений
     **/
     nupdates            decimal default 0,
+
+    isrepost            boolean default false,
+    isrepostcont        boolean default false,
+    isrepostable        boolean default true,
+    
     /**
         флаг удаления
     **/
-    isrepost            boolean default false,
-    isrepostable        boolean default true,
-    
     isdeleted           boolean default false
 );
 

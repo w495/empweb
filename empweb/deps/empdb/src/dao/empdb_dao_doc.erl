@@ -103,6 +103,7 @@ table({fields, all})->
         orig_owner_nick,
 
         isrepost,
+        isrepostcont,
         isrepostable,
         isnoticeable,
 

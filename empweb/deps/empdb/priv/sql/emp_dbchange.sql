@@ -1018,3 +1018,9 @@
 
 alter table post add column
     pic_file_id             decimal references file(id)     default null;
+
+
+
+alter table doc add column
+    isrepostcont        boolean default false;
+

@@ -244,6 +244,8 @@ get(Params) ->
             album,
             nfriends,
             nfoes,
+            repost_blog,
+            repost_album,
             friendtype_alias,
             community
         ]

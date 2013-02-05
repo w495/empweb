@@ -205,31 +205,41 @@ create__(Pass, Params)->
         case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
             {ok, Persobj}->
                 [{Perspl}|_] = Persobj,
-                case {
+                {ok, [{Ownblogpl}]} =
                     empdb_dao_blog:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
                         {body, null}
                     ]),
+                {ok, [{Repostblogpl}]} =
+                    empdb_dao_blog:create(Con, [
+                        {owner_id,  proplists:get_value(id, Perspl)},
+                        {head, null},
+                        {body, null},
+                        {isrepostcont, true},
+                        {parent_id, proplists:get_value(id, Ownblogpl)}
+                    ]),
+                {ok, [{Ownalbumpl}]} =
                     empdb_dao_album:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
                         {body, null}
-                    ])
-                } of
-                    {   {ok, [{Docpl}]},
-                        {ok, [{Albpl}]}
-                    } ->
-                        {ok, [{[
-                            {blog_id,   proplists:get_value(id, Docpl)},
-                            {album_id,  proplists:get_value(id, Albpl)}
-                            |Perspl
-                        ]}]};
-                    {{Eclass, Error}, _} ->
-                        {Eclass, Error};
-                    {_, {Eclass, Error}} ->
-                        {Eclass, Error}
-                end;
+                    ]),
+                {ok, [{Repostalbumpl}]} =
+                    empdb_dao_album:create(Con, [
+                        {owner_id,  proplists:get_value(id, Perspl)},
+                        {head, null},
+                        {body, null},
+                        {isrepostcont, true},
+                        {parent_id, proplists:get_value(id, Ownblogpl)}
+                    ]),
+                {ok, [{[
+                    {blog_id,   proplists:get_value(id, Ownblogpl)},
+                    {album_id,  proplists:get_value(id, Ownalbumpl)},
+                    {repost_blog_id,   proplists:get_value(id, Repostblogpl)},
+                    {repost_album_id,  proplists:get_value(id, Repostalbumpl)}
+                    |Perspl
+                ]}]};
             {error,{not_unique,<<"nick">>}}->
                     Nick = proplists:get_value(nick, Params),
                     Sugs = suggest_nick(Con, Nick),
@@ -646,9 +656,10 @@ login({Uf, Uv}, Params) ->
                         %%
                         %% Получаем блог пользователя.
                         %%
-                        {ok, [Blog]} =
+                        {ok, [Ownblog]} =
                             case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
                                 {owner_id, proplists:get_value(id, Userpl)},
+                                {isrepostcont, false},
                                 {limit, 1}
                             ], [
                                 vcounter,
@@ -668,12 +679,39 @@ login({Uf, Uv}, Params) ->
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
-                                Res1 -> Res1
+                                Res11 -> Res11
+                            end,
+
+                        {ok, [Repostblog]} =
+                            case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+                                {owner_id, proplists:get_value(id, Userpl)},
+                                {isrepostcont, true},
+                                {limit, 1}
+                            ], [
+                                vcounter,
+                                nprotectedposts,
+                                nprivateposts,
+                                npublicposts,
+                                ncomments,
+                                nposts,
+                                contype_alias,
+                                contype_id,
+                                comm_acctype_alias,
+                                comm_acctype_id,
+                                read_acctype_alias,
+                                read_acctype_id,
+                                contype_id,
+                                contype_alias,
+                                id
+                            ])) of
+                                {ok, []} -> {ok, [null]};
+                                Res12 -> Res12
                             end,
                             
-                        {ok, [Album]} =
+                        {ok, [Ownalbum]} =
                             case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
                                 {owner_id, proplists:get_value(id, Userpl)},
+                                {isrepostcont, false},
                                 {limit, 1}
                             ], [
                                 vcounter,
@@ -693,7 +731,33 @@ login({Uf, Uv}, Params) ->
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
-                                Res2 -> Res2
+                                Res21 -> Res21
+                            end,
+
+                        {ok, [Repostalbum]} =
+                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                                {owner_id, proplists:get_value(id, Userpl)},
+                                {isrepostcont, true},
+                                {limit, 1}
+                            ], [
+                                vcounter,
+                                nprotectedposts,
+                                nprivateposts,
+                                npublicposts,
+                                ncomments,
+                                nposts,
+                                contype_alias,
+                                contype_id,
+                                comm_acctype_alias,
+                                comm_acctype_id,
+                                read_acctype_alias,
+                                read_acctype_id,
+                                contype_id,
+                                contype_alias,
+                                id
+                            ])) of
+                                {ok, []} -> {ok, [null]};
+                                Res22 -> Res22
                             end,
                         %%
                         %% Получаем комнату пользователя
@@ -767,8 +831,10 @@ login({Uf, Uv}, Params) ->
                             {nfriends,          Nfriends},
                             {nfoes,             Nfoes},
                             {perm_names,        Perm_names},
-                            {blog,              Blog},
-                            {album,             Album},
+                            {blog,              Ownblog},
+                            {repost_blog,       Repostblog},
+                            {album,             Ownalbum},
+                            {repost_album,      Repostalbum},
                             {live_community,    Live_community},
                             {live_room,         Live_room}
                             |Userpl
@@ -994,6 +1060,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
+                                {isrepostcont, false},
                                 {fields, [
                                     nposts,
                                     npublicposts,
@@ -1015,6 +1082,39 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     get_opt(Con, Params, Options, [{[{blog, null}|Acc]}])
                             end
                     end;
+                repost_blog ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Id, Nick} ->
+                            case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+                                {'or', [
+                                    {owner_id,      Id},
+                                    {owner_nick,    Nick}
+                                ]},
+                                {limit, 1},
+                                {isrepostcont, false},
+                                {fields, [
+                                    nposts,
+                                    npublicposts,
+                                    nprotectedposts,
+                                    ncomments,
+                                    id,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ])) of
+                                {ok, [Blog|_]} ->
+                                    get_opt(Con, Params, Options, [{[{repost_blog, Blog}|Acc]}]);
+                                _ ->
+                                    get_opt(Con, Params, Options, [{[{repost_blog, null}|Acc]}])
+                            end
+                    end;
                 album ->
                     case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
                         {undefined, undefined} ->
@@ -1026,6 +1126,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
+                                {isrepostcont, true},
                                 {fields, [
                                     nposts,
                                     npublicposts,
@@ -1045,6 +1146,39 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     get_opt(Con, Params, Options, [{[{album, Album}|Acc]}]);
                                 _ ->
                                     get_opt(Con, Params, Options, [{[{album, null}|Acc]}])
+                            end
+                    end;
+                repost_album ->
+                    case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
+                        {undefined, undefined} ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Id, Nick} ->
+                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                                {'or', [
+                                    {owner_id,      Id},
+                                    {owner_nick,    Nick}
+                                ]},
+                                {limit, 1},
+                                {isrepostcont, true},
+                                {fields, [
+                                    nposts,
+                                    npublicposts,
+                                    nprotectedposts,
+                                    ncomments,
+                                    id,
+                                    read_acctype_id,
+                                    read_acctype_alias,
+                                    comm_acctype_id,
+                                    comm_acctype_alias,
+                                    contype_id,
+                                    contype_alias,
+                                    vcounter
+                                ]}
+                            ])) of
+                                {ok, [Album|_]} ->
+                                    get_opt(Con, Params, Options, [{[{repost_album, Album}|Acc]}]);
+                                _ ->
+                                    get_opt(Con, Params, Options, [{[{repost_album, null}|Acc]}])
                             end
                     end;
                 community ->
