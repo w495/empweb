@@ -12,9 +12,10 @@
 %%
 -include("empdb.hrl").
 
-
--define(DELETE_EXILE_OTHER, 2.0).
--define(DELETE_EXILE_SELF,  3.0).
+% 
+% -define\(DELETE_EXILE_OTHER, 2.0).
+% -define\(DELETE_EXILE_SELF,  3.0).
+%
 
 
 %% ==========================================================================
@@ -125,9 +126,27 @@ delete_by_pers_id(Con, {ok, [{Params}]}, Savior_id)->
     Price =
         case Pers_id == Savior_id of
             true ->
-                ?DELETE_EXILE_SELF;
+                {ok,[{Servicepl}]} =
+                    empdb_dao_service:get(
+                        Con,
+                        [
+                            {alias, delete_exile_price_self},
+                            {fields, [price]},
+                            {limit, 1}
+                        ]
+                    ),
+                proplists:get_value(price, Servicepl);
             _    ->
-                ?DELETE_EXILE_OTHER
+                {ok,[{Servicepl}]} =
+                    empdb_dao_service:get(
+                        Con,
+                        [
+                            {alias, delete_exile_price_other},
+                            {fields, [price]},
+                            {limit, 1}
+                        ]
+                    ),
+                proplists:get_value(price, Servicepl)
         end,
         
     Money = proplists:get_value(money, Mbsaviorpl),

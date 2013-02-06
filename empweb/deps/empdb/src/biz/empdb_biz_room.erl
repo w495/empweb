@@ -23,9 +23,9 @@
 ]).
 
 
-
--define(CREATE_ROOM_PRICE, 1.0).
-
+%
+% -define\(CREATE_ROOM_PRICE, 1.0).
+%
 
 %%
 %% API Functions
@@ -75,8 +75,18 @@ create(Params)->
             ]),
 
         io:format("~n~n~n Mbroomobjs  = ~p~n~n~n", [Mbroomobjs ]),
-        
-        Price = ?CREATE_ROOM_PRICE,
+
+        {ok,[{Servicepl}]} =
+            empdb_dao_service:get(
+                Con,
+                [
+                    {alias, create_room_price},
+                    {fields, [price]},
+                    {limit, 1}
+                ]
+            ),
+
+        Price = proplists:get_value(price, Servicepl),
         Money = proplists:get_value(money, Mbownerpl),
         case {Price =< Money, Mbroomobjs} of
             {true, []} ->

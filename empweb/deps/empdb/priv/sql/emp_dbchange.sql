@@ -935,15 +935,12 @@
                 default utcnow() + interval '1 week',
         isdeleted           boolean default false
     );
-
-
     insert into paytype(alias, isincome) values  ('zprotbuy',    false);
 */
 
 -- 2013.01.31 18:50:23:043426130 ---------------------------------------------
 
 /*
-
     create sequence seq_invistype_id;
     create table invistype(
         id          decimal
@@ -989,7 +986,6 @@
 
 -- 2013.02.01 13:54:32:927137381 ---------------------------------------------
 
-
 /*
     alter table pers add column invistype_level decimal default 0;
 
@@ -1016,11 +1012,51 @@
         pers_nick varchar(1024) default null;
 */
 
-alter table post add column
-    pic_file_id             decimal references file(id)     default null;
+-- 2013.02.05 18:12:53:880912613 ---------------------------------------------
+
+/*
+    alter table post add column
+        pic_file_id decimal references file(id) default null;
+
+    alter table doc add column
+        isrepostcont boolean default false;
+*/
+
+-- 2013.02.05 19:15:58:283727927 ---------------------------------------------
 
 
 
-alter table doc add column
-    isrepostcont        boolean default false;
+    create sequence seq_service_id;
+    create table service(
+        id          decimal
+            primary key default nextval('seq_service_id'),
+        name_ti     decimal
+            unique default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        price       numeric(1000, 2) default 0,
+        created     timestamp
+            without time zone not null default utcnow(),
+        isonce      boolean    default true,
+        isdeleted   boolean    default false
+    );
 
+    insert into service(alias, price, isonce)
+        values ('create_room_price', 1.0,       true);
+    insert into service(alias, price, isonce)
+        values ('create_community_price',  1.0, true);
+    insert into service(alias, price, isonce)
+        values ('delete_exile_price_other',2.0, true);
+    insert into service(alias, price, isonce)
+        values ('delete_exile_price_self', 3.0, true);
+    insert into service(alias, price, isonce)
+        values ('delete_roomlist_price', 2.0,   true);
+    insert into service(alias, price, isonce)
+        values ('create_experbuy_coef', 0.5,    false);
+    insert into service(alias, price, isonce)
+        values ('create_zprotbuy_coef', 0.5,    false);
+
+
+
+
+
+    

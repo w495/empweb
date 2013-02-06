@@ -20,9 +20,9 @@
 ]).
 
 
-
--define(CREATE_COMMUNITY_PRICE, 1.0).
-
+% 
+% -define\(CREATE_COMMUNITY_PRICE, 1.0).
+%
 
 %%
 %% API Functions
@@ -73,7 +73,18 @@ create(Params)->
                 {limit, 1},
                 {isdeleted, false}
             ]),
-        Price = ?CREATE_COMMUNITY_PRICE,
+
+        {ok,[{Servicepl}]} =
+            empdb_dao_service:get(
+                Con,
+                [
+                    {alias, create_community_price},
+                    {fields, [price]},
+                    {limit, 1}
+                ]
+            ),
+
+        Price = proplists:get_value(price, Servicepl),
         Money = proplists:get_value(money, Mbownerpl),
         {ok, [{Readgteauthoritypl}]} =
             empdb_dao_authority:get(Con, [
@@ -287,7 +298,18 @@ update(Params)->
                 {limit, 1},
                 {isdeleted, false}
             ]),
-        Price = ?CREATE_COMMUNITY_PRICE,
+        {ok,[{Servicepl}]} =
+            empdb_dao_service:get(
+                Con,
+                [
+                    {alias, create_community_price},
+                    {fields, [price]},
+                    {limit, 1}
+                ]
+            ),
+
+        Price = proplists:get_value(price, Servicepl),
+        
         Money = proplists:get_value(money, Mbownerpl),
         {ok, [{Readgteauthoritypl}]} =
             empdb_dao_authority:get(Con, [

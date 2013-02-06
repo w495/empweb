@@ -12,12 +12,12 @@
 %%
 -include("empdb.hrl").
 
--define(DAY_COEF,  0.5).
+% 
+% -define\(EMPDB_BIZ_ZPROTBUY_DAY_COEF,  0.5).
+% 
 
 -define(UNIXTIMEWEEK,  604800). % 60*60*24*7.
 -define(UNIXTIMEDAY,   86400). % 60*60*24*7.
-
-
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -80,7 +80,7 @@ create(Params)->
 
         Expiredint = datetime2int(Expired),
         
-        Price = expired2price(Nowint, Expiredint),
+        Price = expired2price(Con, Nowint, Expiredint),
         Money = proplists:get_value(money, Mbbuyerpl,   0),
 
         Mbzprotbuys = empdb_dao_zprotbuy:get(Con, [{isdeleted, false}|Params]),
@@ -143,13 +143,23 @@ create(Params)->
         end
     end).
 
-expired2price(Nowint, Expiredint) ->
+expired2price(Con, Nowint, Expiredint) ->
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get(
+            Con,
+            [
+                {alias, create_zprotbuy_coef},
+                {fields, [price]},
+                {limit, 1}
+            ]
+        ),
+    Price = proplists:get_value(price, Servicepl),
+
     case Expiredint > Nowint of
         true ->
             Rangeint    = Expiredint - Nowint,
             Rangedays   = Rangeint / ?UNIXTIMEDAY,
-            erlang:round(erlang:abs(?DAY_COEF * Rangedays) * 100) / 100;
-
+            erlang:round(erlang:abs(Price * Rangedays) * 100) / 100;
         false ->
             0
     end.

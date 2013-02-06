@@ -12,8 +12,10 @@
 %%
 -include("empdb.hrl").
 
--define(EXPER_COEF,  0.5).
 
+% 
+% -define\(EXPER_COEF,  0.5).
+% 
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -66,7 +68,7 @@ create(Params)->
             end,
 
         Exper = proplists:get_value(exper,   Params,    Experlack),
-        Price = exper2price(Exper),
+        Price = exper2price(Con, Exper),
         Money = proplists:get_value(money, Mbbuyerpl,   0),
 
         ?empdb_debug("Experlack = ~p~n", [Experlack]),
@@ -162,8 +164,18 @@ create(Params)->
         end
     end).
 
-exper2price(Exper) ->
-    erlang:abs(?EXPER_COEF * Exper).
+exper2price(Con, Exper) ->
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get(
+            Con,
+            [
+                {alias, create_experbuy_coef},
+                {fields, [price]},
+                {limit, 1}
+            ]
+        ),
+    Price = proplists:get_value(price, Servicepl),
+    erlang:abs(Price * Exper).
 
 update(Params)->
     empdb_dao:with_transaction(fun(Con)->

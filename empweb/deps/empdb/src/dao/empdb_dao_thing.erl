@@ -18,6 +18,7 @@
     table/0,
     create/2,
     update/2,
+    count/2,
     get/2,
     get/3,
     is_owner/3
@@ -79,6 +80,10 @@ table(name)->
 
 table()->
     table(name).
+
+
+count(Con, What) ->
+    empdb_dao:count(?MODULE, Con, What).
 
 get(Con, What) ->
     empdb_dao:get(?MODULE, Con, What).

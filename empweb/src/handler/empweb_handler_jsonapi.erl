@@ -2224,7 +2224,39 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_claimtype,
                     action          =   delete
                 };
-                
+
+
+        %% ==================================================
+            <<"count_service">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   'count'
+                };
+            <<"get_service">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   'get'
+                };
+            <<"get_all_services">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   'get'
+                };
+            <<"create_service">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   create
+                };
+            <<"update_service">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   update
+                };
+            <<"delete_service">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_service,
+                    action          =   delete
+                };
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),

@@ -12,7 +12,10 @@
 %%
 -include("empdb.hrl").
 
--define(DELETE_ROOMLIST, 2.0).
+
+% 
+% -define\(DELETE_ROOMLIST, 2.0).
+% 
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -135,7 +138,18 @@ delete_by_pers_id(Con, {ok, [{Params}]}, Selfpersid)->
             ]
         ),
 
-    Price = ?DELETE_ROOMLIST,
+
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get(
+            Con,
+            [
+                {alias, delete_roomlist_price},
+                {fields, [price]},
+                {limit, 1}
+            ]
+        ),
+
+    Price = proplists:get_value(price, Servicepl),
     Money = proplists:get_value(money, Mbperspl),
  
     case {Price =< Money, Pers_id == Selfpersid} of

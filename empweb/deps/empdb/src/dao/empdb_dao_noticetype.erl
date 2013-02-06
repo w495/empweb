@@ -18,6 +18,7 @@
     table/0,
     create/2,
     update/2,
+    count/2,
     get/2,
     get/3,
     is_owner/3
