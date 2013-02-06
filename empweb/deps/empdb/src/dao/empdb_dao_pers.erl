@@ -289,15 +289,16 @@ get_perm(Con, Params, []) ->
 get_perm(Con, Kvalue, Fields) when erlang:is_list(Kvalue) ->
     case {
         proplists:get_value(id, Kvalue),
+        proplists:get_value(nick, Kvalue),
         proplists:get_value(login, Kvalue)
     } of
-        {undefined, undefined   } ->
-            {error, {no_data,no_data}};
-        {Id,        undefined   } ->
-            get_perm(Con, {id, Id}, Fields);
-        {undefined, Login        } ->
+        {undefined, undefined,  undefined} ->
+            {error, {no_data,no_data,no_data}};
+        {undefined, undefined,  Nick} ->
+            get_perm(Con, {nick, Nick}, Fields);
+        {undefined, Login,      _   } ->
             get_perm(Con, {login, Login}, Fields);
-        {Id,        Login        } ->
+        {Id,        _,          _   } ->
             get_perm(Con, {id, Id}, Fields)
     end;
 
@@ -331,8 +332,25 @@ get_perm(Con, {login, Login}, Fields) ->
                     "and pers.login = $1">>
             ],[Login]
         )
-    ).
+    );
 
+get_perm(Con, {nick, Nick}, Fields) ->
+    empdb_dao:pgret(
+        empdb_dao:equery(Con,[
+            <<"select distinct ">>,
+                empdb_dao:table_fields(perm, Fields),
+            <<" from perm "
+                "join perm2pgroup on "
+                    " perm2pgroup.perm_id = perm.id "
+                "join pers2pgroup on "
+                    " pers2pgroup.group_id = perm2pgroup.group_id "
+                "join pers on "
+                    "pers2pgroup.pers_id = pers.id "
+                    "and pers.nick = $1">>
+            ],[Nick]
+        )
+    ).
+    
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Группы пользователя (доступ конкретно по id пользователя)
 %% 

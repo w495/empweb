@@ -215,6 +215,37 @@ get_pers_nick({session_id, Session_id})->
 register(Params)->
     ?evman_args(Params, <<"pers try to register">>),
     empdb_biz_pers:register(Params).
+% 
+% 
+%     case empdb_biz_pers:login(Params) of
+%         {ok, [{Userpl}]} ->
+%             Id          = proplists:get_value(id,           Userpl),
+%             Nick        = proplists:get_value(nick,         Userpl),
+%             Login       = proplists:get_value(login,        Userpl),
+%             Perm_names  = proplists:get_value(perm_names,   Userpl),
+%             Session_id  = empweb_biz_session:new(#empweb_biz_session{
+%                 id          =   Id,
+%                 nick        =   Nick,
+%                 login       =   Login,
+%                 perm_names  =   Perm_names
+%             }),
+% 
+%             io:format("Session_id = ~p~n", [Session_id]),
+% 
+%             ?evman_info({login, [
+%                 {pers,          Userpl},
+%                 {session_id,    Session_id}
+%             ]}),
+%             {ok, [{[
+%                 {session_id, Session_id}
+%                 |   proplists:delete(perm_names,
+%                         proplists:delete(phash,   Userpl)
+%                     )
+%             ]}]};
+%         {error, Error} ->
+%             {error, Error}
+%     end.
+
 
 update(Params)->
     ?evman_args(Params, <<"pers try to update him self">>),
