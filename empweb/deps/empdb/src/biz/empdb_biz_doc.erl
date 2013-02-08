@@ -225,14 +225,28 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
     Owner_id    = proplists:get_value(owner_id, Params, null),
     Owner_nick  = proplists:get_value(owner_nick, Params, null),
     Parent_id   = proplists:get_value(parent_id, Params, null),
-    
+
+
+    Mbrepostlist =
+        Getmodule:Get(Con, [
+            {orig_id, Doc_id},
+            {'or', [
+                {owner_id, Owner_id},
+                {owner_nick, Owner_nick}
+            ]},
+            {limit, 1}
+        ]),
+
+        
     {ok, [{Instpl}]} = Getmodule:Get(Con, [{id, Doc_id}]),
 
     
-    case proplists:get_value(isrepostable, Instpl) of
-        false ->
+    case {proplists:get_value(isrepostable, Instpl), Mbrepostlist} of
+        {false, _} ->
             {error, forbiden};
-        true ->
+        {true, {ok, [{Repostpl}]}} ->
+            {error, {not_uniq_repost, {Repostpl}}};
+        {true, {ok, []}} ->
             Orig_id          = repost_orig(id, orig_id, Instpl),
             Orig_owner_id    = repost_orig(owner_id, orig_owner_id, Instpl),
             Orig_owner_nick  = repost_orig(owner_nick, orig_owner_nick, Instpl),
