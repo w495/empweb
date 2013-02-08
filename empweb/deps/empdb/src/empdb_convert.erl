@@ -15,26 +15,69 @@
             string_to_term/1,
             to_binary/1,
             to_local_datetime/1,
-            to_local_date/1,
             to_universal_datetime/1,
+            to_datetime/1,
+            to_local_date/1,
+            to_universal_date/1,
+            to_date/1,
+            datetime2int/1,
+            int2datetime/1,
+            int2universal_datetime/1,
+            int2local_datetime/1,
+            to_money/1,
             test/0
         ]
 ).
 
 
+-define(EMPDB_CONVERT_UNIXTIMESTART,    {{1970,1,1},{0,0,0}}).
+-define(EMPDB_CONVERT_MONEYDIMENSION,   100).
+-define(EMPDB_CONVERT_TIMEMICROREST,    1000).
+-define(EMPDB_CONVERT_TIMEMACROREST,    1000000).
+
+
+datetime2int(Date) ->
+    calendar:datetime_to_gregorian_seconds(Date)
+    - calendar:datetime_to_gregorian_seconds(?EMPDB_CONVERT_UNIXTIMESTART).
+
+int2universal_datetime(Int) ->
+    calendar:now_to_universal_time(timemacrorest(Int)).
+int2local_datetime(Int) ->
+    calendar:now_to_local_time(timemacrorest(Int)).
+int2datetime(Int) ->
+    int2universal_datetime(Int).
+
 to_local_datetime(Int) ->
-    X = Int div 1000,
-    calendar:now_to_local_time({X div 1000000,X rem 1000000,0}).
+    X = Int div ?EMPDB_CONVERT_TIMEMICROREST,
+    calendar:now_to_local_time(timemacrorest(X)).
+to_universal_datetime(Int) ->
+    X = Int div ?EMPDB_CONVERT_TIMEMICROREST,
+    calendar:now_to_universal_time(timemacrorest(X)).
+to_datetime(Int) ->
+    to_universal_datetime(Int).
 
 to_local_date(Int) ->
     {Date, _Time} = to_local_datetime(Int),
     Date.
+to_universal_date(Int) ->
+    {Date, _Time} = to_universal_date(Int),
+    Date.
+to_date(Int) ->
+    to_universal_date(Int).
 
-to_universal_datetime(Int) ->
-    X = Int div 1000,
-    calendar:now_to_universal_time({X div 1000000,X rem 1000000,0}).
+timemacrorest(Int) ->
+    {
+        Int div ?EMPDB_CONVERT_TIMEMACROREST,
+        Int rem ?EMPDB_CONVERT_TIMEMACROREST,
+        0
+    }.
 
+% ---------------------------------------------------------------------------
 
+to_money(Value) ->
+    erlang:round(to_integer(Value)
+        * ?EMPDB_CONVERT_MONEYDIMENSION)
+            / ?EMPDB_CONVERT_MONEYDIMENSION.
 
 % ---------------------------------------------------------------------------
 

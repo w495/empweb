@@ -155,7 +155,6 @@ table({fields, all})->
     [
         %% Идентификация
         id,
-        login, 
         nick,
         phash,
         email,

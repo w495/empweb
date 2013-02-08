@@ -66,6 +66,7 @@ table({fields, all})->
         invistype_alias,
         price,
         created,
+        expired,
         isdeleted
     ];
 

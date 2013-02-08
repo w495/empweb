@@ -85,7 +85,70 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action='get', params=Params, pers_id=Pers_id
+        action  =   'count',
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = count invisbuy">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = invistype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = invistype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = empweb_norm:filter([unixdatetime])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([float])
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_invisbuy:count([
+                        {buyer_id, Pers_id}
+                        |Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
+        action  =   'get',
+        params  =   Params,
+        pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get invisbuy">>),
 
@@ -116,6 +179,16 @@ handle(_req, #empweb_hap{
                 key         = invistype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = empweb_norm:filter([unixdatetime])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([float])
             }
             |empweb_norm:norm('get')
         ]),
@@ -159,6 +232,11 @@ handle(_req, #empweb_hap{
                 key         = invistype_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = [unixdatetime]
             }
             |empweb_norm:norm('create')
         ]),
@@ -203,6 +281,11 @@ handle(_req, #empweb_hap{
                 key         = invistype_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = [unixdatetime]
             }
             |empweb_norm:norm('update')
         ]),

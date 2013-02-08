@@ -604,7 +604,12 @@ login({Uf, Uv}, Params) ->
         io:format("Params = ~p ~n~n~n~n", [Params]),
         case empdb_dao_pers:get(Con, [{isdeleted, false}|Params]) of
             {ok, [{Userpl}]} ->
-                {ok, Perm_list} = empdb_dao_pers:get_perm(Con, Params, [alias]),
+                {ok, Perm_list} =
+                    empdb_dao_pers:get_perm(
+                        Con,
+                        [{id, proplists:get_value(id, Userpl)}],
+                        [alias]
+                    ),
                 Perm_names = lists:map(fun({Permpl})->
                     empdb_convert:to_atom(proplists:get_value(alias, Permpl))
                 end, Perm_list),
@@ -645,8 +650,8 @@ login({Uf, Uv}, Params) ->
                                         %% Ставим пользователю статус online
                                         %%
                                         empdb_dao_pers:update(Con1, [
-                                            {pstatus_alias, <<"online">>}
-                                            |Params
+                                            {pstatus_alias, <<"online">>},
+                                            {id, proplists:get_value(id, Userpl)}
                                         ])
                                     end);
                                 _ ->
@@ -770,6 +775,8 @@ login({Uf, Uv}, Params) ->
                                 id,
                                 head,
                                 body,
+                                back_file_id,
+                                back_file_path,
                                 roomtype_id,
                                 roomtype_alias,
                                 ulimit,

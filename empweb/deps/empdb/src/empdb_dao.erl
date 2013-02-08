@@ -458,6 +458,12 @@ sql_cond({Ff, {ilike, Like}})
 sql_cond({Ff, {eq, undefined}}) ->
     {[], []};
 
+sql_cond({Ff, {eq, null}})  ->
+    {[{cond_atom(Ff), null}], [
+        empdb_convert:to_binary(Ff),
+        <<" is null">>
+    ]};
+
 sql_cond({Ff, {eq, Val}}) ->
     {   [{cond_atom(Ff), Val}],
         [   empdb_convert:to_binary(Ff),
@@ -469,6 +475,12 @@ sql_cond({Ff, {eq, Val}}) ->
 sql_cond({Ff, {neq, undefined}}) ->
     {[], []};
 
+sql_cond({Ff, {neq, null}})  ->
+    {[{cond_atom(Ff), null}], [
+        empdb_convert:to_binary(Ff),
+        <<" is not null">>
+    ]};
+
 sql_cond({Ff, {neq, Val}}) ->
     {   [{cond_atom(Ff), Val}],
         [   empdb_convert:to_binary(Ff),
@@ -477,6 +489,24 @@ sql_cond({Ff, {neq, Val}}) ->
         ]
     };
 
+
+sql_cond({Ff, {ne, undefined}}) ->
+    {[], []};
+
+sql_cond({Ff, {ne, null}})  ->
+    {[{cond_atom(Ff), null}], [
+        empdb_convert:to_binary(Ff),
+        <<" is not null">>
+    ]};
+
+sql_cond({Ff, {ne, Val}}) ->
+    {   [{cond_atom(Ff), Val}],
+        [   empdb_convert:to_binary(Ff),
+            <<" != $">>,
+            empdb_convert:to_binary(cond_atom(Ff))
+        ]
+    };
+    
 sql_cond({Ff, {lt, undefined}}) ->
     {[], []};
 

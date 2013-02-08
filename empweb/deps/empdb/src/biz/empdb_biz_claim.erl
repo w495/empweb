@@ -75,7 +75,7 @@ update(Params)->
             _ ->
                 empdb_dao_claim:update(Con, [
                     {filter, [
-                        {id, null},
+                        {id, Id},
                         {judge_id, null}
                     ]},
                     {values, [

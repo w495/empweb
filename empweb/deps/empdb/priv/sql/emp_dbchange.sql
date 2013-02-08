@@ -1024,8 +1024,7 @@
 
 -- 2013.02.05 19:15:58:283727927 ---------------------------------------------
 
-
-
+/*
     create sequence seq_service_id;
     create table service(
         id          decimal
@@ -1034,6 +1033,8 @@
             unique default nextval('seq_any_ti'),
         alias       varchar(1024)   unique,
         price       numeric(1000, 2) default 0,
+        expired     timestamp without time zone not null
+            default utcnow() + interval '1 week',
         created     timestamp
             without time zone not null default utcnow(),
         isonce      boolean    default true,
@@ -1054,9 +1055,14 @@
         values ('create_experbuy_coef', 0.5,    false);
     insert into service(alias, price, isonce)
         values ('create_zprotbuy_coef', 0.5,    false);
+*/
+
+-- http://www.tvzavr.ru/Muzyka-revolyutsii
+
+
+    alter table invisbuy add column
+        expired timestamp without time zone
+            default utcnow() + interval '1 week';
 
 
 
-
-
-    

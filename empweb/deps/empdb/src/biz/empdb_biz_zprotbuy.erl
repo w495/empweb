@@ -16,8 +16,6 @@
 % -define\(EMPDB_BIZ_ZPROTBUY_DAY_COEF,  0.5).
 % 
 
--define(UNIXTIMEWEEK,  604800). % 60*60*24*7.
--define(UNIXTIMEDAY,   86400). % 60*60*24*7.
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -46,17 +44,9 @@
 %% Покупки
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-datetime2int(Date) ->
-    calendar:datetime_to_gregorian_seconds(Date)
-    - calendar:datetime_to_gregorian_seconds({{1970,1,1},{0,0,0}}).
-
-int2datetime(Int) ->
-    calendar:now_to_universal_time({Int div 1000000,Int rem 1000000,0}).
-
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
         %% Берем покупателя, и смотрим сколько у него денег
-        io:format("Params = ~p~n", [Params]),
         {ok, [{Mbbuyerpl}]} =
             empdb_dao_pers:get(Con, [
                 {'or', [
@@ -69,22 +59,19 @@ create(Params)->
                 ]},
                 {limit, 1}
             ]),
-
         Now = {erlang:date(), erlang:time()},
-        Nowint  = datetime2int(Now),
-        Rangeint = Nowint + ?UNIXTIMEWEEK,
-
-        io:format("~n~n~n~n                                                     Params = ~p, ~n~n~n~n", [Params]),
-        
-        Expired = proplists:get_value(expired, Params, int2datetime(Rangeint)),
-
-        Expiredint = datetime2int(Expired),
-        
+        Nowint  = empdb_convert:datetime2int(Now),
+        Rangeint = Nowint + ?EMPDB_UNIXTIMEWEEK,
+        Expired =
+            proplists:get_value(
+                expired,
+                Params,
+                empdb_convert:int2datetime(Rangeint)
+            ),
+        Expiredint = empdb_convert:datetime2int(Expired),
         Price = expired2price(Con, Nowint, Expiredint),
         Money = proplists:get_value(money, Mbbuyerpl,   0),
-
         Mbzprotbuys = empdb_dao_zprotbuy:get(Con, [{isdeleted, false}|Params]),
-        
         case {Mbzprotbuys, Expiredint > Nowint , Price =< Money} of
             {{ok, []}, false, _} ->
                 {error, {wrong_expired, {[
@@ -154,12 +141,11 @@ expired2price(Con, Nowint, Expiredint) ->
             ]
         ),
     Price = proplists:get_value(price, Servicepl),
-
     case Expiredint > Nowint of
         true ->
             Rangeint    = Expiredint - Nowint,
-            Rangedays   = Rangeint / ?UNIXTIMEDAY,
-            erlang:round(erlang:abs(Price * Rangedays) * 100) / 100;
+            Rangedays   = Rangeint / ?EMPDB_UNIXTIMEDAY,
+            empdb_convert:to_money(Price * Rangedays);
         false ->
             0
     end.

@@ -432,7 +432,7 @@ create table pers(
                         || '_' not null unique,
     -- nick        varchar(1024)   not null unique,
     phash       char(32)        not null,
-    email       varchar(1024)   default null,
+    email       varchar(1024)   unique default null,
     phone       numeric         default null,
     /**
         ------------------------------------------------------------
