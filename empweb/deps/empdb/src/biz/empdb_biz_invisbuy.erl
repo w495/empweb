@@ -20,6 +20,7 @@
 %% Блоги
 %%
 -export([
+    timeout/0,
     count/1,
     get/1,
     get/2,

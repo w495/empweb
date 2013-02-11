@@ -46,12 +46,16 @@
     nviewsupm/2,
     nviewsup/2,
     nviewsup/3
-]).
+]   ).
 
 
 %% ====================================================================
 %% External functions
 %% ====================================================================
+
+
+nviewsupm(Module, [])->
+    ok;
 
 nviewsupm(Module, [Params])->
     nviewsup(
@@ -60,6 +64,10 @@ nviewsupm(Module, [Params])->
         ),
         [Params]
     ).
+
+
+nviewsup(Function, []) ->
+    ok;
 
 nviewsup(Function, [Params]) when erlang:is_function(Function, 2)->
     spawn_link(fun()->
@@ -71,9 +79,12 @@ nviewsup(Function, [Params]) when erlang:is_function(Function, 2)->
         end)
     end);
 
+
 nviewsup(Module, [Params])->
     nviewsup(Module, update, [Params]).
 
+nviewsup(_module, _function, [])->
+    ok;
 nviewsup(Module, Function, [Params])->
     spawn_link(fun()->
         empdb_dao:with_connection(fun(Con)->
