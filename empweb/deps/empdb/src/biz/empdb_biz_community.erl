@@ -13,6 +13,7 @@
 -export([
     get/1,
     get/2,
+    get_blogs/2,
     count/1,
     create/1,
     update/1,

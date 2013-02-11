@@ -695,13 +695,13 @@ login({Uf, Uv}, Params) ->
                             case Ownblog of
                                 null ->
                                     null;
-                                Ownblog ->
+                                {Ownblogpl} ->
                                     case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
                                         {owner_id,
                                             proplists:get_value(id, Userpl)},
                                         {isrepostcont, true},
                                         {parent_id,
-                                            proplists:get_value(id, Ownblog)},
+                                            proplists:get_value(id, Ownblogpl)},
                                         {limit, 1}
                                     ], [
                                         vcounter,
@@ -757,12 +757,12 @@ login({Uf, Uv}, Params) ->
                             case Ownalbum of
                                 null ->
                                     null;
-                                Ownalbum ->
+                                {Ownalbumpl} ->
                                     case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
                                         {owner_id,
                                             proplists:get_value(id, Userpl)},
                                         {parent_id,
-                                            proplists:get_value(id, Ownalbum)},
+                                            proplists:get_value(id, Ownalbumpl)},
                                         {isrepostcont,  true},
                                         {limit, 1}
                                     ], [
