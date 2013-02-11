@@ -233,7 +233,7 @@ create__(Pass, Params)->
                         {head, null},
                         {body, null},
                         {isrepostcont, true},
-                        {parent_id, proplists:get_value(id, Ownblogpl)}
+                        {parent_id, proplists:get_value(id, Ownalbumpl)}
                     ]),
                 {ok, [{[
                     {blog_id,   proplists:get_value(id, Ownblogpl)},
