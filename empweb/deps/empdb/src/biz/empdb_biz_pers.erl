@@ -790,7 +790,7 @@ login({Uf, Uv}, Params) ->
                         %% Получаем комнату пользователя
                         %%
                         {ok, [Live_room]} =
-                            empdb_dao_room:get(Con, [
+                            empdb_dao_room:get_adds(Con, empdb_dao_room:get(Con, [
                                 {id, proplists:get_value(live_room_id, Userpl)},
                                 {limit, 1}
                             ], [
@@ -810,7 +810,7 @@ login({Uf, Uv}, Params) ->
                                 slogan,
                                 weather,
                                 treas
-                            ]),
+                            ])),
                         Live_community =
                             case empdb_dao_community:get(Con, [
                                 {id, proplists:get_value(live_community_id, Userpl)},

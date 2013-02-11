@@ -116,7 +116,6 @@ get(Con, What) ->
                         and (proplists:get_value(fileinfodir, Phpl) =/= null)
                         and (proplists:get_value(fileinfopath, Phpl) =/= null) of
                         true ->
-                            io:format("~n~n~n~n Phpl = = ~p ~n~n~n~n", [Phpl]),
                             {[
                                 {pic_file_path,
                                     <<  (proplists:get_value(fileinfodir, Phpl))/binary,
