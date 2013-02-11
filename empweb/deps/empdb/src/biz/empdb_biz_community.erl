@@ -13,6 +13,8 @@
 -export([
     get/1,
     get/2,
+    get_con/2,
+    get_con/3,
     get_blogs/2,
     count/1,
     create/1,
@@ -436,31 +438,36 @@ get_blogs(Params)->
 get(Params)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
-        get_adds(Con,
-            empdb_dao_community:get(Con, [
-                {isdeleted, false}
-                |Params
-            ] ++ [
-                {order, {asc, head}}
-            ]),
-            Params
-        )
+        get_con(Con, Params)
     end).
 
 get(Params, Fields)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
-        get_adds(Con,
-            empdb_dao_community:get(Con, [
-                {isdeleted, false}
-                |Params
-            ] ++ [
-                {order, {asc, head}}
-            ], Fields),
-            [{fields, Fields}| Params]
-        )
+        get_con(Con, Params, Fields)
     end).
 
+get_con(Con, Params)->
+    get_adds(Con,
+        empdb_dao_community:get(Con, [
+            {isdeleted, false}
+            |Params
+        ] ++ [
+            {order, {asc, head}}
+        ]),
+        Params
+    ).
+
+get_con(Con, Params, Fields)->
+    get_adds(Con,
+        empdb_dao_community:get(Con, [
+            {isdeleted, false}
+            |Params
+        ] ++ [
+            {order, {asc, head}}
+        ], Fields),
+        [{fields, Fields}| Params]
+    ).
 
 get_blogs(Con, What) ->
     Truefields = proplists:get_value(fields,What,[]),
