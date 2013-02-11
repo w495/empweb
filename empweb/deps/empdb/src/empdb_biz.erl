@@ -85,6 +85,7 @@ nviewsup(Module, [Params])->
 
 nviewsup(_module, _function, [])->
     ok;
+s
 nviewsup(Module, Function, [Params])->
     spawn_link(fun()->
         empdb_dao:with_connection(fun(Con)->
