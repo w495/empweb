@@ -1,7 +1,7 @@
 %% Author: w-495
 %% Created: 25.07.2012
 %% Description: TODO: Add description to biz_user
--module(empdb_biz_room).
+-module(empdb_daowp_room).
 
 %%
 %% Include files
