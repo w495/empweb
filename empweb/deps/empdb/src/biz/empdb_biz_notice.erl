@@ -68,7 +68,7 @@ get(Params, Fileds)->
 
 delete(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_notice:delete(Con, [
+        empdb_dao_notice:update(Con, [
             {filter, [{isdeleted, false}|Params]},
             {values, [{isdeleted, true}]}
         ])

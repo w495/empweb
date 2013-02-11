@@ -50,5 +50,5 @@ get(Params, Fields)->
     empdb_biz_notice:get(Params, Fields).
 
 delete(Params)->
-    empdb_biz_notice:update(Params).
+    empdb_biz_notice:delete(Params).
 
