@@ -209,7 +209,8 @@ create__(Pass, Params)->
                     empdb_dao_blog:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
-                        {body, null}
+                        {body, null},
+                        {isrepostcont, false}
                     ]),
                 {ok, [{Repostblogpl}]} =
                     empdb_dao_blog:create(Con, [
@@ -223,7 +224,8 @@ create__(Pass, Params)->
                     empdb_dao_album:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
-                        {body, null}
+                        {body, null},
+                        {isrepostcont, false}
                     ]),
                 {ok, [{Repostalbumpl}]} =
                     empdb_dao_album:create(Con, [
@@ -663,8 +665,10 @@ login({Uf, Uv}, Params) ->
                         %%
                         {ok, [Ownblog]} =
                             case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                                {owner_id, proplists:get_value(id, Userpl)},
+                                {owner_id,
+                                    proplists:get_value(id, Userpl)},
                                 {isrepostcont, false},
+                                {parent_id,    null},
                                 {limit, 1}
                             ], [
                                 vcounter,
@@ -688,35 +692,45 @@ login({Uf, Uv}, Params) ->
                             end,
 
                         {ok, [Repostblog]} =
-                            case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                                {owner_id, proplists:get_value(id, Userpl)},
-                                {isrepostcont, true},
-                                {limit, 1}
-                            ], [
-                                vcounter,
-                                nprotectedposts,
-                                nprivateposts,
-                                npublicposts,
-                                ncomments,
-                                nposts,
-                                contype_alias,
-                                contype_id,
-                                comm_acctype_alias,
-                                comm_acctype_id,
-                                read_acctype_alias,
-                                read_acctype_id,
-                                contype_id,
-                                contype_alias,
-                                id
-                            ])) of
-                                {ok, []} -> {ok, [null]};
-                                Res12 -> Res12
+                            case Ownblog of
+                                null ->
+                                    null;
+                                Ownblog ->
+                                    case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+                                        {owner_id,
+                                            proplists:get_value(id, Userpl)},
+                                        {isrepostcont, true},
+                                        {parent_id,
+                                            proplists:get_value(id, Ownblog)},
+                                        {limit, 1}
+                                    ], [
+                                        vcounter,
+                                        nprotectedposts,
+                                        nprivateposts,
+                                        npublicposts,
+                                        ncomments,
+                                        nposts,
+                                        contype_alias,
+                                        contype_id,
+                                        comm_acctype_alias,
+                                        comm_acctype_id,
+                                        read_acctype_alias,
+                                        read_acctype_id,
+                                        contype_id,
+                                        contype_alias,
+                                        id
+                                    ])) of
+                                        {ok, []} -> {ok, [null]};
+                                        Res12 -> Res12
+                                    end
                             end,
-                            
+
                         {ok, [Ownalbum]} =
                             case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                                {owner_id, proplists:get_value(id, Userpl)},
-                                {isrepostcont, false},
+                                {owner_id,
+                                    proplists:get_value(id, Userpl)},
+                                {isrepostcont,  false},
+                                {parent_id,     null},
                                 {limit, 1}
                             ], [
                                 vcounter,
@@ -740,29 +754,37 @@ login({Uf, Uv}, Params) ->
                             end,
 
                         {ok, [Repostalbum]} =
-                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                                {owner_id, proplists:get_value(id, Userpl)},
-                                {isrepostcont, true},
-                                {limit, 1}
-                            ], [
-                                vcounter,
-                                nprotectedposts,
-                                nprivateposts,
-                                npublicposts,
-                                ncomments,
-                                nposts,
-                                contype_alias,
-                                contype_id,
-                                comm_acctype_alias,
-                                comm_acctype_id,
-                                read_acctype_alias,
-                                read_acctype_id,
-                                contype_id,
-                                contype_alias,
-                                id
-                            ])) of
-                                {ok, []} -> {ok, [null]};
-                                Res22 -> Res22
+                            case Ownalbum of
+                                null ->
+                                    null;
+                                Ownalbum ->
+                                    case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+                                        {owner_id,
+                                            proplists:get_value(id, Userpl)},
+                                        {parent_id,
+                                            proplists:get_value(id, Ownalbum)},
+                                        {isrepostcont,  true},
+                                        {limit, 1}
+                                    ], [
+                                        vcounter,
+                                        nprotectedposts,
+                                        nprivateposts,
+                                        npublicposts,
+                                        ncomments,
+                                        nposts,
+                                        contype_alias,
+                                        contype_id,
+                                        comm_acctype_alias,
+                                        comm_acctype_id,
+                                        read_acctype_alias,
+                                        read_acctype_id,
+                                        contype_id,
+                                        contype_alias,
+                                        id
+                                    ])) of
+                                        {ok, []} -> {ok, [null]};
+                                        Res22 -> Res22
+                                    end
                             end,
                         %%
                         %% Получаем комнату пользователя
@@ -1067,6 +1089,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
+                                {parent_id, null},
                                 {isrepostcont, false},
                                 {fields, [
                                     nposts,
@@ -1100,7 +1123,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
-                                {isrepostcont, false},
+                                {isrepostcont, true},
                                 {fields, [
                                     nposts,
                                     npublicposts,
@@ -1133,7 +1156,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
-                                {isrepostcont, true},
+                                {parent_id, null},
+                                {isrepostcont, false},
                                 {fields, [
                                     nposts,
                                     npublicposts,

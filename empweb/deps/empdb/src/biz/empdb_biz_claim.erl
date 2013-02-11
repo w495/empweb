@@ -88,6 +88,7 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
+        empdb_biz:nviewsupm(?MODULE, [Params]),
         empdb_dao_claim:get(Con, [{isdeleted, false}|Params])
     end).
 
@@ -183,6 +184,7 @@ get_adds(_Con, Else, Params) ->
     Else.
 
 get(Params, Fileds)->
+    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
 %         get_adds(
 %             Con,

@@ -42,9 +42,24 @@
 ]).
 
 
+-export([
+    nviewsupm/2,
+    nviewsup/2,
+    nviewsup/3
+]).
+
+
 %% ====================================================================
 %% External functions
 %% ====================================================================
+
+nviewsupm(Module, [Params])->
+    nviewsup(
+        erlang:list_to_atom(
+            "empdb_biz_" ++ (lists:last(string:tokens(Module, "_")))
+        ),
+        [Params]
+    ).
 
 nviewsup(Function, [Params]) when erlang:is_function(Function, 2)->
     spawn_link(fun()->

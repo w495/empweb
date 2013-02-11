@@ -42,48 +42,22 @@ create(Params)->
     end).
 
 update(Params)->
-    
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_attach:update(Con, Params)
     end).
 
 get(Params)->
-    nviewsup(fun empdb_dao_attach:update/2, [Params]),
+    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_attach:get(Con, [{isdeleted, false}|Params])
     end).
 
 get(Params, Fileds)->
-    nviewsup(fun empdb_dao_attach:update/2, [Params]),
+    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_attach:get(Con, [{isdeleted, false}|Params], Fileds)
     end).
 
-nviewsup(Function, [Params]) when erlang:is_function(Function, 2)->
-    spawn_link(fun()->
-        empdb_dao:with_connection(fun(Con)->
-            {ok, _} = Function(Con, [
-                {filter, [{isdeleted, false}|Params]},
-                {values, [{nviews, {incr, 1}}]}
-            ])
-        end)
-    end);
-
-nviewsup(Module, [Params])->
-    nviewsup(Module, update, [Params]).
-
-nviewsup(Module, Function, [Params])->
-    spawn_link(fun()->
-        empdb_dao:with_connection(fun(Con)->
-            {ok, _} = Module:Function(Con, [
-                {filter, [{isdeleted, false}|Params]},
-                {values, [{nviews, {incr, 1}}]}
-            ])
-        end)
-    end).
-
-
-    
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_attach:update(Con, [{isdeleted, true}|Params])

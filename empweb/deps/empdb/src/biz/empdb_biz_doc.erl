@@ -240,7 +240,11 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
         
     {ok, [{Instpl}]} = Getmodule:Get(Con, [{id, Doc_id}]),
 
-    
+    %%
+    %% Репосты конкретного документа, 
+    %% конкретным пользователя 
+    %% должны быть уникальны
+    %%
     case {proplists:get_value(isrepostable, Instpl), Mbrepostlist} of
         {false, _} ->
             {error, forbiden};
@@ -605,7 +609,17 @@ update_blog(Params)->
 
 get_blog(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        get_blog_adds(Con,empdb_dao_blog:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params]))
+        get_blog_adds(
+            Con,
+            empdb_dao_blog:get(
+                Con,
+                [
+                    {order, {desc, created}},
+                    {isdeleted, false}
+                    |Params
+                ]
+            )
+        )
     end).
 
 get_blog(Params, Fileds)->

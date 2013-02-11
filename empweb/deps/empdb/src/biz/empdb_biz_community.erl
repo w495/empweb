@@ -423,7 +423,17 @@ count(Params)->
         ])
     end).
 
+
+get_blogs(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao:eqret(
+        "select * from doc j"
+
+        )
+    end).
+
 get(Params)->
+    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
         get_adds(Con,
             empdb_dao_community:get(Con, [
@@ -437,6 +447,7 @@ get(Params)->
     end).
 
 get(Params, Fields)->
+    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
         get_adds(Con,
             empdb_dao_community:get(Con, [
@@ -448,6 +459,51 @@ get(Params, Fields)->
             [{fields, Fields}| Params]
         )
     end).
+
+
+get_blogs(Con, What) ->
+    Truefields = proplists:get_value(fields,What,[]),
+    Fields =
+        case Truefields of
+            [] ->
+                lists:append([
+                    lists:map(
+                        fun(X)->
+                            erlang:list_to_atom(
+                                erlang:atom_to_list(X)
+                                ++
+                                erlang:atom_to_list(community)
+                            )
+                        end,
+                        empdb_dao_community:table({fields, select})
+                    ),
+                    lists:map(
+                        fun(X)->
+                            erlang:list_to_atom(
+                                erlang:atom_to_list(X)
+                                ++
+                                erlang:atom_to_list(cdoc)
+                            )
+                        end,
+                        empdb_dao_doc:table({fields, select})
+                    )
+                ]);
+            _ ->
+                Truefields
+        end,
+        
+    empdb_dao:get([
+        {{empdb_dao_doc, cdoc},             id},
+        {{empdb_dao_community, community},  doc_id},
+        {{empdb_dao_doc,  bdoc}, {pers_id, {cdoc, pers_id}}},
+        {{empdb_dao_vote, bdoc}, {pers_id, {cdoc, pers_id}}}
+    ],Con,[
+        {fields, Fields}
+        | What
+    ]).
+
+
+    
 
 get_adds(Con, {ok, Communitys}, Params) ->
     Fields = proplists:get_value(fields, Params, []),
@@ -516,6 +572,7 @@ filepath(Con, Communitypl, Idfield) ->
                 (proplists:get_value(fileinfopath, List))/binary
             >>
     end.
+
 
 
 
