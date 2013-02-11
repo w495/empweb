@@ -60,7 +60,7 @@ nviewsupm(Module, [])->
 nviewsupm(Module, [Params])->
     nviewsup(
         erlang:list_to_atom(
-            "empdb_biz_" ++ (
+            "empdb_dao_" ++ (
                 lists:last(
                     string:tokens(erlang:atom_to_list(Module), "_")
                 )
