@@ -325,12 +325,12 @@ count(Params)->
 
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_daowp_room:get_con(Con, Params)
+        empdb_daowp_room:get(Con, Params)
     end).
 
 get(Params, Fields)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_daowp_room:get_con(Con, Params, Fields)
+        empdb_daowp_room:get(Con, Params, Fields)
     end).
 
 
