@@ -217,8 +217,8 @@ create__(Pass, Params)->
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
                         {body, null},
-                        {isrepostcont, true},
-                        {parent_id, proplists:get_value(id, Ownblogpl)}
+                        {isrepostcont, true}
+                        %{parent_id, proplists:get_value(id, Ownblogpl)}
                     ]),
                 {ok, [{Ownalbumpl}]} =
                     empdb_dao_album:create(Con, [
@@ -232,8 +232,8 @@ create__(Pass, Params)->
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
                         {body, null},
-                        {isrepostcont, true},
-                        {parent_id, proplists:get_value(id, Ownalbumpl)}
+                        {isrepostcont, true}
+                        %{parent_id, proplists:get_value(id, Ownalbumpl)}
                     ]),
                 {ok, [{[
                     {blog_id,   proplists:get_value(id, Ownblogpl)},
@@ -692,16 +692,17 @@ login({Uf, Uv}, Params) ->
                             end,
 
                         {ok, [Repostblog]} =
-                            case Ownblog of
-                                null ->
-                                    null;
-                                {Ownblogpl} ->
+%                             case Ownblog of
+%                                 null ->
+%                                     null;
+%                                 {Ownblogpl} ->
                                     case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
                                         {owner_id,
                                             proplists:get_value(id, Userpl)},
                                         {isrepostcont, true},
-                                        {parent_id,
-                                            proplists:get_value(id, Ownblogpl)},
+%                                         {parent_id,
+%                                             proplists:get_value(id, Ownblogpl)},
+                                        {parent_id, null},
                                         {limit, 1}
                                     ], [
                                         vcounter,
@@ -722,8 +723,8 @@ login({Uf, Uv}, Params) ->
                                     ])) of
                                         {ok, []} -> {ok, [null]};
                                         Res12 -> Res12
-                                    end
-                            end,
+                                    end,
+%                             end,
 
                         {ok, [Ownalbum]} =
                             case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
@@ -754,15 +755,16 @@ login({Uf, Uv}, Params) ->
                             end,
 
                         {ok, [Repostalbum]} =
-                            case Ownalbum of
-                                null ->
-                                    null;
-                                {Ownalbumpl} ->
+%                             case Ownalbum of
+%                                 null ->
+%                                     null;
+%                                 {Ownalbumpl} ->
                                     case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
                                         {owner_id,
                                             proplists:get_value(id, Userpl)},
-                                        {parent_id,
-                                            proplists:get_value(id, Ownalbumpl)},
+%                                         {parent_id,
+%                                             proplists:get_value(id, Ownalbumpl)},
+                                        {parent_id, null},
                                         {isrepostcont,  true},
                                         {limit, 1}
                                     ], [
@@ -784,8 +786,8 @@ login({Uf, Uv}, Params) ->
                                     ])) of
                                         {ok, []} -> {ok, [null]};
                                         Res22 -> Res22
-                                    end
-                            end,
+                                    end,
+%                             end,
                         %%
                         %% Получаем комнату пользователя
                         %%
@@ -1129,6 +1131,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
+                                {parent_id, null},
                                 {isrepostcont, true},
                                 {fields, [
                                     nposts,
@@ -1196,6 +1199,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {owner_nick,    Nick}
                                 ]},
                                 {limit, 1},
+                                {parent_id, null},
                                 {isrepostcont, true},
                                 {fields, [
                                     nposts,
