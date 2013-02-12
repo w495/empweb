@@ -97,6 +97,7 @@ count_posts(Con, Params)->
         " where "
             "       doc_post.doctype_alias  = 'post' "
             " and   doc_post.isdeleted      = false "
+            " and   doc_post.isrepostcont   = false "
             " and   doc_post.parent_id      = $id "
         " group by "
             " doc_post.read_acctype_alias; ",

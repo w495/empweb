@@ -216,6 +216,7 @@ count_comments(Con, Params)->
         " where "
             "       doc_comment.doctype_alias  = 'comment' "
             " and   doc_comment.isdeleted      = false "
+            " and   doc_comment.isrepostcont   = false "
             " and   doc_comment.parent_id      = $id ",
         Params
     ).

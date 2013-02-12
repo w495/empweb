@@ -105,6 +105,7 @@ count_comments(Con, Params)->
         " where "
             "       doc_comment.doctype_alias  = 'comment' "
             " and   doc_comment.isdeleted      = false "
+            " and   doc_comment.isrepostcont   = false "
             " and   doc_comment.parent_id      = $id ",
         Params
     ).
@@ -114,13 +115,14 @@ count_comments(Con, Params)->
 count_photos(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count(doc_comment.id) "
+            " count(doc_photo.id) "
         " from "
-            " doc as doc_comment "
+            " doc as doc_photo "
         " where "
-            "       doc_comment.doctype_alias  = 'photo' "
-            " and   doc_comment.isdeleted      = false "
-            " and   doc_comment.parent_id      = $id ",
+            "       doc_photo.doctype_alias  = 'photo' "
+            " and   doc_photo.isdeleted      = false "
+            " and   doc_photo.isrepostcont   = false "
+            " and   doc_photo.parent_id      = $id ",
         Params
     ).
 %%
@@ -136,6 +138,7 @@ count_albums(Con, Params)->
         " where "
             "       doc_album.doctype_alias  = 'album' "
             " and   doc_album.isdeleted      = false "
+            " and   doc_album.isrepostcont   = false "
             " and   doc_album.parent_id      = $id "
         " group by "
             " doc_album.read_acctype_alias; ",
