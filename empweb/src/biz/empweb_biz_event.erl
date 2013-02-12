@@ -48,7 +48,7 @@ get(Params)->
     empdb_biz_event:get(Params).
 
 count(Params)->
-    empdb_biz_event:get(Params).
+    empdb_biz_event:count(Params).
 
 get(Params, Fields)->
     empdb_biz_event:get(Params, Fields).

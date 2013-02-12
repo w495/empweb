@@ -2058,6 +2058,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
 
         %% ==================================================
+            <<"count_eventtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventtype,
+                    action          =   count
+                };
             <<"get_eventtype">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_eventtype,
@@ -2085,6 +2090,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                 };
 
         %% ==================================================
+            <<"count_event">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_event,
+                    action          =   count
+                };
             <<"get_event">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_event,

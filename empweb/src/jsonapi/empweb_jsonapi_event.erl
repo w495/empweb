@@ -85,6 +85,47 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
+        action='count', params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get event">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+%                 key         = pers_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = eventtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_event:count(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
         action='get', params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get event">>),
@@ -93,7 +134,7 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key         = pers_id,
+%                 key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
