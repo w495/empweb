@@ -136,9 +136,13 @@ norm('get') ->
             required    = false,
             types       = empweb_norm:filter([float])
         },
-
         #norm_rule{
             key         = isrepost,
+            required    = false,
+            types       = empweb_norm:filter([nullable, boolean])
+        },
+        #norm_rule{
+            key         = isrepostcont,
             required    = false,
             types       = empweb_norm:filter([nullable, boolean])
         },
