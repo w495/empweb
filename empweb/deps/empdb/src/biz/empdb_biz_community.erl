@@ -14,6 +14,7 @@
     get/1,
     get/2,
     get_blogs/2,
+    get_blogs/2,
     count/1,
     create/1,
     update/1,
@@ -425,13 +426,6 @@ count(Params)->
     end).
 
 
-get_blogs(Params)->
-    empdb_dao:with_transaction(fun(Con)->
-        empdb_dao:eqret(
-        "select * from doc j"
-
-        )
-    end).
 
 get(Params)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
