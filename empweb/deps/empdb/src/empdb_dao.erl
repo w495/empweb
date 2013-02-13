@@ -1190,8 +1190,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                     {{table_alias(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
-                                            <<" ">>,
-                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" left ">>,
+                                            %erlang:atom_to_binary(Jointype, utf8),
                                             <<" join ">>,
                                                table_name_as_alias(Current1),
                                             %% сцепление таблиц
@@ -1200,7 +1200,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                Parent1,
+                                                empdb_convert:to_binary(Parent1),
                                                 %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
@@ -1339,6 +1339,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 sql_offset(Offset)
             ]),
 
+        io:format("Query = = ~p ~n~n~n~n~n", [Query]),
         Querycnt =
             Querycons([
                 <<" select ">>,

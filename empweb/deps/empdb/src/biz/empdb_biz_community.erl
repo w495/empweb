@@ -497,7 +497,7 @@ get_blogs(What) ->
         empdb_dao:get([
             {{empdb_dao_doc,        bdoc},  id},
             {{empdb_dao_blog,       blog},  doc_id},
-            {{empdb_dao_pers,       pers},  {live_community_id, {bdoc, id}}}
+            {{empdb_dao_pers,       pers},  {left, {live_community_id, {bdoc, id}}}}
             |
             case Isweek of
                 false  ->
