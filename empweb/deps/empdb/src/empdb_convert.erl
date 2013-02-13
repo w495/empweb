@@ -5,6 +5,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -module(empdb_convert).
+
+
+%%
+%% Структры для работы с запросами к базе данных
+%%
+-include("empdb.hrl").
+
+
 -export([
             to_plain/1,
             from_plain/1,
@@ -24,6 +32,7 @@
             int2datetime/1,
             int2universal_datetime/1,
             int2local_datetime/1,
+            now_minus_week/0,
             to_money/1,
             test/0
         ]
@@ -35,6 +44,12 @@
 -define(EMPDB_CONVERT_TIMEMICROREST,    1000).
 -define(EMPDB_CONVERT_TIMEMACROREST,    1000000).
 
+
+now_minus_week() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y - ?EMPDB_UNIXTIMEWEEK
+    ).
 
 datetime2int(Date) ->
     calendar:datetime_to_gregorian_seconds(Date)

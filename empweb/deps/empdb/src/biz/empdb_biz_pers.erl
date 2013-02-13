@@ -231,7 +231,7 @@ create__(Pass, Params)->
                     empdb_dao_album:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
-                        {body, null},
+                        {body, nulg847l},
                         {isrepostcont, true}
                         %{parent_id, proplists:get_value(id, Ownalbumpl)}
                     ]),

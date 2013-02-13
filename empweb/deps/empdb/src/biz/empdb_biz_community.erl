@@ -4,8 +4,9 @@
 -module(empdb_biz_community).
 
 %%
-%% Include files
+%% Структры для работы с запросами к базе данных
 %%
+-include("empdb.hrl").
 
 %%
 %% Exported Functions
@@ -13,8 +14,7 @@
 -export([
     get/1,
     get/2,
-    get_blogs/2,
-    get_blogs/2,
+    get_blogs/1,
     count/1,
     create/1,
     update/1,
@@ -461,47 +461,73 @@ get_con(Con, Params, Fields)->
         [{fields, Fields}| Params]
     ).
 
-get_blogs(Con, What) ->
-    Truefields = proplists:get_value(fields,What,[]),
-    Fields =
-        case Truefields of
-            [] ->
-                lists:append([
-                    lists:map(
-                        fun(X)->
-                            erlang:list_to_atom(
-                                erlang:atom_to_list(X)
-                                ++
-                                erlang:atom_to_list(community)
-                            )
-                        end,
-                        empdb_dao_community:table({fields, select})
-                    ),
-                    lists:map(
-                        fun(X)->
-                            erlang:list_to_atom(
-                                erlang:atom_to_list(X)
-                                ++
-                                erlang:atom_to_list(cdoc)
-                            )
-                        end,
-                        empdb_dao_doc:table({fields, select})
-                    )
-                ]);
-            _ ->
-                Truefields
-        end,
-        
-    empdb_dao:get([
-        {{empdb_dao_doc, cdoc},             id},
-        {{empdb_dao_community, community},  doc_id},
-        {{empdb_dao_doc,  bdoc}, {pers_id, {cdoc, pers_id}}},
-        {{empdb_dao_vote, bdoc}, {pers_id, {cdoc, pers_id}}}
-    ],Con,[
-        {fields, Fields}
-        | What
-    ]).
+get_blogs(What) ->
+    Isweek = proplists:get_value(isweek, What, false),
+    empdb_dao:with_transaction(fun(Con)->
+        Truefields = proplists:get_value(fields,What,[]),
+        Fields =
+            case Truefields of
+                [] ->
+                    lists:append([
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                    erlang:atom_to_list(blog)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_community:table({fields, select})
+                        ),
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                   erlang:atom_to_list(bdoc)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_doc:table({fields, select})
+                        )
+                    ]);
+                _ ->
+                    Truefields
+            end,
+        What_ = proplists:delete(fields, What),
+        empdb_dao:get([
+            {{empdb_dao_doc,        bdoc},  id},
+            {{empdb_dao_blog,       blog},  doc_id},
+            {{empdb_dao_doc,        community},  {owner_id, {bdoc, owner_id}}}
+            |
+            case Isweek of
+                false  ->
+                    [];
+                true  ->
+                    [{{empdb_dao_vote,  vote},  {doc_id,   {community, id}}}]
+            end
+        ],Con,[
+            {fields, Fields},
+            {order, {desc, bdoc.nvotes}}
+            |
+            case Isweek of
+                false  ->
+                    What_;
+                true  ->
+                    [
+                        {vote.created,
+                            {gt, empdb_convert:now_minus_week()}
+                        }
+                        | What_
+                    ]
+            end
 
+        ])
+    end).
+
+
+
+
+    
 
     
 

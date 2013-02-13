@@ -912,6 +912,9 @@ get(Current, Con, #queryobj{fields=Fields}=Obj)
     ?empdb_debug("Fields = ~p~n~n", [Fields]),
     get(Current, Con, Obj#queryobj{fields=[Fields]});
 
+get([{{table, _ }, _}|_] = Current, Con, #queryobj{} = Qo)  ->
+    get([{Current, null}], Con, Qo);
+
 get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     filter  =   Afilter1,
     fields  =   Input_fields1,
@@ -919,10 +922,18 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo ) when
-    erlang:is_list(Afilter1),erlang:is_list(Aparent)
-    orelse erlang:is_atom(Aparent)->
+    erlang:is_list(Afilter1),
+        erlang:is_tuple(Aparent)
+        orelse erlang:is_list(Aparent)
+        orelse erlang:is_atom(Aparent)->
     %Fields = lists:reverse(Input_fields1),
 
+
+        io:format("~n~n~n Aop =  ~p ~n~n~n ", [Aop ]),
+
+        io:format("~n~n~n Aparent =  ~p ~n~n~n ", [Aparent ]),
+
+        
     {Query, Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         {Op1, {Afilter, Input_fields}} = lists:foldl(
             fun
@@ -994,10 +1005,9 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
 
         Op = lists:reverse(Op1),
 
-        io:format("~n~n~n Afilter ~p ~n~n~n, Input_fields = ~p ~n~n~n", [Afilter, Input_fields]),
+        io:format("~n~n~n Op =   ~p ~n~n~n ", [Op ]),
 
         Fields = Input_fields,
-%         Afilter1
 %         
         [{Parent, Parent_field}|Rest] = Op,
 
@@ -1080,9 +1090,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-
-
-    
         Current_select_fields_ =
             lists:filter(
                 fun ({as, F, N})->
@@ -1100,6 +1107,10 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 end,
                 Fields
             ),
+
+     
+        io:format("~n~n~n Current_select_fields_ = ~p ~n~n~n", [Current_select_fields_]),
+        
         Current_all_fields_ =
             lists:filter(
                 fun({F, _})->
@@ -1109,11 +1120,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             ),
         Current_all_fields =
             empdb_orm_util:current_all_fields(Current_all_fields_, Op),
-
-
         io:format("~n~n~n Current_all_fields_ = ~p ~n~n~n", [Current_all_fields_]),
-
-        
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
@@ -1148,6 +1155,11 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         Binary_parent_name =
             empdb_convert:to_binary(table_options({table, name},Parent)),
 
+        Parent_table_name_as_alias =
+            table_name_as_alias(Parent),
+
+           io:format("~n~n~n Current_select_fields = ~p ~n~n~n", [Current_select_fields]),
+           
         Binary_select_fields =
             fields(
                 Current_select_fields,
@@ -1163,7 +1175,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                     %% поля обоих таблиц в перемешку
                     Action,
                     %% родительская таблиа
-                    <<" from ">>,   Binary_parent_name,
+                    <<" from ">>,   Parent_table_name_as_alias,
                     begin
                         %% 1020
                         {_, Joinlist} = lists:foldl(
@@ -1175,7 +1187,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_name(Current1), Current_field1},
+                                    {{table_alias(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" ">>,
@@ -1188,7 +1200,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
@@ -1201,7 +1214,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_name(Current1), Current_field2},
+                                    {{table_alias(Current1), Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" ">>,
@@ -1214,14 +1227,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
                                         ]
                                     };
                                 ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
-                                    {{table_name(Current1), Current_field1},
+                                    {{table_alias(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
@@ -1232,7 +1246,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                empdb_convert:to_binary(Parent1),
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
@@ -1245,7 +1260,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_name(Current1), Current_field1},
+                                    {{table_alias(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" ">>,
@@ -1258,14 +1273,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
                                         ]
                                     };
                                 ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_name(Current1), Current_field2},
+                                    {{table_alias(Current1), Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
@@ -1276,14 +1292,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
                                         ]
                                     };
                                 ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_name(Current1), Current_field1},
+                                    {{table_alias(Current1), Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
@@ -1294,14 +1311,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
-                                                empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
                                                 <<".">>,
                                                 empdb_convert:to_binary(Parent_field1)
                                             ]
                                         ]
                                     }
                             end,
-                            {{Parent, Parent_field}, []},
+                            {{table_alias(Parent), Parent_field}, []},
                             Rest
                         ),
                         Joinlist
@@ -1330,6 +1348,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             
         {Query, Querycnt, Pfields}
     end),
+
+    
     case empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)) of
         {ok, List}->
             case empdb_dao:pgret(empdb_dao:equery(Con, Querycnt, Pfields)) of
@@ -1366,6 +1386,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             Else2
     end;
 
+
 get(Current, Con, #queryobj{
     filter  =   Filter,
     fields  =   Fields,
@@ -1373,19 +1394,23 @@ get(Current, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
-    %%% depricated___get__(Current, Con, Qo);
+    io:format(" 1Current = ~p~n", [Current]),
     get([{Current, null}], Con, Qo);
 
+
+
 get(Current,Con,#queryobj{}=Qo)  ->
+    io:format(" 2Current = ~p (1)~n~n", [Current]),
     Ocurrent = [
         {{table, name},             Current:table(name)},
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    ?empdb_debug("Ocurrent = ~p~n", [Ocurrent]),
+    io:format(" 2Ocurrent = ~p (2) ~n~n", [Ocurrent]),
     get(Ocurrent,Con,Qo);
 
 get(Current, Con, Opts) when erlang:is_list(Opts) ->
+    io:format(" 3Current = ~p~n", [Current]),
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
@@ -1407,7 +1432,7 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
     ).
 
 get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    ?empdb_debug("Current = ~p~n", [Current]),
+    io:format(" 4Current = ~p~n", [Current]),
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
@@ -1422,72 +1447,6 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
                 offset  =   proplists:get_value(offset,  Opts)
         }
     ).
-
-depricated___get__(Current, Con, #queryobj{
-    filter  =   Filter,
-    fields  =   Fields,
-    order   =   Order,
-    limit   =   Limit,
-    offset  =   Offset
-} = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
-
-    {Query, Pfields} = empdb_memocashe({Current, Qo}, fun() ->
-        Common_all_fields =
-            table_options({table, fields, all}, Current),
-        Common_select_fields =
-            table_options({table, fields, select}, Current),
-        Current_select_fields =
-            lists:filter(
-                fun(F)-> lists:member(F, Common_select_fields) end,
-                Fields
-            ),
-        Current_all_fields =
-            lists:filter(
-                fun({F, _})->
-                    lists:member(F, Common_all_fields)
-                end,
-                Filter
-            ),
-        Current_order =
-            lists:filter(
-                fun
-                    ({desc, F})->
-                        lists:member(F, Common_all_fields);
-                    ({F, desc})->
-                        lists:member(F, Common_all_fields);
-                    ({asc, F})->
-                        lists:member(F, Common_all_fields);
-                    ({F, asc})->
-                        lists:member(F, Common_all_fields);
-                    (F)->
-                        lists:member(F, Common_all_fields)
-                end,
-                Order
-            ),
-        ?empdb_debug("Order = ~p~n~n", [Current_order]),
-
-        Binary_table_name =
-            empdb_convert:to_binary(table_options({table, name},  Current)),
-        Binary_select_fields =
-            fields(
-                Current_select_fields,
-                Common_select_fields
-            ),
-        {Pfields, Where_string} =
-            sql_where(Current_all_fields),
-        Query = [
-            <<"select ">>,  Binary_select_fields,
-            <<" from ">>,   Binary_table_name,
-            Where_string,
-            [
-                sql_order(Current_order),
-                sql_limit(Limit),
-                sql_offset(Offset)
-            ]
-        ],
-        {Query, Pfields}
-    end),
-    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)).
 
 %% ===========================================================================
 %% ===========================================================================
@@ -1508,25 +1467,104 @@ count(Current, Con, #queryobj{fields=Fields}=Obj)
     ?empdb_debug("Fields = ~p~n~n", [Fields]),
     count(Current, Con, Obj#queryobj{fields=[Fields]});
 
+
+count([{{table, _ }, _}|_] = Current, Con, #queryobj{} = Qo)  ->
+    count([{Current, null}], Con, Qo);
+
 count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
-    filter  =   Afilter,
-    fields  =   Fields,
+    filter  =   Afilter1,
+    fields  =   Input_fields1,
     order   =   Order,
     limit   =   Limit,
     offset  =   Offset
 } = Qo ) when
-    erlang:is_list(Afilter),erlang:is_list(Aparent)
-    orelse erlang:is_atom(Aparent)->
-    {Query, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
-        Op = lists:map(
-            fun ({Current, Current_field}) when erlang:is_atom(Current) ->
-                    {table_options(Current), Current_field};
-                ({Current, Current_field}) ->
-                    {Current, Current_field}
+    erlang:is_list(Afilter1),
+        erlang:is_tuple(Aparent)
+        orelse erlang:is_list(Aparent)
+        orelse erlang:is_atom(Aparent)->
+    %Fields = lists:reverse(Input_fields1),
+
+
+        io:format("~n~n~n Aop =  ~p ~n~n~n ", [Aop ]),
+
+        io:format("~n~n~n Aparent =  ~p ~n~n~n ", [Aparent ]),
+
+
+    {Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
+        {Op1, {Afilter, Input_fields}} = lists:foldl(
+            fun
+                ({{Current, As}, Current_field}, {Acc, {Afilteri, Input_fieldsi}}) when erlang:is_atom(Current) ->
+                    Asl = empdb_convert:to_list(As),
+                    Asl_ = Asl ++ "_",
+                    Afilteri2 =
+                        lists:map(
+                            fun
+                                ({K, V})->
+                                    Kl = empdb_convert:to_list(K),
+                                    io:format("~n~n~n Asl_ = ~p Kl = ~p --> ~p ~n~n~n", [Asl_, Kl, lists:prefix(Asl_, Kl)]),
+                                    case lists:prefix(Asl_, Kl) of
+                                        false ->
+                                            {K, V};
+                                        true ->
+                                            Klpost = string:sub_string(Kl, erlang:length(Asl_) + 1),
+                                            {empdb_convert:to_atom(lists:append([Asl, ".", Klpost])), V}
+                                    end;
+                                (X) ->
+                                    X
+                            end,
+                            Afilteri
+                        ),
+                    Input_fieldsi2 =
+                        lists:map(
+                            fun ({as, I, A}) ->
+                                    {as, I, A};
+                                (I)->
+                                    Il = empdb_convert:to_list(I),
+                                    case lists:prefix(Asl_, Il) of
+                                        false ->
+                                            I;
+                                        true ->
+                                            Ilpost = string:sub_string(Il, erlang:length(Asl_) + 1),
+                                            {'as', {empdb_convert:to_atom(lists:append([Asl, ".", Ilpost])), I}}
+                                    end
+                            end,
+                            Input_fieldsi
+                        ),
+                    {
+                        [
+                            {{table_options(Current), As}, Current_field}
+                            |Acc
+                        ],
+                        {Afilteri2, Input_fieldsi2}
+                    };
+
+                ({Current, Current_field}, {Acc, F}) when erlang:is_atom(Current) ->
+                    {
+                        [
+                            {table_options(Current), Current_field}
+                            |Acc
+                        ],
+                        F
+                    };
+                ({Current, Current_field}, {Acc, F}) ->
+                    {
+                        [
+                            {Current, Current_field}
+                            |Acc
+                        ],
+                        F
+                    }
             end,
+            {[], {Afilter1, Input_fields1}},
             Aop
         ),
 
+        Op = lists:reverse(Op1),
+
+        io:format("~n~n~n Op =   ~p ~n~n~n ", [Op ]),
+
+        Fields = Input_fields,
+%
         [{Parent, Parent_field}|Rest] = Op,
 
         Filter = Afilter,
@@ -1542,19 +1580,30 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         ),
         Common_all_fields = lists:append(
             lists:map(
-                fun({Tab,_})->
-                    lists:map(
-                        fun(Item)->
-                            empdb_convert:to_atom(
-                                empdb_convert:to_list(
-                                    table_options({table, name},Tab)
+                fun ({{T1,T2},_})->
+                        lists:map(
+                            fun(Item)->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(T2)
+                                    ++ "." ++
+                                    empdb_convert:to_list(Item)
                                 )
-                                ++ "." ++
-                                empdb_convert:to_list(Item)
-                            )
-                        end,
-                        table_options({table, fields, all},Tab)
-                    )
+                            end,
+                            table_options({table, fields, all},T1)
+                        );
+                    ({Tab,_})->
+                        lists:map(
+                            fun(Item)->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(
+                                        table_options({table, name},Tab)
+                                    )
+                                    ++ "." ++
+                                    empdb_convert:to_list(Item)
+                                )
+                            end,
+                            table_options({table, fields, all},Tab)
+                        )
                 end,
                 Op
             )
@@ -1569,19 +1618,30 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         ),
         Common_select_fields = lists:append(
             lists:map(
-                fun({Tab,_})->
-                    lists:map(
-                        fun(Item)->
-                            empdb_convert:to_atom(
-                                empdb_convert:to_list(
-                                    table_options({table, name},Tab)
+                fun ({{T1, T2},_})->
+                        lists:map(
+                            fun(Item)->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(T2)
+                                    ++ "." ++
+                                    empdb_convert:to_list(Item)
                                 )
-                                ++ "." ++
-                                empdb_convert:to_list(Item)
-                            )
-                        end,
-                        table_options({table, fields, select},Tab)
-                    )
+                            end,
+                            table_options({table, fields, select},T1)
+                        );
+                    ({Tab,_})->
+                        lists:map(
+                            fun(Item)->
+                                empdb_convert:to_atom(
+                                    empdb_convert:to_list(
+                                        table_options({table, name},Tab)
+                                    )
+                                    ++ "." ++
+                                    empdb_convert:to_list(Item)
+                                )
+                            end,
+                            table_options({table, fields, select},Tab)
+                        )
                 end,
                 Op
             )
@@ -1612,6 +1672,7 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             ),
         Current_all_fields =
             empdb_orm_util:current_all_fields(Current_all_fields_, Op),
+        io:format("~n~n~n Current_all_fields_ = ~p ~n~n~n", [Current_all_fields_]),
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
@@ -1622,6 +1683,8 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     (F) ->
                         empdb_orm_util:current_select_fields(F, Op)
+%                     (Else)  ->
+%                         Else
                 end,
                 Current_select_fields_
             ),
@@ -1644,6 +1707,9 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         Binary_parent_name =
             empdb_convert:to_binary(table_options({table, name},Parent)),
 
+        Parent_table_name_as_alias =
+            table_name_as_alias(Parent),
+
         Binary_select_fields =
             fields(
                 Current_select_fields,
@@ -1653,84 +1719,174 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             empdb_convert:to_binary(Parent_field),
         {Pfields, Where_string} =
             sql_where(Current_all_fields),
-        Query = [
-            %% поля обоих таблиц в перемешку
-            <<" select count(*) ">>,
-            %% родительская таблиа
-            <<" from ">>,   Binary_parent_name,
-            begin
-                {_, Joinlist} = lists:foldl(
-                    fun
-                        ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
-                            {{Current1, Current_field1},
-                                Prev ++ [
-                                    %% дочерняя таблиц
-                                    <<" join ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                    %% сцепление таблиц
-                                    <<" on ">>, [
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Current_field1),
-                                        <<" = ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Parent_field1)
-                                    ]
-                                ]
-                            };
-                        ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
-                            {{Current1, Current_field2},
-                                Prev ++ [
-                                    %% дочерняя таблиц
-                                    <<" join ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                    %% сцепление таблиц
-                                    <<" on ">>, [
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Current_field1),
-                                        <<" = ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Parent_field1)
-                                    ]
-                                ]
-                            };
-                        ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
-                            {{Current1, Current_field1},
-                                Prev ++ [
-                                    %% дочерняя таблиц
-                                    <<" join ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                    %% сцепление таблиц
-                                    <<" on ">>, [
-                                        empdb_convert:to_binary(table_options({table, name},Current1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Current_field1),
-                                        <<" = ">>,
-                                        empdb_convert:to_binary(table_options({table, name},Parent1)),
-                                        <<".">>,
-                                        empdb_convert:to_binary(Parent_field1)
-                                    ]
-                                ]
-                            }
+        Querycons =
+            fun(Action, Olo)->
+                [
+                    %% поля обоих таблиц в перемешку
+                    Action,
+                    %% родительская таблиа
+                    <<" from ">>,   Parent_table_name_as_alias,
+                    begin
+                        %% 1020
+                        {_, Joinlist} = lists:foldl(
+                            fun
+                                ({Current1, {Jointype, {Current_field1, {Parent1, Parent_field1}}}}, {{_parent1, _parent_field1}, Prev})
+                                    when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
+                                    {{table_alias(Current1), Current_field1},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
+                                               table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    };
+                                ({Current1, {Jointype, {Current_field1, Current_field2}}}, {{Parent1, Parent_field1}, Prev})
+                                   when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
+                                    {{table_alias(Current1), Current_field2},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
+                                                table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    };
+                                ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
+                                    {{table_alias(Current1), Current_field1},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" join ">>,
+                                               table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                empdb_convert:to_binary(Parent1),
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    };
+                                ({Current1, {Jointype, Current_field1}}, {{Parent1, Parent_field1}, Prev})
+                                   when Jointype == natural;
+                                        Jointype == inner;
+                                        Jointype == left;
+                                        Jointype == right;
+                                        Jointype == full;
+                                        Jointype == outer ->
+                                    {{table_alias(Current1), Current_field1},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" ">>,
+                                            erlang:atom_to_binary(Jointype, utf8),
+                                            <<" join ">>,
+                                                table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    };
+                                ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
+                                    {{table_alias(Current1), Current_field2},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" join ">>,
+                                                table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    };
+                                ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
+                                    {{table_alias(Current1), Current_field1},
+                                        Prev ++ [
+                                            %% дочерняя таблиц
+                                            <<" join ">>,
+                                                table_name_as_alias(Current1),
+                                            %% сцепление таблиц
+                                            <<" on ">>, [
+                                                table_alias(Current1),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Current_field1),
+                                                <<" = ">>,
+                                                Parent1,
+                                                %empdb_convert:to_binary(table_options({table, name},Parent1)),
+                                                <<".">>,
+                                                empdb_convert:to_binary(Parent_field1)
+                                            ]
+                                        ]
+                                    }
+                            end,
+                            {{table_alias(Parent), Parent_field}, []},
+                            Rest
+                        ),
+                        Joinlist
                     end,
-                    {{Parent, Parent_field}, []},
-                    Rest
-                ),
-                Joinlist
+                    Where_string,
+                    Olo
+                ]
             end,
-            Where_string,
-            [
-                sql_order(Current_order),
-                sql_limit(Limit),
-                sql_offset(Offset)
-            ]
-        ],
-        {Query, Pfields}
+
+        Querycnt = Querycons([
+                <<" select ">>,
+                <<" count(*) ">>
+            ], [
+        ]),
+        {Querycnt, Pfields}
     end),
-    empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields));
+    empdb_dao:pgret(empdb_dao:equery(Con, Querycnt, Pfields));
 
 count(Current, Con, #queryobj{
     filter  =   Filter,

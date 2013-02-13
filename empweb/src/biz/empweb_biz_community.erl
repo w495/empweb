@@ -10,6 +10,7 @@
 -export([
     get/1,
     get/2,
+    get_blogs/1,
     count/1,
     create/1,
     join/1,
@@ -23,6 +24,9 @@
 %% ==========================================================================
 %% Внешние функции
 %% ==========================================================================
+
+get_blogs(Params)->
+    empdb_biz_community:get_blogs(Params).
 
 create(Params)->
     empdb_biz_community:create(Params).
