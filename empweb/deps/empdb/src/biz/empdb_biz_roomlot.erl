@@ -180,7 +180,7 @@ remove_expired()->
                                 {isincome,          true},
                                 {price,             Price}
                             ]),
-                        {ok, _} =
+                        {ok, [{Roompl}]} =
                             empdb_dao_room:update(Con, [
                                 {id,                Room_id},
                                 {roomlot_id,        null},
@@ -193,6 +193,18 @@ remove_expired()->
                                 {roombet_owner_nick,null},
                                 {roombet_price,     null},
                                 {owner_id,          Owner_id}
+                            ]),
+                        {ok, _} =
+                            empdb_dao_pers:update(Con, [
+                                {id,        Owner_id},
+                                {own_room_id,
+                                    proplists:get_value(id, Roompl)},
+                                {own_room_head,
+                                    proplists:get_value(id, Roompl)},
+                                {citizen_room_id,
+                                    proplists:get_value(id, Roompl)},
+                                {citizen_room_head,
+                                    proplists:get_value(id, Roompl)}
                             ]);
                     _ ->
                         ok

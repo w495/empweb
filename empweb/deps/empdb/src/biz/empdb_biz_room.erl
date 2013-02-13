@@ -100,9 +100,16 @@ create(Params)->
                         ]),
                         Newmoney = Money - Price,
                         empdb_dao_pers:update(Con,[
-                            {id,            proplists:get_value(id,   Mbownerpl)},
-                            {own_room_id,   proplists:get_value(id, Respl)},
-                            {own_room_head, Head},
+                            {id,
+                                proplists:get_value(id,   Mbownerpl)},
+                            {own_room_id,
+                                proplists:get_value(id, Respl)},
+                            {own_room_head,
+                                proplists:get_value(id, Respl)},
+                            {citizen_room_id,
+                                proplists:get_value(id, Respl)},
+                            {citizen_room_head,
+                                proplists:get_value(id, Respl)},
                             {money, {decr, Price}}
                         ]),
                         {ok, [

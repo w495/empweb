@@ -177,28 +177,37 @@ create(Params)->
                                 %% 1) Старому владельцу зачисляются деньги.
                                 %% 2) Меняется владельца страны.
                                 %% 
-                                {ok, _} = empdb_dao_pers:update(Con, [
-                                    {id,        Roomlot_owner_id},
-                                    {money,     {incr, Price}}
-                                ]),
                                 {ok, _} = empdb_dao_pay:create(Con, [
                                     {pers_id,           Roomlot_owner_id},
                                     {paytype_alias,     roomlot_in},
                                     {isincome,          true},
                                     {price,             Price}
                                 ]),
-                                {ok, _} = empdb_dao_room:update(Con, [
-                                    {id,                Room_id},
-                                    {roomlot_id,        null},
-                                    {roomlot_betmin,    null},
-                                    {roomlot_betmax,    null},
-                                    {roomlot_dtstart,   null},
-                                    {roomlot_dtstop,    null},
-                                    {roombet_id,        null},
-                                    {roombet_owner_id,  null},
-                                    {roombet_owner_nick,null},
-                                    {roombet_price,     null},
-                                    {owner_id,          Roombet_owner_id}
+                                {ok, [{Roompl}]} =
+                                    empdb_dao_room:update(Con, [
+                                        {id,                Room_id},
+                                        {roomlot_id,        null},
+                                        {roomlot_betmin,    null},
+                                        {roomlot_betmax,    null},
+                                        {roomlot_dtstart,   null},
+                                        {roomlot_dtstop,    null},
+                                        {roombet_id,        null},
+                                        {roombet_owner_id,  null},
+                                        {roombet_owner_nick,null},
+                                        {roombet_price,     null},
+                                        {owner_id,          Roombet_owner_id}
+                                    ]),
+                                {ok, _} = empdb_dao_pers:update(Con, [
+                                    {id,        Roomlot_owner_id},
+                                    {own_room_id,
+                                        proplists:get_value(id, Roompl)},
+                                    {own_room_head,
+                                        proplists:get_value(id, Roompl)},
+                                    {citizen_room_id,
+                                        proplists:get_value(id, Roompl)},
+                                    {citizen_room_head,
+                                        proplists:get_value(id, Roompl)},
+                                    {money,     {incr, Price}}
                                 ]),
                                 {ok, _} = empdb_dao_roomlot:update(Con,[
                                     {filter, [
