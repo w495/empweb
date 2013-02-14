@@ -114,8 +114,8 @@ get(Con, What) ->
     empdb_dao:get([
         {empdb_dao_doc,     id},
         {empdb_dao_claim,   doc_id},
-        {{empdb_dao_pers, owner },   {id, {empdb_dao_doc,    owner_id}}},
-        {{empdb_dao_pers, pers  },   {id, {empdb_dao_claim,  pers_id}}},
+        {{empdb_dao_pers, owner },   {id,   {doc,    owner_id}}},
+        {{empdb_dao_pers, pers  },   {id,   {claim,  pers_id}}},
         {{empdb_dao_pers, judge },   {left, {id, {claim,  judge_id}}}}
     ],Con,[
         {fields, Fields}
@@ -153,8 +153,8 @@ get(Con, What, Afields)->
     empdb_dao:get([
         {empdb_dao_doc,     id},
         {empdb_dao_claim,   doc_id},
-        {{empdb_dao_pers, owner },   {id, {empdb_dao_doc,    owner_id}}},
-        {{empdb_dao_pers, pers  },   {id, {empdb_dao_claim,  pers_id}}},
+        {{empdb_dao_pers, owner },   {id,   {doc,    owner_id}}},
+        {{empdb_dao_pers, pers  },   {id,   {claim,  pers_id}}},
         {{empdb_dao_pers, judge },   {left, {id, {claim,  judge_id}}}}
     ],Con,[
         {fields, Fields}
