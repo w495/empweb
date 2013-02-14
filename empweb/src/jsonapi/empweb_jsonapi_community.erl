@@ -101,13 +101,13 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer]),
                 nkey        = 'pers.live_community_id'
-            }
+            },
             #norm_rule{
                 key         = isweek,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }
-            |empweb_norm_doc:norm('get')
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             {ok,
