@@ -484,7 +484,7 @@ get_blogs(Params) ->
                         lists:map(
                             fun(X)->
                                 erlang:list_to_atom(
-                                   erlang:atom_to_list(bdoc)
+                                   erlang:atom_to_list(doc)
                                     ++ "." ++
                                     erlang:atom_to_list(X)
                                 )
@@ -497,9 +497,9 @@ get_blogs(Params) ->
             end,
         What_ = proplists:delete(fields, What),
         empdb_dao:get([
-            {{empdb_dao_doc,        bdoc},  id},
-            {{empdb_dao_blog,       blog},  doc_id},
-            {{empdb_dao_pers,       pers},  {left, {live_community_id, {bdoc, id}}}}
+            {empdb_dao_doc,  id},
+            {empdb_dao_blog,  doc_id},
+            {empdb_dao_pers,  {left, {id, {doc, owne_id}}}}
             |
             case Isweek of
                 false  ->
