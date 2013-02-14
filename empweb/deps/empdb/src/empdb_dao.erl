@@ -1327,7 +1327,12 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         {Query, Querycnt, Pfields}
     end),
 
-    
+    Offsetnum =
+        case Offset of
+            undefined -> 0;
+            _ -> Offset
+        end,
+
     case empdb_dao:pgret(empdb_dao:equery(Con, Query, Pfields)) of
         {ok, List}->
             case empdb_dao:pgret(empdb_dao:equery(Con, Querycnt, Pfields)) of
@@ -1341,7 +1346,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             Number + 1,
                                             [
                                                 {[
-                                                    {"#", Number + Offset},
+                                                    {"#", Number + Offsetnum},
                                                     {"@", Count}
                                                     |lists:reverse(Itempl)
                                                 ]}
