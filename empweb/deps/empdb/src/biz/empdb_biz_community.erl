@@ -461,8 +461,10 @@ get_con(Con, Params, Fields)->
         [{fields, Fields}| Params]
     ).
 
-get_blogs(What) ->
-    Isweek = proplists:get_value(isweek, What, false),
+get_blogs(Params) ->
+    Isweek = proplists:get_value(isweek, Params, false),
+    What = proplists:delete(id, Params),
+    
     empdb_dao:with_transaction(fun(Con)->
         Truefields = proplists:get_value(fields,What,[]),
         Fields =
