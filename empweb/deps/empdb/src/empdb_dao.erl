@@ -1165,7 +1165,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_alias(Current1), Current_field1},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" left ">>,
@@ -1174,7 +1175,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1192,7 +1193,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_alias(Current1), Current_field2},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" ">>,
@@ -1201,7 +1203,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1213,14 +1215,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {Current_field1, {Parent1, Parent_field1}}}, {{_parent1, _parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
                                                table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1238,7 +1241,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         Jointype == right;
                                         Jointype == full;
                                         Jointype == outer ->
-                                    {{table_alias(Current1), Current_field1},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" ">>,
@@ -1247,7 +1251,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1259,14 +1263,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, {Current_field1, Current_field2}}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field2},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field2},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1278,14 +1283,15 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                         ]
                                     };
                                 ({Current1, Current_field1}, {{Parent1, Parent_field1}, Prev})->
-                                    {{table_alias(Current1), Current_field1},
+                                    Table_alias_current1 = table_alias(Current1),
+                                    {{Table_alias_current1, Current_field1},
                                         Prev ++ [
                                             %% дочерняя таблиц
                                             <<" join ">>,
                                                 table_name_as_alias(Current1),
                                             %% сцепление таблиц
                                             <<" on ">>, [
-                                                table_alias(Current1),
+                                                Table_alias_current1,
                                                 <<".">>,
                                                 empdb_convert:to_binary(Current_field1),
                                                 <<" = ">>,
@@ -1459,7 +1465,6 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         orelse erlang:is_list(Aparent)
         orelse erlang:is_atom(Aparent)->
     %Fields = lists:reverse(Input_fields1),
-
 
     {Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         {Op1, {Afilter, Input_fields}} = lists:foldl(
