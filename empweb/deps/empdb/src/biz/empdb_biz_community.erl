@@ -527,12 +527,9 @@ get_blogs(Params) ->
                     What_;
                 true  ->
                     [
-                        {'or', [
-                            {vote.created,
-                                {gt, empdb_convert:now_minus_week()}
-                            },
-                            {doc.nvotes, 0}
-                        ]}
+                        {vote.created,
+                            {gt, empdb_convert:now_minus_week()}
+                        }
                         | What_
                     ]
             end
