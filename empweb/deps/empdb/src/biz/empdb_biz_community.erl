@@ -514,22 +514,25 @@ get_blogs(Params) ->
                 false  ->
                     [];
                 true  ->
-                    [{{empdb_dao_vote,  vote},  {doc_id,   {doc, id}}}]
+                    [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
             {fields, Fields},
             {doc.isrepost,false},
             {doc.isrepostcont,false},
-            {order, {desc, bdoc.nvotes}}
+            {order, {desc, doc.nvotes}}
             |
             case Isweek of
                 false  ->
                     What_;
                 true  ->
                     [
-                        {vote.created,
-                            {gt, empdb_convert:now_minus_week()}
-                        }
+                        {'or', [
+                            {vote.created,
+                                {gt, empdb_convert:now_minus_week()}
+                            },
+                            {doc.nvotes, 0}
+                        ]}
                         | What_
                     ]
             end
