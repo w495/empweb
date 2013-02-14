@@ -262,7 +262,7 @@ update(Params)->
         undefined ->
             %% не пытаемся поменять пароль
             update_(Params);
-        Mbpass ->
+        Mbpass ->   
             %% пытаемся поменять пароль
             case update_([
                 {phash, phash(Mbpass)}
@@ -616,9 +616,6 @@ login({Uf, Uv}, Params) ->
                     empdb_convert:to_atom(proplists:get_value(alias, Permpl))
                 end, Perm_list),
                 Phash = proplists:get_value(phash, Userpl),
-                ?empdb_debug("Userpl   = ~p~n~n", [Userpl]),
-                ?empdb_debug("Phash   = ~p~n~n", [Phash]),
-                ?empdb_debug("Mbphash = ~p~n~n", [Mbphash]),
                 case {Phash =/= Mbphash, Max_auth_error - (EC + 1) > 0} of
                     {true, false} ->
                         %% Фиктиная ветка, в реалности не выполняется.
@@ -641,239 +638,240 @@ login({Uf, Uv}, Params) ->
                                 ]}
                         }};
                     _ ->
-                        spawn_link(fun()->
-                            %% Ключевой момент: без spawn_link код ниже может 
-                            %% привести к блокировкам, а так, 
-                            %% он выполняется независимо.
-                            case proplists:get_value(pstatus_alias, Userpl) of
-                                <<"offline">> ->
-                                    empdb_dao:with_transaction(emp, fun(Con1) ->
-                                        %%
-                                        %% Ставим пользователю статус online
-                                        %%
-                                        empdb_dao_pers:update(Con1, [
-                                            {pstatus_alias, <<"online">>},
-                                            {id, proplists:get_value(id, Userpl)}
-                                        ])
-                                    end);
-                                _ ->
-                                    ok
-                            end
-                        end),
-                        %%
-                        %% Получаем блог пользователя.
-                        %%
-                        {ok, [Ownblog]} =
-                            case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                                {owner_id,
-                                    proplists:get_value(id, Userpl)},
-                                {isrepostcont, false},
-                                {parent_id,    null},
-                                {limit, 1}
-                            ], [
-                                vcounter,
-                                nprotectedposts,
-                                nprivateposts,
-                                npublicposts,
-                                ncomments,
-                                nposts,
-                                contype_alias,
-                                contype_id,
-                                comm_acctype_alias,
-                                comm_acctype_id,
-                                read_acctype_alias,
-                                read_acctype_id,
-                                contype_id,
-                                contype_alias,
-                                id
-                            ])) of
-                                {ok, []} -> {ok, [null]};
-                                Res11 -> Res11
-                            end,
-
-                        {ok, [Repostblog]} =
-%                             case Ownblog of
-%                                 null ->
-%                                     null;
-%                                 {Ownblogpl} ->
-                                    case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
-                                        {owner_id,
-                                            proplists:get_value(id, Userpl)},
-                                        {isrepostcont, true},
-%                                         {parent_id,
-%                                             proplists:get_value(id, Ownblogpl)},
-                                        {parent_id, null},
-                                        {limit, 1}
-                                    ], [
-                                        vcounter,
-                                        nprotectedposts,
-                                        nprivateposts,
-                                        npublicposts,
-                                        ncomments,
-                                        nposts,
-                                        contype_alias,
-                                        contype_id,
-                                        comm_acctype_alias,
-                                        comm_acctype_id,
-                                        read_acctype_alias,
-                                        read_acctype_id,
-                                        contype_id,
-                                        contype_alias,
-                                        id
-                                    ])) of
-                                        {ok, []} -> {ok, [null]};
-                                        Res12 -> Res12
-                                    end,
+%                         spawn_link(fun()->
+%                             %% Ключевой момент: без spawn_link код ниже может 
+%                             %% привести к блокировкам, а так, 
+%                             %% он выполняется независимо.
+%                             case proplists:get_value(pstatus_alias, Userpl) of
+%                                 <<"offline">> ->
+%                                     empdb_dao:with_transaction(emp, fun(Con1) ->
+%                                         %%
+%                                         %% Ставим пользователю статус online
+%                                         %%
+%                                         empdb_dao_pers:update(Con1, [
+%                                             {pstatus_alias, <<"online">>},
+%                                             {id, proplists:get_value(id, Userpl)}
+%                                         ])
+%                                     end);
+%                                 _ ->
+%                                     ok
+%                             end
+%                         end),
+%                         %%
+%                         %% Получаем блог пользователя.
+%                         %%
+%                         {ok, [Ownblog]} =
+%                             case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+%                                 {owner_id,
+%                                     proplists:get_value(id, Userpl)},
+%                                 {isrepostcont, false},
+%                                 {parent_id,    null},
+%                                 {limit, 1}
+%                             ], [
+%                                 vcounter,
+%                                 nprotectedposts,
+%                                 nprivateposts,
+%                                 npublicposts,
+%                                 ncomments,
+%                                 nposts,
+%                                 contype_alias,
+%                                 contype_id,
+%                                 comm_acctype_alias,
+%                                 comm_acctype_id,
+%                                 read_acctype_alias,
+%                                 read_acctype_id,
+%                                 contype_id,
+%                                 contype_alias,
+%                                 id
+%                             ])) of
+%                                 {ok, []} -> {ok, [null]};
+%                                 Res11 -> Res11
 %                             end,
-
-                        {ok, [Ownalbum]} =
-                            case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                                {owner_id,
-                                    proplists:get_value(id, Userpl)},
-                                {isrepostcont,  false},
-                                {parent_id,     null},
-                                {limit, 1}
-                            ], [
-                                vcounter,
-                                nprotectedposts,
-                                nprivateposts,
-                                npublicposts,
-                                ncomments,
-                                nposts,
-                                contype_alias,
-                                contype_id,
-                                comm_acctype_alias,
-                                comm_acctype_id,
-                                read_acctype_alias,
-                                read_acctype_id,
-                                contype_id,
-                                contype_alias,
-                                id
-                            ])) of
-                                {ok, []} -> {ok, [null]};
-                                Res21 -> Res21
-                            end,
-
-                        {ok, [Repostalbum]} =
-%                             case Ownalbum of
-%                                 null ->
-%                                     null;
-%                                 {Ownalbumpl} ->
-                                    case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
-                                        {owner_id,
-                                            proplists:get_value(id, Userpl)},
-%                                         {parent_id,
-%                                             proplists:get_value(id, Ownalbumpl)},
-                                        {parent_id, null},
-                                        {isrepostcont,  true},
-                                        {limit, 1}
-                                    ], [
-                                        vcounter,
-                                        nprotectedposts,
-                                        nprivateposts,
-                                        npublicposts,
-                                        ncomments,
-                                        nposts,
-                                        contype_alias,
-                                        contype_id,
-                                        comm_acctype_alias,
-                                        comm_acctype_id,
-                                        read_acctype_alias,
-                                        read_acctype_id,
-                                        contype_id,
-                                        contype_alias,
-                                        id
-                                    ])) of
-                                        {ok, []} -> {ok, [null]};
-                                        Res22 -> Res22
-                                    end,
+% 
+%                         {ok, [Repostblog]} =
+% %                             case Ownblog of
+% %                                 null ->
+% %                                     null;
+% %                                 {Ownblogpl} ->
+%                                     case empdb_dao_blog:get_adds(Con, empdb_dao_blog:get(Con, [
+%                                         {owner_id,
+%                                             proplists:get_value(id, Userpl)},
+%                                         {isrepostcont, true},
+% %                                         {parent_id,
+% %                                             proplists:get_value(id, Ownblogpl)},
+%                                         {parent_id, null},
+%                                         {limit, 1}
+%                                     ], [
+%                                         vcounter,
+%                                         nprotectedposts,
+%                                         nprivateposts,
+%                                         npublicposts,
+%                                         ncomments,
+%                                         nposts,
+%                                         contype_alias,
+%                                         contype_id,
+%                                         comm_acctype_alias,
+%                                         comm_acctype_id,
+%                                         read_acctype_alias,
+%                                         read_acctype_id,
+%                                         contype_id,
+%                                         contype_alias,
+%                                         id
+%                                     ])) of
+%                                         {ok, []} -> {ok, [null]};
+%                                         Res12 -> Res12
+%                                     end,
+% %                             end,
+% 
+%                         {ok, [Ownalbum]} =
+%                             case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+%                                 {owner_id,
+%                                     proplists:get_value(id, Userpl)},
+%                                 {isrepostcont,  false},
+%                                 {parent_id,     null},
+%                                 {limit, 1}
+%                             ], [
+%                                 vcounter,
+%                                 nprotectedposts,
+%                                 nprivateposts,
+%                                 npublicposts,
+%                                 ncomments,
+%                                 nposts,
+%                                 contype_alias,
+%                                 contype_id,
+%                                 comm_acctype_alias,
+%                                 comm_acctype_id,
+%                                 read_acctype_alias,
+%                                 read_acctype_id,
+%                                 contype_id,
+%                                 contype_alias,
+%                                 id
+%                             ])) of
+%                                 {ok, []} -> {ok, [null]};
+%                                 Res21 -> Res21
 %                             end,
-                        %%
-                        %% Получаем комнату пользователя
-                        %%
-                        {ok, [Live_room]} =
-                            empdb_daowp_room:get(Con, [
-                                {id, proplists:get_value(live_room_id, Userpl)},
-                                {limit, 1}
-                            ], [
-                                id,
-                                head,
-                                body,
-                                back_file_id,
-                                back_file_path,
-                                flag_file_id,
-                                flag_file_path,
-                                wall_file_id,
-                                wall_file_path,
-                                arms_file_id,
-                                arms_file_path,
-                                roomtype_id,
-                                roomtype_alias,
-                                ulimit,
-                                chatlang_id,
-                                chatlang_alias,
-                                regimen_id,
-                                regimen_alias,
-                                topic_id,
-                                slogan,
-                                weather,
-                                treas
-                            ]),
-                        Live_community =
-                            case empdb_dao_community:get(Con, [
-                                {id, proplists:get_value(live_community_id, Userpl)},
-                                {limit, 1},
-                                {fields, [
-                                    ncands,
-                                    nmembs,
-                                    head,
-                                    id,
-                                    communitytype_id,
-                                    communitytype_alias,
-                                    read_acctype_id,
-                                    read_acctype_alias,
-                                    comm_acctype_id,
-                                    comm_acctype_alias,
-                                    contype_id,
-                                    contype_alias,
-                                    vcounter
-                                ]}
-                            ]) of
-                                {ok, [Community1]} ->
-                                    Community1;
-                                {ok, []} ->
-                                    null
-                            end,
-                        {ok,[{[{count,Nfriends}]}]} =
-                            empdb_dao_friend:count(Con, [
-                                {friendtype_alias, friend},
-                                {pers_id, proplists:get_value(id, Userpl)}
-                            ]),
-                        {ok,[{[{count,Nfoes}]}]} =
-                            empdb_dao_friend:count(Con, [
-                                {friendtype_alias, foe},
-                                {pers_id, proplists:get_value(id, Userpl)}
-                            ]),
-                        {ok,[{[{count,Nnewmessages}]}]} =
-                            empdb_dao_message:count(Con,[
-                                {filter, [
-                                    {isdfr,         false},
-                                    {isdeleted,     false},
-                                    {oktype_alias,  null},
-                                    {reader_id, proplists:get_value(id, Userpl)}
-                                ]}
-                            ]),
+% 
+%                         {ok, [Repostalbum]} =
+% %                             case Ownalbum of
+% %                                 null ->
+% %                                     null;
+% %                                 {Ownalbumpl} ->
+%                                     case empdb_dao_album:get_adds(Con, empdb_dao_album:get(Con, [
+%                                         {owner_id,
+%                                             proplists:get_value(id, Userpl)},
+% %                                         {parent_id,
+% %                                             proplists:get_value(id, Ownalbumpl)},
+%                                         {parent_id, null},
+%                                         {isrepostcont,  true},
+%                                         {limit, 1}
+%                                     ], [
+%                                         vcounter,
+%                                         nprotectedposts,
+%                                         nprivateposts,
+%                                         npublicposts,
+%                                         ncomments,
+%                                         nposts,
+%                                         contype_alias,
+%                                         contype_id,
+%                                         comm_acctype_alias,
+%                                         comm_acctype_id,
+%                                         read_acctype_alias,
+%                                         read_acctype_id,
+%                                         contype_id,
+%                                         contype_alias,
+%                                         id
+%                                     ])) of
+%                                         {ok, []} -> {ok, [null]};
+%                                         Res22 -> Res22
+%                                     end,
+% %                             end,
+%                         %%
+%                         %% Получаем комнату пользователя
+%                         %%
+%                         {ok, [Live_room]} =
+%                             empdb_daowp_room:get(Con, [
+%                                 {id, proplists:get_value(live_room_id, Userpl)},
+%                                 {limit, 1}
+%                             ], [
+%                                 id,
+%                                 head,
+%                                 body,
+%                                 back_file_id,
+%                                 back_file_path,
+%                                 flag_file_id,
+%                                 flag_file_path,
+%                                 wall_file_id,
+%                                 wall_file_path,
+%                                 arms_file_id,
+%                                 arms_file_path,
+%                                 roomtype_id,
+%                                 roomtype_alias,
+%                                 ulimit,
+%                                 chatlang_id,
+%                                 chatlang_alias,
+%                                 regimen_id,
+%                                 regimen_alias,
+%                                 topic_id,
+%                                 slogan,
+%                                 weather,
+%                                 treas
+%                             ]),
+%                         Live_community =
+%                             case empdb_dao_community:get(Con, [
+%                                 {id, proplists:get_value(live_community_id, Userpl)},
+%                                 {limit, 1},
+%                                 {fields, [
+%                                     ncands,
+%                                     nmembs,
+%                                     head,
+%                                     id,
+%                                     communitytype_id,
+%                                     communitytype_alias,
+%                                     read_acctype_id,
+%                                     read_acctype_alias,
+%                                     comm_acctype_id,
+%                                     comm_acctype_alias,
+%                                     contype_id,
+%                                     contype_alias,
+%                                     vcounter
+%                                 ]}
+%                             ]) of
+%                                 {ok, [Community1]} ->
+%                                     Community1;
+%                                 {ok, []} ->
+%                                     null
+%                             end,
+%                         {ok,[{[{count,Nfriends}]}]} =
+%                             empdb_dao_friend:count(Con, [
+%                                 {friendtype_alias, friend},
+%                                 {pers_id, proplists:get_value(id, Userpl)}
+%                             ]),
+%                         {ok,[{[{count,Nfoes}]}]} =
+%                             empdb_dao_friend:count(Con, [
+%                                 {friendtype_alias, foe},
+%                                 {pers_id, proplists:get_value(id, Userpl)}
+%                             ]),
+%                         {ok,[{[{count,Nnewmessages}]}]} =
+%                             empdb_dao_message:count(Con,[
+%                                 {filter, [
+%                                     {isdfr,         false},
+%                                     {isdeleted,     false},
+%                                     {oktype_alias,  null},
+%                                     {reader_id, proplists:get_value(id, Userpl)}
+%                                 ]}
+%                             ]),
                         {ok, [{[
-                            {nnewmessages,      Nnewmessages},
-                            {nfriends,          Nfriends},
-                            {nfoes,             Nfoes},
-                            {perm_names,        Perm_names},
-                            {blog,              Ownblog},
-                            {repost_blog,       Repostblog},
-                            {album,             Ownalbum},
-                            {repost_album,      Repostalbum},
-                            {live_community,    Live_community},
-                            {live_room,         Live_room}
+%                             {nnewmessages,      Nnewmessages},
+%                             {nfriends,          Nfriends},
+%                             {nfoes,             Nfoes},
+%                             {perm_names,        Perm_names},
+%                             {blog,              Ownblog},
+%                             {repost_blog,       Repostblog},
+%                             {album,             Ownalbum},
+%                             {repost_album,      Repostalbum},
+%                             {live_community,    Live_community},
+%                             {live_room,         Live_room}
+                            {fictive, true}
                             |Userpl
                         ]}]}
                 end;
