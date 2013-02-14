@@ -927,13 +927,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         orelse erlang:is_list(Aparent)
         orelse erlang:is_atom(Aparent)->
     %Fields = lists:reverse(Input_fields1),
-
-
-        io:format("~n~n~n Aop =  ~p ~n~n~n ", [Aop ]),
-
-        io:format("~n~n~n Aparent =  ~p ~n~n~n ", [Aparent ]),
-
-        
     {Query, Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         {Op1, {Afilter, Input_fields}} = lists:foldl(
             fun
@@ -945,7 +938,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                             fun
                                 ({K, V})->
                                     Kl = empdb_convert:to_list(K),
-                                    io:format("~n~n~n Asl_ = ~p Kl = ~p --> ~p ~n~n~n", [Asl_, Kl, lists:prefix(Asl_, Kl)]),
                                     case lists:prefix(Asl_, Kl) of
                                         false ->
                                             {K, V};
@@ -1002,15 +994,9 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             {[], {Afilter1, Input_fields1}},
             Aop
         ),
-
         Op = lists:reverse(Op1),
-
-        io:format("~n~n~n Op =   ~p ~n~n~n ", [Op ]),
-
         Fields = Input_fields,
-%         
         [{Parent, Parent_field}|Rest] = Op,
-
         Filter = Afilter,
         %% ?empdb_debug("Filter = ~p~n", [Filter]),
 
@@ -1107,10 +1093,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 end,
                 Fields
             ),
-
-     
-        io:format("~n~n~n Current_select_fields_ = ~p ~n~n~n", [Current_select_fields_]),
-        
         Current_all_fields_ =
             lists:filter(
                 fun({F, _})->
@@ -1120,7 +1102,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             ),
         Current_all_fields =
             empdb_orm_util:current_all_fields(Current_all_fields_, Op),
-        io:format("~n~n~n Current_all_fields_ = ~p ~n~n~n", [Current_all_fields_]),
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
@@ -1157,9 +1138,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
 
         Parent_table_name_as_alias =
             table_name_as_alias(Parent),
-
-           io:format("~n~n~n Current_select_fields = ~p ~n~n~n", [Current_select_fields]),
-           
         Binary_select_fields =
             fields(
                 Current_select_fields,
@@ -1339,7 +1317,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 sql_offset(Offset)
             ]),
 
-        io:format("Query = = ~p ~n~n~n~n~n", [Query]),
         Querycnt =
             Querycons([
                 <<" select ">>,
@@ -1364,7 +1341,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             Number + 1,
                                             [
                                                 {[
-                                                    {"#", Number},
+                                                    {"#", Number + Offset},
                                                     {"@", Count}
                                                     |lists:reverse(Itempl)
                                                 ]}
@@ -1379,11 +1356,9 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         end
                     };
                 Else1 ->
-                    io:format("~n~n~n Else1 = ~p ~n~n~n", [Else1]),
                     Else1
             end;
         Else2 ->
-            io:format("~n~n~n Else2 = ~p ~n~n~n", [Else2]),
             Else2
     end;
 
@@ -1395,23 +1370,19 @@ get(Current, Con, #queryobj{
     limit   =   Limit,
     offset  =   Offset
 } = Qo) when erlang:is_list(Filter), erlang:is_list(Current) ->
-    io:format(" 1Current = ~p~n", [Current]),
     get([{Current, null}], Con, Qo);
 
 
 
 get(Current,Con,#queryobj{}=Qo)  ->
-    io:format(" 2Current = ~p (1)~n~n", [Current]),
     Ocurrent = [
         {{table, name},             Current:table(name)},
         {{table, fields, all},      Current:table({fields, all})},
         {{table, fields, select},   Current:table({fields, select})}
     ],
-    io:format(" 2Ocurrent = ~p (2) ~n~n", [Ocurrent]),
     get(Ocurrent,Con,Qo);
 
 get(Current, Con, Opts) when erlang:is_list(Opts) ->
-    io:format(" 3Current = ~p~n", [Current]),
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
@@ -1433,7 +1404,6 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
     ).
 
 get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
-    io:format(" 4Current = ~p~n", [Current]),
     As_filter =
         case proplists:get_value(filter, Opts, undefined) of
             undefined   ->    Opts;
@@ -1486,11 +1456,6 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     %Fields = lists:reverse(Input_fields1),
 
 
-        io:format("~n~n~n Aop =  ~p ~n~n~n ", [Aop ]),
-
-        io:format("~n~n~n Aparent =  ~p ~n~n~n ", [Aparent ]),
-
-
     {Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         {Op1, {Afilter, Input_fields}} = lists:foldl(
             fun
@@ -1502,7 +1467,6 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                             fun
                                 ({K, V})->
                                     Kl = empdb_convert:to_list(K),
-                                    io:format("~n~n~n Asl_ = ~p Kl = ~p --> ~p ~n~n~n", [Asl_, Kl, lists:prefix(Asl_, Kl)]),
                                     case lists:prefix(Asl_, Kl) of
                                         false ->
                                             {K, V};
@@ -1559,18 +1523,10 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             {[], {Afilter1, Input_fields1}},
             Aop
         ),
-
         Op = lists:reverse(Op1),
-
-        io:format("~n~n~n Op =   ~p ~n~n~n ", [Op ]),
-
         Fields = Input_fields,
-%
         [{Parent, Parent_field}|Rest] = Op,
-
         Filter = Afilter,
-        %% ?empdb_debug("Filter = ~p~n", [Filter]),
-
         Common_all_fields_ = lists:append(
             lists:map(
                 fun({Tab,_})->
@@ -1673,7 +1629,6 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             ),
         Current_all_fields =
             empdb_orm_util:current_all_fields(Current_all_fields_, Op),
-        io:format("~n~n~n Current_all_fields_ = ~p ~n~n~n", [Current_all_fields_]),
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
@@ -2451,9 +2406,6 @@ create(Current, Con, #queryobj{
         table_options({table, fields, insert}, Current),
     Common_required_fields =
         table_options({table, fields, insert, required}, Current),
-        
-    io:format("Common_insert_fields = ~p~n~n", [Common_insert_fields]),
-    
     Current_select_fields =
         lists:filter(
             fun(F)-> lists:member(F, Common_select_fields) end,
@@ -2596,8 +2548,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
     filter  =   Filter,
     fields  =   Returning
 } = Queryobj)->
-    io:format("Filter Y = ~p ~n~n~n", [Filter]),
-    
     {ok, Glst} =
         get(Current, Con,  #queryobj{
             filter  = Filter,
@@ -2614,7 +2564,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
         ),
     case Current_field_vals of
         [] ->
-            io:format("~n~n~n Current_field_vals  = ~p  ~n~n~n", [Current_field_vals ]),
             {ok,[]};
         _ ->
             case update(Parent,Con,Queryobj#queryobj{
@@ -2622,7 +2571,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                 filter=[{Parent_field, {in, Current_field_vals}}|Filter]
             }) of
                 {ok, [{[]}]} ->
-                    io:format("~n~n~nParent_pl = XSDDD~n~n~n", []),
                     Pid_pl =
                         case proplists:get_value(Parent_field, Filter) of
                             undefined ->
@@ -2639,7 +2587,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {ok, [{Parent_pl}]} ->
-                    io:format("~n~n~nParent_pl = ~p~n~n~n", [Parent_pl]),
                     Pid = proplists:get_value(Parent_field, Parent_pl),
                     case update(Current, Con, Queryobj#queryobj{
                         filter=[{Current_field, Pid}|Filter],
@@ -2651,7 +2598,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {ok, Parent_pls} ->
-                    io:format("~n~n~n Parent_pls = ~p~n~n~n", [Parent_pls]),
                     Pids = lists:foldl(fun({Parent_pl}, Acc) ->
                         [proplists:get_value(Parent_field, Parent_pl)|Acc]
                     end, [], Parent_pls),
@@ -2691,7 +2637,6 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
                             {Eclass, Error}
                     end;
                 {Eclass, Error} ->
-                    io:format("~n~n~n {Eclass, Error} = ~p~n~n~n", [{Eclass, Error}]),
                     % ?empdb_debug("Eclass ~n~n~n"),
                     {Eclass, Error}
             end
@@ -2758,9 +2703,6 @@ update(Current, Con, #queryobj{
 
                     % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
                     % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
-
-                    io:format("~n~n~n !!!! ~n~n~n", []),
-    
                     get(Current, Con, #queryobj{
                         filter=Filter, 
                         fields=Current_select_fields
