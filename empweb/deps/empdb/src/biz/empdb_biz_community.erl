@@ -499,7 +499,7 @@ get_blogs(Params) ->
         empdb_dao:get([
             {empdb_dao_doc,  id},
             {empdb_dao_blog,  doc_id},
-            {empdb_dao_pers,  {left, {id, {doc, owne_id}}}}
+            {empdb_dao_pers,  {left, {id, {doc, owner_id}}}}
             |
             case Isweek of
                 false  ->
