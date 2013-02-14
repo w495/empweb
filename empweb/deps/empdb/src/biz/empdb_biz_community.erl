@@ -519,14 +519,17 @@ get_blogs(Params) ->
         ],Con,[
             {fields, Fields},
             {doc.isrepost,false},
-            {doc.isrepostcont,false},
-            {order, {desc, doc.nvotes}}
+            {doc.isrepostcont,false}
             |
             case Isweek of
                 false  ->
-                    What_;
+                    [
+                        {order, {desc, doc.created}}
+                        | What_
+                    ];
                 true  ->
                     [
+                        {order, {desc, doc.nvotes}},
                         {vote.created,
                             {gt, empdb_convert:now_minus_week()}
                         }
