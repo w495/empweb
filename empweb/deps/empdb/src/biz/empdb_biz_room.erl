@@ -13,6 +13,7 @@
 -export([
     get/1,
     get/2,
+    get_blogs/1,
     count/1,
     join/1,
     create/1,
@@ -330,6 +331,82 @@ count(Params)->
         ])
     end).
 
+get_blogs(Params) ->
+    Isweek = proplists:get_value(isweek, Params, false),
+    What =
+        lists:keyreplace(
+            id,
+            1 ,
+            proplists:delete(isweek, Params),
+            {'pers.citizen_room_id', proplists:get_value(id, Params, null)}
+        ),
+    empdb_dao:with_transaction(fun(Con)->
+        Truefields = proplists:get_value(fields,What,[]),
+        Fields =
+            case Truefields of
+                [] ->
+                    lists:append([
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                    erlang:atom_to_list(blog)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_community:table({fields, select})
+                        ),
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                   erlang:atom_to_list(doc)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_doc:table({fields, select})
+                        )
+                    ]);
+                _ ->
+                    Truefields
+            end,
+        What_ = proplists:delete(fields, What),
+        empdb_dao:get([
+            {empdb_dao_doc,  id},
+            {empdb_dao_blog,  doc_id},
+            {empdb_dao_pers,  {left, {id, {doc, owner_id}}}}
+            |
+            case Isweek of
+                false  ->
+                    [];
+                true  ->
+                    [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
+            end
+        ],Con,[
+            {fields, Fields},
+            {doc.isrepost,false},
+            {doc.isrepostcont,false}
+            |
+            case Isweek of
+                false  ->
+                    [
+                        {order, {desc, doc.created}}
+                        | What_
+                    ];
+                true  ->
+                    [
+                        {order, {desc, doc.nvotes}},
+                        {vote.created,
+                            {gt, empdb_convert:now_minus_week()}
+                        }
+                        | What_
+                    ]
+            end
+
+        ])
+    end).
+
+    
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_daowp_room:get(Con, Params)

@@ -470,10 +470,6 @@ get_blogs(Params) ->
             proplists:delete(isweek, Params),
             {'pers.live_community_id', proplists:get_value(id, Params, null)}
         ),
-    io:format(" ~n~n~n Params = ~p ~n~n~n ", [Params]),
-    
-    io:format(" ~n~n~n Isweek, = ~p What,  = ~p ~n~n~n ", [Isweek, What]),
-    
     empdb_dao:with_transaction(fun(Con)->
         Truefields = proplists:get_value(fields,What,[]),
         Fields =

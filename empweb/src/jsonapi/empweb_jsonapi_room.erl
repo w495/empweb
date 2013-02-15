@@ -87,6 +87,39 @@ init(_, Req, #empweb_hap{
 %% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_blogs,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get blog[s]">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer]),
+                nkey        = 'pers.live_community_id'
+            },
+            #norm_rule{
+                key         = isweek,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_room:get_blogs(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+    
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   get,

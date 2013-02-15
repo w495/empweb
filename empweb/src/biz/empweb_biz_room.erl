@@ -10,6 +10,7 @@
 -export([
     get/1,
     get/2,
+    get_blogs/1,
     count/1,
     create/1,
     join/1,
@@ -44,6 +45,9 @@ delete_topic(Params)->
 
 count(Params)->
     empdb_biz_room:count(Params).
+
+get_blogs(Params)->
+    empdb_biz_room:get_blogs(Params).
 
 get(Params)->
     empdb_biz_room:get(Params).

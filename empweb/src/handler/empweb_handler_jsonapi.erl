@@ -779,6 +779,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%
             %% Чат-комнаты (страны)
             %%
+            <<"get_room_blogs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_room,
+                    action          =   get_blogs
+                };
             <<"count_room">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_room,
@@ -832,7 +837,6 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_community,
                     action          =   get_blogs
                 };
-                
             <<"count_community">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_community,
