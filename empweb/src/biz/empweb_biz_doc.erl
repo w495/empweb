@@ -195,6 +195,7 @@
     get_message/2,
     get_message_for_me/1,
     get_message_for_me/2,
+    readall_message_for_me/1,
     get_message_from_me/1,
     get_message_from_me/2,
     create_message/1,
@@ -501,6 +502,9 @@ get_message_for_me(Params)->
 
 get_message_from_me(Params)->
     empdb_biz_doc:get_message_from_me(Params).
+
+readall_message_for_me(Params)->
+    empdb_biz_doc:readall_message_for_me(Params).
 
 get_message_for_me(Params, Fields)->
     empdb_biz_doc:get_message_for_me(Params, Fields).

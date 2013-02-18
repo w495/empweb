@@ -93,7 +93,7 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-%                 key         = pers_id,
+                key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },

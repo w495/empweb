@@ -187,6 +187,7 @@
     get_message_for_me/2,
     get_message_from_me/1,
     get_message_from_me/2,
+    readall_message_for_me/1,
 
     count_message/1,
     count_message_types/1,
@@ -896,6 +897,16 @@ mk_message_read(_con, undefined, _, _fields)->
 mk_message_read(_con, _, undefined, _fields)->
     ok;
 
+mk_message_read(Con, all, Reader_id, _fields) ->
+    empdb_dao_message:update(Con, [
+        {filter, [
+            {reader_id, Reader_id}
+        ]},
+        {values, [
+            {oktype_alias, ok}
+        ]}
+    ]);
+    
 mk_message_read(Con, Id, Reader_id, Fields) ->
     case {Fields, lists:member(body, Fields)} of
         {[], _ } ->
@@ -944,6 +955,22 @@ get_message(Params, Fileds)->
         )
     end).
 
+readall_message_for_me(Params)->
+    Mparams =
+        case proplists:get_value(pers_id, Params) of
+            undefined ->
+                Params;
+            Reader_id ->
+                [{reader_id, Reader_id}|Params]
+        end,
+    empdb_dao:with_transaction(fun(Con)->
+        mk_message_read(Con,
+            all,
+            proplists:get_value(reader_id,  Mparams),
+            []
+        )
+    end).
+    
 get_message_for_me(Params)->
     Mparams =
         case proplists:get_value(pers_id, Params) of
