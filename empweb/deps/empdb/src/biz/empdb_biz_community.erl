@@ -698,7 +698,7 @@ get_photos(Params) ->
             {ok,Phobjs} ->
                 {ok,
                     lists:map(fun({Phpl})->
-                        case (lists:member(path, Fields) or (Fields =:= [])) of
+                        case (lists:member(photo.path, Fields) or (Fields =:= [])) of
                             true ->
                                 {[
                                     {path,

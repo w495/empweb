@@ -525,6 +525,9 @@ get_photos(Params) ->
                 _ ->
                     Truefields
             end,
+
+        io:format("~n~n~n                           Fields = ~p ~n~n~n", [Fields]),
+        
         What_ = proplists:delete(fields, What),
         case empdb_dao:get([
             {empdb_dao_doc,  id},
@@ -568,7 +571,7 @@ get_photos(Params) ->
             {ok,Phobjs} ->
                 {ok,
                     lists:map(fun({Phpl})->
-                        case (lists:member(path, Fields) or (Fields =:= [])) of
+                        case (lists:member(photo.path, Fields) or (Fields =:= [])) of
                             true ->
                                 {[
                                     {path,
