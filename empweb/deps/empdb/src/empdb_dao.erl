@@ -1076,23 +1076,23 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-        Current_select_fields_ =
-            lists:filter(
-                fun ({as, F, N})->
-                        lists:member(F, Common_select_fields
-                            ++ Common_select_fields_);
-                    ({as, {F, N}})->
-                        lists:member(F, Common_select_fields
-                            ++ Common_select_fields_);
-                    ({F, as, N})->
-                        lists:member(F, Common_select_fields
-                            ++ Common_select_fields_);
-                    (F)->
-                        lists:member(F, Common_select_fields
-                            ++ Common_select_fields_)
-                end,
-                Fields
-            ),
+        Current_select_fields_ = Fields,
+%             lists:filter(
+%                 fun ({as, F, N})->
+%                         lists:member(F, Common_select_fields
+%                             ++ Common_select_fields_);
+%                     ({as, {F, N}})->
+%                         lists:member(F, Common_select_fields
+%                             ++ Common_select_fields_);
+%                     ({F, as, N})->
+%                         lists:member(F, Common_select_fields
+%                             ++ Common_select_fields_);
+%                     (F)->
+%                         lists:member(F, Common_select_fields
+%                             ++ Common_select_fields_)
+%                 end,
+%                 Fields
+%             ),
         Current_all_fields_ =
             lists:filter(
                 fun({F, _})->

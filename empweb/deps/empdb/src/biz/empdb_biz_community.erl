@@ -479,9 +479,7 @@ get_blogs(Params) ->
                 [] ->
                     lists:append([
                         lists:foldl(
-                            fun (doc_id, A)->
-                                    A;
-                                (X, A)->
+                            fun (X, A)->
                                     [
                                         erlang:list_to_atom(
                                             erlang:atom_to_list(blogs)
@@ -513,13 +511,14 @@ get_blogs(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end
-                                | ['distinct(doc.id)']
+                                end,
+                                {distinct, doc.id}
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
                 _ ->
+                
                     Truefields
             end,
         What_ = proplists:delete(fields, What),
@@ -576,9 +575,7 @@ get_posts(Params) ->
                 [] ->
                     lists:append([
                         lists:foldl(
-                            fun (doc_id, A)->
-                                    A;
-                                (X, A)->
+                            fun (X, A)->
                                     [
                                         erlang:list_to_atom(
                                             erlang:atom_to_list(post)
@@ -610,8 +607,8 @@ get_posts(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end
-                                | ['distinct(doc.id)']
+                                end,
+                                'distinct(doc.id)'
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -672,9 +669,7 @@ get_photos(Params) ->
                 [] ->
                     lists:append([
                         lists:foldl(
-                            fun (doc_id, A)->
-                                    A;
-                                (X, A)->
+                            fun (X, A)->
                                     [
                                         erlang:list_to_atom(
                                             erlang:atom_to_list(photo)
@@ -706,8 +701,8 @@ get_photos(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end
-                                | ['distinct(doc.id)']
+                                end,
+                                'distinct(doc.id)'
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
