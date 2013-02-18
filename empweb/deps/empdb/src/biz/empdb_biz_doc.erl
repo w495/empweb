@@ -900,7 +900,8 @@ mk_message_read(_con, _, undefined, _fields)->
 mk_message_read(Con, all, Reader_id, _fields) ->
     empdb_dao_message:update(Con, [
         {filter, [
-            {reader_id, Reader_id}
+            {reader_id, Reader_id},
+            {oktype_alias, {ne, ok}}
         ]},
         {values, [
             {oktype_alias, ok}
