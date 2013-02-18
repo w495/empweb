@@ -1076,5 +1076,11 @@ insert into eventtype (alias) values ('new_community_out');
 
 insert into eventtype (alias) values ('new_community_exile');
 
+insert into eventtype (alias) values ('new_community_away');
+
+
+insert into communityhisttype (alias) values ('pers_away');
+
+
 insert into eventtype (alias) values ('new_mail');
 
