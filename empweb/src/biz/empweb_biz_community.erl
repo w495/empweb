@@ -11,6 +11,8 @@
     get/1,
     get/2,
     get_blogs/1,
+    get_posts/1,
+    get_photos/1,
     count/1,
     create/1,
     join/1,
@@ -27,6 +29,12 @@
 
 get_blogs(Params)->
     empdb_biz_community:get_blogs(Params).
+
+get_posts(Params)->
+    empdb_biz_community:get_posts(Params).
+
+get_photos(Params)->
+    empdb_biz_community:get_photos(Params).
 
 create(Params)->
     empdb_biz_community:create(Params).

@@ -14,6 +14,8 @@
     get/1,
     get/2,
     get_blogs/1,
+    get_posts/1,
+    get_photos/1,
     count/1,
     join/1,
     create/1,
@@ -404,6 +406,188 @@ get_blogs(Params) ->
             end
 
         ])
+    end).
+
+
+
+get_posts(Params) ->
+    Isweek = proplists:get_value(isweek, Params, false),
+    What =
+        lists:keyreplace(
+            id,
+            1 ,
+            proplists:delete(isweek, Params),
+            {'pers.citizen_room_id', proplists:get_value(id, Params, null)}
+        ),
+    empdb_dao:with_transaction(fun(Con)->
+        Truefields = proplists:get_value(fields,What,[]),
+        Fields =
+            case Truefields of
+                [] ->
+                    lists:append([
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                    erlang:atom_to_list(post)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_community:table({fields, select})
+                        ),
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                   erlang:atom_to_list(doc)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_doc:table({fields, select})
+                        )
+                    ]);
+                _ ->
+                    Truefields
+            end,
+        What_ = proplists:delete(fields, What),
+        empdb_dao:get([
+            {empdb_dao_doc,  id},
+            {empdb_dao_post,  doc_id},
+            {empdb_dao_pers,  {left, {id, {doc, owner_id}}}}
+            |
+            case Isweek of
+                false  ->
+                    [];
+                true  ->
+                    [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
+            end
+        ],Con,[
+            {fields, Fields},
+            {doc.isrepost,false},
+            {doc.isrepostcont,false}
+            |
+            case Isweek of
+                false  ->
+                    [
+                        {order, {desc, doc.created}}
+                        | What_
+                    ];
+                true  ->
+                    [
+                        {order, {desc, doc.nvotes}},
+                        {vote.created,
+                            {gt, empdb_convert:now_minus_week()}
+                        }
+                        | What_
+                    ]
+            end
+
+        ])
+    end).
+
+    
+get_photos(Params) ->
+    Isweek = proplists:get_value(isweek, Params, false),
+    What =
+        lists:keyreplace(
+            id,
+            1 ,
+            proplists:delete(isweek, Params),
+            {'pers.citizen_room_id', proplists:get_value(id, Params, null)}
+        ),
+    empdb_dao:with_transaction(fun(Con)->
+        Truefields = proplists:get_value(fields,What,[]),
+        Fields =
+            case Truefields of
+                [] ->
+                    lists:append([
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                    erlang:atom_to_list(photo)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_community:table({fields, select})
+                        ),
+                        lists:map(
+                            fun(X)->
+                                erlang:list_to_atom(
+                                   erlang:atom_to_list(doc)
+                                    ++ "." ++
+                                    erlang:atom_to_list(X)
+                                )
+                            end,
+                            empdb_dao_doc:table({fields, select})
+                        )
+                    ]);
+                _ ->
+                    Truefields
+            end,
+        What_ = proplists:delete(fields, What),
+        case empdb_dao:get([
+            {empdb_dao_doc,  id},
+            {empdb_dao_photo, {doc_id, file_id}},
+            {empdb_dao_file, id},
+            {empdb_dao_fileinfo, file_id},
+            {empdb_dao_pers,  {left, {id, {doc, owner_id}}}}
+            |
+            case Isweek of
+                false  ->
+                    [];
+                true  ->
+                    [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
+            end
+        ],Con,[
+            {fileinfotype_alias, download},
+            {fields, [
+                {as, {fileinfo.path, fileinfopath}},
+                {as, {fileinfo.dir,  fileinfodir}}
+                | proplists:delete(path, Fields)
+            ]},
+            {doc.isrepost,false},
+            {doc.isrepostcont,false}
+            |
+            case Isweek of
+                false  ->
+                    [
+                        {order, {desc, doc.created}}
+                        | What_
+                    ];
+                true  ->
+                    [
+                        {order, {desc, doc.nvotes}},
+                        {vote.created,
+                            {gt, empdb_convert:now_minus_week()}
+                        }
+                        | What_
+                    ]
+            end
+        ]) of
+            {ok,Phobjs} ->
+                {ok,
+                    lists:map(fun({Phpl})->
+                        case (lists:member(path, Fields) or (Fields =:= [])) of
+                            true ->
+                                {[
+                                    {path,
+                                        <<  (proplists:get_value(fileinfodir, Phpl))/binary,
+                                            (proplists:get_value(fileinfopath, Phpl))/binary
+                                        >>
+                                    }
+                                    | proplists:delete(fileinfodir,
+                                        proplists:delete(fileinfopath,
+                                            proplists:delete(path, Phpl)))
+                                ]};
+                            _ ->
+                                {proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))}
+                        end
+                    end, Phobjs)
+                };
+            Error ->
+                Error
+        end
     end).
 
     

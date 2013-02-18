@@ -118,6 +118,75 @@ handle(_req, #empweb_hap{
             }
         end
     );
+
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_posts,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get blog[s]">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer]),
+                nkey        = 'pers.citizen_room_id'
+            },
+            #norm_rule{
+                key         = isweek,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_community:get_posts(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_photos,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get blog[s]">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer]),
+                nkey        = 'pers.citizen_room_id'
+            },
+            #norm_rule{
+                key         = isweek,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_community:get_photos(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
     
 handle(_req, #empweb_hap{
         is_auth =   true,
