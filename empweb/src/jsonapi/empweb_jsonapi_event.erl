@@ -118,7 +118,12 @@ handle(_req, #empweb_hap{
             ?evman_debug(Data, <<" = Data">>),
             {ok,
                 empweb_jsonapi:resp(
-                    empweb_biz_event:count(Data#norm.return)
+                    empweb_biz_event:count(
+                        empweb_norm:fieldtrigger([
+                            {'self@pers_id', Pers_id}
+                            |Data#norm.return
+                        ], {owner_id, 'self@pers_id'})
+                    )
                 ),
                 Hap
             }
@@ -126,7 +131,9 @@ handle(_req, #empweb_hap{
     );
 
 handle(_req, #empweb_hap{
-        action='get', params=Params, pers_id=Pers_id
+        action='get',
+        params=Params,
+        pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get event">>),
 
@@ -134,7 +141,7 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-%                 key         = pers_id,
+                key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
@@ -160,11 +167,10 @@ handle(_req, #empweb_hap{
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_event:get(
-                        empweb_norm:filter_owner([
-                            {pers_id, Pers_id}
+                        empweb_norm:fieldtrigger([
+                            {'self@pers_id', Pers_id}
                             |Data#norm.return
-                        ]),
-                        proplists:get_value(fields, Data#norm.return, [])
+                        ], {owner_id, 'self@pers_id'})
                     )
                 ),
                 Hap

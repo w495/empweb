@@ -2125,7 +2125,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_event,
                     action          =   count
                 };
-            <<"get_event">> ->
+            <<"get_event2">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_event,
                     action          =   'get'
