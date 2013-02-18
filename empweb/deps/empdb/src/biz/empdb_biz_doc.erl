@@ -863,6 +863,12 @@ is_comment_owner(Uid, Oid)->
 create_message(Params)->
     empdb_dao:with_transaction(empdb_biz_pers:wfoe(
         fun(Con)->
+            {ok, _} =
+                empdb_dao_event:create(emp, [
+                    {owner_id,          proplists:get_value(reader_id, Params)},
+                    {eventtype_alias,   new_mail},
+                    {pers_id,           proplists:get_value(owner_id, Params)}
+                ]),
             empdb_dao_message:create(Con, Params)
         end,
         [
