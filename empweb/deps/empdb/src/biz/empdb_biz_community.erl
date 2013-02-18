@@ -478,24 +478,44 @@ get_blogs(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(blog)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (doc_id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(blog)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
-                            empdb_dao_blog:table({fields, select})
+                            [],
+                            empdb_dao_photo:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                                | ['distinct(doc.id)']
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
@@ -555,24 +575,44 @@ get_posts(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(post)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (doc_id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(post)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
-                            empdb_dao_post:table({fields, select})
+                            [],
+                            empdb_dao_photo:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                                | ['distinct(doc.id)']
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
@@ -631,24 +671,44 @@ get_photos(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(photo)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (doc_id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(photo)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [],
                             empdb_dao_photo:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                                | ['distinct(doc.id)']
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
