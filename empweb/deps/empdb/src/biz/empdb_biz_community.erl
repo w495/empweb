@@ -586,7 +586,7 @@ get_posts(Params) ->
                                     ]
                             end,
                             [],
-                            empdb_dao_photo:table({fields, select})
+                            empdb_dao_post:table({fields, select})
                         ),
                         lists:foldl(
                             fun (id, A)->

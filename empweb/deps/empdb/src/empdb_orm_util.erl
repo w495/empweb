@@ -7,6 +7,13 @@
 ]).
 
 
+
+current_select_fields({Ag, Filtername}, Op) ->
+    empdb_convert:to_atom(empdb_convert:to_list(Ag)
+        ++ "(" ++
+        empdb_convert:to_list(current_select_fields(Filtername, Op))
+        ++ ") ");
+
 current_select_fields(Filtername, Op) ->
     Filternamestr = empdb_convert:to_list(Filtername),
     case lists:member($., empdb_convert:to_list(Filtername)) of

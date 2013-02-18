@@ -168,37 +168,13 @@ fields_(Table, Fields, _default, Additions) ->
             ({as, {Field, Name}})->
                 [<<",">> ,
                     [
-                        empdb_convert:to_binary(Table),
-                        empdb_convert:to_binary(Field),
-                        <<" as ">>,
-                        empdb_convert:to_binary(Name)
-                    ]
-                ];
-            ({as, Field, Name})->
-                [<<",">> ,
-                    [
-                        empdb_convert:to_binary(Table),
-                        empdb_convert:to_binary(Field),
-                        <<" as ">>,
-                        empdb_convert:to_binary(Name)
-                    ]
-                ];
-            ({Field, as, Name})->
-                [<<",">> ,
-                    [
-                        empdb_convert:to_binary(Table),
-                        empdb_convert:to_binary(Field),
+                        fields_1(Table, Field),
                         <<" as ">>,
                         empdb_convert:to_binary(Name)
                     ]
                 ];
             (Field)->
-                [<<",">> ,
-                    [
-                        empdb_convert:to_binary(Table),
-                        empdb_convert:to_binary(Field)
-                    ]
-                ]
+                [<<",">> , fields_1(Table, Field)]
         end,
         lists:append(Fields, Additions)
     ),
@@ -206,6 +182,19 @@ fields_(Table, Fields, _default, Additions) ->
 
 %%% -----------------------------------------------------------------------
 
+
+fields_1(Table, {distinct, Field}) ->
+    [   <<" distinct(">>,
+        empdb_convert:to_binary(Table),
+        empdb_convert:to_binary(Field),
+        <<") ">>
+    ];
+    
+fields_1(Table, Field) ->
+    [
+        empdb_convert:to_binary(Table),
+        empdb_convert:to_binary(Field)
+    ].
 
 fieldvars(Fields) ->
     fieldvars(Fields, []).
@@ -1076,23 +1065,19 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-        Current_select_fields_ = Fields,
-%             lists:filter(
-%                 fun ({as, F, N})->
-%                         lists:member(F, Common_select_fields
-%                             ++ Common_select_fields_);
-%                     ({as, {F, N}})->
-%                         lists:member(F, Common_select_fields
-%                             ++ Common_select_fields_);
-%                     ({F, as, N})->
-%                         lists:member(F, Common_select_fields
-%                             ++ Common_select_fields_);
-%                     (F)->
-%                         lists:member(F, Common_select_fields
-%                             ++ Common_select_fields_)
-%                 end,
-%                 Fields
-%             ),
+        Current_select_fields_ = 
+            lists:filter(
+                fun ({as, {{Ag, F}, N}})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    ({as, {F, N}})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    ({Ag, F})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    (F)->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_)
+                end,
+                Fields
+            ),
         Current_all_fields_ =
             lists:filter(
                 fun({F, _})->
@@ -1105,10 +1090,6 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         Current_select_fields =
             lists:map(
                 fun ({as, {F, N}}) ->
-                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
-                    ({as, F, N}) ->
-                        {as, {empdb_orm_util:current_select_fields(F, Op), N}};
-                    ({F, as, N}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     (F) ->
                         empdb_orm_util:current_select_fields(F, Op)
