@@ -608,7 +608,7 @@ get_posts(Params) ->
                                     true ->
                                         doc.nvotes
                                 end,
-                                'distinct(doc.id)'
+                                {distinct, doc.id}
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -702,7 +702,7 @@ get_photos(Params) ->
                                     true ->
                                         doc.nvotes
                                 end,
-                                'distinct(doc.id)'
+                                {distinct, doc.id}
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
