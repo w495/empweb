@@ -101,7 +101,7 @@ handle(_req, #empweb_hap{
                 key         = id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer]),
-                nkey        = 'pers.live_community_id'
+                nkey        = 'pers.citizen_room_id'
             },
             #norm_rule{
                 key         = isweek,
