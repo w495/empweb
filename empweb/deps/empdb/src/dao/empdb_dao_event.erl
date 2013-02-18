@@ -61,6 +61,7 @@ table({fields, all})->
         doc_id,
         eventtype_id,
         eventtype_alias,
+        own_community_id,
         pers_id,
         pers_nick
     ];

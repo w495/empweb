@@ -383,9 +383,21 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                     {id, Community_id},
                     {limit, 1},
                     {fields, [
+                        id,
+                        owner_id,
                         cands_gte_authority_level
                     ]}
                 ]),
+
+
+            {ok, _} =
+                empdb_dao_event:create(emp, [
+                    {owner_id,          proplists:get_value(owner_id, Communitypl)},
+                    {eventtype_alias,   new_community_cand},
+                    {own_community_id,  proplists:get_value(id, Communitypl)},
+                    {pers_id,           proplists:get_value(id, Mbperspl)}
+                ]),
+
             Candsgteauthoritylevel =
                 proplists:get_value(cands_gte_authority_level, Communitypl),
             Authoritylevel =
@@ -435,9 +447,20 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                     {id, Community_id},
                     {limit, 1},
                     {fields, [
+                        id,
+                        owner_id,
                         fee
                     ]}
                 ]),
+
+           {ok, _} =
+                empdb_dao_event:create(emp, [
+                    {owner_id,          proplists:get_value(id, Mbperspl)},
+                    {eventtype_alias,   new_community_memb},
+                    {live_community_id, proplists:get_value(id, Communitypl)},
+                    {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                ]),
+
             Money   = proplists:get_value(money, Mbperspl),
             Price   = proplists:get_value(fee, Communitypl),
             case Price =< Money of
@@ -507,9 +530,27 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
         proplists:get_value(live_community_approved, Mbperspl) =/= true
     } of
         {true, true} ->
+            Community_id = proplists:get_value(live_community_id, Mbperspl),
+            {ok, [{Communitypl}]} =
+                empdb_dao_community:get(Con, [
+                    {id, Community_id},
+                    {limit, 1},
+                    {fields, [
+                        id,
+                        owner_id
+                    ]}
+                ]),
             %% Человека не одобряли как члена сообщества
             case Function(Con, Params) of
                 {ok, Res} ->
+                    {ok, _} =
+                        empdb_dao_event:create(emp, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_out},
+                            {live_community_id, proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
+
                     empdb_dao_communityhist:create(Con, [
                         {community_id,
                             proplists:get_value(live_community_id, Mbperspl)},
@@ -529,6 +570,24 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                 |proplists:delete(live_community_id, Params)
             ]) of
                 {ok, Res} ->
+                    Community_id = proplists:get_value(live_community_id, Mbperspl),
+                    {ok, [{Communitypl}]} =
+                        empdb_dao_community:get(Con, [
+                            {id, Community_id},
+                            {limit, 1},
+                            {fields, [
+                                id,
+                                owner_id
+                            ]}
+                        ]),
+                    {ok, _} =
+                        empdb_dao_event:create(emp, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_exile},
+                            {live_community_id, proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
+
                     empdb_dao_communityhist:create(Con, [
                         {community_id,
                             proplists:get_value(live_community_id, Mbperspl)},

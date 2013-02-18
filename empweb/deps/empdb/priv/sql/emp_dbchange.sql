@@ -1060,9 +1060,18 @@
 -- http://www.tvzavr.ru/Muzyka-revolyutsii
 
 
-    alter table invisbuy add column
-        expired timestamp without time zone
-            default utcnow() + interval '1 week';
+--     alter table invisbuy add column
+--         expired timestamp without time zone
+--             default utcnow() + interval '1 week';
 
 
 
+alter table event add column own_community_id  decimal references doc(id);
+
+insert into eventtype (alias) values ('new_community_cand');
+
+insert into eventtype (alias) values ('new_community_memb');
+
+insert into eventtype (alias) values ('new_community_out');
+
+insert into eventtype (alias) values ('new_community_exile');
