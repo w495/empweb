@@ -73,7 +73,7 @@ update(Params)->
             true ->
                 empdb_dao_claim:update(Con, Params);
             _ ->
-                empdb_dao_claim:update(Con, [
+                case empdb_dao_claim:update(Con, [
                     {filter, [
                         {id, Id},
                         {judge_id, null}
@@ -82,7 +82,12 @@ update(Params)->
                         {claimtype_alias, progress}
                         |Params
                     ]}
-                ])
+                ]) of
+                    {ok, []} ->
+                        {error, not_uniq_judge};
+                    Else ->
+                        Else
+                end
         end
     end).
 
