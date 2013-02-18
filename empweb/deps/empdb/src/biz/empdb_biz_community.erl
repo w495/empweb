@@ -493,9 +493,7 @@ get_blogs(Params) ->
                             empdb_dao_photo:table({fields, select})
                         ),
                         lists:foldl(
-                            fun (id, A)->
-                                    A;
-                                (X, A)->
+                            fun (X, A)->
                                     [
                                         erlang:list_to_atom(
                                             erlang:atom_to_list(doc)
@@ -511,8 +509,7 @@ get_blogs(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end,
-                                {distinct, doc.id}
+                                end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -534,6 +531,7 @@ get_blogs(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fields, Fields},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
@@ -607,8 +605,7 @@ get_posts(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end,
-                                {distinct, doc.id}
+                                end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -629,6 +626,7 @@ get_posts(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fields, Fields},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
@@ -701,8 +699,7 @@ get_photos(Params) ->
                                         doc.created;
                                     true ->
                                         doc.nvotes
-                                end,
-                                {distinct, doc.id}
+                                end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -725,6 +722,7 @@ get_photos(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fileinfotype_alias, download},
             {fields, [
                 {as, {fileinfo.path, fileinfopath}},

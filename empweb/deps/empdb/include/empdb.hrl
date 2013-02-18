@@ -5,6 +5,7 @@
 %% @doc Структура описания запроса.
 %%
 -record(queryobj, {
+        distinct    = [] :: list(),
     %% Для select \ insert \ update \ delete
         filter      = [] :: proplists:proplist(),
     %% Для select \ insert \ update

@@ -905,11 +905,12 @@ get([{{table, _ }, _}|_] = Current, Con, #queryobj{} = Qo)  ->
     get([{Current, null}], Con, Qo);
 
 get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
-    filter  =   Afilter1,
-    fields  =   Input_fields1,
-    order   =   Order,
-    limit   =   Limit,
-    offset  =   Offset
+    filter   =   Afilter1,
+    fields   =   Input_fields1,
+    order    =   Order,
+    limit    =   Limit,
+    distinct =   Distinct,
+    offset   =   Offset
 } = Qo ) when
     erlang:is_list(Afilter1),
         erlang:is_tuple(Aparent)
@@ -1297,7 +1298,24 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         Query =
             Querycons([
                 <<" select ">>,
-                Binary_select_fields
+                case Distinct of
+                    [] ->
+                        Binary_select_fields;
+                    _ ->
+                        string:join([[
+                            <<"distinct ( ">>,
+                            string:join(
+                                lists:map(
+                                    fun(X) ->
+                                        [empdb_convert:to_binary(X)]
+                                    end,
+                                    Distinct
+                                ),
+                                [<<",">>]
+                            ),
+                            <<")">>
+                        ], [Binary_select_fields]], [<<",">>])
+                end
             ], [
                 sql_order(Current_order),
                 sql_limit(Limit),
@@ -1382,8 +1400,9 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
         end,
     get(Current, Con,
         #queryobj{
-                filter  =   As_filter,
-                fields  =
+                filter   =   As_filter,
+                distinct =   proplists:get_value(distinct,   Opts, []),
+                fields   =
                     proplists:get_value(fields,  Opts,
                         proplists:get_value(returning,  Opts,
                             proplists:get_value(return,  Opts, [])
