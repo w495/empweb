@@ -447,13 +447,6 @@ handle(_req, #empweb_hap{
         %% ----------------------------------------------------
         %% Имя
             #norm_rule{
-                key         = money,
-                required    = false,
-                types       = empweb_norm:filter([nullable, money])
-            },
-        %% ----------------------------------------------------
-        %% Имя
-            #norm_rule{
                 key         = fname,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
@@ -861,6 +854,11 @@ handle(_req, #empweb_hap{
             },
             #norm_at_least_one{
                 rules=[
+                %% деньги
+                    #norm_rule{
+                        key         = money,
+                        types       = [nullable, money]
+                    },
                 %% Пароль
                     #norm_rule{
                         key = nick,
