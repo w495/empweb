@@ -463,6 +463,9 @@ get_con(Con, Params, Fields)->
         [{fields, Fields}| Params]
     ).
 
+
+
+
 get_blogs(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
     What =
@@ -515,7 +518,6 @@ get_blogs(Params) ->
                         )
                     ]);
                 _ ->
-                
                     Truefields
             end,
         What_ = proplists:delete(fields, What),
@@ -551,11 +553,8 @@ get_blogs(Params) ->
                         | What_
                     ]
             end
-
         ])
     end).
-
-
 
 get_posts(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
@@ -646,10 +645,8 @@ get_posts(Params) ->
                         | What_
                     ]
             end
-
         ])
     end).
-
 
 get_photos(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
@@ -773,13 +770,8 @@ get_photos(Params) ->
         end
     end).
 
-    
 
 
-
-    
-
-    
 
 get_adds(Con, {ok, Communitys}, Params) ->
     Fields = proplists:get_value(fields, Params, []),

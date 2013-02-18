@@ -333,6 +333,9 @@ count(Params)->
         ])
     end).
 
+
+
+
 get_blogs(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
     What =
@@ -348,24 +351,39 @@ get_blogs(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(blog)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(blogs)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
-                            empdb_dao_blog:table({fields, select})
+                            [],
+                            empdb_dao_photo:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
@@ -385,6 +403,7 @@ get_blogs(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fields, Fields},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
@@ -404,11 +423,8 @@ get_blogs(Params) ->
                         | What_
                     ]
             end
-
         ])
     end).
-
-
 
 get_posts(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
@@ -425,24 +441,41 @@ get_posts(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(post)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(post)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [],
                             empdb_dao_post:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
@@ -462,6 +495,7 @@ get_posts(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fields, Fields},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
@@ -481,11 +515,9 @@ get_posts(Params) ->
                         | What_
                     ]
             end
-
         ])
     end).
 
-    
 get_photos(Params) ->
     Isweek = proplists:get_value(isweek, Params, false),
     What =
@@ -501,33 +533,47 @@ get_photos(Params) ->
             case Truefields of
                 [] ->
                     lists:append([
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                    erlang:atom_to_list(photo)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(photo)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [],
                             empdb_dao_photo:table({fields, select})
                         ),
-                        lists:map(
-                            fun(X)->
-                                erlang:list_to_atom(
-                                   erlang:atom_to_list(doc)
-                                    ++ "." ++
-                                    erlang:atom_to_list(X)
-                                )
+                        lists:foldl(
+                            fun (id, A)->
+                                    A;
+                                (X, A)->
+                                    [
+                                        erlang:list_to_atom(
+                                            erlang:atom_to_list(doc)
+                                            ++ "." ++
+                                            erlang:atom_to_list(X)
+                                        )
+                                        |A
+                                    ]
                             end,
+                            [
+                                case Isweek of
+                                    false  ->
+                                        doc.created;
+                                    true ->
+                                        doc.nvotes
+                                end
+                            ],
                             empdb_dao_doc:table({fields, select})
                         )
                     ]);
                 _ ->
                     Truefields
             end,
-
-        io:format("~n~n~n                           Fields = ~p ~n~n~n", [Fields]),
-        
         What_ = proplists:delete(fields, What),
         case empdb_dao:get([
             {empdb_dao_doc,  id},
@@ -543,6 +589,7 @@ get_photos(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
+            {distinct, [doc.id]},
             {fileinfotype_alias, download},
             {fields, [
                 {as, {fileinfo.path, fileinfopath}},
@@ -592,6 +639,9 @@ get_photos(Params) ->
                 Error
         end
     end).
+
+
+
 
     
 get(Params)->
