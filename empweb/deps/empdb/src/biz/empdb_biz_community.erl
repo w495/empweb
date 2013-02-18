@@ -486,7 +486,7 @@ get_blogs(Params) ->
                                     erlang:atom_to_list(X)
                                 )
                             end,
-                            empdb_dao_community:table({fields, select})
+                            empdb_dao_blog:table({fields, select})
                         ),
                         lists:map(
                             fun(X)->
@@ -563,7 +563,7 @@ get_posts(Params) ->
                                     erlang:atom_to_list(X)
                                 )
                             end,
-                            empdb_dao_community:table({fields, select})
+                            empdb_dao_post:table({fields, select})
                         ),
                         lists:map(
                             fun(X)->
@@ -639,7 +639,7 @@ get_photos(Params) ->
                                     erlang:atom_to_list(X)
                                 )
                             end,
-                            empdb_dao_community:table({fields, select})
+                            empdb_dao_photo:table({fields, select})
                         ),
                         lists:map(
                             fun(X)->
