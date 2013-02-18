@@ -484,7 +484,7 @@ get_blogs(Params) ->
                                 (X, A)->
                                     [
                                         erlang:list_to_atom(
-                                            erlang:atom_to_list(blog)
+                                            erlang:atom_to_list(blogs)
                                             ++ "." ++
                                             erlang:atom_to_list(X)
                                         )
