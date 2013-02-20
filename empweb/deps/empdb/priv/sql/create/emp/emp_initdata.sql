@@ -749,7 +749,6 @@ insert into doctype(alias)
             ('community'),
             ('message'),
             ('notice'),
-            ('event'),
             ('roomlot'),
             ('album'),
             ('photo'),

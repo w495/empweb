@@ -223,9 +223,10 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
     Doc_id      = proplists:get_value(id, Params,
         proplists:get_value(doc_id, Params)
     ),
-    Owner_id    = proplists:get_value(owner_id, Params, null),
-    Owner_nick  = proplists:get_value(owner_nick, Params, null),
-    Parent_id   = proplists:get_value(parent_id, Params, null),
+    Owner_id    = proplists:get_value(owner_id,     Params, null),
+    Owner_nick  = proplists:get_value(owner_nick,   Params, null),
+    Parent_id   = proplists:get_value(parent_id,    Params, null),
+    Fields      = proplists:get_value(fields,       Params, [id]),
 
 
     Mbrepostlist =
@@ -238,7 +239,7 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
             {limit, 1}
         ]),
 
-        
+
     {ok, [{Instpl}]} = Getmodule:Get(Con, [{id, Doc_id}]),
 
     %%
@@ -280,10 +281,18 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
                 {orig_id,           Orig_id},
                 {orig_owner_id,     Orig_owner_id},
                 {orig_owner_nick,   Orig_owner_nick},
-                {isrepost,          true}
+                {isrepost,          true},
+                {fields,            Fields}
                 |Preinstpl
             ]) of
                 {ok, [{Newinstpl}]} ->
+%                     {ok, _} =
+%                         empdb_dao_event:create(Con, [
+%                             {owner_id, Orig_owner_id},
+%                             {pers_id,  Owner_id},
+%                             {friendtype_id, proplists:get_value(friendtype_id, Friendpl)},
+%                             {eventtype_alias, new_friend}
+%                         ]),
                     {ok, _} = empdb_dao_repost:create(Con, [
                         {doc_id,            proplists:get_value(id, Newinstpl)},
                         {owner_id,          Owner_id},
@@ -685,16 +694,36 @@ is_blog_owner(Uid, Oid)->
 
 repost_post(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_biz_doc:repost(
+        case empdb_biz_doc:repost(
             empdb_dao_post,
             Con,
-            Params
-        )
+            [{fields, [owner_id, head]}|Params]
+        ) of
+            {ok, [{Postpl}]} ->
+                empdb_daowp_event:feedfriends([
+                    {pers_id,           proplists:get_value(owner_id,   Postpl)},
+                    {doc_id,            proplists:get_value(id,         Postpl)},
+                    {eventtype_alias,   repost_post}
+                ]),
+                {ok, [{Postpl}]};
+            Else ->
+                Else
+        end
     end).
 
 create_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_post:create(Con, Params)
+        case empdb_dao_post:create(Con, [{fields, [id, owner_id, head]}|Params]) of
+            {ok, [{Postpl}]} ->
+                empdb_daowp_event:feedfriends([
+                    {pers_id,           proplists:get_value(owner_id, Postpl)},
+                    {doc_id,            proplists:get_value(id,     Postpl)},
+                    {eventtype_alias,   create_post}
+                ]),
+                {ok, [{Postpl}]};
+            Else ->
+                Else 
+        end
     end).
 
 update_post(Params)->
@@ -864,18 +893,18 @@ is_comment_owner(Uid, Oid)->
 create_message(Params)->
     empdb_dao:with_transaction(empdb_biz_pers:wfoe(
         fun(Con)->
-            {ok, _} =
-                empdb_dao_event:create(emp, [
-                    case proplists:get_value(reader_id, Params) of
-                        undefined ->
-                            {owner_nick,          proplists:get_value(reader_nick, Params)};
-                        Reader_id ->
-                            {owner_id,          Reader_id}
-                    end,
-                    {eventtype_alias,   new_mail},
-                    {pers_id,           proplists:get_value(owner_id, Params)}
-                ]),
-            empdb_dao_message:create(Con, Params)
+            case empdb_dao_message:create(Con, [{fields, [reader_id, id, owner_id]}|Params]) of
+                {ok, [{Messpl}]} ->
+                    empdb_dao_event:create(emp, [
+                        {owner_id,          proplists:get_value(reader_id, Messpl)},
+                        {doc_id,            proplists:get_value(id, Messpl)},
+                        {pers_id,           proplists:get_value(owner_id, Messpl)},
+                        {eventtype_alias,   create_message}
+                    ]),
+                    {ok, [{Messpl}]};
+                Else ->
+                    Else
+            end
         end,
         [
             {pers_id,       proplists:get_value(owner_id, Params)},

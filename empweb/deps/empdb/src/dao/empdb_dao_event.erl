@@ -58,12 +58,30 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
-        doc_id,
+        id,
+        head,
+        body,
+        owner_id,
+        owner_nick,
+        pers_id,
+        pers_nick,
+        friendtype_id,
+        friendtype_alias,
         eventtype_id,
         eventtype_alias,
-        own_community_id,
-        pers_id,
-        pers_nick
+        doc_id,
+        doc_head,
+        doc_owner_id,
+        doc_owner_nick,
+        doc_parent_id,
+        doctype_id,
+        doctype_alias,
+        orig_id,
+        orig_owner_id,
+        orig_owner_nick,
+        isnews,
+        created,
+        isdeleted
     ];
 
 %%
@@ -83,21 +101,21 @@ table()->
 
 
 count(Con, What) ->
-    empdb_dao_doc:count(?MODULE, Con, What).
+    empdb_dao:count(?MODULE, Con, What).
 
 get(Con, What) ->
-    empdb_dao_doc:get(?MODULE, Con, What).
+    empdb_dao:get(?MODULE, Con, What).
 
 get(Con, What, Fields)->
-    empdb_dao_doc:get(?MODULE, Con, What, Fields).
+    empdb_dao:get(?MODULE, Con, What, Fields).
 
 create(Con, Proplist)->
-    empdb_dao_doc:create(?MODULE, Con, Proplist).
+    empdb_dao:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
-    empdb_dao_doc:update(?MODULE, Con, Proplist).
+    empdb_dao:update(?MODULE, Con, Proplist).
 
 is_owner(Con, Owner_id, Obj_id) ->
-    empdb_dao_doc:is_owner(Con, Owner_id, Obj_id).
+    empdb_dao:is_owner(Con, Owner_id, Obj_id).
 
 

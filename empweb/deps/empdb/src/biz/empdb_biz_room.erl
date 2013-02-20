@@ -405,6 +405,7 @@ get_blogs(Params) ->
         ],Con,[
             {distinct, [doc.id]},
             {fields, Fields},
+            {doc.isdeleted,false},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
             |

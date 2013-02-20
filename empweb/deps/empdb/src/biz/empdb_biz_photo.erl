@@ -50,7 +50,11 @@ get(Params)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:get_adds(Con,
-            empdb_dao_photo:get(Con, [{isdeleted, false}|Params]),
+            empdb_dao_photo:get(Con, [
+                {order, {desc, created}},
+                {isdeleted, false}
+                |Params
+            ]),
             Params
         )
     end).
@@ -59,7 +63,11 @@ get(Params, Fields)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:get_adds(Con,
-            empdb_dao_photo:get(Con, [{isdeleted, false}|Params], Fields),
+            empdb_dao_photo:get(Con, [
+                {order, {desc, created}},
+                {isdeleted, false}
+                |Params
+            ], Fields),
             [{fields, Fields}|Params]
         )
     end).

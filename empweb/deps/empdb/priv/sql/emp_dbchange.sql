@@ -1065,8 +1065,7 @@
 --             default utcnow() + interval '1 week';
 
 
-
-alter table event add column own_community_id  decimal references doc(id);
+/*
 
 insert into eventtype (alias) values ('new_community_cand');
 
@@ -1078,9 +1077,79 @@ insert into eventtype (alias) values ('new_community_exile');
 
 insert into eventtype (alias) values ('new_community_away');
 
+insert into communityhisttype (alias) values ('pers_away');
+
+insert into eventtype (alias) values ('create_mail');
+*/
+
+
+
+
+
+alter table eventtype add column isnews boolean  default false;
+
 
 insert into communityhisttype (alias) values ('pers_away');
 
 
-insert into eventtype (alias) values ('new_mail');
+insert into eventtype (alias) values ('new_community_cand');
+insert into eventtype (alias) values ('new_community_memb');
+insert into eventtype (alias) values ('new_community_out');
+insert into eventtype (alias) values ('new_community_exile');
+insert into eventtype (alias) values ('new_community_away');
+insert into eventtype (alias) values ('create_mail');
+
+insert into eventtype (alias) values ('birthday_today');
+insert into eventtype (alias) values ('add_friend');
+insert into eventtype (alias) values ('delete_friend');
+insert into eventtype (alias) values ('create_message');
+
+
+insert into eventtype (alias, isnews) values ('create_post', true);
+insert into eventtype (alias, isnews) values ('repost_post', true);
+insert into eventtype (alias, isnews) values ('create_photo', true);
+insert into eventtype (alias, isnews) values ('repost_photo', true);
+insert into eventtype (alias, isnews) values ('repost_post_my', false);
+insert into eventtype (alias, isnews) values ('repost_photo_my', false);
+
+
+
+create sequence seq_event_id;
+create table event(
+    id                  decimal primary key default     nextval('seq_event_id'),
+    head                text,
+    body                text default null,
+
+    owner_id            decimal references pers(id) default null,
+    owner_nick          varchar(1024)               default null,
+
+    pers_id             decimal references pers(id) default null,
+    pers_nick           varchar(1024)               default null,
+
+    friendtype_id decimal           references friendtype(id)       default null,
+    friendtype_alias varchar(1024)  references friendtype(alias)    default null,
+
+    eventtype_id        decimal         references eventtype(id)    default null,
+    eventtype_alias     varchar(1024)   references eventtype(alias) default null,
+
+    doc_id          decimal         references doc(id)          default null,
+    doc_head        varchar(1024)                               default null,
+    doc_owner_id    decimal         references pers(id)         default null,
+    doc_owner_nick  varchar(1024)                               default null,
+    doc_parent_id   decimal         references doc(id)          default null,
+    oktype_id       decimal         references oktype(id)       default null,
+    oktype_alias    varchar(1024)   references oktype(alias)    default null,
+    doctype_id      decimal         references doctype(id)      default null,
+    doctype_alias   varchar(1024)   references doctype(alias)   default null,
+    contype_id      decimal         references contype(id)      default null,
+    contype_alias   varchar(1024)   references contype(alias)   default null,
+    orig_id         decimal         references doc(id)          default null,
+    orig_owner_id   decimal         references pers(id)         default null,
+    orig_owner_nick varchar(1024)                               default null,
+
+    isnews              boolean  default false,
+    
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           boolean default false
+);
 

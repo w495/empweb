@@ -1517,6 +1517,7 @@ create table eventtype(
     **/
     name_ti     decimal unique  default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
+    isnews      boolean  default false,
     created     timestamp       without time zone not null default utcnow(),
     isdeleted   boolean            default false
 );

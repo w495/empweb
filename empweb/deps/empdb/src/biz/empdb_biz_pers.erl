@@ -13,10 +13,13 @@
 %% Экспортируемые функции
 %% ===========================================================================
 
+
 %%
 %% Сам пользователь
 %%
 -export([
+    start/0,
+    start/1,
     register/1,
     update/1,
     login/1,
@@ -26,7 +29,9 @@
     count/1,
     get_opt/2,
     get_opt/3,
-    wfoe/2
+    wfoe/2,
+    whose_birthday/0,
+    timeout/0
 ]).
 
 %%
@@ -97,6 +102,23 @@
 %% ===========================================================================
 
 
+start()->
+    start([]).
+
+start(_)->
+    % timer:apply_interval(
+    %     ?EMPDB_BIZ_PERS_WHOSE_BIRTHDAY_TIMEOUT,
+    %     ?MODULE,
+    %     whose_birthday,
+    %     []
+    % ),
+    timer:apply_interval(
+        300000,
+        ?MODULE,
+        whose_birthday,
+        []
+    ),
+    ok.
 
 wfoe(Function, Options)->
     Pers_id     = proplists:get_value(pers_id,      Options),
@@ -127,6 +149,75 @@ wfoe(Function, Options)->
 %% Сам пользователь
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+timeout() ->
+    case erlang:time() of
+        {0, 0, 0} ->
+            whose_birthday();
+        _ ->
+            ok
+    end.
+
+whose_birthday() ->
+    empdb_dao:with_connection(emp, fun(Con)->
+        %% Выбираем всех у кого ДР сегодня.
+        case empdb_dao_pers:whose_birthday(Con) of
+            {ok, []} ->
+                ok;
+            {ok, Birthdaylist}->
+                %% Выбирали всех у кого ДР сегодня.
+                %% Проходим по списку и отсылаем их друзьям 
+                %% (подписчикам сообщения).
+                lists:map(
+                    fun({Birthdaymanpl})->
+                        Birthdayman_id =
+                            proplists:get_value(id, Birthdaymanpl),
+                        %% Выбираем подписчиков именников.
+                        case empdb_dao_friend:get(Con, [
+                            {friend_id, Birthdayman_id},
+                            {friendtype_alias, friend}
+                        ]) of
+                            {ok, []} ->
+                                ok;
+                            {ok, Persobjs} ->
+                                %% Выбирали подписчиков именников.
+                                %% Отсылаем им всем по 1 сообщения,
+                                %% что сегодня у Birthdayma ДР.
+                                empdb_daowp_event:feedfriends([
+                                    {pers_id, Birthdayman_id},
+                                    {eventtype_alias, birthday_today}
+                                ],[uniq]);
+%                                 lists:map(
+%                                     fun({Perspl})->
+%                                         Pers_id =
+%                                             proplists:get_value(pers_id, Perspl),
+%                                         %% Отсекаем повторную отправку сообщения.
+%                                         case empdb_dao_event:get(Con, [
+%                                             {owner_id, Pers_id},
+%                                             {pers_id, Birthdayman_id},
+%                                             {eventtype_alias, birthday_today}
+%                                         ]) of
+%                                             {ok, []} ->
+%                                                 empdb_dao_event:create(Con, [
+%                                                     {owner_id, Pers_id},
+%                                                     {pers_id, Birthdayman_id},
+%                                                     {eventtype_alias, birthday_today}
+%                                                 ]);
+%                                             Eventelse ->
+%                                                 Eventelse
+%                                         end
+%                                     end,
+%                                     Persobjs
+%                                 );
+                            Perselse ->
+                                Perselse
+                        end
+                    end,
+                    Birthdaylist
+                );
+            Birthdayelse ->
+                Birthdayelse
+        end
+    end).
 %%
 %% @doc Cоздает нового пользователя в базе данных сервера приложений,
 %% и нового пользователя сервера jabberd.
@@ -392,7 +483,7 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                 empdb_dao_event:create(Con, [
                     {owner_id,          proplists:get_value(owner_id, Communitypl)},
                     {eventtype_alias,   new_community_cand},
-                    {own_community_id,  proplists:get_value(id, Communitypl)},
+                    {doc_id,  proplists:get_value(id, Communitypl)},
                     {pers_id,           proplists:get_value(id, Mbperspl)}
                 ]),
 
@@ -443,7 +534,7 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(owner_id, Communitypl)},
                             {eventtype_alias,   new_community_away},
-                            {own_community_id,  proplists:get_value(id, Communitypl)},
+                            {doc_id,  proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(id, Mbperspl)}
                         ]),
                     {ok, _} =
@@ -487,7 +578,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                 empdb_dao_event:create(Con, [
                     {owner_id,          proplists:get_value(id, Mbperspl)},
                     {eventtype_alias,   new_community_memb},
-                    {live_community_id, proplists:get_value(id, Communitypl)},
+                    {doc_id, proplists:get_value(id, Communitypl)},
                     {pers_id,           proplists:get_value(owner_id, Communitypl)}
                 ]),
 
@@ -577,7 +668,7 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(id, Mbperspl)},
                             {eventtype_alias,   new_community_out},
-                            {live_community_id, proplists:get_value(id, Communitypl)},
+                            {doc_id, proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(owner_id, Communitypl)}
                         ]),
 
@@ -614,7 +705,7 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(id, Mbperspl)},
                             {eventtype_alias,   new_community_exile},
-                            {live_community_id, proplists:get_value(id, Communitypl)},
+                            {doc_id, proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(owner_id, Communitypl)}
                         ]),
 
@@ -1434,28 +1525,35 @@ add_friend(Params)->
         %             Error2
         %     end
         % ),
-        case empdb_dao_friend:create(Con, Params) of
-            {ok, _frndpls} ->
-                %% TODO: костыль
-                %% Возможно, иммет смысл получать 
-                %% на основе _frndpls
-                empdb_dao_pers:get(Con,
-                    [   {isdeleted, false},
-                        {'or', [
-                            {id, proplists:get_value(friend_id, Params)},
-                            {nick, proplists:get_value(friend_nick, Params)}
-                        ]}
-                    ],
-                    [   id,
-                        nick,
-                        pstatus_id,
-                        pstatus_alias,
-                        live_room_id,
-                        live_room_head
-                    ]
-                );
-            Error ->
-                Error
+        case empdb_dao_friend:create(Con, [{fields, [friendtype_id, pers_id, friend_id]}|Params]) of
+            {ok, [{Friendpl}]} ->
+                {ok, [{Perspl}]} =
+                    empdb_dao_pers:get(Con,
+                        [   {isdeleted, false},
+                            {limit, 1},
+                            {id, proplists:get_value(friend_id, Friendpl)}
+                        ],
+                        [   id,
+                            nick,
+                            pstatus_id,
+                            pstatus_alias,
+                            live_room_id,
+                            live_room_head
+                        ]
+                    ),
+                {ok, _} =
+                    empdb_dao_event:create(Con, [
+                        {owner_id, proplists:get_value(friend_id, Friendpl)},
+                        {pers_id,  proplists:get_value(pers_id, Friendpl)},
+                        {friendtype_id, proplists:get_value(friendtype_id, Friendpl)},
+                        {eventtype_alias, add_friend}
+                    ]),
+                spawn_link(fun()->
+                    empdb_biz_pers:whose_birthday()
+                end),
+                {ok, [{Perspl}]};
+            Friendelse->
+                Friendelse
         end
     end).
 
@@ -1487,13 +1585,26 @@ delete_friend(Params)->
         %             Error2
         %     end
         % ),
-        empdb_dao_friend:delete(Con, Params)
+        case empdb_dao_friend:delete(Con, Params) of
+            {ok, X} ->
+                {ok, _} =
+                    empdb_dao_event:create(Con, [
+                        {owner_id, proplists:get_value(friend_id, Params)},
+                        {pers_id,  proplists:get_value(pers_id,   Params)},
+                        {friendtype_id, proplists:get_value(friendtype_id, Params)},
+                        {eventtype_alias, delete_friend}
+                    ]),
+                {ok, X};
+            Else ->
+                Else
+        end
     end).
 
 get_friend(Params)->
     empdb_dao:with_connection(emp, fun(Con)->
         empdb_dao_friend:get(Con, [
-            {order, {nick, asc}}
+            {order, {nick, asc}},
+            {isdeleted, false}
             |Params
         ])
     end).

@@ -58,6 +58,7 @@ start_link()->
 %% --------------------------------------------------------------------
 init([]) ->
     process_flag(trap_exit, true),
+    empdb_biz_pers:start(),
     {ok, [], ?EMPDB_TIMER_TIMEOUT}.
 
 
@@ -99,7 +100,9 @@ handle_info(timeout, State) ->
 
 handle_info(Info, State) ->
     {noreply, State, ?EMPDB_TIMER_TIMEOUT}.
-
+%%
+%% TODO: пересадить на timer:apply_interval
+%%
 timeouts()->
     empdb_biz_roomlot:timeout(),
     empdb_biz_exile:timeout(),

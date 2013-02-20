@@ -85,12 +85,12 @@ drop trigger if exists t1on_insert_subdoc_inst on message;
 create trigger t1on_insert_subdoc_inst after insert
    on message for each row execute procedure on_insert_subdoc_inst('message');
 
-/**
-    Тригер присвоения типа документа при создании сообщения
-**/
-drop trigger if exists t1on_insert_subdoc_inst on event;
-create trigger t1on_insert_subdoc_inst after insert
-   on event for each row execute procedure on_insert_subdoc_inst('event');
+-- /**
+--     Тригер присвоения типа документа при создании сообщения
+-- **/
+-- drop trigger if exists t1on_insert_subdoc_inst on event;
+-- create trigger t1on_insert_subdoc_inst after insert
+--    on event for each row execute procedure on_insert_subdoc_inst('event');
 
 /**
     Тригер присвоения типа документа при создании лота

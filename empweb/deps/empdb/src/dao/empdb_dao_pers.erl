@@ -25,6 +25,7 @@
     update/3,
     get/2,
     get/3,
+    whose_birthday/1,
     count/2,
     get_perm/2,
     get_perm/3,
@@ -250,6 +251,17 @@ table(name)->
 table()->
     table(name).
 
+
+whose_birthday(Con)->
+    empdb_dao:eqret(Con,
+        <<"select "
+                "id, nick"
+            " from "
+                " pers "
+            " where "
+                "extract(doy from birthday) = extract(doy from now())"
+        ";">>
+    ).
 
 count(Con, What) ->
     empdb_dao:count(?MODULE, Con, What).
