@@ -866,7 +866,12 @@ create_message(Params)->
         fun(Con)->
             {ok, _} =
                 empdb_dao_event:create(emp, [
-                    {owner_id,          proplists:get_value(reader_id, Params)},
+                    case proplists:get_value(reader_id, Params) of
+                        undefined ->
+                            {owner_nick,          proplists:get_value(reader_nick, Params)};
+                        Reader_id ->
+                            {owner_id,          Reader_id}
+                    end,
                     {eventtype_alias,   new_mail},
                     {pers_id,           proplists:get_value(owner_id, Params)}
                 ]),

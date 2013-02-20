@@ -535,6 +535,7 @@ get_blogs(Params) ->
         ],Con,[
             {distinct, [doc.id]},
             {fields, Fields},
+            {doc.isdeleted,false},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
             |
@@ -627,6 +628,7 @@ get_posts(Params) ->
         ],Con,[
             {distinct, [doc.id]},
             {fields, Fields},
+            {doc.isdeleted,false},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
             |
@@ -726,6 +728,7 @@ get_photos(Params) ->
                 {as, {fileinfo.dir,  fileinfodir}}
                 | proplists:delete(path, Fields)
             ]},
+            {doc.isdeleted,false},
             {doc.isrepost,false},
             {doc.isrepostcont,false}
             |
