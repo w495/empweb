@@ -141,12 +141,23 @@ create(Params)->
                                     {money, {incr, Maxprev_price}}
                                 ]),
                                 %% Шлем сообщение, что ставка бита
+                                %% Тому кто ставил
                                 {ok, _} = empdb_dao_event:create(Con, [
                                     {eventobj_alias,    roombet},
                                     {eventact_alias,    delete},
-                                    {owner_id,          Roombet_owner_id},
+                                    {owner_id,          Maxprev_owner_id},
                                     {target_id,         proplists:get_value(id, Maxprev)},
                                     {pers_id,           Roomlot_owner_id},
+                                    {eventtype_alias,   delete_roombet_beatrate}
+                                ]),
+                                %% Шлем сообщение, что ставка бита
+                                %% Владельцу аукциона
+                                {ok, _} = empdb_dao_event:create(Con, [
+                                    {eventobj_alias,    roombet},
+                                    {eventact_alias,    delete},
+                                    {owner_id,          Roomlot_owner_id},
+                                    {target_id,         proplists:get_value(id, Maxprev)},
+                                    {pers_id,           Roombet_owner_id},
                                     {eventtype_alias,   delete_roombet_beatrate}
                                 ]),
                                 {ok, _} = empdb_dao_pay:create(Con, [
