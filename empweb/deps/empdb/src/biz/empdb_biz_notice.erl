@@ -79,3 +79,14 @@ is_owner(Uid, Oid)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_notice:is_owner(Con, Uid, Oid)
     end).
+
+f()->
+    
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_notice:get(Con,
+            [
+                {isdeleted, false}|Params
+            ],
+            Fileds
+        )
+    end).

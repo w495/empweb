@@ -32,6 +32,7 @@
             int2datetime/1,
             int2universal_datetime/1,
             int2local_datetime/1,
+            now_plus_week/0,
             now_minus_week/0,
             to_money/1,
             test/0
@@ -44,7 +45,12 @@
 -define(EMPDB_CONVERT_TIMEMICROREST,    1000).
 -define(EMPDB_CONVERT_TIMEMACROREST,    1000000).
 
-
+now_plus_week() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y + ?EMPDB_UNIXTIMEWEEK
+    ).
+    
 now_minus_week() ->
     {X,Y,_} = now(),
     empdb_convert:int2datetime(
