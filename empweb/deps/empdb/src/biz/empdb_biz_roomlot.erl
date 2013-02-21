@@ -227,7 +227,6 @@ remove_expired()->
                                     proplists:get_value(id, Roompl)}
                             ]);
                     _ ->
-
                         %% Владельцу аукциона шлем сообщение,
                         %% что аукцион окончен
                         empdb_dao_event:create(Con, [
