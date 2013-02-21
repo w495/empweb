@@ -186,28 +186,6 @@ whose_birthday() ->
                                     {pers_id, Birthdayman_id},
                                     {eventtype_alias, birthday_today}
                                 ],[uniq]);
-%                                 lists:map(
-%                                     fun({Perspl})->
-%                                         Pers_id =
-%                                             proplists:get_value(pers_id, Perspl),
-%                                         %% Отсекаем повторную отправку сообщения.
-%                                         case empdb_dao_event:get(Con, [
-%                                             {owner_id, Pers_id},
-%                                             {pers_id, Birthdayman_id},
-%                                             {eventtype_alias, birthday_today}
-%                                         ]) of
-%                                             {ok, []} ->
-%                                                 empdb_dao_event:create(Con, [
-%                                                     {owner_id, Pers_id},
-%                                                     {pers_id, Birthdayman_id},
-%                                                     {eventtype_alias, birthday_today}
-%                                                 ]);
-%                                             Eventelse ->
-%                                                 Eventelse
-%                                         end
-%                                     end,
-%                                     Persobjs
-%                                 );
                             Perselse ->
                                 Perselse
                         end

@@ -26,6 +26,7 @@
     get/2,
     get/3,
     whose_birthday/1,
+    whose_birthday/2,
     count/2,
     get_perm/2,
     get_perm/3,
@@ -255,6 +256,31 @@ table()->
 
 
 whose_birthday(Con)->
+    whose_birthday(Con, doy).
+
+whose_birthday(Con, quarter)->
+    empdb_dao:eqret(Con,
+        <<"select "
+                "id, nick"
+            " from "
+                " pers "
+            " where "
+                "extract(quarter from birthday) = extract(quarter from now())"
+        ";">>
+    );
+
+whose_birthday(Con, month)->
+    empdb_dao:eqret(Con,
+        <<"select "
+                "id, nick"
+            " from "
+                " pers "
+            " where "
+                "extract(month from birthday) = extract(month from now())"
+        ";">>
+    );
+    
+whose_birthday(Con, doy)->
     empdb_dao:eqret(Con,
         <<"select "
                 "id, nick"
