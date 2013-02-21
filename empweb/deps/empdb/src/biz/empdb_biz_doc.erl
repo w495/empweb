@@ -899,7 +899,7 @@ create_message(Params)->
         fun(Con)->
             case empdb_dao_message:create(Con, [{fields, [reader_id, id, owner_id]}|Params]) of
                 {ok, [{Messpl}]} ->
-                    empdb_dao_event:create(emp, [
+                    empdb_dao_event:create(Con, [
                         {eventobj_alias,    message},
                         {eventact_alias,    create},
                         {owner_id,          proplists:get_value(reader_id, Messpl)},

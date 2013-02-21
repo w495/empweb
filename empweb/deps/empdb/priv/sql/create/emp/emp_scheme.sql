@@ -443,7 +443,7 @@ create table pers(
     sname       varchar(1024)   default null,
     isempl      boolean         default null,
     empl        varchar(1024)   default null,
-    
+
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
     interest    varchar(1024)   default null,

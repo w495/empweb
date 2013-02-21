@@ -1085,162 +1085,143 @@ insert into eventtype (alias) values ('create_mail');
 
 
 
-
-alter table eventtype add column isnews boolean  default false;
-
-
-insert into communityhisttype (alias) values ('pers_away');
+-- 2013.02.21 17:25:58:980890996 ---------------------------------------------
 
 
-insert into eventtype (alias) values ('new_community_cand');
-insert into eventtype (alias) values ('new_community_memb');
-insert into eventtype (alias) values ('new_community_out');
-insert into eventtype (alias) values ('new_community_exile');
-insert into eventtype (alias) values ('new_community_away');
-insert into eventtype (alias) values ('create_mail');
-
-insert into eventtype (alias) values ('birthday_today');
-insert into eventtype (alias) values ('add_friend');
-insert into eventtype (alias) values ('delete_friend');
-insert into eventtype (alias) values ('create_message');
-
-
-insert into eventtype (alias, isnews) values ('create_post', true);
-insert into eventtype (alias, isnews) values ('repost_post', true);
-insert into eventtype (alias, isnews) values ('create_photo', true);
-insert into eventtype (alias, isnews) values ('repost_photo', true);
-insert into eventtype (alias, isnews) values ('repost_post_my', false);
-insert into eventtype (alias, isnews) values ('repost_photo_my', false);
-
-
-create sequence seq_event_id;
-create table event(
-    id                  decimal primary key default     nextval('seq_event_id'),
-    head                text,
-    body                text default null,
-
-    owner_id            decimal references pers(id) default null,
-    owner_nick          varchar(1024)               default null,
-
-    pers_id             decimal references pers(id) default null,
-    pers_nick           varchar(1024)               default null,
-
-    friendtype_id decimal           references friendtype(id)       default null,
-    friendtype_alias varchar(1024)  references friendtype(alias)    default null,
-
-    eventtype_id        decimal         references eventtype(id)    default null,
-    eventtype_alias     varchar(1024)   references eventtype(alias) default null,
-
-    eventobj_id        decimal         references eventobj(id)    default null,
-    eventobj_alias     varchar(1024)   references eventobj(alias) default null,
-
-    eventact_id        decimal         references eventact(id)    default null,
-    eventact_alias     varchar(1024)   references eventact(alias) default null,
-
-    eventspc_id        decimal         references eventspc(id)    default null,
-    eventspc_alias     varchar(1024)   references eventspc(alias) default null,
-
-    target_id       decimal                                     default null,
-    doc_id          decimal         references doc(id)          default null,
-    doc_head        varchar(1024)                               default null,
-    doc_owner_id    decimal         references pers(id)         default null,
-    doc_owner_nick  varchar(1024)                               default null,
-    doc_parent_id   decimal         references doc(id)          default null,
-    oktype_id       decimal         references oktype(id)       default null,
-    oktype_alias    varchar(1024)   references oktype(alias)    default null,
-    doctype_id      decimal         references doctype(id)      default null,
-    doctype_alias   varchar(1024)   references doctype(alias)   default null,
-    contype_id      decimal         references contype(id)      default null,
-    contype_alias   varchar(1024)   references contype(alias)   default null,
-    orig_id         decimal         references doc(id)          default null,
-    orig_owner_id   decimal         references pers(id)         default null,
-    orig_owner_nick varchar(1024)                               default null,
-
-    isnews              boolean  default false,
+/*
+    alter table eventtype add column isnews boolean  default false;
+    insert into communityhisttype (alias) values ('pers_away');
+    insert into eventtype (alias) values ('new_community_cand');
+    insert into eventtype (alias) values ('new_community_memb');
+    insert into eventtype (alias) values ('new_community_out');
+    insert into eventtype (alias) values ('new_community_exile');
+    insert into eventtype (alias) values ('new_community_away');
+    insert into eventtype (alias) values ('create_mail');
+    insert into eventtype (alias) values ('birthday_today');
+    insert into eventtype (alias) values ('add_friend');
+    insert into eventtype (alias) values ('delete_friend');
+    insert into eventtype (alias) values ('create_message');
+    insert into eventtype (alias, isnews) values ('create_post', true);
+    insert into eventtype (alias, isnews) values ('repost_post', true);
+    insert into eventtype (alias, isnews) values ('create_photo', true);
+    insert into eventtype (alias, isnews) values ('repost_photo', true);
+    insert into eventtype (alias, isnews) values ('repost_post_my', false);
+    insert into eventtype (alias, isnews) values ('repost_photo_my', false);
     
-    created             timestamp without time zone not null default utcnow(),
-    isdeleted           boolean default false
-);
+    create sequence seq_event_id;
+    create table event(
+        id                  decimal primary key default     nextval('seq_event_id'),
+        head                text,
+        body                text default null,
+        owner_id            decimal references pers(id) default null,
+        owner_nick          varchar(1024)               default null,
+        pers_id             decimal references pers(id) default null,
+        pers_nick           varchar(1024)               default null,
+        friendtype_id decimal           references friendtype(id)       default null,
+        friendtype_alias varchar(1024)  references friendtype(alias)    default null,
+        eventtype_id        decimal         references eventtype(id)    default null,
+        eventtype_alias     varchar(1024)   references eventtype(alias) default null,
+        eventobj_id        decimal         references eventobj(id)    default null,
+        eventobj_alias     varchar(1024)   references eventobj(alias) default null,
+        eventact_id        decimal         references eventact(id)    default null,
+        eventact_alias     varchar(1024)   references eventact(alias) default null,
+        eventspc_id        decimal         references eventspc(id)    default null,
+        eventspc_alias     varchar(1024)   references eventspc(alias) default null,
+        target_id       decimal                                     default null,
+        doc_id          decimal         references doc(id)          default null,
+        doc_head        varchar(1024)                               default null,
+        doc_owner_id    decimal         references pers(id)         default null,
+        doc_owner_nick  varchar(1024)                               default null,
+        doc_parent_id   decimal         references doc(id)          default null,
+        oktype_id       decimal         references oktype(id)       default null,
+        oktype_alias    varchar(1024)   references oktype(alias)    default null,
+        doctype_id      decimal         references doctype(id)      default null,
+        doctype_alias   varchar(1024)   references doctype(alias)   default null,
+        contype_id      decimal         references contype(id)      default null,
+        contype_alias   varchar(1024)   references contype(alias)   default null,
+        orig_id         decimal         references doc(id)          default null,
+        orig_owner_id   decimal         references pers(id)         default null,
+        orig_owner_nick varchar(1024)                               default null,
+        isnews              boolean  default false,
+        created             timestamp without time zone not null default utcnow(),
+        isdeleted           boolean default false
+    );
+    create sequence seq_eventobj_id;
+    create table eventobj(
+        id          decimal primary key default nextval('seq_eventobj_id'),
+        name_ti     decimal unique  default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        isnews      boolean  default false,
+        created     timestamp       without time zone not null default utcnow(),
+        isdeleted   boolean            default false
+    );
+
+    create sequence seq_eventact_id;
+    create table eventact(
+        id          decimal primary key default nextval('seq_eventact_id'),
+        name_ti     decimal unique  default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        isnews      boolean  default false,
+        created     timestamp       without time zone not null default utcnow(),
+        isdeleted   boolean            default false
+    );
+
+    create sequence seq_eventspc_id;
+    create table eventspc(
+        id          decimal primary key default nextval('seq_eventspc_id'),
+        name_ti     decimal unique  default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        isnews      boolean  default false,
+        created     timestamp       without time zone not null default utcnow(),
+        isdeleted   boolean            default false
+    );
+
+    insert into eventtype (alias, isnews) values ('create_exile', true);
+    insert into eventtype (alias, isnews) values ('delete_exile_save', true);
+    insert into eventtype (alias, isnews) values ('delete_exile_remove_expired', true);
+
+    alter table event add column
+        target_id decimal default null;
+
+    alter table event add column
+        eventobj_id        decimal         references eventobj(id)    default null;
+    alter table event add column
+        eventobj_alias     varchar(1024)   references eventobj(alias) default null;
+
+    alter table event add column
+        eventact_id        decimal         references eventact(id)    default null;
+    alter table event add column
+        eventact_alias     varchar(1024)   references eventact(alias) default null;
+
+    alter table event add column
+        eventspc_id        decimal         references eventspc(id)    default null;
+    alter table event add column
+        eventspc_alias     varchar(1024)   references eventspc(alias) default null;
+
+    insert into eventact (alias) values ('create');
+    insert into eventact (alias) values ('delete');
+    insert into eventact (alias) values ('update');
+    insert into eventact (alias) values ('repost');
+    insert into eventobj (alias) values ('photo');
+    insert into eventobj (alias) values ('post');
+    insert into eventobj (alias) values ('blog');
+    insert into eventobj (alias) values ('exile');
+    insert into eventobj (alias) values ('pers');
+    insert into eventobj (alias) values ('message');
+    insert into eventobj (alias) values ('friend');
+*/
 
 
 
-create sequence seq_eventobj_id;
-create table eventobj(
-    id          decimal primary key default nextval('seq_eventobj_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique  default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    isnews      boolean  default false,
-    created     timestamp       without time zone not null default utcnow(),
-    isdeleted   boolean            default false
-);
 
-create sequence seq_eventact_id;
-create table eventact(
-    id          decimal primary key default nextval('seq_eventact_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique  default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    isnews      boolean  default false,
-    created     timestamp       without time zone not null default utcnow(),
-    isdeleted   boolean            default false
-);
+    insert into eventobj (alias) values ('roomlot');
+    insert into eventobj (alias) values ('roombet');
+    insert into eventtype (alias, isnews) values ('delete_roomlot_expired', false);
 
-create sequence seq_eventspc_id;
-create table eventspc(
-    id          decimal primary key default nextval('seq_eventspc_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique  default nextval('seq_any_ti'),
-    alias       varchar(1024)   unique,
-    isnews      boolean  default false,
-    created     timestamp       without time zone not null default utcnow(),
-    isdeleted   boolean            default false
-);
-
-
-insert into eventtype (alias, isnews) values ('create_exile', true);
-insert into eventtype (alias, isnews) values ('delete_exile_save', true);
-insert into eventtype (alias, isnews) values ('delete_exile_remove_expired', true);
-
-
-alter table event add column
-    target_id decimal default null;
+    insert into eventtype (alias, isnews) values ('delete_roombet_beatrate', false);
+    insert into eventtype (alias, isnews) values ('create_roombet_win', false);
+    insert into eventtype (alias, isnews) values ('delete_roomlot_win', false);
     
-alter table event add column
-    eventobj_id        decimal         references eventobj(id)    default null;
-alter table event add column
-    eventobj_alias     varchar(1024)   references eventobj(alias) default null;
-
-alter table event add column
-    eventact_id        decimal         references eventact(id)    default null;
-alter table event add column
-    eventact_alias     varchar(1024)   references eventact(alias) default null;
-
-alter table event add column
-    eventspc_id        decimal         references eventspc(id)    default null;
-alter table event add column
-    eventspc_alias     varchar(1024)   references eventspc(alias) default null;
 
 
-
-insert into eventact (alias) values ('create');
-insert into eventact (alias) values ('delete');
-insert into eventact (alias) values ('update');
-insert into eventact (alias) values ('repost');
-
-
-insert into eventobj (alias) values ('photo');
-insert into eventobj (alias) values ('post');
-insert into eventobj (alias) values ('blog');
-insert into eventobj (alias) values ('exile');
-insert into eventobj (alias) values ('pers');
-
-
-insert into eventobj (alias) values ('message');
-insert into eventobj (alias) values ('friend');
+    

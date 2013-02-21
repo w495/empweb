@@ -140,6 +140,15 @@ create(Params)->
                                     {id,    Maxprev_owner_id},
                                     {money, {incr, Maxprev_price}}
                                 ]),
+                                %% Шлем сообщение, что ставка бита
+                                {ok, _} = empdb_dao_event:create(Con, [
+                                    {eventobj_alias,    roombet},
+                                    {eventact_alias,    delete},
+                                    {owner_id,          Roombet_owner_id},
+                                    {target_id,         proplists:get_value(id, Maxprev)},
+                                    {pers_id,           Roomlot_owner_id},
+                                    {eventtype_alias,   delete_roombet_beatrate}
+                                ]),
                                 {ok, _} = empdb_dao_pay:create(Con, [
                                     {pers_id,           Maxprev_owner_id},
                                     {paytype_alias,     roombet_in},
@@ -167,7 +176,12 @@ create(Params)->
                             {isincome,          false},
                             {price,             Price}
                         ]),
-                        Roombet = empdb_dao_roombet:create(Con, Params),
+                        Roombet = empdb_dao_roombet:create(Con,[
+                            {filter, [
+                                id
+                            ]}
+                            |Params
+                        ]),
                         case Price =:= Betmax of
                             true ->
                                 %% 
@@ -201,13 +215,28 @@ create(Params)->
                                     {id,        Roomlot_owner_id},
                                     {own_room_id,
                                         proplists:get_value(id, Roompl)},
-                                    {own_room_head,
-                                        proplists:get_value(id, Roompl)},
                                     {citizen_room_id,
                                         proplists:get_value(id, Roompl)},
-                                    {citizen_room_head,
-                                        proplists:get_value(id, Roompl)},
                                     {money,     {incr, Price}}
+                                ]),
+                                %% Победителю шлем сообщение, что он победил
+                                {ok, _} = empdb_dao_event:create(Con, [
+                                    {eventobj_alias,    roombet},
+                                    {eventact_alias,    create},
+                                    {owner_id,          Roombet_owner_id},
+                                    {target_id,         proplists:get_value(id, Roombet)},
+                                    {pers_id,           Roomlot_owner_id},
+                                    {eventtype_alias,   create_roombet_win}
+                                ]),
+                                %% Владельцу аукциона шлем сообщение,
+                                %% что аукцион окончен
+                                {ok, _} = empdb_dao_event:create(Con, [
+                                    {eventobj_alias,    roomlot},
+                                    {eventact_alias,    delete},
+                                    {owner_id,          Roomlot_owner_id},
+                                    {doc_id,            Roomlot_id},
+                                    {pers_id,           Roombet_owner_id},
+                                    {eventtype_alias,   delete_roomlot_win}
                                 ]),
                                 {ok, _} = empdb_dao_roomlot:update(Con,[
                                     {filter, [
