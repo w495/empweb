@@ -36,6 +36,7 @@
 
 
 create(Params)->
+    Room_authority_alias = inhabitant,
     empdb_dao:with_transaction(fun(Con)->
         {ok, [{Mbownerpl}]} =
             empdb_dao_pers:get(Con, [
@@ -46,7 +47,11 @@ create(Params)->
                 {fields, [
                     id,
                     nick,
-                    money
+                    money,
+                    exper,
+                    authority_id,
+                    authority_alias,
+                    authority_level
                 ]},
                 {limit, 1}
             ]),
@@ -80,19 +85,32 @@ create(Params)->
         io:format("~n~n~n Mbroomobjs  = ~p~n~n~n", [Mbroomobjs ]),
 
         {ok,[{Servicepl}]} =
-            empdb_dao_service:get(
-                Con,
-                [
+            empdb_dao_service:get( Con, [
                     {alias, create_room_price},
                     {fields, [price]},
                     {limit, 1}
-                ]
-            ),
+            ]),
 
+        {ok, [{Authority}]} =
+            empdb_dao_authority:get(Con, [
+                {alias, Room_authority_alias},
+                {limit, 1}
+            ]),
+            
         Price = proplists:get_value(price, Servicepl),
         Money = proplists:get_value(money, Mbownerpl),
-        case {Price =< Money, Mbroomobjs} of
-            {true, []} ->
+
+        Room_authority_level =
+            proplists:get_value(level, Authority),
+
+        Pers_authority_level =
+            proplists:get_value(authority_level, Mbownerpl),
+
+        Pers_authority_alias =
+            proplists:get_value(authority_alias, Mbownerpl),
+
+        case {Money >= Price, Pers_authority_level >= Room_authority_level,  Mbroomobjs} of
+            {true, true, []} ->
                 case empdb_dao_room:create(Con, Params) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
@@ -125,7 +143,7 @@ create(Params)->
                     Else ->
                         Else
                 end;
-            {true, Mbroomobjs} ->
+            {true, true, Mbroomobjs} ->
                 case lists:foldl(
                     fun
                         (_, {error,{not_unique_owner,Owner_id}})->
@@ -147,7 +165,14 @@ create(Params)->
                     Not_unique_owner ->
                         Not_unique_owner
                 end;
-            {false, _ }->
+            {true, false,  _ }->
+                {error, {not_enough_money, {[
+                    {pers_authority_alias, Pers_authority_alias},
+                    {pers_authority_level, Pers_authority_level},
+                    {room_authority_alias, Room_authority_alias},
+                    {room_authority_level, Room_authority_level}
+                ]}}};
+            {false, true,  _ }->
                 {error, {not_enough_money, {[
                     {money, Money},
                     {price, Price}
