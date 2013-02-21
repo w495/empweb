@@ -166,6 +166,7 @@ remove_expired()->
                     ]}
                 ]) of
                     {ok, [{Maxbetpl}]} ->
+                        Maxbetpl_id = proplists:get_value(id, Maxbetpl),
                         Owner_id    = proplists:get_value(owner_id, Maxbetpl),
                         Price       = proplists:get_value(price,    Maxbetpl),
                         {ok, _} =
@@ -194,6 +195,17 @@ remove_expired()->
                                 {roombet_price,     null},
                                 {owner_id,          Owner_id}
                             ]),
+                        %% Победителю шлем сообщение, что он победил
+                        {ok, _} = empdb_dao_event:create(Con, [
+                            {eventobj_alias,    roombet},
+                            {eventact_alias,    create},
+                            {owner_id,          Owner_id},
+                            {target_id,         Maxbetpl_id},
+                            {pers_id,           Roomlot_owner_id},
+                            {eventtype_alias,   create_roombet_win}
+                        ]),
+                        %% Владельцу аукциона шлем сообщение,
+                        %% что аукцион окончен
                         empdb_dao_event:create(Con, [
                             {eventobj_alias,    roomlot},
                             {eventact_alias,    delete},
