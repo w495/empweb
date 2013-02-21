@@ -803,7 +803,23 @@ repost_comment(Params)->
 create_comment(Params)->
     empdb_dao:with_transaction(fun(Con)->
         %% Создаем
-        empdb_dao_comment:create(Con, Params)
+        {ok, [{Parentpl}]} =
+            empdb_dao_doc:get(Con, [
+                {id, proplists:get_value(parent_id, Params, null)},
+                {limit, 1},
+                {fields, [owner_id]}
+            ]),
+        Wfoe =
+            empdb_biz_pers:wfoe(
+                fun(Con1)->
+                    empdb_dao_comment:create(Con1, Params)
+                end,
+                [
+                    {friend_id, proplists:get_value(owner_id, Parentpl, null)},
+                    {pers_id,   proplists:get_value(owner_id, Params, null)}
+                ]
+            ),
+        Wfoe(Con)
     end).
 
 update_comment(Params)->
