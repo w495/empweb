@@ -80,6 +80,13 @@ table({fields, all})->
         orig_owner_id,
         orig_owner_nick,
         isnews,
+        eventobj_id,
+        eventobj_alias,
+        eventact_id,
+        eventact_alias,
+        eventspc_id,
+        eventspc_alias,
+        target_id,
         created,
         isdeleted
     ];

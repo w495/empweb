@@ -2124,6 +2124,103 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+        %% ==================================================
+            <<"count_eventobj">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   count
+                };
+            <<"get_eventobj">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   'get'
+                };
+            <<"get_all_eventobjs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   'get'
+                };
+            <<"create_eventobj">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   create
+                };
+            <<"update_eventobj">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   update
+                };
+            <<"delete_eventobj">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventobj,
+                    action          =   delete
+                };
+
+
+        %% ==================================================
+            <<"count_eventact">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   count
+                };
+            <<"get_eventact">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   'get'
+                };
+            <<"get_all_eventacts">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   'get'
+                };
+            <<"create_eventact">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   create
+                };
+            <<"update_eventact">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   update
+                };
+            <<"delete_eventact">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventact,
+                    action          =   delete
+                };
+
+        %% ==================================================
+            <<"count_eventspc">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   count
+                };
+            <<"get_eventspc">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   'get'
+                };
+            <<"get_all_eventspcs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   'get'
+                };
+            <<"create_eventspc">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   create
+                };
+            <<"update_eventspc">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   update
+                };
+            <<"delete_eventspc">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_eventspc,
+                    action          =   delete
+                };
         %% ==================================================
             <<"count_event">> ->
                 Eh#empweb_hap{

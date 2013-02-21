@@ -697,10 +697,12 @@ repost_post(Params)->
         case empdb_biz_doc:repost(
             empdb_dao_post,
             Con,
-            [{fields, [owner_id, head]}|Params]
+            [{fields, [owner_id, id]}|Params]
         ) of
             {ok, [{Postpl}]} ->
                 empdb_daowp_event:feedfriends([
+                    {eventobj_alias,    post},
+                    {eventact_alias,    repost},
                     {pers_id,           proplists:get_value(owner_id,   Postpl)},
                     {doc_id,            proplists:get_value(id,         Postpl)},
                     {eventtype_alias,   repost_post}
@@ -713,9 +715,11 @@ repost_post(Params)->
 
 create_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        case empdb_dao_post:create(Con, [{fields, [id, owner_id, head]}|Params]) of
+        case empdb_dao_post:create(Con, [{fields, [id, owner_id]}|Params]) of
             {ok, [{Postpl}]} ->
                 empdb_daowp_event:feedfriends([
+                    {eventobj_alias,    post},
+                    {eventact_alias,    create},
                     {pers_id,           proplists:get_value(owner_id, Postpl)},
                     {doc_id,            proplists:get_value(id,     Postpl)},
                     {eventtype_alias,   create_post}
@@ -896,6 +900,8 @@ create_message(Params)->
             case empdb_dao_message:create(Con, [{fields, [reader_id, id, owner_id]}|Params]) of
                 {ok, [{Messpl}]} ->
                     empdb_dao_event:create(emp, [
+                        {eventobj_alias,    message},
+                        {eventact_alias,    create},
                         {owner_id,          proplists:get_value(reader_id, Messpl)},
                         {doc_id,            proplists:get_value(id, Messpl)},
                         {pers_id,           proplists:get_value(owner_id, Messpl)},

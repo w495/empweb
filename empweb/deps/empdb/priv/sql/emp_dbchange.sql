@@ -1113,7 +1113,6 @@ insert into eventtype (alias, isnews) values ('repost_post_my', false);
 insert into eventtype (alias, isnews) values ('repost_photo_my', false);
 
 
-
 create sequence seq_event_id;
 create table event(
     id                  decimal primary key default     nextval('seq_event_id'),
@@ -1132,6 +1131,16 @@ create table event(
     eventtype_id        decimal         references eventtype(id)    default null,
     eventtype_alias     varchar(1024)   references eventtype(alias) default null,
 
+    eventobj_id        decimal         references eventobj(id)    default null,
+    eventobj_alias     varchar(1024)   references eventobj(alias) default null,
+
+    eventact_id        decimal         references eventact(id)    default null,
+    eventact_alias     varchar(1024)   references eventact(alias) default null,
+
+    eventspc_id        decimal         references eventspc(id)    default null,
+    eventspc_alias     varchar(1024)   references eventspc(alias) default null,
+
+    target_id       decimal                                     default null,
     doc_id          decimal         references doc(id)          default null,
     doc_head        varchar(1024)                               default null,
     doc_owner_id    decimal         references pers(id)         default null,
@@ -1153,3 +1162,85 @@ create table event(
     isdeleted           boolean default false
 );
 
+
+
+create sequence seq_eventobj_id;
+create table eventobj(
+    id          decimal primary key default nextval('seq_eventobj_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isnews      boolean  default false,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   boolean            default false
+);
+
+create sequence seq_eventact_id;
+create table eventact(
+    id          decimal primary key default nextval('seq_eventact_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isnews      boolean  default false,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   boolean            default false
+);
+
+create sequence seq_eventspc_id;
+create table eventspc(
+    id          decimal primary key default nextval('seq_eventspc_id'),
+    /**
+        Номер языковой сущности
+    **/
+    name_ti     decimal unique  default nextval('seq_any_ti'),
+    alias       varchar(1024)   unique,
+    isnews      boolean  default false,
+    created     timestamp       without time zone not null default utcnow(),
+    isdeleted   boolean            default false
+);
+
+
+insert into eventtype (alias, isnews) values ('create_exile', true);
+insert into eventtype (alias, isnews) values ('delete_exile_save', true);
+insert into eventtype (alias, isnews) values ('delete_exile_remove_expired', true);
+
+
+alter table event add column
+    target_id decimal default null;
+    
+alter table event add column
+    eventobj_id        decimal         references eventobj(id)    default null;
+alter table event add column
+    eventobj_alias     varchar(1024)   references eventobj(alias) default null;
+
+alter table event add column
+    eventact_id        decimal         references eventact(id)    default null;
+alter table event add column
+    eventact_alias     varchar(1024)   references eventact(alias) default null;
+
+alter table event add column
+    eventspc_id        decimal         references eventspc(id)    default null;
+alter table event add column
+    eventspc_alias     varchar(1024)   references eventspc(alias) default null;
+
+
+
+insert into eventact (alias) values ('create');
+insert into eventact (alias) values ('delete');
+insert into eventact (alias) values ('update');
+insert into eventact (alias) values ('repost');
+
+
+insert into eventobj (alias) values ('photo');
+insert into eventobj (alias) values ('post');
+insert into eventobj (alias) values ('blog');
+insert into eventobj (alias) values ('exile');
+insert into eventobj (alias) values ('pers');
+
+
+insert into eventobj (alias) values ('message');
+insert into eventobj (alias) values ('friend');

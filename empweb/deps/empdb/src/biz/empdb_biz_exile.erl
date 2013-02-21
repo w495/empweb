@@ -50,11 +50,29 @@ create(Params)->
     empdb_dao:with_transaction(fun(Con)->
         case empdb_dao_exile:get(Con, [{isdeleted, false}|Params]) of
             {ok, []} ->
-                empdb_dao_exile:create(Con, Params);
+                case empdb_dao_exile:create(Con,[
+                    {fields, [
+                        owner_id,
+                        sender_id
+                    ]}
+                    |Params
+                ]) of
+                    {ok, [{Exilepl}]} ->
+                        empdb_dao_event:create(emp, [
+                            {eventobj_alias,    exile},
+                            {eventact_alias,    create},
+                            {owner_id,          proplists:get_value(pers_id, Exilepl)},
+                            {pers_id,           proplists:get_value(sender_id , Exilepl)},
+                            {eventtype_alias,   create_exile}
+                        ]),
+                        {ok, [{Exilepl}]};
+                    Elsecreate ->
+                        Elsecreate
+                end;
             {ok, _} ->
                 {error, not_uniq_exile};
-            Else ->
-                Else
+            Elseget ->
+                Elseget
         end
     end).
 
@@ -179,7 +197,7 @@ delete_by_pers_id(Con, {ok, [{Params}]}, Savior_id)->
                     {money, {decr, Price}}
                 ]),
             {ok, [{Respl}]} =
-                empdb_dao_exile:update(Con, [
+                case empdb_dao_exile:update(Con, [
                     {filter, [
                         {isdeleted, false},
                         {id, Id}
@@ -188,7 +206,19 @@ delete_by_pers_id(Con, {ok, [{Params}]}, Savior_id)->
                         {isdeleted, true},
                         {savior_id, Savior_id}
                     ]}
-                ]),
+                ]) of
+                    {ok, [{Exilepl}]} ->
+                        empdb_dao_event:create(emp, [
+                            {eventobj_alias,    exile},
+                            {eventact_alias,    delete},
+                            {owner_id,          Pers_id},
+                            {pers_id,           Savior_id},
+                            {eventtype_alias,   delete_exile_save}
+                        ]),
+                        {ok, [{Exilepl}]};
+                    Elseupdate ->
+                        Elseupdate
+                end,
             {ok, [{[
                 {price, Price},
                 {money, Money - Price}
@@ -209,17 +239,38 @@ timeout()->
 remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
         Nowdt = {date(), time()},
-        {ok, Dexiles} =
-            empdb_dao_exile:update(Con,[
-                {filter, [
-                    {isdeleted, false},
-                    {expired, {lt, Nowdt}}
-                ]},
-                {values, [
-                    {isdeleted, true}
-                ]}
-            ]),
-        {ok, Dexiles}
+        case empdb_dao_exile:update(Con,[
+            {filter, [
+                {isdeleted, false},
+                {expired, {lt, Nowdt}}
+            ]},
+            {fields, [
+                id,
+                owner_id,
+                sender_id
+            ]},
+            {values, [
+                {isdeleted, true}
+            ]}
+        ]) of
+            {ok, Dexiles} ->
+                lists:map(
+                    fun({Dexilepl})->
+                        empdb_dao_event:create(emp, [
+                            {eventobj_alias,    exile},
+                            {eventact_alias,    delete},
+                            {target_id,         proplists:get_value(id, Dexilepl)},
+                            {owner_id,          proplists:get_value(pers_id, Dexilepl)},
+                            {pers_id,           proplists:get_value(sender_id , Dexilepl)},
+                            {eventtype_alias,   delete_exile_expired}
+                        ])
+                    end,
+                    Dexiles
+                ),
+                {ok, Dexiles};
+            Elseupdate ->
+                Elseupdate
+        end
     end).
 
 is_owner(Uid, Oid)->

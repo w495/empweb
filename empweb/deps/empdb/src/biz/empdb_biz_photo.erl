@@ -33,12 +33,46 @@
 
 repost(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_biz_doc:repost(empdb_dao_photo, Con, Params)
+        case empdb_biz_doc:repost(
+            empdb_dao_photo,
+            Con,
+            [{fields, [owner_id, id]}|Params]
+        ) of
+            {ok, [{Postpl}]} ->
+                empdb_daowp_event:feedfriends([
+                    {eventobj_alias,    photo},
+                    {eventact_alias,    repost},
+                    {pers_id,           proplists:get_value(owner_id,   Postpl)},
+                    {doc_id,            proplists:get_value(id,         Postpl)},
+                    {eventtype_alias,   repost_photo}
+                ]),
+                {ok, [{Postpl}]};
+            Else ->
+                Else
+        end
     end).
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_photo:create(Con, Params)
+        %% empdb_dao_photo:create(Con, Params)
+        case empdb_dao_photo:create(Con, [
+            {fields, [
+                id, owner_id
+            ]}
+            |Params
+        ]) of
+            {ok, [{Postpl}]} ->
+                empdb_daowp_event:feedfriends([
+                    {eventobj_alias,    photo},
+                    {eventact_alias,    repost},
+                    {pers_id,           proplists:get_value(owner_id, Postpl)},
+                    {doc_id,            proplists:get_value(id,     Postpl)},
+                    {eventtype_alias,   create_photo}
+                ]),
+                {ok, [{Postpl}]};
+            Else ->
+                Else
+        end
     end).
 
 update(Params)->

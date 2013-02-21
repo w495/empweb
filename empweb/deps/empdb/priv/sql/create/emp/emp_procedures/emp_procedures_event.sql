@@ -1,15 +1,13 @@
 \echo :FILE 'in'
 
-
-
 /**
     @doc Обеспечивает совместное состояние события
 **/
 
-
 create or replace function event_util_fields_on_insert() returns "trigger" as $$
 begin
     if (not (new.doc_id is null)) then
+        new.target_id = new.doc_id;
         new.doc_head =
             (select doc.head from doc where doc.id = new.doc_id);
         new.doc_owner_id =
@@ -37,7 +35,6 @@ begin
         new.orig_owner_nick =
             (select doc.orig_owner_nick from doc where doc.id = new.doc_id);
     end if;
-    
     if (new.owner_nick is null) then
         if not (new.owner_id is null) then
             new.owner_nick =
@@ -50,7 +47,6 @@ begin
         new.owner_id           =
             (select pers.id from pers where pers.nick = new.owner_nick);
     end if;
-
     if (not (new.eventtype_id is null)) and (new.eventtype_alias is null) then
         new.eventtype_alias =
             (select eventtype.alias
@@ -79,6 +75,54 @@ begin
                 where
                     eventtype.alias = new.eventtype_alias);
     end if;
+    if (not (new.eventobj_id is null)) and (new.eventobj_alias is null) then
+        new.eventobj_alias =
+            (select eventobj.alias
+                from
+                    eventobj
+                where
+                    eventobj.id = new.eventobj_id);
+    end if;
+    if (new.eventobj_id is null) and (not (new.eventobj_alias is null)) then
+        new.eventobj_id =
+            (select eventobj.id
+                from
+                    eventobj
+                where
+                    eventobj.alias = new.eventobj_alias);
+    end if;
+    if (not (new.eventact_id is null)) and (new.eventact_alias is null) then
+        new.eventact_alias =
+            (select eventact.alias
+                from
+                    eventact
+                where
+                    eventact.id = new.eventact_id);
+    end if;
+    if (new.eventact_id is null) and (not (new.eventact_alias is null)) then
+        new.eventact_id =
+            (select eventact.id
+                from
+                    eventact
+                where
+                    eventact.alias = new.eventact_alias);
+    end if;
+    if (not (new.eventspc_id is null)) and (new.eventspc_alias is null) then
+        new.eventspc_alias =
+            (select eventspc.alias
+                from
+                    eventspc
+                where
+                    eventspc.id = new.eventspc_id);
+    end if;
+    if (new.eventspc_id is null) and (not (new.eventspc_alias is null)) then
+        new.eventspc_id =
+            (select eventspc.id
+                from
+                    eventspc
+                where
+                    eventspc.alias = new.eventspc_alias);
+    end if;
     if (new.pers_nick is null) then
         if not (new.pers_id is null) then
             new.pers_nick =
@@ -93,6 +137,7 @@ begin
     end if;
     if (new.friendtype_alias is null) then
         if not (new.friendtype_id is null) then
+            new.target_id = new.friendtype_id;
             new.friendtype_alias =
                 (select friendtype.alias
                     from friendtype
@@ -100,12 +145,12 @@ begin
         end if;
     end if;
     if (new.friendtype_id is null) then
+        new.target_id = new.friendtype_id;
         new.friendtype_id           =
             (select friendtype.id
                 from friendtype
                     where friendtype.alias = new.friendtype_alias);
     end if;
-
     return new;
 end;
 $$ language plpgsql;

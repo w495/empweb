@@ -93,12 +93,47 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = body,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
                 key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = friendtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
@@ -111,8 +146,99 @@ handle(_req, #empweb_hap{
                 key         = eventtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doc_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = doc_owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doc_owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = doc_parent_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doctype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doctype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = orig_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = orig_owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = orig_owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isnews,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = eventobj_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventobj_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = eventact_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventact_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = eventspc_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventspc_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = target_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             }
-            |empweb_norm_doc:norm('get')
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -141,12 +267,47 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = body,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
                 key         = pers_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = pers_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = friendtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
@@ -159,8 +320,98 @@ handle(_req, #empweb_hap{
                 key         = eventtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doc_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = doc_owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doc_owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = doc_parent_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doctype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = doctype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = orig_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = orig_owner_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = orig_owner_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isnews,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
+                key         = eventobj_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventobj_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = eventact_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventact_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = eventspc_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = eventspc_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = target_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             }
-            |empweb_norm_doc:norm('get')
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -185,6 +436,31 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+                        #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = body,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
             #norm_rule{
                 key         = pers_id,
                 required    = false,
@@ -192,6 +468,16 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = friendtype_alias,
                 required    = false,
                 types       = [nullable, string]
             },
@@ -204,8 +490,98 @@ handle(_req, #empweb_hap{
                 key         = eventtype_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_parent_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = orig_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isnews,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = eventobj_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventobj_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventact_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventact_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventspc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventspc_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = target_id,
+                required    = false,
+                types       = [nullable, integer]
             }
-            |empweb_norm_doc:norm('create')
+            |empweb_norm:norm('create')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -229,6 +605,31 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+                       #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = body,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
             #norm_rule{
                 key         = pers_id,
                 required    = false,
@@ -236,6 +637,16 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = friendtype_alias,
                 required    = false,
                 types       = [nullable, string]
             },
@@ -248,8 +659,98 @@ handle(_req, #empweb_hap{
                 key         = eventtype_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_parent_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = orig_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isnews,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = eventobj_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventobj_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventact_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventact_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventspc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventspc_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = target_id,
+                required    = false,
+                types       = [nullable, integer]
             }
-            |empweb_norm_doc:norm('update')
+            |empweb_norm:norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
@@ -273,6 +774,31 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+                        #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = body,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
             #norm_rule{
                 key         = pers_id,
                 required    = false,
@@ -280,6 +806,16 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = pers_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = friendtype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = friendtype_alias,
                 required    = false,
                 types       = [nullable, string]
             },
@@ -292,8 +828,98 @@ handle(_req, #empweb_hap{
                 key         = eventtype_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doc_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = doc_parent_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = doctype_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = orig_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = orig_owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isnews,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
+                key         = eventobj_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventobj_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventact_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventact_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = eventspc_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = eventspc_alias,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = target_id,
+                required    = false,
+                types       = [nullable, integer]
             }
-            |empweb_norm_doc:norm('update')
+            |empweb_norm:norm('update')
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
