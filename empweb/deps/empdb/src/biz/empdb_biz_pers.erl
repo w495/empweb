@@ -754,7 +754,6 @@ ca(L, R) ->
 login(Params) ->
     io:format("Params = ~p ~n~n~n~n", [Params]),
 
-    
     Id      = proplists:get_value(id,       Params),
     Login   = proplists:get_value(login,    Params),
     Nick    = proplists:get_value(nick,    Params),
@@ -784,7 +783,10 @@ login({Uf, Uv}, Params) ->
     EC = 0,
     empdb_dao:with_transaction(emp, fun(Con)->
         io:format("Params = ~p ~n~n~n~n", [Params]),
-        case empdb_dao_pers:get(Con, [{isdeleted, false}|Params]) of
+        case empdb_dao_pers:get(Con, [
+            {isdeleted, false}
+            |Params
+        ]) of
             {ok, [{Userpl}]} ->
                 {ok, Perm_list} =
                     empdb_dao_pers:get_perm(
@@ -1057,15 +1059,32 @@ login({Uf, Uv}, Params) ->
                         ]}]}
                 end;
             _ ->
-                %% Нет такого пользователя
-                {error,
-                    {bad_pers,
-                        {[
-                            {Uf,    Uv},
-                            {pass,  Mbpass}
-                        ]}
-                    }
-                }
+                case empdb_dao_pers:get(Con, [
+                    {isdeleted, true},
+                    {istimeover, true}
+                    |Params
+                ]) of
+                    {ok, [{_Timeoeruserpl}]} ->
+                        %% Нет такого пользователя
+                        {error,
+                            {bad_pers,
+                                {[
+                                    {Uf,    Uv},
+                                    {istimeover, true}
+                                ]}
+                            }
+                        };
+                    _ ->
+                        %% Нет такого пользователя
+                        {error,
+                            {bad_pers,
+                                {[
+                                    {Uf,    Uv},
+                                    {pass,  Mbpass}
+                                ]}
+                            }
+                        }
+                end
         end
     end).
     

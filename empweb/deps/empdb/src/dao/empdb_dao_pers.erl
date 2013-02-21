@@ -232,6 +232,7 @@ table({fields, all})->
         % allowauctoffer,
         perspicbody_id,
         perspichead_id,
+        istimeover,
         isdeleted
     ];
 

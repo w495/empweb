@@ -1223,5 +1223,6 @@ insert into eventtype (alias) values ('create_mail');
     insert into eventtype (alias, isnews) values ('delete_roomlot_win', false);
     
 
+    alter table pers add column
+        istimeover          boolean default false;
 
-    

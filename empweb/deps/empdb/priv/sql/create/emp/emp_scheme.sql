@@ -581,6 +581,12 @@ create table pers(
         количество обновлений
     **/
     nupdates            decimal default 0,
+
+    /**
+        флаг удаления по времени
+    **/
+    istimeover          boolean default false,
+    
     /**
         флаг удаления
     **/    
