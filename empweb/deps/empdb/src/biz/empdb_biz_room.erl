@@ -166,7 +166,7 @@ create(Params)->
                         Not_unique_owner
                 end;
             {true, false,  _ }->
-                {error, {not_enough_money, {[
+                {error, {not_enough_authority, {[
                     {pers_authority_alias, Pers_authority_alias},
                     {pers_authority_level, Pers_authority_level},
                     {room_authority_alias, Room_authority_alias},
