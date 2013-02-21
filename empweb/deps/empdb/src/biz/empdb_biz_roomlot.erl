@@ -227,6 +227,16 @@ remove_expired()->
                                     proplists:get_value(id, Roompl)}
                             ]);
                     _ ->
+
+                        %% Владельцу аукциона шлем сообщение,
+                        %% что аукцион окончен
+                        empdb_dao_event:create(Con, [
+                            {eventobj_alias,    roomlot},
+                            {eventact_alias,    delete},
+                            {owner_id,          Roomlot_owner_id},
+                            {doc_id,            Roomlot_id},
+                            {eventtype_alias,   delete_roomlot_expired}
+                        ]),
                         ok
                 end
             end,
