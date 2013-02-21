@@ -1079,7 +1079,7 @@ login({Uf, Uv}, Params) ->
                             |Userpl
                         ]}]}
                 end;
-            _ ->
+            X ->
                 case empdb_dao_pers:get(Con, [
                     {isdeleted, true},
                     {istimeover, true}
@@ -1095,8 +1095,9 @@ login({Uf, Uv}, Params) ->
                                 ]}
                             }
                         };
-                    _ ->
+                    Y ->
                         %% Нет такого пользователя
+                        io:format("~n~n~n X = ~p ~n~n~n ~n~n~n ", [X]),
                         {error,
                             {bad_pers,
                                 {[

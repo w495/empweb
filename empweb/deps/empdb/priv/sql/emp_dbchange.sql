@@ -1228,7 +1228,7 @@ insert into eventtype (alias) values ('create_mail');
 
 
 
-alter table doc add column
+alter table pers add column
     isostatusable       boolean         default true;
 
 
