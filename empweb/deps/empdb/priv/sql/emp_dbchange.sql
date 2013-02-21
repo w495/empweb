@@ -1226,3 +1226,16 @@ insert into eventtype (alias) values ('create_mail');
     alter table pers add column
         istimeover          boolean default false;
 
+
+
+alter table doc add column
+    isostatusable       boolean         default true;
+
+
+alter table doc add column
+    head_ti     decimal unique default nextval('seq_any_ti');
+
+
+alter table doc add column
+    body_ti     decimal unique default nextval('seq_any_ti');
+

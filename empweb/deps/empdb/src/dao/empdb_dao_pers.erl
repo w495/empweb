@@ -179,9 +179,10 @@ table({fields, all})->
         pstatus_id,
         pstatus_alias,
 
-        %% Чиновничий
+        %% Чиновничий статус
         ostatus_id,
         ostatus_alias,
+        isostatusable,
         
         authority_id,
         authority_alias,

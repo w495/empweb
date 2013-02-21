@@ -996,6 +996,11 @@ handle(_req, #empweb_hap{
                         required    = false,
                         types       = [nullable, string]
                     },
+                    #norm_rule{
+                        key         = isostatusable,
+                        required    = false,
+                        types       = [nullable, boolean]
+                    },
                 %%
                     #norm_rule{
                         key         = pstatus_id,

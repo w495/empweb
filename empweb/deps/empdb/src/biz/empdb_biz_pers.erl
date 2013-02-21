@@ -400,7 +400,28 @@ update_(Params)->
         end
     end).
 
-update(Con, {nick, undefined},  {Function, [Params]}, _mbperspl) ->
+
+update(Con, {ostatus_alias, Ostatusid},  {Function, [Params]}, Mbperspl) ->
+    case proplists:get_value(isostatusable, Mbperspl) of
+        true ->
+            Function(Con, Params);
+        _ ->
+            {error, {isnt_isostatusable, {[
+                {isostatusable, false}
+            ]}}}
+    end;
+
+update(Con, {ostatus_id, Ostatusid},  {Function, [Params]}, Mbperspl) ->
+    case proplists:get_value(isostatusable, Mbperspl) of
+        true ->
+            Function(Con, Params);
+        _ ->
+            {error, {isnt_isostatusable, {[
+                {isostatusable, false}
+            ]}}}
+    end;
+
+update(Con, {nick, undefined},  {Function, [Params]}, Mbperspl) ->
     Function(Con, Params);
 
 update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->

@@ -320,31 +320,6 @@ create table mstatus(
 -- --
 
 
-create sequence seq_perspichead_id;
-create table perspichead(
-    id          decimal primary key default nextval('seq_perspichead_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique default nextval('seq_any_ti'),
-    file_id     decimal references file(id) default null,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
-);
-
-create sequence seq_perspicbody_id;
-create table perspicbody(
-    id          decimal primary key default nextval('seq_perspicbody_id'),
-    /**
-        Номер языковой сущности
-    **/
-    name_ti     decimal unique default nextval('seq_any_ti'),
-    file_id     decimal references file(id) default null,
-    created     timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
-);
-
-
 
 
 ------------------------------------------------------------------------------
@@ -402,7 +377,7 @@ create table geo(
     **/
     nnodes          decimal default 0,
     created         timestamp without time zone not null default utcnow(),
-    isdeleted   boolean default false
+    isdeleted       boolean default false
 );
 
 
@@ -470,6 +445,7 @@ create table pers(
     /**
         Чиновничий статус пользователя
     **/
+    isostatusable       boolean         default true,
     ostatus_id          decimal         references ostatus(id)    default null,
     ostatus_alias       varchar(1024)   references ostatus(alias) default null,
 
@@ -824,6 +800,9 @@ create table doc(
     id                  decimal primary key default     nextval('seq_doc_id'),
     head                text,
     body                text default null,
+    head_ti             decimal unique default nextval('seq_any_ti');
+    body_ti             decimal unique default nextval('seq_any_ti');
+
     /**
         Владелец документа
     **/
@@ -1074,23 +1053,35 @@ create table photo(
 
 
 create table wall(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
 );
 
 create table back(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
 );
 
 create table flag(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
 );
 
 create table arms(
-    doc_id              decimal unique references doc(id),
-    file_id             decimal references file(id)     default null,
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
+);
+
+
+create table perspichead(
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
+);
+
+
+create table perspicbody(
+    doc_id      decimal unique references doc(id),
+    file_id     decimal references file(id)     default null,
 );
 
 
