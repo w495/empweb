@@ -457,6 +457,12 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
+        %% Работает или нет
+            #norm_rule{
+                key         = isempl,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
         %% Род занятий
             #norm_rule{
                 key         = empl,
@@ -499,13 +505,13 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             },
-        %% Комната
+        %% Комната, где находится
             #norm_rule{
                 key         = live_room_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
-        %% Комната
+        %% Комната, где гражданин
             #norm_rule{
                 key         = citizen_room_id,
                 required    = false,
@@ -515,7 +521,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = live_room_pos,
                  required   = false,
-                types       = empweb_norm:filter([nullable, 'float']) 
+                types       = empweb_norm:filter([nullable, 'float'])
             },
         %% Тип комнаты
             #norm_rule{
@@ -560,17 +566,6 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-        %% Невидимость пользователя
-            #norm_rule{
-                key         = invistype_id,
-                required    = false,
-                types       = empweb_norm:filter([nullable, integer])
-            },
-            #norm_rule{
-                key         = invistype_alias,
-                required    = false,
-                types       = empweb_norm:filter([nullable, string])
-            },
         %% Чиновничий статус пользователя
             #norm_rule{
                 key         = ostatus_id,
@@ -581,6 +576,11 @@ handle(_req, #empweb_hap{
                 key         = ostatus_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isostatusable,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             },
         %% Статус пользователя
             #norm_rule{
@@ -784,6 +784,11 @@ handle(_req, #empweb_hap{
                 key         = ostatus_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = isostatusable,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             },
         %% Статус пользователя
             #norm_rule{
