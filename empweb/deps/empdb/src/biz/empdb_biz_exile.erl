@@ -62,7 +62,7 @@ create(Params)->
                         empdb_dao_event:create(emp, [
                             {eventobj_alias,    exile},
                             {eventact_alias,    create},
-                            {target_id,         proplists:get_value(id, Exilepl)},
+                            {target_id,         sproplists:get_value(id, Exilepl)},
                             {owner_id,          proplists:get_value(pers_id, Exilepl)},
                             {pers_id,           proplists:get_value(sender_id , Exilepl)},
                             {eventtype_alias,   create_exile}
