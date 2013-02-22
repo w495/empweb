@@ -233,12 +233,29 @@ begin
             (select room.roomtype_alias from room
                 where room.doc_id = new.live_room_id);
     end if;
-    
-    if new.citizen_room_id != old.citizen_room_id then
+
+    if (new.citizen_room_id != old.citizen_room_id) then
         new.citizen_room_head =
             (select doc.head from doc
                 where doc.id = new.citizen_room_id);
         new.citizen_room_fromdatetime = utcnow();
+        new.ostatus_alias = 'citizen';
+        new.ostatus_id =
+            (select id from ostatus   where alias = new.ostatus_alias);
+
+    else
+        if new.ostatus_id != old.ostatus_id then
+            new.ostatus_alias =
+                (select ostatus.alias
+                    from ostatus
+                        where ostatus.id = new.ostatus_id);
+        end if;
+        if new.ostatus_alias != old.ostatus_alias then
+            new.ostatus_id =
+                (select ostatus.id
+                    from ostatus
+                        where ostatus.alias = new.ostatus_alias);
+        end if;
     end if;
 
     if (
@@ -285,54 +302,6 @@ begin
         update community set ncands = ncands - 1
             where community.doc_id = new.live_community_id;
     end if;
-
-
-
---     if (
---         (new.own_community_id != old.own_community_id)
---     and
---         (not (new.own_community_id is null))
---     and (
---             (not (new.live_community_id is null))
--- --         or
--- --             (not (old.live_community_id is null))
---     )) then
--- --         if (new.live_community_id is null) then
--- --             new.own_community_head =
--- --                 (select doc.head from doc
--- --                     where doc.id = new.own_community_id
--- --                         and doc.doctype_alias = 'community');
--- --             new.live_community_id = new.own_community_head;
--- --             new.live_community_head =
--- --                 (select doc.head from doc
--- --                     where doc.id = new.live_community_id
--- --                         and doc.doctype_alias = 'community');
--- --         else
---         raise exception 'exists_own_community';
---         else
---         new.live_community_id = new.own_community_id;
--- --      end if;
---     end if;
-
-
-
-    /**
-        Чиновничий статус пользователя
-    **/
-
-    if new.ostatus_id != old.ostatus_id then
-        new.ostatus_alias =
-            (select ostatus.alias
-                from ostatus
-                    where ostatus.id = new.ostatus_id);
-    end if;
-    if new.ostatus_alias != old.ostatus_alias then
-        new.ostatus_id =
-            (select ostatus.id
-                from ostatus
-                    where ostatus.alias = new.ostatus_alias);
-    end if;
-
     /**
         Статус online \ offline
     **/
@@ -348,8 +317,6 @@ begin
                 from pstatus
                     where pstatus.alias = new.pstatus_alias);
     end if;
-
-
     if new.exper != old.exper then
         /**
             Авторитет пользователя,
@@ -394,7 +361,6 @@ begin
     else
         new.experlackprice  = null;
     end if;
-
     /**
         Авторитет пользователя
     **/
@@ -414,7 +380,6 @@ begin
                 where
                     roomtype.alias = new.live_roomtype_alias);
     end if;
-    
     /**
         Авторитет пользователя
     **/
@@ -546,7 +511,7 @@ begin
                 where
                     invistype.id = new.invistype_id);
     end if;
-    
+
     if new.live_room_pos != old.live_room_pos then
         if (new.live_room_pos  is null) then
             new.live_room_pos = cast(

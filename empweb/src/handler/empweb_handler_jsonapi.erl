@@ -2399,6 +2399,72 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_service,
                     action          =   delete
                 };
+
+
+        %% ==================================================
+            <<"count_perspichead">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   count
+                };
+            <<"get_perspichead">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   'get'
+                };
+            <<"get_all_perspicheads">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   'get'
+                };
+            <<"create_perspichead">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   create
+                };
+            <<"update_perspichead">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   update
+                };
+            <<"delete_perspichead">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspichead,
+                    action          =   delete
+                };
+
+
+        %% ==================================================
+            <<"count_perspicbody">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   count
+                };
+            <<"get_perspicbody">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   'get'
+                };
+            <<"get_all_perspicbodys">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   'get'
+                };
+            <<"create_perspicbody">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   create
+                };
+            <<"update_perspicbody">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   update
+                };
+            <<"delete_perspicbody">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_perspicbody,
+                    action          =   delete
+                };
             _ -> []
         end,
     ?evman_debug({empweb_jsonapi_action, Hap}),

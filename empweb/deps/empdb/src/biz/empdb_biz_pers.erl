@@ -378,6 +378,22 @@ update_(Params)->
         end
     end).
 
+update(Con, {isostatusable, _},  {Function, [Params]}, Mbperspl) ->
+    case proplists:get_value(ostatus_alias, Mbperspl) of
+        police  ->
+            {error, {isostatusable, {[
+                {ostatus_alias, police}
+            ]}}};
+        officer ->
+            {error, {isostatusable, {[
+                {ostatus_alias, officer}
+            ]}}};
+        _ ->
+            Function(Con, Params)
+    end;
+
+update(Con, {ostatus_alias, citizen},  {Function, [Params]}, Mbperspl) ->
+    Function(Con, Params);
 
 update(Con, {ostatus_alias, Ostatusid},  {Function, [Params]}, Mbperspl) ->
     case proplists:get_value(isostatusable, Mbperspl) of
