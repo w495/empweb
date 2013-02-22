@@ -41,21 +41,24 @@ update(Params)->
     end).
 
 count(Params)->
-    case empdb_dao_event:count(Con, [{isdeleted, false}|Params]) of
-        {ok, [{Allcountpl}]}->
-            {ok, [{Exilecountpl}]} =
-                empdb_dao_event:count(Con, [
-                    {isdeleted,         false},
-                    {eventobj_alias,    exile},
-                    {eventact_alias,    create},
-                    {eventtype_alias,   create_exile}
-                    |Params
-                ]),
-                Exilecount = proplists:get(count, Exilecountpl, 0),
-            {ok, [{[{exilecount, Exilecount}|Allcountpl]}]};
-        Allcountelse ->
-            Allcountelse
-    end
+    empdb_dao:with_connection(fun(Con)->
+        case empdb_dao_event:count(Con, [{isdeleted, false}|Params]) of
+            {ok, [{Allcountpl}]}->
+                {ok, [{Exilecountpl}]} =
+                    empdb_dao_event:count(Con, [
+                        {isdeleted,         false},
+                        {eventobj_alias,    exile},
+                        {eventact_alias,    create},
+                        {eventtype_alias,   create_exile}
+                        |Params
+                    ]),
+                    Exilecount = proplists:get(count, Exilecountpl, 0),
+                {ok, [{[{exilecount, Exilecount}|Allcountpl]}]};
+            Allcountelse ->
+                Allcountelse
+        end
+    end).
+
 
     
 get(Params)->
