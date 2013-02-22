@@ -52,7 +52,7 @@ count(Params)->
                         {eventtype_alias,   create_exile}
                         |Params
                     ]),
-                    Exilecount = proplists:get(count, Exilecountpl, 0),
+                    Exilecount = proplists:get_value(count, Exilecountpl, 0),
                 {ok, [{[{exilecount, Exilecount}|Allcountpl]}]};
             Allcountelse ->
                 Allcountelse
