@@ -277,6 +277,8 @@ get(Params) ->
             nfoes,
             repost_blog,
             repost_album,
+            perspichead,
+            perspicbody,
             friendtype_alias,
             community
         ]
