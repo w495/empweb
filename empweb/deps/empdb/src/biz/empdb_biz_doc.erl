@@ -815,8 +815,8 @@ create_comment(Params)->
                     empdb_dao_comment:create(Con1, Params)
                 end,
                 [
-                    {friend_id, proplists:get_value(owner_id, Parentpl, null)},
-                    {pers_id,   proplists:get_value(owner_id, Params, null)}
+                    {pers_id,   proplists:get_value(owner_id, Parentpl, null)},
+                    {friend_id, proplists:get_value(owner_id, Params, null)}
                 ]
             ),
         Wfoe(Con)
@@ -929,10 +929,10 @@ create_message(Params)->
             end
         end,
         [
-            {pers_id,       proplists:get_value(owner_id, Params)},
-            {pers_nick,     proplists:get_value(owner_nick, Params)},
-            {friend_id,     proplists:get_value(reader_id, Params)},
-            {friend_nick,   proplists:get_value(reader_nick, Params)}
+            {friend_id,     proplists:get_value(owner_id, Params)},
+            {friend_nick,   proplists:get_value(owner_nick, Params)},
+            {pers_id,       proplists:get_value(reader_id, Params)},
+            {pers_nick,     proplists:get_value(reader_nick, Params)}
         ]
     )).
 

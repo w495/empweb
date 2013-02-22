@@ -1107,7 +1107,6 @@ insert into eventtype (alias) values ('create_mail');
     insert into eventtype (alias, isnews) values ('repost_photo', true);
     insert into eventtype (alias, isnews) values ('repost_post_my', false);
     insert into eventtype (alias, isnews) values ('repost_photo_my', false);
-    
     create sequence seq_event_id;
     create table event(
         id                  decimal primary key default     nextval('seq_event_id'),
@@ -1155,7 +1154,6 @@ insert into eventtype (alias) values ('create_mail');
         created     timestamp       without time zone not null default utcnow(),
         isdeleted   boolean            default false
     );
-
     create sequence seq_eventact_id;
     create table eventact(
         id          decimal primary key default nextval('seq_eventact_id'),
@@ -1165,7 +1163,6 @@ insert into eventtype (alias) values ('create_mail');
         created     timestamp       without time zone not null default utcnow(),
         isdeleted   boolean            default false
     );
-
     create sequence seq_eventspc_id;
     create table eventspc(
         id          decimal primary key default nextval('seq_eventspc_id'),
@@ -1175,14 +1172,11 @@ insert into eventtype (alias) values ('create_mail');
         created     timestamp       without time zone not null default utcnow(),
         isdeleted   boolean            default false
     );
-
     insert into eventtype (alias, isnews) values ('create_exile', true);
     insert into eventtype (alias, isnews) values ('delete_exile_save', true);
     insert into eventtype (alias, isnews) values ('delete_exile_remove_expired', true);
-
     alter table event add column
         target_id decimal default null;
-
     alter table event add column
         eventobj_id        decimal         references eventobj(id)    default null;
     alter table event add column
@@ -1197,7 +1191,6 @@ insert into eventtype (alias) values ('create_mail');
         eventspc_id        decimal         references eventspc(id)    default null;
     alter table event add column
         eventspc_alias     varchar(1024)   references eventspc(alias) default null;
-
     insert into eventact (alias) values ('create');
     insert into eventact (alias) values ('delete');
     insert into eventact (alias) values ('update');
@@ -1212,30 +1205,53 @@ insert into eventtype (alias) values ('create_mail');
 */
 
 
+-- 2013.02.22 11:57:31:552364540
 
+/*
 
     insert into eventobj (alias) values ('roomlot');
     insert into eventobj (alias) values ('roombet');
     insert into eventtype (alias, isnews) values ('delete_roomlot_expired', false);
-
     insert into eventtype (alias, isnews) values ('delete_roombet_beatrate', false);
     insert into eventtype (alias, isnews) values ('create_roombet_win', false);
     insert into eventtype (alias, isnews) values ('delete_roomlot_win', false);
-    
-
     alter table pers add column
         istimeover          boolean default false;
+    alter table pers add column
+        isostatusable       boolean         default true;
+    alter table doc add column
+        head_ti     decimal unique default nextval('seq_any_ti');
+    alter table doc add column
+        body_ti     decimal unique default nextval('seq_any_ti');
+*/
+
+
+alter table pers drop column perspichead_id ;
+alter table pers drop column perspicbody_id ;
+drop table perspicbody ;
+drop table perspichead ;
+
+
+
+create table perspichead(
+    doc_id      decimal unique references doc(id),
+    x           decimal default null,
+    y           decimal default null,
+    file_id     decimal references file(id)     default null
+);
+
+
+create table perspicbody(
+    doc_id      decimal unique references doc(id),
+    x           decimal default null,
+    y           decimal default null,
+    file_id     decimal references file(id)     default null
+);
 
 
 
 alter table pers add column
-    isostatusable       boolean         default true;
-
-
-alter table doc add column
-    head_ti     decimal unique default nextval('seq_any_ti');
-
-
-alter table doc add column
-    body_ti     decimal unique default nextval('seq_any_ti');
+    perspichead_id     decimal references perspichead(doc_id);
+alter table pers add column
+    perspicbody_id     decimal references perspicbody(doc_id);
 

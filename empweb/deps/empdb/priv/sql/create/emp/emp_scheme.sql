@@ -529,8 +529,10 @@ create table pers(
     own_room_head       varchar(1024) /*references doc(head)*/ default null,
     
     -- allowauctoffer      boolean default false,
-    perspicbody_id      decimal references perspicbody(id)   default null,
+
     perspichead_id      decimal references perspichead(id)   default null,
+    perspicbody_id      decimal references perspicbody(id)   default null,
+
     /**
         ------------------------------------------------------------
             Внутрениие поля
@@ -1072,16 +1074,19 @@ create table arms(
     file_id     decimal references file(id)     default null,
 );
 
-
 create table perspichead(
     doc_id      decimal unique references doc(id),
-    file_id     decimal references file(id)     default null,
+    x           decimal default null,
+    y           decimal default null,
+    file_id     decimal references file(id)     default null
 );
 
 
 create table perspicbody(
     doc_id      decimal unique references doc(id),
-    file_id     decimal references file(id)     default null,
+    x           decimal default null,
+    y           decimal default null,
+    file_id     decimal references file(id)     default null
 );
 
 

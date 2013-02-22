@@ -121,10 +121,10 @@ create(Params)->
             end
         end,
         [
-            {pers_id,       proplists:get_value(buyer_id,     Params)},
-            {pers_nick,     proplists:get_value(buyer_nick,   Params)},
-            {friend_id,     proplists:get_value(owner_id,     Params, proplists:get_value(buyer_id,     Params))},
-            {friend_nick,   proplists:get_value(owner_nick,   Params, proplists:get_value(buyer_id,     Params))}
+            {friend_id,   proplists:get_value(buyer_id,     Params)},
+            {friend_nick, proplists:get_value(buyer_nick,   Params)},
+            {pers_id,     proplists:get_value(owner_id,     Params, proplists:get_value(buyer_id,     Params))},
+            {pers_nick,   proplists:get_value(owner_nick,   Params, proplists:get_value(buyer_id,     Params))}
         ]
     )).
 
