@@ -1183,19 +1183,28 @@ get_tfparams(Con, {geo_id, Geo_id}, Acc1)->
 get_tfparams(Con, {Key, Value}, Acc1)->
     [{Key, Value}|Acc1].
 
-
-
-get_opt(Params, Options)->
+get_opt(Params1, Options)->
+    Fields =
+        lists:foldl(
+            fun (perspichead, Acc)->
+                [perspichead, perspichead_id|Acc];
+                (perspicbody, Acc)->
+                [perspicbody, perspicbody_id|Acc];
+                (Field, Acc)->
+                [Field|Acc]
+            end,
+            [],
+            proplists:get_value(fields, Params1, [])
+        ),
+    Params =
+        lists:keyreplace(fields, 1, Params1, {fields, Fields}),
     empdb_dao:with_connection(emp, fun(Con)->
         {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)]),
         get_opt(Con, Params, Options, Userpls)
     end).
 
 get_opt(Params, Fields, Options)->
-    empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)], Fields),
-        get_opt(Con, [{fields, Fields}|Params], Options, Userpls)
-    end).
+    get_opt([{fields, Fields}|Params], Options).
 
 get_opt(Con, Params, [], Proplist)
     -> {ok, Proplist};
@@ -1212,7 +1221,6 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                         " ~n~n~n                                       "
                         "                       friendtype_alias ~n~n~n", []
                     ),
-                    
                     Selfpersid = proplists:get_value(self@pers_id, Params),
                     Friendid = proplists:get_value(id, Acc),
                     Friendnick = proplists:get_value(nick, Acc),
@@ -1435,6 +1443,40 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 _ ->
                                     get_opt(Con, Params, Options, [{[{repost_album, null}|Acc]}])
                             end
+                    end;
+
+
+                perspichead ->
+                    case proplists:get_value(perspichead_id, Acc) of
+                        undefined ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        Perspichead_id ->
+                            {ok, [Perspichead]} =
+                                empdb_dao_perspichead:get(
+                                    Con,
+                                    [
+                                        {perspichead_id, Perspichead_id},
+                                        {limit, 1},
+                                        {fields, [path, x, y, file_id, id]}
+                                    ]
+                                ),
+                            get_opt(Con, Params, Options, [{[{perspichead, Perspichead}|Acc]}])
+                    end;
+                perspicbody ->
+                    case proplists:get_value(perspicbody_id, Acc) of
+                        undefined ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        Perspicbody_id ->
+                            {ok, [Perspicbody]} =
+                                empdb_dao_perspicbody:get(
+                                    Con,
+                                    [
+                                        {perspicbody_id, Perspicbody_id},
+                                        {limit, 1},
+                                        {fields, [path, x, y, file_id, id]}
+                                    ]
+                                ),
+                            get_opt(Con, Params, Options, [{[{perspicbody, Perspicbody}|Acc]}])
                     end;
                 community ->
                     case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
