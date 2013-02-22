@@ -38,6 +38,16 @@ norm('get') ->
             required    = false,
             types       = empweb_norm:filter([string])
         },
+        #norm_rule{
+            key         = perspichead_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key         = perspicbody_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
     %% ----------------------------------------------------
     %% Имя
         #norm_rule{

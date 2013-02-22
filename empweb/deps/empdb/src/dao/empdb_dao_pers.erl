@@ -232,8 +232,9 @@ table({fields, all})->
         own_room_head,
         
         % allowauctoffer,
-        perspicbody_id,
         perspichead_id,
+        perspicbody_id,
+        
         istimeover,
         isdeleted
     ];

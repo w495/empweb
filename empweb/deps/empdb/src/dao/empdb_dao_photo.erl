@@ -92,7 +92,6 @@ get(Con, What) ->
             What,
             lists:append([empdb_dao_photo:table({fields, select}), empdb_dao_doc:table({fields, select})])
         ),
-
     case empdb_dao:get([
         {empdb_dao_doc, id},
         {empdb_dao_photo, {doc_id, file_id}},

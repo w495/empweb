@@ -94,6 +94,16 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
                 types = [string]
             },
             #norm_rule{
+                key         = perspichead_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = perspicbody_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
                 key = email,
                 required = false,
                 types = [email]
@@ -516,6 +526,16 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = nick,
                         types = [string]
+                    },
+                    #norm_rule{
+                        key         = perspichead_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key         = perspicbody_id,
+                        required    = false,
+                        types       = [nullable, integer]
                     },
                 %% ----------------------------------------------------
                 %% Пароль
