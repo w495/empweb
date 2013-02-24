@@ -1183,6 +1183,8 @@ get_tfparams(Con, {geo_id, Geo_id}, Acc1)->
 get_tfparams(Con, {Key, Value}, Acc1)->
     [{Key, Value}|Acc1].
 
+
+
 get_opt(Params1, Options)->
     Fields =
         lists:foldl(
@@ -1449,7 +1451,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                 perspichead ->
                     case proplists:get_value(perspichead_id, Acc) of
                         undefined ->
-                            get_opt(Con, Params, Options, [{Acc}]);
+                            get_opt(Con, Params, Options, [{[{perspichead, null}|Acc]}]);
                         Perspichead_id ->
                             {ok, [Perspichead]} =
                                 empdb_dao_perspichead:get(
@@ -1465,7 +1467,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                 perspicbody ->
                     case proplists:get_value(perspicbody_id, Acc) of
                         undefined ->
-                            get_opt(Con, Params, Options, [{Acc}]);
+                            get_opt(Con, Params, Options, [{[{perspicbody, null}|Acc]}]);
                         Perspicbody_id ->
                             {ok, [Perspicbody]} =
                                 empdb_dao_perspicbody:get(

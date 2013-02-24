@@ -921,6 +921,16 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_doc,
                     action          =   readall_message_for_me
                 };
+            <<"count_message_for_me">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   count_message_for_me
+                };
+            <<"count_message_from_me">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   count_message_from_me
+                };
             <<"get_message_for_me">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,
