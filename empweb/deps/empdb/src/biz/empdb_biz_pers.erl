@@ -1707,7 +1707,7 @@ delete_friend(Params)->
         %             Error2
         %     end
         % ),
-        case empdb_dao_friend:delete(Con, Params) of
+        case empdb_dao_friend:delete(Con, [{fields, [friendtype_id, pers_id, friend_id]}|Params]) of
             {ok, X} ->
                 {ok, _} =
                     empdb_dao_event:create(Con, [
