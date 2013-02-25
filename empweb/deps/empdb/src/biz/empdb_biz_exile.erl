@@ -53,7 +53,7 @@ create(Params)->
                 case empdb_dao_exile:create(Con,[
                     {fields, [
                         id,
-                        owner_id,
+                        pers_id,
                         sender_id
                     ]}
                     |Params
