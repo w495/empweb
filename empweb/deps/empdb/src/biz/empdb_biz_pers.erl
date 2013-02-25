@@ -1709,6 +1709,8 @@ delete_friend(Params)->
         % ),
 
         case empdb_dao_friend:get(Con, Params) of
+            {ok, []} ->
+                {error, not_exists};
             {ok, Friendlist} ->
                 {ok, _} =
                     empdb_dao_friend:delete(Con, Params),
