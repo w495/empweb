@@ -1707,16 +1707,24 @@ delete_friend(Params)->
         %             Error2
         %     end
         % ),
-        case empdb_dao_friend:delete(Con, [{fields, [friendtype_id, pers_id, friend_id]}|Params]) of
-            {ok, X} ->
+
+        case empdb_dao_friend:get(Con, Params) of
+            {ok, Friendlist} ->
                 {ok, _} =
-                    empdb_dao_event:create(Con, [
-                        {owner_id, proplists:get_value(friend_id, Params)},
-                        {pers_id,  proplists:get_value(pers_id,   Params)},
-                        {friendtype_id, proplists:get_value(friendtype_id, Params)},
-                        {eventtype_alias, delete_friend}
-                    ]),
-                {ok, X};
+                    empdb_dao_friend:delete(Con, Params),
+                lists:map(
+                    fun({Friendpl})->
+                        {ok, _} =
+                            empdb_dao_event:create(Con, [
+                                {owner_id, proplists:get_value(friend_id, Friendpl)},
+                                {pers_id,  proplists:get_value(pers_id,   Friendpl)},
+                                {friendtype_id, proplists:get_value(friendtype_id, Friendpl)},
+                                {eventtype_alias, delete_friend}
+                            ])
+                    end,
+                    Friendlist
+                ),
+                {ok, Friendlist};
             Else ->
                 Else
         end
