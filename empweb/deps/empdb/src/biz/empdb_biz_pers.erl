@@ -1485,15 +1485,20 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                         undefined ->
                             get_opt(Con, Params, Options, [{[{perspichead, null}|Acc]}]);
                         Perspichead_id ->
-                            {ok, [Perspichead]} =
-                                empdb_dao_perspichead:get(
+                            Perspichead =
+                                case empdb_dao_perspichead:get(
                                     Con,
                                     [
                                         {id, Perspichead_id},
                                         {limit, 1},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
-                                ),
+                                ) of
+                                    {ok, [Perspichead1]} ->
+                                        Perspichead1;
+                                    {ok, []} ->
+                                        null
+                                end,
                             get_opt(Con, Params, Options, [{[{perspichead, Perspichead}|Acc]}])
                     end;
                 perspicbody ->
@@ -1501,15 +1506,21 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                         undefined ->
                             get_opt(Con, Params, Options, [{[{perspicbody, null}|Acc]}]);
                         Perspicbody_id ->
-                            {ok, [Perspicbody]} =
-                                empdb_dao_perspicbody:get(
+                            Perspicbody =
+                                case empdb_dao_perspicbody:get(
                                     Con,
                                     [
                                         {id, Perspicbody_id},
                                         {limit, 1},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
-                                ),
+                                ) of
+                                    {ok, [Perspicbody1]} ->
+                                        Perspicbody1;
+                                    {ok, []} ->
+                                        null
+                                end,
+                                
                             get_opt(Con, Params, Options, [{[{perspicbody, Perspicbody}|Acc]}])
                     end;
                 community ->
