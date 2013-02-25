@@ -1712,7 +1712,7 @@ delete_friend(Params)->
             {ok, []} ->
                 {error, not_exists};
             {ok, Friendlist} ->
-                {ok, _} =
+                {ok, Delinfo} =
                     empdb_dao_friend:delete(Con, Params),
                 lists:map(
                     fun({Friendpl})->
@@ -1726,7 +1726,7 @@ delete_friend(Params)->
                     end,
                     Friendlist
                 ),
-                {ok, Friendlist};
+                {ok, Delinfo};
             Else ->
                 Else
         end
