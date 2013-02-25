@@ -279,6 +279,8 @@ get(Params) ->
             repost_album,
             perspichead,
             perspicbody,
+%             perspichead_path,
+%             perspicbody_path,
             friendtype_alias,
             community
         ]

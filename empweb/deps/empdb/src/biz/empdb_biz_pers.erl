@@ -1040,6 +1040,37 @@ login({Uf, Uv}, Params) ->
                                 {ok, []} ->
                                     null
                             end,
+
+                            Perspichead =
+                                case empdb_dao_perspichead:get(
+                                    Con,
+                                    [
+                                        {id, proplists:get_value(perspichead_id, Userpl)},
+                                        {limit, 1},
+                                        {fields, [path, x, y, file_id, id]}
+                                    ]
+                                ) of
+                                    {ok, [Perspichead1]} ->
+                                        Perspichead1;
+                                    {ok, []} ->
+                                        null
+                                end,
+
+                            Perspicbody =
+                                case empdb_dao_perspicbody:get(
+                                    Con,
+                                    [
+                                        {id, proplists:get_value(perspicbody_id, Userpl)},
+                                        {limit, 1},
+                                        {fields, [path, x, y, file_id, id]}
+                                    ]
+                                ) of
+                                    {ok, [Perspicbody1]} ->
+                                        Perspicbody1;
+                                    {ok, []} ->
+                                        null
+                                end,
+
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
                                 {friendtype_alias, friend},
@@ -1060,6 +1091,8 @@ login({Uf, Uv}, Params) ->
                                 ]}
                             ]),
                         {ok, [{[
+                            {perspichead,       Perspichead},
+                            {perspicbody,       Perspicbody},
                             {nnewmessages,      Nnewmessages},
                             {nfriends,          Nfriends},
                             {nfoes,             Nfoes},
@@ -1447,7 +1480,6 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                             end
                     end;
 
-
                 perspichead ->
                     case proplists:get_value(perspichead_id, Acc) of
                         undefined ->
@@ -1457,7 +1489,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 empdb_dao_perspichead:get(
                                     Con,
                                     [
-                                        {perspichead_id, Perspichead_id},
+                                        {id, Perspichead_id},
                                         {limit, 1},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
@@ -1473,7 +1505,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 empdb_dao_perspicbody:get(
                                     Con,
                                     [
-                                        {perspicbody_id, Perspicbody_id},
+                                        {id, Perspicbody_id},
                                         {limit, 1},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
