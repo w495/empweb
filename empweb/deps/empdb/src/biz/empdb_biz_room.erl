@@ -111,7 +111,7 @@ create(Params)->
 
         case {Money >= Price, Pers_authority_level >= Room_authority_level,  Mbroomobjs} of
             {true, true, []} ->
-                case empdb_dao_room:create(Con, Params) of
+                case empdb_dao_room:create(Con, [{fields, [id, head]}|Params]) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
                             {pers_id,           Owner_id},
@@ -126,11 +126,11 @@ create(Params)->
                             {own_room_id,
                                 proplists:get_value(id, Respl)},
                             {own_room_head,
-                                proplists:get_value(id, Respl)},
+                                proplists:get_value(head, Respl)},
                             {citizen_room_id,
                                 proplists:get_value(id, Respl)},
                             {citizen_room_head,
-                                proplists:get_value(id, Respl)},
+                                proplists:get_value(head, Respl)},
                             {money, {decr, Price}}
                         ]),
                         {ok, [
