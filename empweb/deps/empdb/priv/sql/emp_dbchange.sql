@@ -1256,4 +1256,11 @@ alter table thingbuy add column
     expired             timestamp without time zone          default null;
 
 alter table thingwish add column
-    rent                numeric(1000, 2) default null,
+    rent                numeric(1000, 2) default null;
+
+
+alter table pers add column
+    costume_thing_id decimal references thingbuy(id) default null;
+
+
+    

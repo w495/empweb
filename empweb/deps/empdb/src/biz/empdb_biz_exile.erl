@@ -241,7 +241,7 @@ timeout()->
 
 remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
-        Nowdt = {date(), time()},
+        Nowdt = calendar:local_time_to_universal_time({date(), time()}),
         case empdb_dao_exile:update(Con,[
             {filter, [
                 {isdeleted, false},
@@ -249,7 +249,7 @@ remove_expired()->
             ]},
             {fields, [
                 id,
-                owner_id,
+                pers_id,
                 sender_id
             ]},
             {values, [
@@ -259,14 +259,15 @@ remove_expired()->
             {ok, Dexiles} ->
                 lists:map(
                     fun({Dexilepl})->
-                        empdb_dao_event:create(emp, [
-                            {eventobj_alias,    exile},
-                            {eventact_alias,    delete},
-                            {target_id,         proplists:get_value(id, Dexilepl)},
-                            {owner_id,          proplists:get_value(pers_id, Dexilepl)},
-                            {pers_id,           proplists:get_value(sender_id , Dexilepl)},
-                            {eventtype_alias,   delete_exile_expired}
-                        ])
+                        {ok, _} =
+                            empdb_dao_event:create(emp, [
+                                {eventobj_alias,    exile},
+                                {eventact_alias,    delete},
+                                {target_id,         proplists:get_value(id, Dexilepl)},
+                                {owner_id,          proplists:get_value(pers_id, Dexilepl)},
+                                {pers_id,           proplists:get_value(sender_id , Dexilepl)},
+                                {eventtype_alias,   delete_exile_expired}
+                            ])
                     end,
                     Dexiles
                 ),

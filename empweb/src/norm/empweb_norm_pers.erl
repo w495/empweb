@@ -48,6 +48,11 @@ norm('get') ->
             required    = false,
             types       = empweb_norm:filter([nullable, integer])
         },
+        #norm_rule{
+            key         = costume_thing_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
     %% ----------------------------------------------------
     %% Имя
         #norm_rule{

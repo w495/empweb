@@ -142,7 +142,7 @@ begin
 
     if new.isdeleted then
         update pers set
-            live_room_id = noobsroom(),
+            live_room_id = (select noobsroom()),
             isprisoner = false
         where pers.id = new.pers_id;
     else

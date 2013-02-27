@@ -1071,6 +1071,22 @@ login({Uf, Uv}, Params) ->
                                         null
                                 end,
 
+                            Costume_thing =
+                                case empdb_dao_thingbuy:get(
+                                    Con,
+                                    [
+                                        {id, proplists:get_value(costume_thing_id, Userpl)},
+                                        {thing_alias, costume},
+                                        {limit, 1},
+                                        {fields, [path, file_id, id]}
+                                    ]
+                                ) of
+                                    {ok, [Costume_thing1]} ->
+                                        Costume_thing1;
+                                    {ok, []} ->
+                                        null
+                                end,
+
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
                                 {friendtype_alias, friend},
@@ -1093,6 +1109,7 @@ login({Uf, Uv}, Params) ->
                         {ok, [{[
                             {perspichead,       Perspichead},
                             {perspicbody,       Perspicbody},
+                            {costume_thing,     Costume_thing},
                             {nnewmessages,      Nnewmessages},
                             {nfriends,          Nfriends},
                             {nfoes,             Nfoes},
@@ -1225,6 +1242,8 @@ get_opt(Params1, Options)->
                 [perspichead, perspichead_id|Acc];
                 (perspicbody, Acc)->
                 [perspicbody, perspicbody_id|Acc];
+                (costume_thing, Acc)->
+                [costume_thing, costume_thing_id|Acc];
                 (Field, Acc)->
                 [Field|Acc]
             end,
@@ -1484,6 +1503,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                     case proplists:get_value(perspichead_id, Acc) of
                         undefined ->
                             get_opt(Con, Params, Options, [{[{perspichead, null}|Acc]}]);
+                        null ->
+                            get_opt(Con, Params, Options, [{[{perspichead, null}|Acc]}]);
                         Perspichead_id ->
                             Perspichead =
                                 case empdb_dao_perspichead:get(
@@ -1505,6 +1526,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                     case proplists:get_value(perspicbody_id, Acc) of
                         undefined ->
                             get_opt(Con, Params, Options, [{[{perspicbody, null}|Acc]}]);
+                        null ->
+                            get_opt(Con, Params, Options, [{[{perspicbody, null}|Acc]}]);
                         Perspicbody_id ->
                             Perspicbody =
                                 case empdb_dao_perspicbody:get(
@@ -1522,6 +1545,30 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 end,
                                 
                             get_opt(Con, Params, Options, [{[{perspicbody, Perspicbody}|Acc]}])
+                    end;
+                costume_thing ->
+                    case proplists:get_value(costume_thing_id, Acc) of
+                        undefined ->
+                            get_opt(Con, Params, Options, [{[{costume_thing, null}|Acc]}]);
+                        null ->
+                            get_opt(Con, Params, Options, [{[{costume_thing, null}|Acc]}]);
+                        Costume_thing_id ->
+                            Costume_thing =
+                                case empdb_dao_thingbuy:get(
+                                    Con,
+                                    [
+                                        {id, Costume_thing_id},
+                                        {thing_alias, costume},
+                                        {limit, 1},
+                                        {fields, [path, file_id, id]}
+                                    ]
+                                ) of
+                                    {ok, [Costume_thing1]} ->
+                                        Costume_thing1;
+                                    {ok, []} ->
+                                        null
+                                end,
+                            get_opt(Con, Params, Options, [{[{perspicbody, Costume_thing}|Acc]}])
                     end;
                 community ->
                     case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of

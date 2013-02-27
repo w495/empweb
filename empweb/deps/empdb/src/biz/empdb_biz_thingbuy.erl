@@ -49,6 +49,7 @@ create(Params)->
                         {alias,  proplists:get_value(thing_alias, Params)}
                     ]},
                     {fields, [
+                        rent,
                         price
                     ]},
                     {limit, 1}
@@ -67,22 +68,15 @@ create(Params)->
                     {limit, 1}
                 ]),
 
-            Now = {erlang:date(), erlang:time()},
-            Nowint  = empdb_convert:datetime2int(Now),
-            Rangeint = Nowint + ?EMPDB_UNIXTIMEWEEK,
-
+            Expired = proplists:get_value(expired, Params, null),
             Thingprice = proplists:get_value(price, Mbthingpl, null),
             Thingrent = proplists:get_value(rent, Mbthingpl, null),
-            Expired =
-                proplists:get_value(
-                    expired,
-                    Params,
-                    empdb_convert:int2datetime(Rangeint)
-                ),
-            Expiredint = empdb_convert:datetime2int(Expired),
-
-            Price = case Thingprice of
+            
+            Price = case Expired of
                 null ->
+                    Expiredint = empdb_convert:datetime2int(Expired),
+                    Now = {erlang:date(), erlang:time()},
+                    Nowint  = empdb_convert:datetime2int(Now),
                     expired2price(Con, Thingrent, Nowint, Expiredint);
                 _ ->
                     Thingprice
