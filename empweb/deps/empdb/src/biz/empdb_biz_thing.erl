@@ -66,7 +66,7 @@ delete(Filter)->
                 |Filter
             ]},
             {values, [
-                {isdeleted, false}
+                {isdeleted, true}
             ]}
         ])
     end).
