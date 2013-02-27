@@ -1040,7 +1040,6 @@
         isonce      boolean    default true,
         isdeleted   boolean    default false
     );
-
     insert into service(alias, price, isonce)
         values ('create_room_price', 1.0,       true);
     insert into service(alias, price, isonce)
@@ -1055,38 +1054,17 @@
         values ('create_experbuy_coef', 0.5,    false);
     insert into service(alias, price, isonce)
         values ('create_zprotbuy_coef', 0.5,    false);
+    insert into eventtype (alias) values ('new_community_cand');
+    insert into eventtype (alias) values ('new_community_memb');
+    insert into eventtype (alias) values ('new_community_out');
+    insert into eventtype (alias) values ('new_community_exile');
+    insert into eventtype (alias) values ('new_community_away');
+    insert into communityhisttype (alias) values ('pers_away');
+    insert into eventtype (alias) values ('create_mail');
 */
-
--- http://www.tvzavr.ru/Muzyka-revolyutsii
-
-
---     alter table invisbuy add column
---         expired timestamp without time zone
---             default utcnow() + interval '1 week';
-
-
-/*
-
-insert into eventtype (alias) values ('new_community_cand');
-
-insert into eventtype (alias) values ('new_community_memb');
-
-insert into eventtype (alias) values ('new_community_out');
-
-insert into eventtype (alias) values ('new_community_exile');
-
-insert into eventtype (alias) values ('new_community_away');
-
-insert into communityhisttype (alias) values ('pers_away');
-
-insert into eventtype (alias) values ('create_mail');
-*/
-
-
 
 
 -- 2013.02.21 17:25:58:980890996 ---------------------------------------------
-
 
 /*
     alter table eventtype add column isnews boolean  default false;
@@ -1205,7 +1183,7 @@ insert into eventtype (alias) values ('create_mail');
 */
 
 
--- 2013.02.22 11:57:31:552364540
+-- 2013.02.22 11:57:31:552364540 ---------------------------------------------
 
 /*
 
@@ -1226,32 +1204,56 @@ insert into eventtype (alias) values ('create_mail');
 */
 
 
-alter table pers drop column perspichead_id ;
-alter table pers drop column perspicbody_id ;
-drop table perspicbody ;
-drop table perspichead ;
+-- 2013.02.27 10:08:19:307711396 ---------------------------------------------
+
+/*
+    alter table pers drop column perspichead_id ;
+    alter table pers drop column perspicbody_id ;
+    drop table perspicbody ;
+    drop table perspichead ;
+    create table perspichead(
+        doc_id      decimal unique references doc(id),
+        x           decimal default null,
+        y           decimal default null,
+        file_id     decimal references file(id)     default null
+    );
+    create table perspicbody(
+        doc_id      decimal unique references doc(id),
+        x           decimal default null,
+        y           decimal default null,
+        file_id     decimal references file(id)     default null
+    );
+    alter table pers add column
+        perspichead_id     decimal references perspichead(doc_id);
+    alter table pers add column
+        perspicbody_id     decimal references perspicbody(doc_id);
+*/
 
 
 
-create table perspichead(
-    doc_id      decimal unique references doc(id),
-    x           decimal default null,
-    y           decimal default null,
-    file_id     decimal references file(id)     default null
-);
 
+alter table thing add column
+    thingtype_alias    varchar(1024)    default null;
 
-create table perspicbody(
-    doc_id      decimal unique references doc(id),
-    x           decimal default null,
-    y           decimal default null,
-    file_id     decimal references file(id)     default null
-);
+alter table thing add column
+    price           numeric(1000, 2)   default null;
 
+alter table thing add column
+    rent            numeric(1000, 2)   default null;
+    
+alter table thing add column
+    file_id         decimal references file(id) default null;
 
+--
 
-alter table pers add column
-    perspichead_id     decimal references perspichead(doc_id);
-alter table pers add column
-    perspicbody_id     decimal references perspicbody(doc_id);
+alter table thingtype add column
+    file_id         decimal references file(id) default null;
 
+alter table thingbuy add column
+    rent            numeric(1000, 2)   default null;
+
+alter table thingbuy add column
+    expired             timestamp without time zone          default null;
+
+alter table thingwish add column
+    rent                numeric(1000, 2) default null,

@@ -18,7 +18,26 @@ begin
             nchildtargets   = nchildtargets - 1
         where
             thingtype.id = new.thingtype_id;
+        new.thingtype_alias =
+            (select alias
+                from thingtype
+                    where thingtype.id = new.thingtype_id);
     end if;
+    if new.thingtype_alias != old.thingtype_alias then
+        new.thingtype_id =
+            (select id
+                from thingtype
+                    where thingtype.alias = new.thingtype_alias);
+        update thingtype set
+            nchildtargets   = nchildtargets + 1
+        where
+            thingtype.id = new.thingtype_id;
+        update thingtype set
+            nchildtargets   = nchildtargets - 1
+        where
+            thingtype.id = new.thingtype_id;
+    end if;
+    
     if (new.isdeleted = true) and (old.isdeleted = false) then
         update thingtype set
             nchildtargets   = nchildtargets - 1
@@ -48,6 +67,21 @@ begin
             nchildtargets   = nchildtargets + 1
         where
             thingtype.id = new.thingtype_id;
+        new.thingtype_alias =
+            (select alias
+                from thingtype
+                    where thingtype.id = new.thingtype_id);
+    else
+        if not (new.thingtype_alias is null) then
+            new.thingtype_id =
+                (select id
+                    from thingtype
+                        where thingtype.alias = new.thingtype_alias);
+            update thingtype set
+                nchildtargets   = nchildtargets + 1
+            where
+                thingtype.id = new.thingtype_id;
+        end if;
     end if;
     return new;
 end;

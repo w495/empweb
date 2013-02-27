@@ -106,6 +106,11 @@ handle(_req, #empweb_hap{
                 key         = parent_id,
                 required    = false,
                 types       = [integer]
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
             }
             |empweb_norm:norm('get')
         ]),
@@ -139,6 +144,11 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = parent_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = file_id,
                 required    = false,
                 types       = [integer]
             }
@@ -179,6 +189,11 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = parent_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = file_id,
                 required    = false,
                 types       = [integer]
             }

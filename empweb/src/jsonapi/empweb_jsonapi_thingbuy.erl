@@ -123,6 +123,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = empweb_norm:filter([unixdatetime])
             }
             |empweb_norm:norm('get')
         ]),
@@ -172,6 +177,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = empweb_norm:filter([unixdatetime])
             }
             |empweb_norm:norm('get')
         ]),
@@ -215,6 +225,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->
@@ -266,6 +281,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->
@@ -313,6 +333,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = [unixdatetime]
             }
         ]),
         fun(Data)->

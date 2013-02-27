@@ -108,7 +108,22 @@ handle(_req, #empweb_hap{
                 types       = [float]
             },
             #norm_rule{
+                key         = rent,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
                 key         = thingtype_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = file_id,
                 required    = false,
                 types       = [integer]
             }
@@ -148,7 +163,22 @@ handle(_req, #empweb_hap{
                 types       = [float]
             },
             #norm_rule{
+                key         = rent,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
                 key         = thingtype_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = file_id,
                 required    = false,
                 types       = [integer]
             }
@@ -193,7 +223,22 @@ handle(_req, #empweb_hap{
                 types       = [float]
             },
             #norm_rule{
+                key         = rent,
+                required    = false,
+                types       = [float]
+            },
+            #norm_rule{
                 key         = thingtype_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = file_id,
                 required    = false,
                 types       = [integer]
             }

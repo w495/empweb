@@ -66,6 +66,9 @@ table({fields, all})->
         thing_alias,
         created,
         counter,
+        rent,
+        price,
+        expired,
         isdeleted
     ];
 
@@ -88,11 +91,72 @@ count(Con, What) ->
     empdb_dao:count(?MODULE, Con, What).
 
 get(Con, What) ->
-    empdb_dao:get(?MODULE, Con, What).
+    Truefields = proplists:get_value(fields,What,[]),
+
+    Fields =
+        case Truefields of
+            [] ->
+                empdb_dao_thingbuy:table({fields, select});
+            _ ->
+                Truefields
+        end,
+
+    case empdb_dao:get([
+        {empdb_dao_thingbuy, thing_id},
+        {empdb_dao_thing, {id, file_id}},
+        {empdb_dao_file, {left, id}},
+        {empdb_dao_fileinfo, {left, file_id}}
+    ],Con,[
+        {'or', [
+            {fileinfotype_alias, download},
+            {thing.file_id, null}
+        ]},
+        {fields, [
+            {as, {fileinfo.path, fileinfopath}},
+            {as, {fileinfo.dir,  fileinfodir}}
+            | proplists:delete(path, Fields)
+        ]}
+        |proplists:delete(fields, What)
+    ]) of
+        {ok,Phobjs} ->
+            {ok,
+                lists:map(fun({Phpl})->
+                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
+                        true ->
+                            {[
+                                {path,
+                                    case {
+                                        proplists:get_value(fileinfodir, Phpl),
+                                        proplists:get_value(fileinfopath, Phpl)
+                                    } of
+                                        {null, _} ->
+                                            null;
+                                        {_, null} ->
+                                            null;
+                                        {Fileinfodir, Fileinfopath} ->
+                                            <<  (Fileinfodir)/binary,
+                                                (Fileinfopath)/binary
+                                            >>
+                                    end
+                                }
+                                | proplists:delete(fileinfodir,
+                                    proplists:delete(fileinfopath,
+                                        proplists:delete(path, Phpl)))
+                            ]};
+                        _ ->
+                            {proplists:delete(fileinfodir,
+                                proplists:delete(fileinfopath, Phpl))}
+                    end
+                end, Phobjs)
+            };
+        Error ->
+            Error
+    end.
+%     empdb_dao:get(?MODULE, Con, What, Fields).
 
 get(Con, What, Fields)->
-    empdb_dao:get(?MODULE, Con, What, Fields).
-
+    empdb_dao:get(?MODULE, Con, [{fields, Fields}|What]).
+    
 create(Con, Proplist)->
     empdb_dao:create(?MODULE, Con, Proplist).
 

@@ -1700,6 +1700,8 @@ create table thingtype(
     **/
     nnodes              decimal default 0,
 
+    file_id         references file(id) default null,
+    
     created         timestamp without time zone not null default utcnow(),
     isdeleted       boolean    default false
 );
@@ -1727,10 +1729,13 @@ create table thing(
     /**
         Ccылка на вершину дерева типов вещей
     **/
-    thingtype_id    decimal references thingtype(id) default null,
-    
+    thingtype_id       decimal references thingtype(id) default null,
+    thingtype_alias    varchar(1024)                    default null,
+
     price           numeric(1000, 2)   default null,
-    
+    rent            numeric(1000, 2)   default null,
+    file_id         references file(id) default null,
+
     created         timestamp without time zone not null default utcnow(),
     isdeleted       boolean    default false
 );
@@ -1848,10 +1853,11 @@ create table thingbuy (
     thing_alias         varchar(1024)   references thing(alias) not null,
 
     price               numeric(1000, 2) default null,
+    rent                numeric(1000, 2) default null,
+    file_id             references file(id) default null,
 
-    counter             timestamp without time zone not null default utcnow(),
-
-    -- expired             timestamp without time zone          default null,
+    counter             timestamp without time zone          default utcnow(),
+    expired             timestamp without time zone          default null,
 
     created             timestamp without time zone not null default utcnow(),
     isdeleted           boolean default false
@@ -1879,7 +1885,8 @@ create table thingwish (
     thing_alias         varchar(1024)   references thing(alias) not null,
 
     price               numeric(1000, 2) default null,
-
+    rent                numeric(1000, 2) default null,
+    
     counter             timestamp without time zone not null default utcnow(),
 
     -- expired             timestamp without time zone          default null,

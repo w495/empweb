@@ -66,7 +66,28 @@ create(Params)->
                     ]},
                     {limit, 1}
                 ]),
-            Price = proplists:get_value(price, Mbthingpl),
+
+            Now = {erlang:date(), erlang:time()},
+            Nowint  = empdb_convert:datetime2int(Now),
+            Rangeint = Nowint + ?EMPDB_UNIXTIMEWEEK,
+
+            Thingprice = proplists:get_value(price, Mbthingpl, null),
+            Thingrent = proplists:get_value(rent, Mbthingpl, null),
+            Expired =
+                proplists:get_value(
+                    expired,
+                    Params,
+                    empdb_convert:int2datetime(Rangeint)
+                ),
+            Expiredint = empdb_convert:datetime2int(Expired),
+
+            Price = case Thingprice of
+                null ->
+                    expired2price(Con, Thingrent, Nowint, Expiredint);
+                _ ->
+                    Thingprice
+            end,
+
             Money = proplists:get_value(money, Mbbuyerpl),
             case Price =< Money of
                 true ->
@@ -76,7 +97,9 @@ create(Params)->
                         {money, {decr, Price}}
                     ]),
                     case empdb_dao_thingbuy:create(Con,[
-                        {price, Price}
+                        {price,     Thingprice},
+                        {expired,   Expired},
+                        {rent,      Thingrent}
                         |Params
                     ]) of
                         {ok, [{Respl}]} ->
@@ -128,6 +151,17 @@ create(Params)->
         ]
     )).
 
+expired2price(Con, Rent, Nowint, Expiredint) ->
+    case Expiredint > Nowint of
+        true ->
+            Rangeint    = Expiredint - Nowint,
+            Rangedays   = Rangeint / ?EMPDB_UNIXTIMEDAY,
+            empdb_convert:to_money(Rent * Rangedays);
+        false ->
+            0
+    end.
+
+    
 update(Params)->
     empdb_dao:with_transaction(fun(Con)->
         case empdb_dao_thingbuy:update(Con, Params) of
