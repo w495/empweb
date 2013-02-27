@@ -102,32 +102,43 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = owner_nick,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = buyer_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = buyer_nick,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = thing_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = thing_alias,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = empweb_norm:filter([unixdatetime])
+                types       = empweb_norm:filter([unixdatetime]),
+                default     = null
             }
             |empweb_norm:norm('get')
         ]),
@@ -156,32 +167,33 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = owner_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = owner_nick,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = thing_id,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = thing_alias,
                 required    = false,
-                types       = [nullable, string]
+                types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = empweb_norm:filter([unixdatetime])
+                types       = empweb_norm:filter([unixdatetime]),
+                default     = null
             }
             |empweb_norm:norm('get')
         ]),
@@ -229,7 +241,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [unixdatetime]
+                types       = [nullable, unixdatetime],
+                default     = null
             }
         ]),
         fun(Data)->
@@ -285,7 +298,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [unixdatetime]
+                types       = [unixdatetime],
+                default     = null
             }
         ]),
         fun(Data)->
@@ -337,7 +351,8 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [unixdatetime]
+                types       = [unixdatetime],
+                default     = null
             }
         ]),
         fun(Data)->

@@ -105,12 +105,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = rent,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = thingtype_id,
@@ -160,12 +160,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = rent,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = thingtype_id,
@@ -220,12 +220,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = rent,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = thingtype_id,
@@ -282,12 +282,12 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = price,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = rent,
                 required    = false,
-                types       = [float]
+                types       = [nullable, float]
             },
             #norm_rule{
                 key         = thingtype_id,

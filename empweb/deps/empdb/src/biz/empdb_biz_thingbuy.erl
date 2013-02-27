@@ -72,19 +72,36 @@ create(Params)->
             Thingprice = proplists:get_value(price, Mbthingpl, null),
             Thingrent = proplists:get_value(rent, Mbthingpl, null),
             
-            Price = case Expired of
-                null ->
-                    Expiredint = empdb_convert:datetime2int(Expired),
-                    Now = {erlang:date(), erlang:time()},
-                    Nowint  = empdb_convert:datetime2int(Now),
-                    expired2price(Con, Thingrent, Nowint, Expiredint);
-                _ ->
-                    Thingprice
-            end,
+            {Priceerror, Price} =
+                case {Expired, Thingprice, Thingrent} of
+                    {null, null, _} ->
+                        {{error, no_price}, null};
+                    {null, _, _} ->
+                        {ok, Thingprice};
+                    {_, _, null} ->
+                        {{error, no_rent}, null};
+                    {_, _, _} ->
+                        Expiredint = empdb_convert:datetime2int(Expired),
+                        Now = {erlang:date(), erlang:time()},
+                        Nowint  = empdb_convert:datetime2int(Now),
+                        {ok, expired2price(Con, Thingrent, Nowint, Expiredint)}
+                end,
 
             Money = proplists:get_value(money, Mbbuyerpl),
-            case Price =< Money of
-                true ->
+            case {Priceerror, Price =< Money} of
+                {{error, no_price}, _} ->
+                    {error, {no_price, {[
+                        {money, Money},
+                        {price, Thingprice},
+                        {rent,  Thingrent}
+                    ]}}};
+                {{error, no_rent}, _} ->
+                    {error, {no_rent, {[
+                        {money, Money},
+                        {price, Thingprice},
+                        {rent,  Thingrent}
+                    ]}}};
+                {_, true} ->
                     Newmoney = Money - Price,
                     empdb_dao_pers:update(Con,[
                         {id,    proplists:get_value(id,   Mbbuyerpl)},
@@ -130,7 +147,7 @@ create(Params)->
                         Else ->
                             Else
                     end;
-                false ->
+                {_, false} ->
                     {error, {not_enough_money, {[
                         {money, Money},
                         {price, Price}
