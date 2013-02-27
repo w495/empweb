@@ -23,6 +23,7 @@
 -export([
     update/1,
     create/1,
+    delete/1,
     get/1,
     get/2
 ]).
@@ -41,6 +42,9 @@ create(Params)->
 
 update(Params)->
     empdb_biz_thing:update(Params).
+
+delete(Params)->
+    empdb_biz_thing:delete(Params).
 
 get(Params)->
     empdb_biz_thing:get(Params).

@@ -24,7 +24,8 @@
     get/1,
     get/2,
     create/1,
-    update/1
+    update/1,
+    delete/1
 ]).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -55,6 +56,19 @@ get(Params)->
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_thing:get(Con, [{isdeleted, false}|Params], Fileds)
+    end).
+
+delete(Filter)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao_thing:update(Con, [
+            {filter, [
+                {isdeleted, false}
+                |Filter
+            ]},
+            {values, [
+                {isdeleted, false}
+            ]}
+        ])
     end).
 
 is_owner(Uid, Oid)->

@@ -206,6 +206,51 @@ handle(_req, #empweb_hap{
 
 
 
+handle(_req, #empweb_hap{
+        action=delete, params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = delete thingtype">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = alias,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = name_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = descr_ti,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = parent_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,empweb_jsonapi:resp(empweb_biz_thingtype:delete(Data#norm.return)),Hap}
+        end
+    );
+
 
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
