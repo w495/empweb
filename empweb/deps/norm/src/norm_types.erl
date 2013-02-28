@@ -49,14 +49,17 @@ nullable("nil") ->
 nullable(nil) ->
     null;
 nullable("null") ->
+    io:format(" ~n~n~n                      !Value = ~p ~n~n~n", ["null"]),
     null;
 nullable(null) ->
+    io:format(" ~n~n~n                      !Value = ~p ~n~n~n", [null]),
     null;
 nullable(<<"">>) ->
     null;
 nullable(<<"nil">>) ->
     null;
 nullable(<<"null">>) ->
+    io:format(" ~n~n~n                      !Value = ~p ~n~n~n", [<<"null">>]),
     null.
 
 boolean(true) ->
@@ -94,7 +97,10 @@ unixtime(Value) ->
     D.
 
 unixdatetime(Value) ->
-    norm_convert:to_universal_datetime(norm_convert:to_integer(Value)).
+    io:format(" ~n~n~n                      !Value = ~p ~n~n~n", [Value]),
+    X = norm_convert:to_universal_datetime(norm_convert:to_integer(Value)),
+    io:format(" ~n~n~n                      !ValueX = ~p ~n~n~n", [X]),
+    X.
 
 %% Email проверка
 email(Value) ->

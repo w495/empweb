@@ -90,7 +90,6 @@ norm(Data, [#norm_rule{rules=[], required=true, key=?UNIQ_UNDEFINED, keys=[]}=Ru
     Norm;
 
 norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[],  default=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
-    io:format("norm(Data, Crules, Norm) ~p ~n", [norm(Data, Crules, Norm)]),
     case norm(Data, Crules, #norm{}) of
         #norm{errors=[], return=[]} ->
             norm(Data, Restrules,
@@ -114,7 +113,6 @@ norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ
 
 
 norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ_UNDEFINED, keys=[], nkey=Nkey, default=Default}=Rule|Restrules], Norm) ->
-    io:format("norm(Data, Crules, Norm) ~p ~n", [norm(Data, Crules, Norm)]),
     case norm(Data, Crules, #norm{}) of
         #norm{errors=[], return=[]} ->
             norm(Data, Restrules,
@@ -248,14 +246,17 @@ to_rule_type(Value, Type_rules) ->
 
 rule_type_done(Converter, Value, Type)
         when erlang:is_atom(Type)->
+    io:format("1)  = ~p ~n", [{Converter, Type, Value}]),
     {ok, Converter:Type(Value)};
 
 rule_type_done(_converter, _value, Type)
         when erlang:is_function(Type, 0) ->
+    io:format("1)  = ~p ~n", [{_converter, Type, _value}]),
     {ok, Type()};
     
 rule_type_done(_converter, Value, Type)
         when erlang:is_function(Type, 1) ->
+    io:format("1)  = ~p ~n", [{_converter, Type, Value}]),
     {ok, Type(Value)}.
 
 %%
@@ -280,7 +281,9 @@ to_rule_type(_converter, Value, [[]|_rest]) ->
 to_rule_type(Converter, Value, [Type|Restrules]) ->
     io:format("1)  = ~p ~n", [{Type, Value, Restrules}]),
     try
-        rule_type_done(Converter, Value, Type)
+        X = rule_type_done(Converter, Value, Type),
+         io:format("1.1)  = ~p ~n", [{X}]),
+        X
     catch
         throw : {type_error, Error} ->
             throw({type_error, Error});
