@@ -150,8 +150,8 @@ normlist(Types)->
 
 normpair(Types)->
     fun
-        (null) ->
-            {null, null};
+%         (null) ->
+%             {null, null};
         ({[{Fitem,Sitem}]}) ->
             {ok, Fres} = norm:to_rule_type(Fitem, Types),
             {ok, Sres} = norm:to_rule_type(Sitem, Types),
@@ -160,8 +160,8 @@ normpair(Types)->
 
 normpair(Types1, Types2)->
     fun
-        (null) ->
-            {null, null};
+%         (null) ->
+%             {null, null};
         ({[{Fitem,Sitem}]}) ->
             {ok, Fres} = norm:to_rule_type(Fitem, Types1),
             {ok, Sres} = norm:to_rule_type(Sitem, Types2),
@@ -170,8 +170,8 @@ normpair(Types1, Types2)->
 
 normfilter(Types)->
     fun
-        (null) ->
-            {null, null};
+%         (null) ->
+%             {null, null};
         ({[{Fitem,Sitem}]}) ->
             {ok, Fres} = norm:to_rule_type(Fitem, [atom]),
             {ok, Sres} = norm:to_rule_type(Sitem, [normlist(Types)|Types]),

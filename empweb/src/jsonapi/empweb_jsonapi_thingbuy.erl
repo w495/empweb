@@ -98,7 +98,8 @@ handle(_req, #empweb_hap{
 
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
-        norm:norm(Params, [
+        norm:norm(Params, begin
+        X = [
             #norm_rule{
                 key         = id,
                 required    = false,
@@ -135,6 +136,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, float])
             },
             #norm_rule{
+                key         = expired,
+                required    = false,
+                types       = empweb_norm:filter([nullable, unixdatetime])
+            },
+            #norm_rule{
                 key         = thing_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
@@ -143,14 +149,12 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
-            },
-            #norm_rule{
-                key         = expired,
-                required    = false,
-                types       = empweb_norm:filter([nullable, unixdatetime])
             }
             |empweb_norm:norm('get')
-        ]),
+        ],
+        io:format("~n ~n ~n X  = ~p ~n ~n ~n ", [{X}]),
+        X
+        end),
         fun(Data)->
             io:format("~n~n~n Data#norm.return = ~p ~n~n~n", [Data#norm.return]),
             {ok,
@@ -204,14 +208,14 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
-                key         = thing_alias,
-                required    = false,
-                types       = empweb_norm:filter([nullable, string])
-            },
-            #norm_rule{
                 key         = expired,
                 required    = false,
                 types       = empweb_norm:filter([nullable, unixdatetime])
+            },
+            #norm_rule{
+                key         = thing_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             }
             |empweb_norm:norm('get')
         ]),
