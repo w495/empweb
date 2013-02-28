@@ -246,17 +246,17 @@ to_rule_type(Value, Type_rules) ->
 
 rule_type_done(Converter, Value, Type)
         when erlang:is_atom(Type)->
-    io:format("1)  = ~p ~n", [{Converter, Type, Value}]),
+    io:format("1.1)  = ~p ~n", [{Converter , Type, Value}]),
     {ok, Converter:Type(Value)};
 
 rule_type_done(_converter, _value, Type)
         when erlang:is_function(Type, 0) ->
-    io:format("1)  = ~p ~n", [{_converter, Type, _value}]),
+    io:format("1.1)  = ~p ~n", [{_converter, Type, _value}]),
     {ok, Type()};
     
 rule_type_done(_converter, Value, Type)
         when erlang:is_function(Type, 1) ->
-    io:format("1)  = ~p ~n", [{_converter, Type, Value}]),
+    io:format("1.1)  = ~p ~n", [{_converter, Type, Value}]),
     {ok, Type(Value)}.
 
 %%
@@ -282,7 +282,7 @@ to_rule_type(Converter, Value, [Type|Restrules]) ->
     io:format("1)  = ~p ~n", [{Type, Value, Restrules}]),
     try
         X = rule_type_done(Converter, Value, Type),
-         io:format("1.1)  = ~p ~n", [{X}]),
+         io:format("1.5)  = ~p ~n", [{X}]),
         X
     catch
         throw : {type_error, Error} ->

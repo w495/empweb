@@ -537,6 +537,11 @@ handle(_req, #empweb_hap{
                         required    = false,
                         types       = [nullable, integer]
                     },
+                    #norm_rule{
+                        key         = costume_thing_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
                 %% ----------------------------------------------------
                 %% Пароль
                     #norm_rule{
