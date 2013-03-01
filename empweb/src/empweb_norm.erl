@@ -136,8 +136,8 @@ norm(_) ->
 
 normlist(Types)->
     fun
-        (null) ->
-            [];
+%         (null) ->
+%             [];
         (List) when erlang:is_list(List) ->
             lists:map(
                 fun(Item)->
