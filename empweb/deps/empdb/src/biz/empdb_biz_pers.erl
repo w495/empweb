@@ -1568,7 +1568,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {ok, []} ->
                                         null
                                 end,
-                            get_opt(Con, Params, Options, [{[{perspicbody, Costume_thing}|Acc]}])
+                            get_opt(Con, Params, Options, [{[{costume_thing, Costume_thing}|Acc]}])
                     end;
                 community ->
                     case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
