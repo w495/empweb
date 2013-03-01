@@ -1229,38 +1229,33 @@
         perspicbody_id     decimal references perspicbody(doc_id);
 */
 
+-- 2013.03.01 15:10:30:261555319 ---------------------------------------------
 
 /*
-
-alter table thing add column
-    thingtype_alias    varchar(1024)    default null;
-
-alter table thing add column
-    price           numeric(1000, 2)   default null;
-
-alter table thing add column
-    rent            numeric(1000, 2)   default null;
-    
-alter table thing add column
-    file_id         decimal references file(id) default null;
-
---
-
-alter table thingtype add column
-    file_id         decimal references file(id) default null;
-
-alter table thingbuy add column
-    rent            numeric(1000, 2)   default null;
-
-alter table thingbuy add column
-    expired             timestamp without time zone          default null;
-
-alter table thingwish add column
-    rent                numeric(1000, 2) default null;*/
+    alter table thing add column
+        thingtype_alias    varchar(1024)    default null;
+    alter table thing add column
+        price           numeric(1000, 2)   default null;
+    alter table thing add column
+        rent            numeric(1000, 2)   default null;
+    alter table thing add column
+        file_id         decimal references file(id) default null;
+    alter table thingtype add column
+        file_id         decimal references file(id) default null;
+    alter table thingbuy add column
+        rent            numeric(1000, 2)   default null;
+    alter table thingbuy add column
+        expired             timestamp without time zone          default null;
+    alter table thingwish add column
+        rent                numeric(1000, 2) default null;
+*/
 
 
-alter table pers add column
-    costume_thingbuy_id decimal references thingbuy(id) default null;
+    alter table pers add column
+        costume_thingbuy_id decimal references thingbuy(id) default null;
 
+    alter table thingbuy add column
+        thingtype_id       decimal references thingtype(id) default null;
 
-    
+    alter table thingbuy add column
+        thingtype_alias    varchar(1024)                    default null;    

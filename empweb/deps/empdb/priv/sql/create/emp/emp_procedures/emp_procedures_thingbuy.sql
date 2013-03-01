@@ -49,6 +49,10 @@ begin
         if not (new.thing_id is null) then
             new.thing_alias =
                 (select thing.alias from thing where thing.id = new.thing_id);
+            new.thingtype_id =
+                (select thing.thingtype_id from thing where thing.id = new.thing_id);
+            new.thingtype_alias =
+                (select thing.thingtype_alias from thing where thing.id = new.thing_id);
         else
             new.thing_alias        = null;
         end if;
@@ -56,6 +60,10 @@ begin
     if (new.thing_id is null) then
         new.thing_id           =
             (select thing.id from thing where thing.alias = new.thing_alias);
+        new.thingtype_id =
+            (select thing.thingtype_id from thing where thing.id = new.thing_id);
+        new.thingtype_alias =
+            (select thing.thingtype_alias from thing where thing.id = new.thing_id);
     end if;
 
     return new;
@@ -96,10 +104,18 @@ begin
     if new.thing_id != old.thing_id then
         new.thing_alias =
             (select thing.alias from thing where thing.id = new.thing_id);
+        new.thingtype_id =
+            (select thing.thingtype_id from thing where thing.id = new.thing_id);
+        new.thingtype_alias =
+            (select thing.thingtype_alias from thing where thing.id = new.thing_id);
     end if;
     if new.thing_alias != old.thing_alias then
         new.thing_id =
             (select thing.id from thing where thing.alias = new.thing_alias);
+        new.thingtype_id =
+            (select thing.thingtype_id from thing where thing.id = new.thing_id);
+        new.thingtype_alias =
+            (select thing.thingtype_alias from thing where thing.id = new.thing_id);
     end if;
     return new;
 end;

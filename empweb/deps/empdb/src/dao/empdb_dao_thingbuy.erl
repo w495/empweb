@@ -64,6 +64,8 @@ table({fields, all})->
         owner_nick,
         thing_id,
         thing_alias,
+        thingtype_id,
+        thingtype_alias,
         created,
         counter,
         rent,
