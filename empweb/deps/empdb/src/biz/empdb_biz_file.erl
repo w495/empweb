@@ -39,6 +39,8 @@ create(Params)->
     Fs_dir = <<"deps/empdb/priv/data/">>,
     Dl_dir = <<"/jsonapi/photo/">>,
 
+    io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
+
     Doc_id   = proplists:get_value(doc_id,   Params, null),
     Owner_id = proplists:get_value(owner_id, Params, null),
 
@@ -166,11 +168,22 @@ create(Params)->
             {path,                  Dl_path_ext}
         ]),
 
-        {ok, [{[
-            {file_id,       File_id},
-            {originalname,  Ul_name},
-            {md5sum,        Md5_string}
-        ]}]}
+
+        case proplists:get_value(isres,   Params, null) of
+            true ->
+                {ok, [{[
+                    {file_id,       File_id},
+                    {path,          erlang:list_to_binary([Dl_dir, Dl_path_ext])},
+                    {originalname,  Ul_name},
+                    {md5sum,        Md5_string}
+                ]}]};
+            _ ->
+                {ok, [{[
+                    {file_id,       File_id},
+                    {originalname,  Ul_name},
+                    {md5sum,        Md5_string}
+                ]}]}
+        end
     end).
 
 update(Params)->

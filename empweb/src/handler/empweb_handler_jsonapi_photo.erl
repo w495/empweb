@@ -191,6 +191,7 @@ acc_part(
         handler         = empweb_jsonapi_file,
         action          = create,
         params          = [
+            {isres,         false},
             {filebody,      Fullbody},
             {filename,      Filename},
             {nchanks,       Nchanks},
