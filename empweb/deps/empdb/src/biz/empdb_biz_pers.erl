@@ -1779,13 +1779,39 @@ delete_friend(Params)->
         end
     end).
 
-get_friend(Params)->
+get_friend(Params1)->
+    Fields =
+        lists:foldl(
+            fun (perspichead, Acc)->
+                [perspichead, perspichead_id|Acc];
+                (perspicbody, Acc)->
+                [perspicbody, perspicbody_id|Acc];
+                (costume_thing, Acc)->
+                [costume_thing, costume_thing_id|Acc];
+                (Field, Acc)->
+                [Field|Acc]
+            end,
+            [],
+            proplists:get_value(fields, Params1, [])
+        ),
+
+    Options = [
+        perspichead,
+        perspicbody,
+        costume_thing
+    ],
+
+    Params =
+        lists:keyreplace(fields, 1, Params1, {fields, Fields}),
+        
     empdb_dao:with_connection(emp, fun(Con)->
-        empdb_dao_friend:get(Con, [
-            {order, {nick, asc}},
-            {isdeleted, false}
-            |Params
-        ])
+        {ok, Userpls} =
+            empdb_dao_friend:get(Con, [
+                {order, {nick, asc}},
+                {isdeleted, false}
+                |Params
+            ]),
+        get_opt(Con, Params, Options, Userpls)
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

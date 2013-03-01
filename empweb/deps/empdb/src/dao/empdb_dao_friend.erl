@@ -123,6 +123,9 @@ empdb_dao_pers({fields, select})->
         father_id,
         live_room_id,
         live_room_head,
+        perspichead_id,
+        perspicbody_id,
+        costume_thing_id,
         isdeleted
     ].
 
@@ -138,7 +141,7 @@ get(Con, Proplist) ->
     Empdb_dao_pers = [
         {{table, name},             empdb_dao_pers:table(name)},
         {{table, fields, all},      empdb_dao_pers:table({fields, all})},
-        {{table, fields, select},   empdb_dao_pers({fields, select})}
+        {{table, fields, select},   empdb_dao_pers:table({fields, select})}
     ],
     
     empdb_dao:get(
