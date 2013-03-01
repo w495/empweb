@@ -1076,7 +1076,7 @@ login({Uf, Uv}, Params) ->
                                     Con,
                                     [
                                         {id, proplists:get_value(costume_thingbuy_id, Userpl)},
-                                        {thing_alias, costume},
+                                        {thingtype_alias, costume},
                                         {limit, 1},
                                         {fields, [path, file_id, id]}
                                     ]
@@ -1558,7 +1558,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     Con,
                                     [
                                         {id, Costume_thingbuy_id},
-                                        {thing_alias, costume},
+                                        {thingtype_alias, costume},
                                         {limit, 1},
                                         {fields, [path, file_id, id]}
                                     ]
