@@ -151,12 +151,12 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
-                key         = thingbuy_id,
+                key         = thingtype_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
-                key         = thingbuy_alias,
+                key         = thingtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             }
@@ -228,12 +228,12 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
-                key         = thingbuy_id,
+                key         = thingtype_id,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
-                key         = thingbuy_alias,
+                key         = thingtype_alias,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             }
