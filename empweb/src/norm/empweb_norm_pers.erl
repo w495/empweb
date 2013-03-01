@@ -49,7 +49,7 @@ norm('get') ->
             types       = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key         = costume_thing_id,
+            key         = costume_thingbuy_id,
             required    = false,
             types       = empweb_norm:filter([nullable, integer])
         },

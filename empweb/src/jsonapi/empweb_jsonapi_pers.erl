@@ -538,7 +538,7 @@ handle(_req, #empweb_hap{
                         types       = [nullable, integer]
                     },
                     #norm_rule{
-                        key         = costume_thing_id,
+                        key         = costume_thingbuy_id,
                         required    = false,
                         types       = [nullable, integer]
                     },

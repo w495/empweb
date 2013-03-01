@@ -234,7 +234,7 @@ table({fields, all})->
         % allowauctoffer,
         perspichead_id,
         perspicbody_id,
-        costume_thing_id,
+        costume_thingbuy_id,
         
         istimeover,
         isdeleted
