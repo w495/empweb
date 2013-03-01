@@ -300,8 +300,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [nullable, unixdatetime],
-                default     = null
+                types       = [nullable, unixdatetime]
             }
         ]),
         fun(Data)->
@@ -357,8 +356,7 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = expired,
                 required    = false,
-                types       = [unixdatetime],
-                default     = null
+                types       = [nullable, unixdatetime]
             }
         ]),
         fun(Data)->
