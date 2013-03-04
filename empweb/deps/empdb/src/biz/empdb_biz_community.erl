@@ -122,7 +122,7 @@ create(Params)->
             (Authority_level >= Candsgteauthority_level)
         } of
             {true, [], true} ->
-                case empdb_dao_community:create(Con, [{nmembs, 1}|Params]) of
+                case empdb_dao_community:create(Con, Params) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
                             {pers_id,           proplists:get_value(owner_id,   Params)},

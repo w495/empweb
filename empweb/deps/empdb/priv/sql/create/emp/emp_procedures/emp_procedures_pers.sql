@@ -1,8 +1,6 @@
 \echo :FILE 'in'
 
 
-
-
 /**
     Aтомарное создание комнаты для новичков.
 **/
@@ -165,7 +163,7 @@ begin
         (select doc.head from doc
             where doc.id = new.citizen_room_id and doc.doctype_alias = 'room');
 
-            
+
     new.live_roomtype_alias   = 'noobs';
     new.live_roomtype_id      =
         (select id from roomtype where roomtype.alias = new.live_roomtype_alias);
@@ -268,8 +266,10 @@ begin
         raise exception 'exists_live_community';
     else
         if(new.own_community_id != new.live_community_id)
-        or ((new.own_community_id is null)
-        and (old.live_community_id is null)) then
+            or (
+                (new.own_community_id is null)
+                    and (old.live_community_id is null)
+            ) then
             new.live_community_approved = false;
             update community set ncands = ncands + 1
                 where community.doc_id = new.live_community_id;
@@ -284,8 +284,10 @@ begin
                 where community.doc_id = new.live_community_id;
         end if;
         if(new.live_community_approved is true) then
-            update community set ncands = ncands - 1
-                where community.doc_id = new.live_community_id;
+            if(new.own_community_id != new.live_community_id) then
+                update community set ncands = ncands - 1
+                    where community.doc_id = new.live_community_id;
+            end if
             update community set nmembs = nmembs + 1
                 where community.doc_id = new.live_community_id;
         end if;
@@ -297,10 +299,11 @@ begin
         end if;
     end if;
 
-    if (new.live_community_id is null) then
+    if ((old.live_community_id  is not null)
+        and (new.live_community_id is null)) then
         new.live_community_approved = null;
-        update community set ncands = ncands - 1
-            where community.doc_id = new.live_community_id;
+        update community set nmembs = nmembs - 1
+            where community.doc_id = old.live_community_id;
     end if;
     /**
         Статус online \ offline

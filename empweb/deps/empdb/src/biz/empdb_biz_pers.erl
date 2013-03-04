@@ -489,43 +489,69 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                     {limit, 1},
                     {fields, [
                         id,
+                        fee,
                         owner_id,
                         cands_gte_authority_level
                     ]}
                 ]),
 
-            {ok, _} =
-                empdb_dao_event:create(Con, [
-                    {owner_id,          proplists:get_value(owner_id, Communitypl)},
-                    {eventtype_alias,   new_community_cand},
-                    {doc_id,  proplists:get_value(id, Communitypl)},
-                    {pers_id,           proplists:get_value(id, Mbperspl)}
-                ]),
-
+            %% если уровень человека на момент подачи заявки
+            %% ниже уровня сообщества,
+            %% то подать заявку на вступление в сообщество он не может.
             Candsgteauthoritylevel =
                 proplists:get_value(cands_gte_authority_level, Communitypl),
             Authoritylevel =
                 proplists:get_value(authority_level, Mbperspl),
-            %% если уровень человека ниже уровня сообщества,
-            %% то вступить в него он не может.
-            case  Candsgteauthoritylevel =< Authoritylevel of
-                true ->
+            %% Если человек на момент подачи заявки
+            %% не может оплатить взнос (fee),
+            %% то подать заявку на вступление в сообщество он не может.
+            Money   = proplists:get_value(money, Mbperspl),
+            Price   = proplists:get_value(fee, Communitypl),
+            case  {Candsgteauthoritylevel =< Authoritylevel, Price =< Money} of
+                {true, true} ->
                     case Function(Con, Params) of
                         {ok, Res} ->
-                            empdb_dao_communityhist:create(Con, [
-                                {community_id,
-                                    Community_id},
-                                {pers_id,
-                                    proplists:get_value(id, Mbperspl)},
-                                {communityhisttype_alias,
-                                    pers_cand}
-                            ]),
+                            %% Делаем запись в историю сообщества,
+                            %% о том, что появился новый пользователь.
+                            {ok, _} =
+                                empdb_dao_communityhist:create(Con, [
+                                    {community_id,
+                                        Community_id},
+                                    {pers_id,
+                                        proplists:get_value(id, Mbperspl)},
+                                    {communityhisttype_alias,
+                                        pers_cand}
+                                ]),
+                            %% Отправляем владельцу сообщества сообщение,
+                            %% что появился новый кандидат.
+                            {ok, _} =
+                                empdb_dao_event:create(Con, [
+                                    {owner_id,          proplists:get_value(owner_id, Communitypl)},
+                                    {eventtype_alias,   new_community_cand},
+                                    {doc_id,  proplists:get_value(id, Communitypl)},
+                                    {pers_id,           proplists:get_value(id, Mbperspl)}
+                                ]),
                             {ok, Res};
                         Else ->
                             Else
                     end;
-                _ ->
+                {_, true} ->
                     {error, {not_enough_level, {[
+                        {cands_gte_authority_level,
+                            Candsgteauthoritylevel
+                        },
+                        {authority_level,
+                            Authoritylevel}
+                    ]}}};
+                {true, _} ->
+                    {error, {not_enough_money, {[
+                        {money, Money},
+                        {price, Price}
+                    ]}}};
+                {_, _} ->
+                    {error, {not_enough_level_not_enough_money, {[
+                        {money, Money},
+                        {price, Price},
                         {cands_gte_authority_level,
                             Candsgteauthoritylevel
                         },
@@ -545,13 +571,8 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                 ]),
             case Function(Con, Params) of
                 {ok, Res} ->
-                    {ok, _} =
-                        empdb_dao_event:create(Con, [
-                            {owner_id,          proplists:get_value(owner_id, Communitypl)},
-                            {eventtype_alias,   new_community_away},
-                            {doc_id,  proplists:get_value(id, Communitypl)},
-                            {pers_id,           proplists:get_value(id, Mbperspl)}
-                        ]),
+                    %% Делаем запись в историю сообщества,
+                    %% что существующий пользователь вышел из сообщества.
                     {ok, _} =
                         empdb_dao_communityhist:create(Con, [
                             {community_id,
@@ -560,6 +581,17 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                                 proplists:get_value(id, Mbperspl)},
                             {communityhisttype_alias,
                                 pers_away}
+                        ]),
+                    %% Отправляем владельцу сообщества сообщение,
+                    %% что существующий пользователь вышел из сообщества.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(owner_id, Communitypl)},
+                            {eventtype_alias,   new_community_away},
+                            {eventact_alias,    update},
+                            {eventobj_alias,    pers},
+                            {doc_id,  proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(id, Mbperspl)}
                         ]),
                     {ok, Res};
                 Else ->
@@ -589,14 +621,6 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                     ]}
                 ]),
 
-           {ok, _} =
-                empdb_dao_event:create(Con, [
-                    {owner_id,          proplists:get_value(id, Mbperspl)},
-                    {eventtype_alias,   new_community_memb},
-                    {doc_id, proplists:get_value(id, Communitypl)},
-                    {pers_id,           proplists:get_value(owner_id, Communitypl)}
-                ]),
-
             Money   = proplists:get_value(money, Mbperspl),
             Price   = proplists:get_value(fee, Communitypl),
             case Price =< Money of
@@ -613,7 +637,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                                     {communityhisttype_alias,
                                         pers_memb}
                                 ]),
-                            %% Создаем запись в лог казны сообщества
+                            %% Создаем запись в лог казны сообщества.
                             {ok, _} =
                                 empdb_dao_communitytreas:create(Con, [
                                     {pers_id,           Pers_id},
@@ -622,7 +646,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                                     {treastype_alias,   fee_in},
                                     {price,             Price}
                                 ]),
-                            %% Создаем запись в лог кошелька пользователя
+                            %% Создаем запись в лог кошелька пользователя.
                             {ok, _} =
                                 empdb_dao_pay:create(Con, [
                                     {pers_id,
@@ -643,6 +667,17 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                                     {id,    proplists:get_value(id,   Mbperspl)},
                                     {money, {decr, Price}}
                                 ]),
+                            %% Отправляем пользователю сообщение,
+                            %% что его одобрили.
+                            {ok, _} =
+                                    empdb_dao_event:create(Con, [
+                                        {owner_id,          proplists:get_value(id, Mbperspl)},
+                                        {eventact_alias,    update},
+                                        {eventobj_alias,    pers},
+                                        {eventtype_alias,   new_community_memb},
+                                        {doc_id, proplists:get_value(id, Communitypl)},
+                                        {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                                    ]),
                             {ok, Res};
                         Else ->
                             Else
