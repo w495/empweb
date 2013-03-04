@@ -635,7 +635,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                             {ok, _} =
                                 empdb_dao_community:update(Con, [
                                     {id,    Community_id},
-                                    {treas, Price}
+                                    {treas, {incr, Price}}
                                 ]),
                             %% Снимаем с пользователя деньги
                             {ok, _} =
