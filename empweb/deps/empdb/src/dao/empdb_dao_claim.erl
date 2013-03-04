@@ -63,7 +63,15 @@ table({fields, all})->
         judge_id,
         judge_nick,
         claimtype_id,
-        claimtype_alias
+        claimtype_alias,
+        ss_owner_citizen_room_id,
+        ss_owner_citizen_room_head,
+        ss_owner_live_room_id,
+        ss_owner_live_room_head,
+        ss_pers_citizen_room_id,
+        ss_pers_citizen_room_head,
+        ss_pers_live_room_id,
+        ss_pers_live_room_head
     ];
 
 %%

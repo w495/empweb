@@ -49,6 +49,24 @@ begin
         new.judge_id           =
             (select pers.id from pers where pers.nick = new.judge_nick);
     end if;
+
+
+    if (new.room_head is null) then
+        if not (new.room_id is null) then
+            new.room_head =
+                (select doc.head
+                    from doc
+                        where doc.id = new.room_id);
+        else
+            new.room_head        = null;
+        end if;
+    end if;
+    if (new.room_id is null) then
+        new.room_id =
+            (select doc.id
+                from doc
+                    where doc.head = new.room_head);
+
     return new;
 end;
 $$ language plpgsql;
@@ -96,6 +114,19 @@ begin
         new.judge_id =
             (select pers.id from pers where pers.nick = new.judge_nick);
     end if;
+
+
+    if new.room_id != old.room_id then
+        new.room_head =
+            (select doc.head
+                from doc
+                    where doc.id = new.room_id);
+    end if;
+    if new.room_head != old.room_head then
+        new.room_id =
+            (select doc.id
+                from doc
+                    where doc.head = new.room_head);
     
     return new;
 end;

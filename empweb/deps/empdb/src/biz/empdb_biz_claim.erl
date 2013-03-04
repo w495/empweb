@@ -39,30 +39,79 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        case proplists:get_value(pers_nick, Params) of
-            undefined ->
-                empdb_dao_claim:create(Con, [
+        case empdb_dao_pers:get(Con, [
+            {'or', [
+                {id,      proplists:get_value(pers_id, Params, null)},
+                {nick,    proplists:get_value(pers_nick, Params, null)}
+            ]},
+            {fields, [
+                id,
+                citizen_room_id,
+                citizen_room_head,
+                live_room_id,
+                live_room_head
+            ]},
+            {limit, 1}
+        ]) of
+            {ok, [{Perspl}]} ->
+                Id = proplists:get_value(id, Perspl),
+                create__(Con, [
+                    {pers_id, proplists:get_value(id, Perspl)},
+                    {ss_pers_citizen_room_id,
+                        proplists:get_value(citizen_room_id, Perspl)},
+                    {ss_pers_citizen_room_head,
+                        proplists:get_value(citizen_room_head, Perspl)},
+                    {ss_pers_live_room_id,
+                        proplists:get_value(live_room_id, Perspl)},
+                    {ss_pers_live_room_head,
+                        proplists:get_value(live_room_head, Perspl)},
                     {claimtype_alias, open}
-                    |Params
+                    |proplists:delete(pers_id, proplists:delete(pers_nick, Params))
                 ]);
-            Nick ->
-                case empdb_dao_pers:get(Con, [
-                    {nick, Nick},
-                    {fields, [id]},
-                    {limit, 1}
-                ]) of
-                    {ok, [{Perspl}]} ->
-                        Id = proplists:get_value(id, Perspl),
-                        empdb_dao_claim:create(Con, [
-                            {pers_id, Id},
-                            {claimtype_alias, open}
-                            |proplists:delete(pers_nick, Params)
-                        ]);
-                    Else ->
-                        {error, pers_nick_do_not_exists}
-                end
+            {ok, []} ->
+                {error, pers_does_not_exist};
+            Elsepers ->
+                Elsepers
         end
     end).
+
+
+
+create__(Con, Params)->
+    case empdb_dao_pers:get(Con, [
+        {'or', [
+            {id,      proplists:get_value(owner_id, Params, null)},
+            {nick,    proplists:get_value(owner_nick, Params, null)}
+        ]},
+        {fields, [
+            id,
+            citizen_room_id,
+            citizen_room_head,
+            live_room_id,
+            live_room_head
+        ]},
+        {limit, 1}
+    ]) of
+        {ok, [{Ownerpl}]} ->
+            empdb_dao_claim:create(Con, [
+                {owner_id, proplists:get_value(id, Ownerpl)},
+                {ss_owner_citizen_room_id,
+                    proplists:get_value(citizen_room_id, Ownerpl)},
+                {ss_owner_citizen_room_head,
+                    proplists:get_value(citizen_room_head, Ownerpl)},
+                {ss_owner_live_room_id,
+                    proplists:get_value(live_room_id, Ownerpl)},
+                {ss_owner_live_room_head,
+                    proplists:get_value(live_room_head, Ownerpl)},
+                {claimtype_alias, open}
+                |proplists:delete(owner_id, proplists:delete(owner_nick, Params))
+            ]);
+        {ok, []} ->
+            {error, owner_does_not_exist};
+        Elseowner ->
+            Elseowner
+    end.
+
 
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
@@ -165,6 +214,12 @@ get_adds(Con, {ok, Res}, Params) ->
                             {owner_live_room_head,
                                 proplists:get_value(live_room_head, Ownerpl)
                             },
+                            {owner_citizen_room_id,
+                                proplists:get_value(citizen_room_id, Ownerpl)
+                            },
+                            {owner_citizen_room_head,
+                                proplists:get_value(citizen_room_head, Ownerpl)
+                            },
                             {pers_authority_id,
                                 proplists:get_value(authority_id, Perspl)
                             },
@@ -176,6 +231,12 @@ get_adds(Con, {ok, Res}, Params) ->
                             },
                             {pers_live_room_head,
                                 proplists:get_value(live_room_head, Perspl)
+                            },
+                            {pers_citizen_room_id,
+                                proplists:get_value(citizen_room_id, Perspl)
+                            },
+                            {pers_citizen_room_head,
+                                proplists:get_value(citizen_room_head, Perspl)
                             }
                         ]
                     )

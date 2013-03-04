@@ -1258,4 +1258,49 @@
         thingtype_id       decimal references thingtype(id) default null;
 
     alter table thingbuy add column
-        thingtype_alias    varchar(1024)                    default null;    
+        thingtype_alias    varchar(1024)                    default null;
+
+
+    alter table thingbuy add column
+        thingtype_alias    varchar(1024)                    default null;
+
+
+
+    alter table claim add column
+        room_id decimal references doc(id) default null;
+
+    alter table claim add column
+        room_head varchar(1024)            default null;
+
+
+--
+
+    alter table claim add column
+        ss_owner_citizen_room_id decimal references doc(id) default null;
+
+    alter table claim add column
+        ss_owner_citizen_room_head varchar(1024)            default null;
+
+
+    alter table claim add column
+        ss_owner_live_room_id decimal references doc(id) default null;
+
+    alter table claim add column
+        ss_owner_live_room_head varchar(1024)            default null;
+
+
+
+    alter table claim add column
+        ss_pers_citizen_room_id decimal references doc(id) default null;
+
+    alter table claim add column
+        ss_pers_citizen_room_head varchar(1024)            default null;
+
+
+    alter table claim add column
+        ss_pers_live_room_id decimal references doc(id) default null;
+
+    alter table claim add column
+        ss_pers_live_room_head varchar(1024)            default null;
+
+        
