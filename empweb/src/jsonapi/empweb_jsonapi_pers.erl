@@ -703,6 +703,35 @@ handle(_req, #empweb_hap{
                         key = lang_alias,
                         types = [nullable, string]
                     },
+
+                %% Уровень показа денег
+                    #norm_rule{
+                        key = show_money_acctype_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = show_money_acctype_alias,
+                        types = [nullable, string]
+                    },
+                %% Уровень получения сообщений.
+                    #norm_rule{
+                        key = message_acctype_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = message_acctype_alias,
+                        types = [nullable, string]
+                    },
+                %% Уровень принятия подарков.
+                    #norm_rule{
+                        key = thingwish_acctype_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = thingwish_acctype_alias,
+                        types = [nullable, string]
+                    },
+
                 %% Принимать, не принимать аукционы
                     #norm_rule{
                         key = allowauctionoffer,

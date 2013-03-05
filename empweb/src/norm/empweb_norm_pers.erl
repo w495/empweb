@@ -213,6 +213,33 @@ norm('get') ->
             required    = false,
             types       = empweb_norm:filter([nullable, string])
         },
+    %% Уровень показа денег
+        #norm_rule{
+            key = show_money_acctype_id,
+            types = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key = show_money_acctype_alias,
+            types = empweb_norm:filter([nullable, string])
+        },
+    %% Уровень получения сообщений.
+        #norm_rule{
+            key = message_acctype_id,
+            types = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key = message_acctype_alias,
+            types = empweb_norm:filter([nullable, string])
+        },
+    %% Уровень принятия подарков.
+        #norm_rule{
+            key = thingwish_acctype_id,
+            types = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key = thingwish_acctype_alias,
+            types = empweb_norm:filter([nullable, string])
+        },
     %% Реальное место положение
         #norm_rule{
             key         = geo_id,
