@@ -359,7 +359,9 @@ update_(Params)->
     empdb_dao:with_transaction(fun(Con)->
         Pers =
             empdb_dao_pers:get(Con,[
-                {id,    proplists:get_value(id,   Params)}
+                {filter,    proplists:get_value(filter,   Params, [
+                    {id,    proplists:get_value(id,   Params)}
+                ])}
             ]),
         case Pers of
             {ok, [{Mbperspl}]} ->
