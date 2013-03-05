@@ -540,6 +540,26 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                             Else
                     end;
                 {_, true} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило уровня.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_level}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило уровня.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_level},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
                     {error, {not_enough_level, {[
                         {cands_gte_authority_level,
                             Candsgteauthoritylevel
@@ -548,11 +568,51 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                             Authoritylevel}
                     ]}}};
                 {true, _} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило средств.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_money}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило средств.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_money},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
                     {error, {not_enough_money, {[
                         {money, Money},
                         {price, Price}
                     ]}}};
                 {_, _} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило уровня и средств.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_level_not_enough_money}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило уровня и средств.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_level_not_enough_money},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
                     {error, {not_enough_level_not_enough_money, {[
                         {money, Money},
                         {price, Price},
@@ -594,7 +654,7 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
                             {eventtype_alias,   new_community_away},
                             {eventact_alias,    update},
                             {eventobj_alias,    pers},
-                            {doc_id,  proplists:get_value(id, Communitypl)},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(id, Mbperspl)}
                         ]),
                     {ok, Res};
@@ -621,14 +681,29 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                     {fields, [
                         id,
                         owner_id,
-                        fee
+                        fee,
+                        cands_gte_authority_level
                     ]}
                 ]),
 
             Money   = proplists:get_value(money, Mbperspl),
             Price   = proplists:get_value(fee, Communitypl),
-            case Price =< Money of
-                true ->
+
+
+            %% если уровень человека на момент подачи заявки
+            %% ниже уровня сообщества,
+            %% то подать заявку на вступление в сообщество он не может.
+            Candsgteauthoritylevel =
+                proplists:get_value(cands_gte_authority_level, Communitypl),
+            Authoritylevel =
+                proplists:get_value(authority_level, Mbperspl),
+            %% Если человек на момент подачи заявки
+            %% не может оплатить взнос (fee),
+            %% то подать заявку на вступление в сообщество он не может.
+            Money   = proplists:get_value(money, Mbperspl),
+            Price   = proplists:get_value(fee, Communitypl),
+            case  {Candsgteauthoritylevel =< Authoritylevel, Price =< Money} of
+                {true, true} ->
                     case Function(Con, Params) of
                         {ok, Res} ->
                             %% Создаем событие истории 
@@ -686,10 +761,88 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                         Else ->
                             Else
                     end;
-                false ->
+                {_, true} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило уровня.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_level}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило уровня.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_level},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
+                    {error, {not_enough_level, {[
+                        {cands_gte_authority_level,
+                            Candsgteauthoritylevel
+                        },
+                        {authority_level,
+                            Authoritylevel}
+                    ]}}};
+                {true, _} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило средств.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_money}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило средств.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_money},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
                     {error, {not_enough_money, {[
                         {money, Money},
                         {price, Price}
+                    ]}}};
+                {_, _} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что у пользователя не хватило уровня и средств.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                Community_id},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_not_enough_level_not_enough_money}
+                        ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что у пользователя не хватило уровня и средств.
+                    {ok, _} =
+                        empdb_dao_event:create(Con, [
+                            {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventtype_alias,   new_community_not_enough_level_not_enough_money},
+                            {doc_id,            proplists:get_value(id, Communitypl)},
+                            {pers_id,           proplists:get_value(owner_id, Communitypl)}
+                        ]),
+                    {error, {not_enough_level_not_enough_money, {[
+                        {money, Money},
+                        {price, Price},
+                        {cands_gte_authority_level,
+                            Candsgteauthoritylevel
+                        },
+                        {authority_level,
+                            Authoritylevel}
                     ]}}}
             end;
         false ->
@@ -729,7 +882,7 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                             {communityhisttype_alias,
                                 pers_out}
                         ]),
-                    %% Отправляем владельцу сообщества сообщение,
+                    %% Отправляем пользователю сообщение,
                     %% что пользователя не одобряли.
                     {ok, _} =
                         empdb_dao_event:create(Con, [
@@ -761,6 +914,8 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                                 owner_id
                             ]}
                         ]),
+                    %% Делаем запись в историю сообщества,
+                    %% что пользователя выгнали.
                     {ok, _} =
                         empdb_dao_communityhist:create(Con, [
                             {community_id,
@@ -770,6 +925,8 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                             {communityhisttype_alias,
                                 pers_exile}
                         ]),
+                    %% Отправляем пользователю сообщение,
+                    %% что пользователя выгнали.
                     {ok, _} =
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(id, Mbperspl)},

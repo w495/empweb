@@ -1250,57 +1250,56 @@
         rent                numeric(1000, 2) default null;
 */
 
+-- 2013.03.05 16:02:01:632280169 ---------------------------------------------
 
+/*
     alter table pers add column
         costume_thingbuy_id decimal references thingbuy(id) default null;
-
     alter table thingbuy add column
         thingtype_id       decimal references thingtype(id) default null;
-
     alter table thingbuy add column
         thingtype_alias    varchar(1024)                    default null;
-
-
     alter table thingbuy add column
         thingtype_alias    varchar(1024)                    default null;
-
-
-
     alter table claim add column
         room_id decimal references doc(id) default null;
-
     alter table claim add column
         room_head varchar(1024)            default null;
-
-
---
-
     alter table claim add column
         ss_owner_citizen_room_id decimal references doc(id) default null;
-
     alter table claim add column
         ss_owner_citizen_room_head varchar(1024)            default null;
-
-
     alter table claim add column
         ss_owner_live_room_id decimal references doc(id) default null;
-
     alter table claim add column
         ss_owner_live_room_head varchar(1024)            default null;
-
-
-
     alter table claim add column
         ss_pers_citizen_room_id decimal references doc(id) default null;
-
     alter table claim add column
         ss_pers_citizen_room_head varchar(1024)            default null;
-
-
     alter table claim add column
         ss_pers_live_room_id decimal references doc(id) default null;
-
     alter table claim add column
         ss_pers_live_room_head varchar(1024)            default null;
+*/
 
-        
+
+
+    insert into eventtype (alias) values ('new_community_not_enough_money');
+
+
+    insert into eventtype (alias) values ('new_community_not_enough_level');
+
+
+    insert into eventtype (alias) values ('new_community_not_enough_level_not_enough_money');
+
+    
+
+
+    insert into communityhisttype (alias) values ('pers_not_enough_money');
+
+    insert into communityhisttype (alias) values ('pers_not_enough_level');
+
+    insert into communityhisttype (alias) values ('pers_not_enough_level_not_enough_money');
+
+    
