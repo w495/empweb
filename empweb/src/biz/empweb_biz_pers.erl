@@ -375,7 +375,10 @@ restore_pass(Params) ->
                     end, {false, []}, [email, phone]),
                     case Status of
                         true ->
-                            case empdb_biz_pers:update([{nick, Ppnick}, {pass, Pass}]) of
+                            case empdb_biz_pers:update([
+                                {filter, [{nick, Ppnick}]},
+                                {values, [{pass, Pass}]}
+                            ]) of
                                 {ok, [{Upl}]} ->
                                     {ok, [{[
                                         {errors, [{Reasons}]}
