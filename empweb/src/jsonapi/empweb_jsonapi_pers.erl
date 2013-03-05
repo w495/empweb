@@ -177,7 +177,7 @@ handle(Req, #empweb_hap{
         norm:norm(Params, [
             #norm_rule{
                 key = nick,
-                types = [integer]
+                types = [string]
             },
             #norm_rule{
                 key = email,
