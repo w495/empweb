@@ -162,7 +162,7 @@ remove_expired()->
             empdb_dao_zprotbuy:update(Con,[
                 {filter, [
                     {isdeleted, false},
-                    {expired, {lt, empdb_convert:datetime2int(Nowdt)}}
+                    {expired, {lt, Nowdt}}
                 ]},
                 {values, [
                     {isdeleted, true}
