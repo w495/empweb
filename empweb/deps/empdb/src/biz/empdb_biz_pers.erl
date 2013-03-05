@@ -327,7 +327,9 @@ create__(Pass, Params)->
 %% и обновляется запись пользователя сервера jabberd.
 %%
 update(Params)->
-    case proplists:get_value(pass, Params) of
+    case proplists:get_value(pass, Params,
+        proplists:get_value(pass, proplists:get_value(values, Params)))
+    of
         undefined ->
             %% не пытаемся поменять пароль
             update_(Params);
