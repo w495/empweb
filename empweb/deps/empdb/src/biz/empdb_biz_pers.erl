@@ -121,7 +121,7 @@ start(_)->
     ),
 
     timer:apply_interval(
-        60000,
+        120000,
         ?MODULE,
         make_offline,
         []
