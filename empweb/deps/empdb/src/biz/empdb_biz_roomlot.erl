@@ -42,7 +42,28 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_roomlot:create(Con, Params)
+        case empdb_dao_roomlot:get(Con,[
+            {   filter,
+                proplists:get_value(filter, Params, [
+                    {room_id, proplists:get_value(room_id, Params)}
+                ])
+            }
+        ]) of
+            {ok, []} ->
+                empdb_dao_roomlot:create(Con, Params);
+            {ok, _} ->
+                {error, {not_uniq_roomlot, {[
+                    {room_id,
+                        proplists:get_value(room_id, Params,
+                            proplists:get_value(room_id,
+                                proplists:get_value(filter, Params, [])
+                            )
+                        )
+                    }
+                ]}}};
+            Elseget ->
+                Elseget
+        end
     end).
 
 update(Params)->

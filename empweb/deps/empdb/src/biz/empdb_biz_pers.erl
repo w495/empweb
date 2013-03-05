@@ -328,7 +328,7 @@ create__(Pass, Params)->
 %%
 update(Params)->
     case proplists:get_value(pass, Params,
-        proplists:get_value(pass, proplists:get_value(values, Params)))
+        proplists:get_value(pass, proplists:get_value(values, Params, [])))
     of
         undefined ->
             %% не пытаемся поменять пароль
