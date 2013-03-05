@@ -537,11 +537,11 @@ create table pers(
     show_money_acctype_id     decimal         references acctype(id)    default null,
     show_money_acctype_alias  varchar(1024)   references acctype(alias) default null,
 
-    message_acctype_id     decimal         references acctype(id)    default null,
-    message_acctype_alias  varchar(1024)   references acctype(alias) default null,
+    get_message_acctype_id     decimal         references acctype(id)    default null,
+    get_message_acctype_alias  varchar(1024)   references acctype(alias) default null,
 
-    thingwish_acctype_id     decimal         references acctype(id)    default null,
-    thingwish_acctype_alias  varchar(1024)   references acctype(alias) default null,
+    get_thingbuy_acctype_id     decimal         references acctype(id)    default null,
+    get_thingbuy_acctype_alias  varchar(1024)   references acctype(alias) default null,
 
     /**
         ------------------------------------------------------------

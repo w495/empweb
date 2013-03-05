@@ -1302,14 +1302,17 @@ alter table pers add column
 alter table pers add column
     show_money_acctype_alias  varchar(1024)   references acctype(alias) default null;
 
+    
 alter table pers add column
-    message_acctype_id     decimal         references acctype(id)    default null;
+    get_message_acctype_id     decimal         references acctype(id)    default null;
 
 alter table pers add column
-    message_acctype_alias  varchar(1024)   references acctype(alias) default null;
+    get_message_acctype_alias  varchar(1024)   references acctype(alias) default null;
+
+    
+alter table pers add column
+    get_thingbuy_acctype_id     decimal         references acctype(id)    default null;
 
 alter table pers add column
-    thingwish_acctype_id     decimal         references acctype(id)    default null;
+    get_thingbuy_acctype_alias  varchar(1024)   references acctype(alias) default null;
 
-alter table pers add column
-    thingwish_acctype_alias  varchar(1024)   references acctype(alias) default null;

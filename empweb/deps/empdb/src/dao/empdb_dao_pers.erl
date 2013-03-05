@@ -239,11 +239,11 @@ table({fields, all})->
         show_money_acctype_id,
         show_money_acctype_alias,
 
-        message_acctype_id,
-        message_acctype_alias,
+        get_message_acctype_id,
+        get_message_acctype_alias,
 
-        thingwish_acctype_id,
-        thingwish_acctype_alias,
+        get_thingbuy_acctype_id,
+        get_thingbuy_acctype_alias,
 
     
         istimeover,

@@ -226,23 +226,23 @@ norm('get') ->
         },
     %% Уровень получения сообщений.
         #norm_rule{
-            key = message_acctype_id,
+            key = get_message_acctype_id,
             required    = false,
             types = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = message_acctype_alias,
+            key = get_message_acctype_alias,
             required    = false,
             types = empweb_norm:filter([nullable, string])
         },
     %% Уровень принятия подарков.
         #norm_rule{
-            key = thingwish_acctype_id,
+            key = get_thingbuy_acctype_id,
             required    = false,
             types = empweb_norm:filter([nullable, integer])
         },
         #norm_rule{
-            key = thingwish_acctype_alias,
+            key = get_thingbuy_acctype_alias,
             required    = false,
             types = empweb_norm:filter([nullable, string])
         },

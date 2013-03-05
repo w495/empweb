@@ -715,27 +715,21 @@ handle(_req, #empweb_hap{
                     },
                 %% Уровень получения сообщений.
                     #norm_rule{
-                        key = message_acctype_id,
+                        key = get_message_acctype_id,
                         types = [nullable, integer]
                     },
                     #norm_rule{
-                        key = message_acctype_alias,
+                        key = get_message_acctype_alias,
                         types = [nullable, string]
                     },
                 %% Уровень принятия подарков.
                     #norm_rule{
-                        key = thingwish_acctype_id,
+                        key = get_thingbuy_acctype_id,
                         types = [nullable, integer]
                     },
                     #norm_rule{
-                        key = thingwish_acctype_alias,
+                        key = get_thingbuy_acctype_alias,
                         types = [nullable, string]
-                    },
-
-                %% Принимать, не принимать аукционы
-                    #norm_rule{
-                        key = allowauctionoffer,
-                        types = [nullable, boolean]
                     },
                 %% Реальное место положение
                     #norm_rule{

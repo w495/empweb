@@ -59,7 +59,7 @@ create(Params)->
                 ]},
                 {limit, 1}
             ]),
-        Now = {erlang:date(), erlang:time()},
+        Now = calendar:local_time_to_universal_time({erlang:date(), erlang:time()}),
         Nowint  = empdb_convert:datetime2int(Now),
         Rangeint = Nowint + ?EMPDB_UNIXTIMEWEEK,
         Expired =
@@ -119,7 +119,7 @@ create(Params)->
                 end;
             {{ok, []}, _, false} ->
                 {error, {not_enough_money, {[
-                    {expired, Expired},
+                    {expired, Expiredint},
                     {money, Money},
                     {price, Price}
                 ]}}};
@@ -157,12 +157,12 @@ timeout()->
 
 remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
-        Nowdt = {date(), time()},
+        Nowdt = calendar:local_time_to_universal_time({erlang:date(), erlang:time()}),
         {ok, Dexiles} =
             empdb_dao_zprotbuy:update(Con,[
                 {filter, [
                     {isdeleted, false},
-                    {expired, {lt, Nowdt}}
+                    {expired, {lt, empdb_convert:datetime2int(Nowdt)}}
                 ]},
                 {values, [
                     {isdeleted, true}

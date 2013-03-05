@@ -199,31 +199,31 @@ begin
     end if;
 
 
-    if (new.message_acctype_alias is null) then
-        if not (new.message_acctype_id is null) then
-            new.message_acctype_alias =
-                (select alias from acctype where id = new.message_acctype_id);
+    if (new.get_message_acctype_alias is null) then
+        if not (new.get_message_acctype_id is null) then
+            new.get_message_acctype_alias =
+                (select alias from acctype where id = new.get_message_acctype_id);
         else
-            new.message_acctype_alias  = 'public';
+            new.get_message_acctype_alias  = 'public';
         end if;
     end if;
-    if (new.message_acctype_id is null) then
-        new.message_acctype_id     =
-            (select id from acctype   where alias = new.message_acctype_alias);
+    if (new.get_message_acctype_id is null) then
+        new.get_message_acctype_id     =
+            (select id from acctype   where alias = new.get_message_acctype_alias);
     end if;
 
 
-    if (new.thingwish_acctype_alias is null) then
-        if not (new.thingwish_acctype_id is null) then
-            new.thingwish_acctype_alias =
-                (select alias from acctype where id = new.thingwish_acctype_id);
+    if (new.get_thingbuy_acctype_alias is null) then
+        if not (new.get_thingbuy_acctype_id is null) then
+            new.get_thingbuy_acctype_alias =
+                (select alias from acctype where id = new.get_thingbuy_acctype_id);
         else
-            new.thingwish_acctype_alias  = 'public';
+            new.get_thingbuy_acctype_alias  = 'public';
         end if;
     end if;
-    if (new.thingwish_acctype_id is null) then
-        new.thingwish_acctype_id     =
-            (select id from acctype   where alias = new.thingwish_acctype_alias);
+    if (new.get_thingbuy_acctype_id is null) then
+        new.get_thingbuy_acctype_id     =
+            (select id from acctype   where alias = new.get_thingbuy_acctype_alias);
     end if;
 
     if (new.show_money_acctype_alias is null) then
@@ -611,40 +611,38 @@ begin
     end if;
 
 
-    if new.message_acctype_id != old.message_acctype_id then
-        new.message_acctype_alias =
+    if new.get_message_acctype_id != old.get_message_acctype_id then
+        new.get_message_acctype_alias =
             (select acctype.alias
                 from
                     acctype
                 where
-                    acctype.id = new.message_acctype_id);
+                    acctype.id = new.get_message_acctype_id);
     end if;
-    if new.message_acctype_alias != old.message_acctype_alias then
-        new.message_acctype_id =
+    if new.get_message_acctype_alias != old.get_message_acctype_alias then
+        new.get_message_acctype_id =
             (select acctype.id
                 from
                     acctype
                 where
-                    acctype.alias = new.message_acctype_alias);
+                    acctype.alias = new.get_message_acctype_alias);
     end if;
 
-
-
-    if new.thingwish_acctype_id != old.thingwish_acctype_id then
-        new.thingwish_acctype_alias =
+    if new.get_thingbuy_acctype_id != old.get_thingbuy_acctype_id then
+        new.get_thingbuy_acctype_alias =
             (select acctype.alias
                 from
                     acctype
                 where
-                    acctype.id = new.thingwish_acctype_id);
+                    acctype.id = new.get_thingbuy_acctype_id);
     end if;
-    if new.thingwish_acctype_alias != old.thingwish_acctype_alias then
-        new.thingwish_acctype_id =
+    if new.get_thingbuy_acctype_alias != old.get_thingbuy_acctype_alias then
+        new.get_thingbuy_acctype_id =
             (select acctype.id
                 from
                     acctype
                 where
-                    acctype.alias = new.thingwish_acctype_alias);
+                    acctype.alias = new.get_thingbuy_acctype_alias);
     end if;
 
 
