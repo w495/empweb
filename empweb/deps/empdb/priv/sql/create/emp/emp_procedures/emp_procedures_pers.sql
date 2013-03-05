@@ -212,6 +212,7 @@ on pers for each row execute procedure pers_util_fields_on_insert();
 /**
     @doc Обеспечивает совместное состояние пользователя
 **/
+
 create or replace function pers_util_fields_on_update() returns "trigger" as $$
 begin
     if new.own_room_id != old.own_room_id then
@@ -231,7 +232,6 @@ begin
             (select room.roomtype_alias from room
                 where room.doc_id = new.live_room_id);
     end if;
-
     if (new.citizen_room_id != old.citizen_room_id) then
         new.citizen_room_head =
             (select doc.head from doc
@@ -255,55 +255,70 @@ begin
                         where ostatus.alias = new.ostatus_alias);
         end if;
     end if;
-
-    if (
-        (new.live_community_id != old.live_community_id)
-    and
-        (not (new.live_community_id is null))
-    and
-        (not (old.live_community_id is null))
-    ) then
-        raise exception 'exists_live_community';
-    else
-        if(new.own_community_id != new.live_community_id)
-            or (
-                (new.own_community_id is null)
-                    and (old.live_community_id is null)
-            ) then
-            new.live_community_approved = false;
-            update community set ncands = ncands + 1
-                where community.doc_id = new.live_community_id;
+    if (old.live_community_id is distinct from new.live_community_id) then
+        if ((old.live_community_id is not null) and (new.live_community_id is not null)) then
+            if (new.live_community_id != old.live_community_id) then
+                raise exception 'exists_live_community';
+            end if;
         end if;
-    end if;
-
-    if (new.live_community_approved != old.live_community_approved) then
-        if(new.live_community_approved is null) then
-            update community set ncands = ncands + 1
-                where community.doc_id = new.live_community_id;
-            update community set nmembs = nmembs - 1
-                where community.doc_id = new.live_community_id;
-        end if;
-        if(new.live_community_approved is true) then
-            if(new.own_community_id != new.live_community_id) then
-                update community set ncands = ncands - 1
+        if ((old.live_community_id is null) and (new.live_community_id is not null)) then
+            if (old.live_community_approved is null) and (new.live_community_approved is null) then
+                update community set ncands = ncands + 1
                     where community.doc_id = new.live_community_id;
-            end if
+            end if;
+            if (old.live_community_approved is null) and (new.live_community_approved = true) then
+                update community set ncands = ncands - 1
+                    where community.doc_id = new.live_community_id and ncands > 0;
+                update community set nmembs = nmembs + 1
+                    where community.doc_id = new.live_community_id;
+            end if;
+            if (old.live_community_approved is null) and (new.live_community_approved = false) then
+                raise exception 'not_valid_combination';
+            end if;
+            if (old.live_community_approved = true ) and (new.live_community_approved = false) then
+                raise exception 'not_valid_combination';
+            end if;
+            if (old.live_community_approved = true ) and (new.live_community_approved is null) then
+                raise exception 'not_valid_combination';
+            end if;
+        end if;
+
+        if ((old.live_community_id is not null) and (new.live_community_id is null)) then
+            if (old.live_community_approved is null) then
+                update community set ncands = ncands - 1
+                    where community.doc_id = old.live_community_id and ncands > 0;
+                new.live_community_id = null;
+                new.live_community_approved = null;
+            end if;
+            if (old.live_community_approved = true) then
+                update community set nmembs = nmembs - 1
+                    where community.doc_id = old.live_community_id and nmembs > 0;
+                new.live_community_id = null;
+                new.live_community_approved = null;
+            end if;
+        end if;
+    else
+        if (old.live_community_approved is null) and (new.live_community_approved = true) then
+            update community set ncands = ncands - 1
+                where community.doc_id = new.live_community_id and ncands > 0;
             update community set nmembs = nmembs + 1
                 where community.doc_id = new.live_community_id;
         end if;
-        if(new.live_community_approved is false) then
+        if (old.live_community_approved is null) and (new.live_community_approved = false) then
             update community set ncands = ncands - 1
-                where community.doc_id = new.live_community_id;
-            update community set nmembs = nmembs - 1
-                where community.doc_id = new.live_community_id;
+                where community.doc_id = new.live_community_id and ncands > 0;
+            new.live_community_id = null;
+            new.live_community_approved = null;
         end if;
-    end if;
-
-    if ((old.live_community_id  is not null)
-        and (new.live_community_id is null)) then
-        new.live_community_approved = null;
-        update community set nmembs = nmembs - 1
-            where community.doc_id = old.live_community_id;
+        if (old.live_community_approved = true ) and (new.live_community_approved = false) then
+            update community set nmembs = nmembs - 1
+                where community.doc_id = new.live_community_id and nmembs > 0;
+            new.live_community_id = null;
+            new.live_community_approved = null;
+        end if;
+        if (old.live_community_approved = true ) and (new.live_community_approved is null) then
+            raise exception 'not_valid_combination';
+        end if;
     end if;
     /**
         Статус online \ offline

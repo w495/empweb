@@ -714,22 +714,28 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
             %% Человека не одобряли как члена сообщества
             case Function(Con, Params) of
                 {ok, Res} ->
+                    %% Делаем запись в историю сообщества,
+                    %% что пользователя не одобряли.
+                    {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                proplists:get_value(live_community_id, Mbperspl)},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_out}
+                        ]),
+                    %% Отправляем владельцу сообщества сообщение,
+                    %% что пользователя не одобряли.
                     {ok, _} =
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventact_alias,    update},
+                            {eventobj_alias,    pers},
                             {eventtype_alias,   new_community_out},
                             {doc_id, proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(owner_id, Communitypl)}
                         ]),
-
-                    empdb_dao_communityhist:create(Con, [
-                        {community_id,
-                            proplists:get_value(live_community_id, Mbperspl)},
-                        {pers_id,
-                            proplists:get_value(id, Mbperspl)},
-                        {communityhisttype_alias,
-                            pers_out}
-                    ]),
                     {ok, Res};
                 Else ->
                     Else
@@ -752,21 +758,23 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
                             ]}
                         ]),
                     {ok, _} =
+                        empdb_dao_communityhist:create(Con, [
+                            {community_id,
+                                proplists:get_value(live_community_id, Mbperspl)},
+                            {pers_id,
+                                proplists:get_value(id, Mbperspl)},
+                            {communityhisttype_alias,
+                                pers_exile}
+                        ]),
+                    {ok, _} =
                         empdb_dao_event:create(Con, [
                             {owner_id,          proplists:get_value(id, Mbperspl)},
+                            {eventact_alias,    update},
+                            {eventobj_alias,    pers},
                             {eventtype_alias,   new_community_exile},
                             {doc_id, proplists:get_value(id, Communitypl)},
                             {pers_id,           proplists:get_value(owner_id, Communitypl)}
                         ]),
-
-                    empdb_dao_communityhist:create(Con, [
-                        {community_id,
-                            proplists:get_value(live_community_id, Mbperspl)},
-                        {pers_id,
-                            proplists:get_value(id, Mbperspl)},
-                        {communityhisttype_alias,
-                            pers_exile}
-                    ]),
                     {ok, Res};
                 Else ->
                     Else

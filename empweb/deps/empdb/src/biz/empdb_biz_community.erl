@@ -111,9 +111,9 @@ create(Params)->
         Authority_level =
             proplists:get_value(authority_level, Mbownerpl),
         Readgteauthority_level =
-            proplists:get_value(level, Readgteauthoritypl),
+            proplists:get_value(level, Readgteauthoritypl, 0),
         Candsgteauthority_level =
-            proplists:get_value(level, Candsgteauthoritypl),
+            proplists:get_value(level, Candsgteauthoritypl, 0),
         case {
             Price =< Money,
             Mbcommunityobjs,

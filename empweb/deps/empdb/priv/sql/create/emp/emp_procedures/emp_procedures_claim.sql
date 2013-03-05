@@ -80,7 +80,7 @@ begin
     /**
         Типы жалоб
     **/
-    if new.claimtype_id != old.claimtype_id then
+    if new.claimtype_id is distinct from old.claimtype_id then
         new.claimtype_alias =
             (select claimtype.alias
                 from
@@ -88,7 +88,7 @@ begin
                 where
                     claimtype.id = new.claimtype_id);
     end if;
-    if new.claimtype_alias != old.claimtype_alias then
+    if new.claimtype_alias is distinct from old.claimtype_alias then
         new.claimtype_id =
             (select claimtype.id
                 from
@@ -97,32 +97,32 @@ begin
                     claimtype.alias = new.claimtype_alias);
     end if;
     
-    if new.pers_id != old.pers_id then
+    if new.pers_id is distinct from old.pers_id then
         new.pers_nick =
             (select pers.nick from pers where pers.id = new.pers_id);
     end if;
-    if new.pers_nick != old.pers_nick then
+    if new.pers_nick is distinct from old.pers_nick then
         new.pers_id =
             (select pers.id from pers where pers.nick = new.pers_nick);
     end if;
 
-    if new.judge_id != old.judge_id then
+    if new.judge_id is distinct from old.judge_id then
         new.judge_nick =
             (select pers.nick from pers where pers.id = new.judge_id);
     end if;
-    if new.judge_nick != old.judge_nick then
+    if new.judge_nick is distinct from old.judge_nick then
         new.judge_id =
             (select pers.id from pers where pers.nick = new.judge_nick);
     end if;
 
 
-    if new.room_id != old.room_id then
+    if new.room_id is distinct from old.room_id then
         new.room_head =
             (select doc.head
                 from doc
                     where doc.id = new.room_id);
     end if;
-    if new.room_head != old.room_head then
+    if new.room_head is distinct from old.room_head then
         new.room_id =
             (select doc.id
                 from doc

@@ -50,6 +50,7 @@ init(_, Req, #empweb_hap{
         auth            =   Auth,
         is_auth         =   Is_auth,
         pers_id         =   User_id,
+        pers_nick       =   Pers_nick,
         pers_perm_names =   User_perm_names
     } = Hap)->
     %%%
@@ -60,6 +61,7 @@ init(_, Req, #empweb_hap{
         {params,            Params},
         {is_auth,           Is_auth},
         {pers_id,           User_id},
+        {pers_nick,         Pers_nick},
         {pers_perm_names,   User_perm_names}
     ]}, <<" = Hap">>),
 
@@ -71,6 +73,7 @@ init(_, Req, #empweb_hap{
             params          =   Params,
             is_auth         =   Is_auth,
             pers_id         =   User_id,
+            pers_nick       =   Pers_nick,
             pers_perm_names =   User_perm_names
         }
     }.
@@ -160,11 +163,12 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
 
 
 handle(Req, #empweb_hap{
-        action  =   pass,
-        params  =   Params,
-        is_auth =   Is_auth,
-        pers_id =   Pers_id,
-        auth    =   Auth,
+        action  =       pass,
+        params  =       Params,
+        is_auth =       Is_auth,
+        pers_id =       Pers_id,
+        pers_nick =     Pers_nick,
+        auth    =       Auth,
         pers_perm_names=Pperm_names
     }=Hap) ->
     ?evman_args(Hap, <<" = pass">>),
@@ -172,7 +176,7 @@ handle(Req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
-                key = id,
+                key = nick,
                 types = [integer]
             },
             #norm_rule{
@@ -185,7 +189,7 @@ handle(Req, #empweb_hap{
                 empweb_jsonapi:resp(
                     empweb_biz_pers:pass([
                         Auth,
-                        {pers_id, Pers_id},
+                        {self@pers_nick, Pers_nick},
                         {is_auth, Is_auth}
                         | Data#norm.return
                     ])

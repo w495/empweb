@@ -329,13 +329,13 @@ login(Params) ->
 %%
 pass(Params) ->
     ?evman_args(Params, <<"pers try to remind password">>),
-    Id = proplists:get_value(id,Params),
-    Pers_id = proplists:get_value(pers_id,Params),
+    Ppnick = proplists:get_value(nick,Params),
+    Spnick = proplists:get_value(self@pers_nick,Params),
     %%
     %% Востанавливать пароль можно только, если пользователь не залогинен
     %% в системе, или если залогинен, но восстанавливает пароль для себя.
     %%
-    case {proplists:get_value(is_auth,Params), Id == Pers_id} of
+    case {proplists:get_value(is_auth,Params), Spnick == Ppnick} of
         {true, true}->
             restore_pass(Params);
         {false, _}->
@@ -343,7 +343,7 @@ pass(Params) ->
         {undefined, _}->
             restore_pass(Params);
         _ ->
-            {error,{bad_pers,{[{id, Id}]}}}
+            {error,{bad_pers,{[{nick, Ppnick}]}}}
     end.
 
 %%
@@ -352,11 +352,11 @@ pass(Params) ->
 %%  потом сбрасываем старый пароль.
 %%
 restore_pass(Params) ->
-    Id = proplists:get_value(id,Params),
+    Ppnick = proplists:get_value(nick,Params),
     Email = proplists:get_value(email,Params),
     case empdb_biz_pers:get(Params, [email, phone]) of
         {ok,[]} ->
-            {error,{bad_pers,{[{id, Id}, {email,Email}]}}};
+            {error,{bad_pers,{[{nick, Ppnick}, {email,Email}]}}};
         {ok,[{Perspl}]} ->
             case Email == proplists:get_value(email, Perspl) of
                 true ->
@@ -375,21 +375,21 @@ restore_pass(Params) ->
                     end, {false, []}, [email, phone]),
                     case Status of
                         true ->
-                            case empdb_biz_pers:update([{id, Id}, {pass, Pass}]) of
+                            case empdb_biz_pers:update([{nick, Ppnick}, {pass, Pass}]) of
                                 {ok, [{Upl}]} ->
                                     {ok, [{[
                                         {errors, [{Reasons}]}
                                         | Upl
                                     ]}]};
                                 {error,{required,[username,password]}} ->
-                                    {error,{this_is_test_user,{[{id, Id}]}}}
+                                    {error,{this_is_test_user,{[{nick, Ppnick}]}}}
                             end;
                         false ->
-                            {error,{no_enough_info,{[{id, Id}]}}}
+                            {error,{no_enough_info,{[{nick, Ppnick}]}}}
                     end;
                 _ -> 
                     io:format("~n ==> ~p ~n", [Perspl]),
-                    {error,{bad_pers,{[{id, Id}, {email,Email}]}}}
+                    {error,{bad_pers,{[{nick, Ppnick}, {email,Email}]}}}
             end;
         {error, Error} ->
             {error, Error}
