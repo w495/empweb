@@ -41,6 +41,7 @@ update(Params)->
     end).
 
 count(Params)->
+    
     empdb_dao:with_connection(fun(Con)->
         case empdb_dao_event:count(Con, [{isdeleted, false}|Params]) of
             {ok, [{Allcountpl}]}->
@@ -53,6 +54,23 @@ count(Params)->
                         |Params
                     ]),
                     Exilecount = proplists:get_value(count, Exilecountpl, 0),
+
+                    spawn_link(fun()->
+                        %% Ключевой момент: без spawn_link код ниже может
+                        %% привести к блокировкам, а так,
+                        %% он выполняется независимо.
+                        empdb_dao:with_transaction(emp, fun(Conupdate) ->
+                            %%
+                            %% Ставим пользователю статус online
+                            %%
+                            {ok, _} =
+                                empdb_dao_pers:update(Conupdate, [
+                                    {pstatus_alias, online},
+                                    {id, proplists:get_value(owner_id, Params)}
+                                ])
+                        end)
+                    end),
+
                 {ok, [{[{exilecount, Exilecount}|Allcountpl]}]};
             Allcountelse ->
                 Allcountelse

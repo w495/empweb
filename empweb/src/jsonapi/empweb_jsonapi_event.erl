@@ -85,7 +85,10 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
-        action='count', params=Params, pers_id=Pers_id
+        action  =   'count',
+        params  =   Params,
+        pers_id =   Pers_id
+        
     } = Hap) ->
     ?evman_args([Hap], <<" = get event">>),
 
