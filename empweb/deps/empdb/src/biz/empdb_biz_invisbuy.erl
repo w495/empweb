@@ -63,7 +63,8 @@ create(Params)->
                 ]},
                 {fields, [
                     id,
-                    invistype_level
+                    invistype_level,
+                    invistype_alias
                 ]},
                 {limit, 1}
             ]),
@@ -76,6 +77,7 @@ create(Params)->
                 ]},
                 {fields, [
                     level,
+                    alias,
                     price,
                     id
                 ]},
