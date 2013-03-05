@@ -1284,22 +1284,32 @@
 */
 
 
+-- 2013.03.05 17:15:30:160369728 ---------------------------------------------
 
+/*
     insert into eventtype (alias) values ('new_community_not_enough_money');
-
-
     insert into eventtype (alias) values ('new_community_not_enough_level');
-
-
     insert into eventtype (alias) values ('new_community_not_enough_level_not_enough_money');
-
-    
-
-
     insert into communityhisttype (alias) values ('pers_not_enough_money');
-
     insert into communityhisttype (alias) values ('pers_not_enough_level');
-
     insert into communityhisttype (alias) values ('pers_not_enough_level_not_enough_money');
+*/
 
-    
+
+alter table pers add column
+    show_money_acctype_id     decimal         references acctype(id)    default null;
+
+alter table pers add column
+    show_money_acctype_alias  varchar(1024)   references acctype(alias) default null;
+
+alter table pers add column
+    message_acctype_id     decimal         references acctype(id)    default null;
+
+alter table pers add column
+    message_acctype_alias  varchar(1024)   references acctype(alias) default null;
+
+alter table pers add column
+    thingwish_acctype_id     decimal         references acctype(id)    default null;
+
+alter table pers add column
+    thingwish_acctype_alias  varchar(1024)   references acctype(alias) default null;

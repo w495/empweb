@@ -198,6 +198,48 @@ begin
             geo.id = new.geo_id;
     end if;
 
+
+    if (new.message_acctype_alias is null) then
+        if not (new.message_acctype_id is null) then
+            new.message_acctype_alias =
+                (select alias from acctype where id = new.message_acctype_id);
+        else
+            new.message_acctype_alias  = 'public';
+        end if;
+    end if;
+    if (new.message_acctype_id is null) then
+        new.message_acctype_id     =
+            (select id from acctype   where alias = new.message_acctype_alias);
+    end if;
+
+
+    if (new.thingwish_acctype_alias is null) then
+        if not (new.thingwish_acctype_id is null) then
+            new.thingwish_acctype_alias =
+                (select alias from acctype where id = new.thingwish_acctype_id);
+        else
+            new.thingwish_acctype_alias  = 'public';
+        end if;
+    end if;
+    if (new.thingwish_acctype_id is null) then
+        new.thingwish_acctype_id     =
+            (select id from acctype   where alias = new.thingwish_acctype_alias);
+    end if;
+
+    if (new.show_money_acctype_alias is null) then
+        if not (new.show_money_acctype_id is null) then
+            new.show_money_acctype_alias =
+                (select alias from acctype where id = new.show_money_acctype_id);
+        else
+            new.show_money_acctype_alias  = 'public';
+        end if;
+    end if;
+    if (new.show_money_acctype_id is null) then
+        new.show_money_acctype_id     =
+            (select id from acctype   where alias = new.show_money_acctype_alias);
+    end if;
+
+    
     return new;
 end;
 $$ language plpgsql;
@@ -568,6 +610,62 @@ begin
             geo.id = new.geo_id;
     end if;
 
+
+    if new.message_acctype_id != old.message_acctype_id then
+        new.message_acctype_alias =
+            (select acctype.alias
+                from
+                    acctype
+                where
+                    acctype.id = new.message_acctype_id);
+    end if;
+    if new.message_acctype_alias != old.message_acctype_alias then
+        new.message_acctype_id =
+            (select acctype.id
+                from
+                    acctype
+                where
+                    acctype.alias = new.message_acctype_alias);
+    end if;
+
+
+
+    if new.thingwish_acctype_id != old.thingwish_acctype_id then
+        new.thingwish_acctype_alias =
+            (select acctype.alias
+                from
+                    acctype
+                where
+                    acctype.id = new.thingwish_acctype_id);
+    end if;
+    if new.thingwish_acctype_alias != old.thingwish_acctype_alias then
+        new.thingwish_acctype_id =
+            (select acctype.id
+                from
+                    acctype
+                where
+                    acctype.alias = new.thingwish_acctype_alias);
+    end if;
+
+
+    if new.show_money_acctype_id != old.show_money_acctype_id then
+        new.show_money_acctype_alias =
+            (select acctype.alias
+                from
+                    acctype
+                where
+                    acctype.id = new.show_money_acctype_id);
+    end if;
+    if new.show_money_acctype_alias != old.show_money_acctype_alias then
+        new.show_money_acctype_id =
+            (select acctype.id
+                from
+                    acctype
+                where
+                    acctype.alias = new.show_money_acctype_alias);
+    end if;
+
+    
     return new;
 end;
 $$ language plpgsql;

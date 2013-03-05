@@ -231,11 +231,21 @@ table({fields, all})->
         own_room_id,
         own_room_head,
         
-        % allowauctoffer,
         perspichead_id,
         perspicbody_id,
         costume_thingbuy_id,
-        
+
+
+        show_money_acctype_id,
+        show_money_acctype_alias,
+
+        message_acctype_id,
+        message_acctype_alias,
+
+        thingwish_acctype_id,
+        thingwish_acctype_alias,
+
+    
         istimeover,
         isdeleted
     ];

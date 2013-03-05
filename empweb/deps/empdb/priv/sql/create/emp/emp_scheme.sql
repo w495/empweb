@@ -533,6 +533,16 @@ create table pers(
     perspichead_id      decimal references perspichead(id)   default null,
     perspicbody_id      decimal references perspicbody(id)   default null,
 
+
+    show_money_acctype_id     decimal         references acctype(id)    default null,
+    show_money_acctype_alias  varchar(1024)   references acctype(alias) default null,
+
+    message_acctype_id     decimal         references acctype(id)    default null,
+    message_acctype_alias  varchar(1024)   references acctype(alias) default null,
+
+    thingwish_acctype_id     decimal         references acctype(id)    default null,
+    thingwish_acctype_alias  varchar(1024)   references acctype(alias) default null,
+
     /**
         ------------------------------------------------------------
             Внутрениие поля
