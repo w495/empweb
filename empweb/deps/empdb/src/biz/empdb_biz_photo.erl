@@ -106,8 +106,6 @@ get(Params, Fields)->
         )
     end).
 
-
-    
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_photo:update(Con, [{isdeleted, true}|Params])

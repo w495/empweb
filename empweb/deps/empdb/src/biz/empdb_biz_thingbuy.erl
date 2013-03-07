@@ -87,6 +87,8 @@ create(Params)->
                         {ok, expired2price(Con, Thingrent, Nowint, Expiredint)}
                 end,
 
+            io:format("~n~n~n Costs = ~p ~n~n~n", [Costs]),
+            
             Money = proplists:get_value(money, Mbbuyerpl),
             case {Costserror, Costs =< Money} of
                 {{error, no_price}, _} ->
@@ -167,6 +169,13 @@ create(Params)->
     )).
 
 expired2price(Con, Rent, Nowint, Expiredint) ->
+
+    io:format("~n~n~n PL = ~p ~n~n~n", [[
+        {rent, Rent},
+        {nowint, Nowint},
+        {expiredint, Expiredint}
+    ]]),
+
     case Expiredint > Nowint of
         true ->
             Rangeint    = Expiredint - Nowint,
