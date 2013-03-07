@@ -1295,24 +1295,32 @@
     insert into communityhisttype (alias) values ('pers_not_enough_level_not_enough_money');
 */
 
+/*
 
-alter table pers add column
-    show_money_acctype_id     decimal         references acctype(id)    default null;
+    alter table pers add column
+        show_money_acctype_id     decimal         references acctype(id)    default null;
+    alter table pers add column
+        show_money_acctype_alias  varchar(1024)   references acctype(alias) default null;
+    alter table pers add column
+        get_message_acctype_id     decimal         references acctype(id)    default null;
+    alter table pers add column
+        get_message_acctype_alias  varchar(1024)   references acctype(alias) default null;
+    alter table pers add column
+        get_thingbuy_acctype_id     decimal         references acctype(id)    default null;
+    alter table pers add column
+        get_thingbuy_acctype_alias  varchar(1024)   references acctype(alias) default null;
 
-alter table pers add column
-    show_money_acctype_alias  varchar(1024)   references acctype(alias) default null;
+*/
 
+    alter table wall  add column
+        isdefault boolean default false;
+
+    alter table back  add column
+        isdefault boolean default false;
+
+    alter table flag  add column
+        isdefault boolean default false;
+
+    alter table arms  add column
+        isdefault boolean default false;
     
-alter table pers add column
-    get_message_acctype_id     decimal         references acctype(id)    default null;
-
-alter table pers add column
-    get_message_acctype_alias  varchar(1024)   references acctype(alias) default null;
-
-    
-alter table pers add column
-    get_thingbuy_acctype_id     decimal         references acctype(id)    default null;
-
-alter table pers add column
-    get_thingbuy_acctype_alias  varchar(1024)   references acctype(alias) default null;
-

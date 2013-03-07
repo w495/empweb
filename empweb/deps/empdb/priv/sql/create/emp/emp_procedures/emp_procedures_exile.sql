@@ -106,9 +106,9 @@ begin
             (select pers.id from pers where pers.nick = new.savior_nick);
     end if;
 
-    if new.isdeleted then
-        new.room_id = noobsroom();
-    end if;
+--     if new.isdeleted then
+--         new.room_id = noobsroom();
+--     end if;
 
     
     if new.room_id != old.room_id then

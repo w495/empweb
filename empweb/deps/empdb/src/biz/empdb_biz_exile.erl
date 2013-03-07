@@ -48,7 +48,10 @@
 
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        case empdb_dao_exile:get(Con, [{isdeleted, false}|Params]) of
+        case empdb_dao_exile:get(Con, [
+            {isdeleted, false},
+            {pers_id, proplists:get_value(pers_id, Params)}
+        ]) of
             {ok, []} ->
                 case empdb_dao_exile:create(Con,[
                     {fields, [

@@ -1,6 +1,6 @@
 [Dolphin]
-AdditionalInfo=CustomizedDetails,Details_Size,Details_Type,Details_Date,Details_Permissions
-Timestamp=2013,3,4,14,28,38
+AdditionalInfo=CustomizedDetails,Details_Date,Details_Type,Details_Size,Details_Permissions
+Timestamp=2013,3,6,18,42,52
 ViewMode=1
 
 [Settings]

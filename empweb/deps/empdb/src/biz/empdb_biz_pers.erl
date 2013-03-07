@@ -1216,7 +1216,7 @@ login({Uf, Uv}, Params) ->
                         %% Получаем комнату пользователя
                         %%
                         {ok, [Live_room]} =
-                            empdb_daowp_room:get(Con, [
+                            case empdb_daowp_room:get(Con, [
                                 {id, proplists:get_value(live_room_id, Userpl)},
                                 {limit, 1}
                             ], [
@@ -1242,8 +1242,13 @@ login({Uf, Uv}, Params) ->
                                 slogan,
                                 weather,
                                 treas
-                            ]),
-                            
+                            ]) of
+                                {ok, [Room1]} ->
+                                    Room1;
+                                {ok, []} ->
+                                    null
+                            end,
+
                         Live_community =
                             case empdb_dao_community:get(Con, [
                                 {id, proplists:get_value(live_community_id, Userpl)},
@@ -1512,7 +1517,6 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                         Friendid,
                         Friendnick
                     }]),
-                     
                     case {Selfpersid, Friendid, Friendnick} of
                         {undefined,
                             _,

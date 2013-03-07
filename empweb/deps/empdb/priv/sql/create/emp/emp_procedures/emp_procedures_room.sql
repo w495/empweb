@@ -187,6 +187,8 @@ on room for each row execute procedure room_util_fields_on_update();
 create or replace function room_util_fields_on_insert() returns "trigger" as $$
 begin
 
+    new.back_file_id = (select file_id from back where isdefault  = true limit 1);
+
     /**
         Авторитет комнаты
     **/

@@ -72,7 +72,7 @@ create(Params)->
             Thingprice = proplists:get_value(price, Mbthingpl, null),
             Thingrent = proplists:get_value(rent, Mbthingpl, null),
             
-            {Priceerror, Price} =
+            {Costserror, Costs} =
                 case {Expired, Thingprice, Thingrent} of
                     {null, null, _} ->
                         {{error, no_price}, null};
@@ -82,13 +82,13 @@ create(Params)->
                         {{error, no_rent}, null};
                     {_, _, _} ->
                         Expiredint = empdb_convert:datetime2int(Expired),
-                        Now = {erlang:date(), erlang:time()},
+                        Now = erlang:universaltime(),
                         Nowint  = empdb_convert:datetime2int(Now),
                         {ok, expired2price(Con, Thingrent, Nowint, Expiredint)}
                 end,
 
             Money = proplists:get_value(money, Mbbuyerpl),
-            case {Priceerror, Price =< Money} of
+            case {Costserror, Costs =< Money} of
                 {{error, no_price}, _} ->
                     {error, {no_price, {[
                         {money, Money},
@@ -102,10 +102,10 @@ create(Params)->
                         {rent,  Thingrent}
                     ]}}};
                 {_, true} ->
-                    Newmoney = Money - Price,
+                    Newmoney = Money - Costs,
                     empdb_dao_pers:update(Con,[
                         {id,    proplists:get_value(id,   Mbbuyerpl)},
-                        {money, {decr, Price}}
+                        {money, {decr, Costs}}
                     ]),
                     case empdb_dao_thingbuy:create(Con,[
                         {price,     Thingprice},
@@ -118,7 +118,7 @@ create(Params)->
                                 {pers_id,           proplists:get_value(buyer_id,   Params)},
                                 {paytype_alias,     thing_out},
                                 {isincome,          false},
-                                {price,             Price}
+                                {price,             Costs}
                             ]),
                             {ok, _} = empdb_dao_thingwish:update(Con, [
                                 {filter, [
@@ -140,7 +140,9 @@ create(Params)->
                             {ok, [
                                 {[
                                     {money, Newmoney},
-                                    {price, Price}
+                                    {costs, Costs},
+                                    {price, Thingprice},
+                                    {rent,  Thingrent}
                                     |Respl
                                 ]}
                             ]};
@@ -150,7 +152,9 @@ create(Params)->
                 {_, false} ->
                     {error, {not_enough_money, {[
                         {money, Money},
-                        {price, Price}
+                        {costs, Costs},
+                        {price, Thingprice},
+                        {rent,  Thingrent}
                     ]}}}
             end
         end,

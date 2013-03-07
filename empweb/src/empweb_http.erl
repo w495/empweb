@@ -51,6 +51,10 @@ make_auth_cookie(Body) ->
         proplists:get_value(session_id, Body),
         [
             {max_age, 1800000},
+
+            %%
+            %% see also empweb_biz_session
+            %%
             {local_time, calendar:local_time()},
             {path, <<"/">>}
         ]

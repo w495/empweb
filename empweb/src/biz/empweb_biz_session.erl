@@ -33,7 +33,11 @@
 
 -define(EMPWEB_BIZ_SESSION_TIMEOUT, 300000). %% 5*60*1000
 
--define(EMPWEB_BIZ_SESSION_EXPIRETIMEOUT, 18000).
+-define(EMPWEB_BIZ_SESSION_EXPIRETIMEOUT, 1800000). 
+%%
+%% see also empweb_http
+%%
+
 
 -define(EMPWEB_BIZ_SESSION_TABLENAME,
     list_to_atom(atom_to_list(node()) ++ ".biz_session")
@@ -45,6 +49,12 @@
 %% ====================================================================
 
 start_link()->
+    timer:apply_interval(
+        300000,
+        ?MODULE,
+        timeout,
+        []
+    ),
     amnesia:start_link([
         {local_tables, [
             {?EMPWEB_BIZ_SESSION_TABLENAME, [
@@ -74,7 +84,7 @@ new(#empweb_biz_session{uid=Uid, id=Id} = Biz_session) ->
         ?EMPWEB_BIZ_SESSION_TABLENAME,
         Biz_session#empweb_biz_session{
             uid = Uid,
-            time=erlang:localtime()
+            time=erlang:universaltime()
         },
         write
     ),
@@ -108,7 +118,7 @@ eqid(Id, Item) ->
     Id == Item#empweb_biz_session.id.
 
 remove_expired() ->
-    Curtime = calendar:datetime_to_gregorian_seconds(erlang:localtime()),
+    Curtime = calendar:datetime_to_gregorian_seconds(erlang:universaltime()),
     Function =
         fun() ->
             Query =
@@ -150,7 +160,7 @@ remove_dubles(Id) ->
                                     {Auid, Atime}
                             end
                         end,
-                        {[], calendar:datetime_to_gregorian_seconds(erlang:localtime())},
+                        {[], calendar:datetime_to_gregorian_seconds(erlang:universaltime())},
                         Set
                     ),
                     amnesia:delete(?EMPWEB_BIZ_SESSION_TABLENAME, Ruid);

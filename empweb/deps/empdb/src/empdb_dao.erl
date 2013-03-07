@@ -2572,6 +2572,9 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
             [],
             Glst
         ),
+
+        %% empdb_dao:table_alias(empdb_dao_doc).
+    
     case Current_field_vals of
         [] ->
             {ok,[]};
