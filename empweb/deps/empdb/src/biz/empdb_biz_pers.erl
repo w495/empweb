@@ -1215,7 +1215,7 @@ login({Uf, Uv}, Params) ->
                         %%
                         %% Получаем комнату пользователя
                         %%
-                        {ok, [Live_room]} =
+                        Live_room =
                             case empdb_daowp_room:get(Con, [
                                 {id, proplists:get_value(live_room_id, Userpl)},
                                 {limit, 1}
