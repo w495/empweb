@@ -460,16 +460,6 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
-                key         = savior_id,
-                required    = false,
-                types       = [nullable, integer]
-            },
-            #norm_rule{
-                key         = savior_nick,
-                required    = false,
-                types       = [nullable, string]
-            },
-            #norm_rule{
                 key         = room_id,
                 required    = false,
                 types       = [nullable, integer]
