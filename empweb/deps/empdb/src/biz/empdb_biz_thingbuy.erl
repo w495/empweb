@@ -68,42 +68,54 @@ create(Params)->
                     {limit, 1}
                 ]),
 
+            Now = erlang:universaltime(),
+            Nowint  = empdb_convert:datetime2int(Now),
             Expired = proplists:get_value(expired, Params, null),
             Thingprice = proplists:get_value(price, Mbthingpl, null),
             Thingrent = proplists:get_value(rent, Mbthingpl, null),
+            Expiredint = empdb_convert:nullable_datetime2int(Expired),
             
             {Costserror, Costs} =
                 case {Expired, Thingprice, Thingrent} of
                     {null, null, _} ->
-                        {{error, no_price}, null};
+                        {error, no_price};
                     {null, _, _} ->
                         {ok, Thingprice};
                     {_, _, null} ->
-                        {{error, no_rent}, null};
+                        {error, no_rent};
                     {_, _, _} ->
-                        Expiredint = empdb_convert:datetime2int(Expired),
-                        Now = erlang:universaltime(),
-                        Nowint  = empdb_convert:datetime2int(Now),
-                        {ok, expired2price(Con, Thingrent, Nowint, Expiredint)}
+                        expired2price(Con, Thingrent, Nowint, Expiredint)
                 end,
 
             io:format("~n~n~n Costs = ~p ~n~n~n", [Costs]),
             
             Money = proplists:get_value(money, Mbbuyerpl),
-            case {Costserror, Costs =< Money} of
-                {{error, no_price}, _} ->
+            case {Costserror, Costs} of
+                {error, no_price} ->
                     {error, {no_price, {[
-                        {money, Money},
-                        {price, Thingprice},
-                        {rent,  Thingrent}
+                        {'now',     Nowint},
+                        {expired,   Expiredint},
+                        {money,     Money},
+                        {price,     Thingprice},
+                        {rent,      Thingrent}
                     ]}}};
-                {{error, no_rent}, _} ->
+                {error, no_rent} ->
                     {error, {no_rent, {[
-                        {money, Money},
-                        {price, Thingprice},
-                        {rent,  Thingrent}
+                        {'now',     Nowint},
+                        {expired,   Expiredint},
+                        {money,     Money},
+                        {price,     Thingprice},
+                        {rent,      Thingrent}
                     ]}}};
-                {_, true} ->
+                {error, wrong_expired} ->
+                    {error, {wrong_expired, {[
+                        {'now',     Nowint},
+                        {expired,   Expiredint},
+                        {money,     Money},
+                        {price,     Thingprice},
+                        {rent,      Thingrent}
+                    ]}}};
+                {_, Costs} when Costs =< Money ->
                     Newmoney = Money - Costs,
                     empdb_dao_pers:update(Con,[
                         {id,    proplists:get_value(id,   Mbbuyerpl)},
@@ -151,12 +163,14 @@ create(Params)->
                         Else ->
                             Else
                     end;
-                {_, false} ->
+                {_, Costs} when Costs > Money  ->
                     {error, {not_enough_money, {[
-                        {money, Money},
-                        {costs, Costs},
-                        {price, Thingprice},
-                        {rent,  Thingrent}
+                        {'now',     Nowint},
+                        {expired,   Expiredint},
+                        {money,     Money},
+                        {costs,     Costs},
+                        {price,     Thingprice},
+                        {rent,      Thingrent}
                     ]}}}
             end
         end,
@@ -180,9 +194,9 @@ expired2price(Con, Rent, Nowint, Expiredint) ->
         true ->
             Rangeint    = Expiredint - Nowint,
             Rangedays   = Rangeint / ?EMPDB_UNIXTIMEDAY,
-            empdb_convert:to_money(Rent * Rangedays);
+            {ok, empdb_convert:to_money(Rent * Rangedays)};
         false ->
-            0
+            {error, wrong_expired}
     end.
 
     

@@ -31,6 +31,7 @@
             datetime2int/1,
             int2datetime/1,
             int2universal_datetime/1,
+            nullable_datetime2int/1,
             int2local_datetime/1,
             now_plus_week/0,
             now_minus_week/0,
@@ -57,6 +58,15 @@ now_minus_week() ->
         X * 1000000 + Y - ?EMPDB_UNIXTIMEWEEK
     ).
 
+
+
+nullable_datetime2int(null) ->
+    null;
+
+nullable_datetime2int(Date) ->
+    calendar:datetime_to_gregorian_seconds(Date)
+    - calendar:datetime_to_gregorian_seconds(?EMPDB_CONVERT_UNIXTIMESTART).
+
 datetime2int(Date) ->
     calendar:datetime_to_gregorian_seconds(Date)
     - calendar:datetime_to_gregorian_seconds(?EMPDB_CONVERT_UNIXTIMESTART).
@@ -65,6 +75,7 @@ int2universal_datetime(Int) ->
     calendar:now_to_universal_time(timemacrorest(Int)).
 int2local_datetime(Int) ->
     calendar:now_to_local_time(timemacrorest(Int)).
+
 int2datetime(Int) ->
     int2universal_datetime(Int).
 
