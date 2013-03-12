@@ -150,6 +150,12 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
     Hap =
         case Fname of
+        %% ----------------------------------------------------------------
+            <<"get_firecounts">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_firecounts,
+                    action          =   'get'
+                };
         %%
         %% Тип разрешения: не рассмотрен, запрещена, разрешена
         %%
