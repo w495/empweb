@@ -108,6 +108,7 @@ timeouts()->
     empdb_biz_exile:timeout(),
     empdb_biz_invisbuy:timeout(),
     empdb_biz_zprotbuy:timeout(),
+    empdb_biz_thingbuy:timeout(),
     ok.
 
 

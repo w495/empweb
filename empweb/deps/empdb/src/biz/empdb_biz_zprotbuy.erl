@@ -157,8 +157,8 @@ timeout()->
 
 remove_expired()->
     empdb_dao:with_transaction(fun(Con)->
-        Nowdt = calendar:local_time_to_universal_time({erlang:date(), erlang:time()}),
-        {ok, Dexiles} =
+        Nowdt = erlang:universaltime(),
+        {ok, Dzprotbuy} =
             empdb_dao_zprotbuy:update(Con,[
                 {filter, [
                     {isdeleted, false},
@@ -168,7 +168,7 @@ remove_expired()->
                     {isdeleted, true}
                 ]}
             ]),
-        {ok, Dexiles}
+        {ok, Dzprotbuy}
     end).
 
 update(Params)->

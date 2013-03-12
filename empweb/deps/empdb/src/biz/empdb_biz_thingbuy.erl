@@ -22,6 +22,7 @@
 %%
 -export([
     count/1,
+    timeout/0,
     get/1,
     get/2,
     create/1,
@@ -199,7 +200,28 @@ expired2price(Con, Rent, Nowint, Expiredint) ->
             {error, wrong_expired}
     end.
 
-    
+
+
+timeout()->
+    remove_expired().
+
+remove_expired()->
+    empdb_dao:with_transaction(fun(Con)->
+        Nowdt = erlang:universaltime(),
+        {ok, Dthingbuy} =
+            empdb_dao_thingbuy:update(Con,[
+                {filter, [
+                    {isdeleted, false},
+                    {expired, {lt, Nowdt}},
+                    {expired, {neq, null}}
+                ]},
+                {values, [
+                    {isdeleted, true}
+                ]}
+            ]),
+        {ok, Dthingbuy}
+    end).
+
 update(Params)->
     empdb_dao:with_transaction(fun(Con)->
         case empdb_dao_thingbuy:update(Con, Params) of
