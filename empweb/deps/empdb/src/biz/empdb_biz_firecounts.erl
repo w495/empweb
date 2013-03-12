@@ -45,10 +45,24 @@ get(Params)->
             end)
         end),
 
-        {ok, [{[
-            {event, [{[empdb_dao_event:count(Con, [{isdeleted, false}|Params])]}] },
-            {exile, [{[empdb_dao_exile:count(Con, [{isdeleted, false}|Params])]}]  }
-        ]}]}
+        case {
+            empdb_dao_event:count(Con, [{isdeleted, false}|Params]),
+            empdb_dao_exile:count(Con, [{isdeleted, false}|Params])
+        } of
+            {
+                {ok, [{Event}]},
+                {ok, [{Exile}]}
+            } ->
+                {ok, [{[
+                    {event_count,  proplists:get_value(count, Event, null)},
+                    {exile_count,  proplists:get_value(count, Exile, null)}
+                ]}]};
+            {
+                Error,
+                _
+            } ->
+                Error
+        end
     end).
 
 
