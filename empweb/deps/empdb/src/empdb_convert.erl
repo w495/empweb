@@ -107,7 +107,7 @@ timemacrorest(Int) ->
 % ---------------------------------------------------------------------------
 
 to_money(Value) ->
-    erlang:round(to_integer(Value)
+    erlang:round(to_float(Value)
         * ?EMPDB_CONVERT_MONEYDIMENSION)
             / ?EMPDB_CONVERT_MONEYDIMENSION.
 
