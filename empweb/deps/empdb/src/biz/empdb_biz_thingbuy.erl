@@ -191,7 +191,7 @@ expired2price(Con, Rent, Nowint, Expiredint) ->
         {expiredint, Expiredint}
     ]]),
 
-    case Expiredint > Nowint of
+    case ((Expiredint - Nowint) > ?EMPDB_UNIXTIMEDAY) of
         true ->
             Rangeint    = Expiredint - Nowint,
             Rangedays   = Rangeint / ?EMPDB_UNIXTIMEDAY,
