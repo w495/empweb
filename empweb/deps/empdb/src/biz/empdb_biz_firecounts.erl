@@ -28,6 +28,23 @@
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
+
+        spawn_link(fun()->
+            %% Ключевой момент: без spawn_link код ниже может
+            %% привести к блокировкам, а так,
+            %% он выполняется независимо.
+            empdb_dao:with_transaction(emp, fun(Conupdate) ->
+                %%
+                %% Ставим пользователю статус online
+                %%
+                {ok, _} =
+                    empdb_dao_pers:update(Conupdate, [
+                        {pstatus_alias, online},
+                        {id, proplists:get_value(owner_id, Params)}
+                    ])
+            end)
+        end),
+
         {ok, [{[
             {event, [{[empdb_dao_event:count(Con, [{isdeleted, false}|Params])]}] },
             {exile, [{[empdb_dao_exile:count(Con, [{isdeleted, false}|Params])]}]  }
