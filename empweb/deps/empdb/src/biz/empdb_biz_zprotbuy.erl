@@ -141,7 +141,7 @@ expired2price(Con, Nowint, Expiredint) ->
             ]
         ),
     Price = proplists:get_value(price, Servicepl),
-    case Expiredint > Nowint of
+    case ((Expiredint - Nowint) >= ?EMPDB_UNIXTIMEDAY) of
         true ->
             Rangeint    = Expiredint - Nowint,
             Rangedays   = Rangeint / ?EMPDB_UNIXTIMEDAY,

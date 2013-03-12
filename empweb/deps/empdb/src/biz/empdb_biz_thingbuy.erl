@@ -185,11 +185,6 @@ create(Params)->
 
 expired2price(Con, Rent, Nowint, Expiredint) ->
 
-    io:format("~n~n~n PL = ~p ~n~n~n", [[
-        {rent, Rent},
-        {nowint, Nowint},
-        {expiredint, Expiredint}
-    ]]),
 
     case ((Expiredint - Nowint) >= ?EMPDB_UNIXTIMEDAY) of
         true ->
