@@ -185,7 +185,6 @@ create(Params)->
 
 expired2price(Con, Rent, Nowint, Expiredint) ->
 
-
     case ((Expiredint - Nowint) >= ?EMPDB_UNIXTIMEDAY) of
         true ->
             Rangeint    = Expiredint - Nowint,

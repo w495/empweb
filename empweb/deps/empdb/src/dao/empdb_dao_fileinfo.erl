@@ -74,6 +74,9 @@ table({fields, all})->
         filetype_id,
         filetype_alias,
         
+        image_width,
+        image_height,
+
         tokenlong,
         tokenstring,
         md5long,
