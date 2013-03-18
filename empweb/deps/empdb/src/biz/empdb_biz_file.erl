@@ -21,12 +21,16 @@
 %% Блоги
 %%
 -export([
+    md5/1,
     get/1,
     get/2,
+    create_copy_worker/1,
     create/1,
     delete/1,
     update/1
 ]).
+
+
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -34,45 +38,44 @@
 %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 create(Params)->
-    Fs_dir = <<"deps/empdb/priv/data/">>,
-    Dl_dir = <<"/jsonapi/photo/">>,
+    Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
+    Dldir = ?EMPDB_BIZ_FILE_DLDIR,
 
     io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
+
 
     Doc_id   = proplists:get_value(doc_id,   Params, null),
     Owner_id = proplists:get_value(owner_id, Params, null),
 
     %% Получаем данные о загружаемом файле
-    Ul_name  = proplists:get_value(filename, Params, []),
-    Ul_body  = proplists:get_value(filebody, Params, []),
-    Ul_ext   = proplists:get_value(fileextension, Params, []),
-    Ul_size  = erlang:byte_size(Ul_body),
+    Ulname  = proplists:get_value(filename, Params, []),
+    Ulbody  = proplists:get_value(filebody, Params, []),
+    Ulext   = proplists:get_value(fileextension, Params, []),
+    Ulsize  = erlang:byte_size(Ulbody),
 
-    Md5_binary = erlang:md5(Ul_body),
-    Path_binary  =
-        <<  (crypto:rand_bytes(crypto:rand_uniform(1, 8)))/binary,
-            Md5_binary/binary,
-            (crypto:rand_bytes(crypto:rand_uniform(1, 8)))/binary
-        >>,
+
+    
+    Md5binary = md5(Ulbody),
+    Path_binary  = rand_bytes(),
+
     Path_list =
         [[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Path_binary],
 
     %% Конструируем пути для файла в файловой системе.
-    Fs_path         = erlang:list_to_binary(filename:join(Path_list)),
-    Fs_path_ext     =  << Fs_path/binary, $., Ul_ext/binary >>,
-    Fs_path_full    =  << Fs_dir/binary, Fs_path_ext/binary >>,
+    Fspath         = erlang:list_to_binary(filename:join(Path_list)),
+    Fspath_ext     =  << Fspath/binary, $., Ulext/binary >>,
+    Fspath_full    =  << Fsdir/binary, Fspath_ext/binary >>,
 
-    spawn_link(fun()->
-        ok = filelib:ensure_dir(Fs_path_full),
-        ok = file:write_file(Fs_path_full, Ul_body)
-    end),
+    %spawn_link(fun()->
+        ok = filelib:ensure_dir(Fspath_full),
+        ok = file:write_file(Fspath_full, Ulbody),
+    %end),
 
     %% Конструируем пути для файла для скачивания.
-    Dl_path         = erlang:list_to_binary(string:join(Path_list,[<<"/">>])),
-    Dl_path_ext     = << Dl_path/binary, $., Ul_ext/binary  >>,
-    Dl_path_full    = << Dl_dir/binary, Dl_path_ext/binary >>,
+    Dlpath         = erlang:list_to_binary(string:join(Path_list,[<<"/">>])),
+    Dlpath_ext     = << Dlpath/binary, $., Ulext/binary  >>,
+    Dlpath_full    = << Dldir/binary, Dlpath_ext/binary >>,
 
     Token_string =
         erlang:list_to_binary(
@@ -80,22 +83,27 @@ create(Params)->
         ),
     Token_long =
         erlang:list_to_integer(erlang:binary_to_list(Token_string), 16),
-    Md5_string =
+    Md5string =
         erlang:list_to_binary(
-            [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Md5_binary]
+            [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Md5binary]
         ),
-    Md5_long =
-        erlang:list_to_integer(erlang:binary_to_list(Md5_string), 16),
+    Md5long =
+        erlang:list_to_integer(erlang:binary_to_list(Md5string), 16),
 
     empdb_dao:with_transaction(fun(Con)->
         %% -------------------------------------------------------------------
         %% Выбираем тип файла.
         %% -------------------------------------------------------------------
         {ok, [{Filetypepl}]} = empdb_dao_filetype:get(Con, [
-            {ext, Ul_ext},
+            {ext, Ulext},
             {limit, 1}
         ]),
-        Filetype_id = proplists:get_value(id, Filetypepl),
+        
+        Filetype_id =
+            proplists:get_value(id,           Filetypepl),
+        Filetype_mimesuptype =
+            proplists:get_value(mimesuptype,  Filetypepl),
+
 
         %% -------------------------------------------------------------------
         %% Создаем контейнер, куда помещаем описания файлов
@@ -105,31 +113,61 @@ create(Params)->
             {owner_id,          Owner_id},
             {tokenstring,       Token_string},
             {tokenlong,         Token_long}
-            
-%             {dlfileinfo_id,     proplists:get_value(id, Dlfileinfopl)},
-%             {fsfileinfo_id,     proplists:get_value(id, Fsfileinfopl)},
-%             {ulfileinfo_id,     proplists:get_value(id, Ul_fileinfopl)}
         ]),
 
         File_id = proplists:get_value(id, File),
 
-        %% -------------------------------------------------------------------
-        %% Создаем описание файла, который загрузил пользователь.
-        %% -------------------------------------------------------------------
-        {ok, [{Ul_fileinfopl}]} = empdb_dao_fileinfo:create(Con, [
-            {fileinfotype_alias,    upload},
-            {doc_id,                Doc_id},
-            {owner_id,              Owner_id},
-            {filetype_id,           Filetype_id},
-            {'size',                Ul_size},
-            {tokenstring,           Token_string},
-            {tokenlong,             Token_long},
-            {md5string,             Md5_string},
-            {md5long,               Md5_long},
-            {file_id,               File_id},
-            {name,                  Ul_name}
-        ]),
 
+
+        io:format("~n~nFspath = ~p~n~n", [Fspath_full]),
+        Whpl =
+            case Filetype_mimesuptype of
+                <<"image">> ->
+                    Whpl_ = gm:identify(Fspath_full, [width, height]),
+                    {ok, [{_}]} = empdb_dao_fileinfo:create(Con, [
+                        {fileinfotype_alias,    filesystem},
+                        {doc_id,                Doc_id},
+                        {owner_id,              Owner_id},
+                        {filetype_id,           Filetype_id},
+                        {'size',                Ulsize},
+                        {tokenstring,           Token_string},
+                        {tokenlong,             Token_long},
+                        {md5string,             Md5string},
+                        {md5long,               Md5long},
+                        {dir,                   Fsdir},
+                        {file_id,               File_id},
+                        {path,                  Fspath_ext},
+                        {image_width,           null},
+                        {image_height,          null}
+                    ]),
+                    {ok, [{_}]} = empdb_dao_fileinfo:create(Con, [
+                        {fileinfotype_alias,    download},
+                        {doc_id,                Doc_id},
+                        {owner_id,              Owner_id},
+                        {filetype_id,           Filetype_id},
+                        {'size',                Ulsize},
+                        {tokenstring,           Token_string},
+                        {tokenlong,             Token_long},
+                        {md5string,             Md5string},
+                        {md5long,               Md5long},
+                        {dir,                   Dldir},
+                        {file_id,               File_id},
+                        {path,                  Dlpath_ext},
+                        {image_width,           null},
+                        {image_height,          null}
+                    ]),
+                    [
+                        {image_width,  proplists:get_value(width, Whpl_) },
+                        {image_height, proplists:get_value(height, Whpl_)}
+                    ];
+                _ ->
+                    [
+                        {image_width, null},
+                        {image_height, null}
+                    ]
+            end,
+
+            
         %% -------------------------------------------------------------------
         %% Создаем описание файла, 
         %% который собираемся хранить в файловой системе
@@ -139,15 +177,17 @@ create(Params)->
             {doc_id,                Doc_id},
             {owner_id,              Owner_id},
             {filetype_id,           Filetype_id},
-            {'size',                Ul_size},
+            {'size',                Ulsize},
             {tokenstring,           Token_string},
             {tokenlong,             Token_long},
-            {md5string,             Md5_string},
-            {md5long,               Md5_long},
-            {dir,                   Fs_dir},
+            {md5string,             Md5string},
+            {md5long,               Md5long},
+            {dir,                   Fsdir},
             {file_id,               File_id},
-            {path,                  Fs_path_ext}
+            {path,                  Fspath_ext}
+            |Whpl
         ]),
+
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла,
@@ -158,33 +198,349 @@ create(Params)->
             {doc_id,                Doc_id},
             {owner_id,              Owner_id},
             {filetype_id,           Filetype_id},
-            {'size',                Ul_size},
+            {'size',                Ulsize},
             {tokenstring,           Token_string},
             {tokenlong,             Token_long},
-            {md5string,             Md5_string},
-            {md5long,               Md5_long},
-            {dir,                   Dl_dir},
+            {md5string,             Md5string},
+            {md5long,               Md5long},
+            {dir,                   Dldir},
             {file_id,               File_id},
-            {path,                  Dl_path_ext}
+            {path,                  Dlpath_ext}
+            |Whpl
         ]),
 
 
+        %% -------------------------------------------------------------------
+        %% Создаем описание файла, который загрузил пользователь.
+        %% -------------------------------------------------------------------
+        {ok, [{Ulfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
+            {fileinfotype_alias,    upload},
+            {doc_id,                Doc_id},
+            {owner_id,              Owner_id},
+            {filetype_id,           Filetype_id},
+            {'size',                Ulsize},
+            {tokenstring,           Token_string},
+            {tokenlong,             Token_long},
+            {md5string,             Md5string},
+            {md5long,               Md5long},
+            {file_id,               File_id},
+            {name,                  Ulname}
+            |Whpl
+        ]),
+% 
+%         
+%         spawn_link(fun()->
+%             lists:map(
+%                 fun({W, H})->
+%                     spawn_link(fun()->
+%                         create_copy([
+%                             {fs_path_full,  Fspath_full},
+%                             {file_id,       File_id},
+%                             {doc_id,        Doc_id},
+%                             {owner_id,      Owner_id},
+%                             {fileextension, Ulext},
+%                             {image_width,   W},
+%                             {image_height,  H},
+%                             {ul_name,       Ulname}
+%                         ])
+%                     end),
+%                     spawn_link(fun()->
+%                         create_copy([
+%                             {fs_path_full,  Fspath_full},
+%                             {file_id,       File_id},
+%                             {doc_id,        Doc_id},
+%                             {owner_id,      Owner_id},
+%                             {fileextension, Ulext},
+%                             {image_width,   erlang:trunc(W*0.98)},
+%                             {image_height,  erlang:trunc(H*0.98)},
+%                             {ul_name,       Ulname}
+%                         ])
+%                     end)
+%                 end,
+%                 [
+%                     {320, 240},
+%                     {480, 320},
+%                     {220, 176},
+%                     {128, 128}
+%                 ]
+%             )
+%         end),
+    
         case proplists:get_value(isres,   Params, null) of
             true ->
                 {ok, [{[
                     {file_id,       File_id},
-                    {path,          erlang:list_to_binary([Dl_dir, Dl_path_ext])},
-                    {originalname,  Ul_name},
-                    {md5sum,        Md5_string}
+                    {path,          erlang:list_to_binary([Dldir, Dlpath_ext])},
+                    {originalname,  Ulname},
+                    {md5sum,        Md5string}
                 ]}]};
             _ ->
                 {ok, [{[
                     {file_id,       File_id},
-                    {originalname,  Ul_name},
-                    {md5sum,        Md5_string}
+                    {originalname,  Ulname},
+                    {md5sum,        Md5string}
                 ]}]}
         end
     end).
+
+
+gm_convert_geometry(null, null) ->
+    {error, null};
+
+gm_convert_geometry(null, H) ->
+    {ok,
+        erlang:list_to_binary([
+            <<"x">>,
+            empdb_convert:to_binary(H)
+        ])
+    };
+    
+gm_convert_geometry(W, null) ->
+    {ok,
+        erlang:list_to_binary([
+            empdb_convert:to_binary(W),
+            <<"x ">>
+        ])
+    };
+
+gm_convert_geometry(W, H) ->
+    {ok,
+        erlang:list_to_binary([
+            empdb_convert:to_binary(W),
+            <<"x">>,
+            empdb_convert:to_binary(H)
+        ])
+    }.
+
+convert(Params)->
+    Orig_fs_path_full   = proplists:get_value(orig_fs_path_full, Params),
+    Fspath_full        = proplists:get_value(fs_path_full, Params),
+    Image_width         = proplists:get_value(image_width, Params),
+    Image_height         = proplists:get_value(image_height, Params),
+    
+    case gm_convert_geometry(Image_width, Image_height) of
+        {error, Reason} ->
+            io:format("~n ~n Reason = ~p ~n ~n", [ Reason ]),
+            Reason;
+        {ok, Geometry} ->
+            gm:convert(
+                Orig_fs_path_full,
+                Fspath_full,
+                [{geometry,
+                    erlang:list_to_binary([
+                        Geometry,
+                        <<" >">>
+                    ])
+                }]
+            )
+    end.
+
+
+create_copy(Params)->
+    Fspath_full     = proplists:get_value(fs_path_full, Params),
+    File_id         = proplists:get_value(file_id,          Params, null),
+    Doc_id          = proplists:get_value(doc_id,           Params, null),
+    Owner_id        = proplists:get_value(owner_id,         Params, null),
+    Ext             = proplists:get_value(fileextension,    Params, []),
+    Image_width     = proplists:get_value(image_width,      Params, null),
+    Image_height    = proplists:get_value(image_height,     Params, null),
+    Connection      = proplists:get_value(connection,       Params, null),
+    
+    create_copy_worker([
+        {connection,    Connection},
+        {fs_path_full,  Fspath_full},
+        {file_id,       File_id},
+        {doc_id,        Doc_id},
+        {owner_id,      Owner_id},
+        {fileextension, Ext},
+        {image_width,   Image_width},
+        {image_height,  Image_height}
+    ]),
+    create_copy_worker([
+        {connection,    Connection},
+        {fs_path_full,  Fspath_full},
+        {file_id,       File_id},
+        {doc_id,        Doc_id},
+        {owner_id,      Owner_id},
+        {fileextension, Ext},
+        {image_width,   Image_width},
+        {image_height,  null}
+    ]),
+    create_copy_worker([
+        {connection,    Connection},
+        {fs_path_full,  Fspath_full},
+        {file_id,       File_id},
+        {doc_id,        Doc_id},
+        {owner_id,      Owner_id},
+        {fileextension, Ext},
+        {image_width,   null},
+        {image_height,  Image_height}
+    ]),
+    ok.
+
+create_copy_worker(Params)->
+    Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
+    Dldir = ?EMPDB_BIZ_FILE_DLDIR,
+
+    io:format("~n ~n Params = ~p ~n~n", [ Params ]),
+
+    
+    File_id         = proplists:get_value(file_id,          Params, null),
+    Doc_id          = proplists:get_value(doc_id,           Params, null),
+    Owner_id        = proplists:get_value(owner_id,         Params, null),
+    Ext             = proplists:get_value(fileextension,    Params, <<>>),
+    Image_width     = proplists:get_value(image_width,      Params, null),
+    Image_height    = proplists:get_value(image_height,     Params, null),
+    Connection      = proplists:get_value(connection,       Params, null),
+
+
+    Orig_fs_path = proplists:get_value(fs_path, Params, <<>>),
+    Orig_fs_dir  = proplists:get_value(fs_dir,  Params, <<>>),
+
+    Orig_fs_path_full = proplists:get_value(fs_path_full, Params,
+        << Orig_fs_dir/binary, Orig_fs_path/binary >>),
+
+
+    
+    Path_binary  = rand_bytes(),
+
+
+
+    io:format("~n ~n Image_width = ~p ~p ~n~n", [ Image_width, Image_height ]),
+
+    
+    Path_list =
+        [[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Path_binary],
+
+
+
+    io:format("~n ~n Ext = ~w ~n~n", [ Ext ]),
+
+
+    io:format("~n ~n Path_list = ~w ~n~n", [ Path_list ]),
+
+    
+    %% Конструируем пути для файла в файловой системе.
+    Fspath         = erlang:list_to_binary(filename:join(Path_list)),
+
+    io:format("~n ~n Fspath = ~w ~n ~n", [ Fspath ]),
+    
+    Fspath_ext     =  << Fspath/binary, $., Ext/binary >>,
+
+    io:format("~n ~n Fspath_ext = ~w ~n ~n", [ Fspath_ext ]),
+
+    
+    Fspath_full    =  << Fsdir/binary, Fspath_ext/binary >>,
+
+    io:format("~n ~n Fspath_full = ~p ~n ~n", [ Fspath_full ]),
+
+
+    io:format("~n ~n Orig_fs_path_full = ~p ~n ~n", [ Orig_fs_path_full ]),
+
+    
+    ok = filelib:ensure_dir(Fspath_full),
+    convert([
+        {orig_fs_path_full, Orig_fs_path_full},
+        {fs_path_full,      Fspath_full},
+        {image_width,       Image_width},
+        {image_height,      Image_height}
+    ]),
+    
+    {ok, Fsbody} = file:read_file(Fspath_full),
+    Md5binary = md5(Fsbody),
+
+    Fssize  = erlang:byte_size(Fsbody),
+       
+    %% Конструируем пути для файла для скачивания.
+    Dlpath         = erlang:list_to_binary(string:join(Path_list,[<<"/">>])),
+    Dlpath_ext     = << Dlpath/binary, $., Ext/binary  >>,
+    Dlpath_full    = << Dldir/binary, Dlpath_ext/binary >>,
+
+    Token_string =
+        erlang:list_to_binary(
+            [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Path_binary]
+        ),
+    Token_long =
+        erlang:list_to_integer(erlang:binary_to_list(Token_string), 16),
+    Md5string =
+        erlang:list_to_binary(
+            [ io_lib:format("~2.16.0b", [X]) || <<X>> <=  Md5binary]
+        ),
+    Md5long =
+        erlang:list_to_integer(erlang:binary_to_list(Md5string), 16),
+
+    Iwidth  = Image_width,
+    Iheight = Image_height,
+
+    Daoaction=
+        fun(Con)->
+            {ok, [{Filetypepl}]} = empdb_dao_filetype:get(Con, [
+                {ext, Ext},
+                {limit, 1}
+            ]),
+            Filetype_id =
+                proplists:get_value(id,           Filetypepl),
+            Filetype_mimesuptype =
+                proplists:get_value(mimesuptype,  Filetypepl),
+            %% -------------------------------------------------------------------
+            %% Создаем описание файла,
+            %% который собираемся хранить в файловой системе
+            %% -------------------------------------------------------------------
+            {ok, [{Fsfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
+                {fileinfotype_alias,    filesystem},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Fssize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {dir,                   Fsdir},
+                {file_id,               File_id},
+                {path,                  Fspath_ext},
+                {image_width,           Iwidth},
+                {image_height,          Iheight}
+            ]),
+            %% -------------------------------------------------------------------
+            %% Создаем описание файла,
+            %% который собираемся отдавать пользователю
+            %% -------------------------------------------------------------------
+            {ok, [{Dlfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
+                {fileinfotype_alias,    download},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Fssize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {dir,                   Dldir},
+                {file_id,               File_id},
+                {path,                  Dlpath_ext},
+                {image_width,           Iwidth},
+                {image_height,          Iheight}
+            ]),
+            {ok, [{[
+                {file_id,       File_id},
+                %{path,          erlang:list_to_binary([Dldir, Dlpath_ext])},
+                {dir,           Dldir},
+                {path,          Dlpath_ext},
+                {image_width,   Image_width},
+                {image_height,  Image_height},
+                {dl_dir,        Dldir},
+                {dl_path_ext,   Dlpath_ext},
+                {md5sum,        Md5string}
+            ]}]}
+        end,
+
+    case Connection of
+        null ->
+            empdb_dao:with_transaction(Daoaction);
+        Con ->
+            Daoaction(Con)
+    end.
 
 update(Params)->
     ok.
@@ -198,3 +554,19 @@ delete(Params)->
     ok.
 is_owner(Uid, Oid)->
     ok.
+
+
+rand_bytes()->
+    crypto:rand_bytes(crypto:rand_uniform(16, 32)).
+
+rand_bytes(Md5binary)->
+    <<  (crypto:rand_bytes(crypto:rand_uniform(1, 8)))/binary,
+        Md5binary/binary,
+        (crypto:rand_bytes(crypto:rand_uniform(1, 8)))/binary
+    >>.
+    
+md5(Bin) ->
+    C1 = erlang:md5_init(),
+    C2 = erlang:md5_update(C1, Bin),
+    C3 = erlang:md5_final(C2),
+    C3.

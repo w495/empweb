@@ -557,7 +557,7 @@ sql_cond({Ff,undefined}) ->
 
 sql_cond({Ff, null} = Tuple) ->
     ?empdb_debug("Tuple = ~p~n~n", [Tuple]),
-    {[{cond_atom(Ff), null}], [
+    {[], [
         empdb_convert:to_binary(Ff),
         <<" is null">>
     ]};
@@ -2908,12 +2908,17 @@ to_type(<<"f">>, bool) ->
 to_type(<<"t">>, bool) ->
     true;
 
+to_type(false, bool) ->
+    false;
+to_type(true, bool) ->
+    true;
+
 to_type(V, varchar) ->
     V;
 to_type(V, text) ->
     V;
 to_type(V, Type) ->
-    ?empdb_debug("Type= ~p~n", [Type]),
+    ?empdb_debug("~p Type= ~p ~n", [V, Type]),
     V.
 
 % name_columns([{column, Name, Type, _P3, _P4, _P5}|Ct], [V|Vt], Ret) ->

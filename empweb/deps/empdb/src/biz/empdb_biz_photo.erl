@@ -93,18 +93,14 @@ get(Params)->
         )
     end).
 
+
+% get_(Con, Params) ->
+
+
+
+    
 get(Params, Fields)->
-    empdb_biz:nviewsupm(?MODULE, [Params]),
-    empdb_dao:with_connection(fun(Con)->
-        empdb_dao_photo:get_adds(Con,
-            empdb_dao_photo:get(Con, [
-                {order, {desc, created}},
-                {isdeleted, false}
-                |Params
-            ], Fields),
-            [{fields, Fields}|Params]
-        )
-    end).
+    ?MODULE:sget([{fields, Fields}|Params]).
 
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->

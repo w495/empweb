@@ -58,9 +58,6 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        ulfileinfo_id,
-        dlfileinfo_id,
-        fsfileinfo_id,
         owner_id,
         owner_nick,
         doc_id,

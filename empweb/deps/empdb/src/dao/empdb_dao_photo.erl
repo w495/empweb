@@ -90,49 +90,178 @@ get(Con, What) ->
         proplists:get_value(
             fields,
             What,
-            lists:append([empdb_dao_photo:table({fields, select}), empdb_dao_doc:table({fields, select})])
+            lists:append([
+                empdb_dao_photo:table({fields, select}),
+                empdb_dao_doc:table({fields, select}),
+                [image_width, image_height, file_id]
+            ])
         ),
+
+    Req_width     = proplists:get_value(image_width, What, null),
+    Req_height    = proplists:get_value(image_height, What, null),
+    
     case empdb_dao:get([
         {empdb_dao_doc, id},
         {empdb_dao_photo, {doc_id, file_id}},
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
-%         {image_width,  proplists:get_value(image_width, What)},
-%         {image_height, proplists:get_value(image_height, What)},
-        {fileinfotype_alias, download},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            fileinfotype_alias,
+            fileinfo.filetype_ext,
+            {as, {fileinfo.path, path}},
+            {as, {fileinfo.dir,  dir}}
             | proplists:delete(path, Fields)
-        ]}
-        |proplists:delete(fields, What)
+        ]},
+        {fileinfotype_alias, filesystem},
+        {image_height, null},
+        {image_width, null}
+        
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %         {'or', [
+            %             {image_width, Req_width},
+            %             {image_width, null}
+            %         ]},
+            %         {'or', [
+            %             {image_height, Req_height},
+            %             {image_height, null}
+            %         ]}
+            % {image_width, proplists:get_value(image_width,      What, null)},
+            % {image_height, proplists:get_value(image_height,     What, null)},
+            % {fileinfotype_alias, download}
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
+
     ]) of
         {ok,Phobjs} ->
-            {ok,
-                lists:map(fun({Phpl})->
-                    case (lists:member(path, Fields) or (Fields =:= [])) of
-                        true ->
-                            {[
-                                {path,
-                                    <<  (proplists:get_value(fileinfodir, Phpl))/binary,
-                                        (proplists:get_value(fileinfopath, Phpl))/binary
-                                    >>
-                                }
-                                | proplists:delete(fileinfodir,
-                                    proplists:delete(fileinfopath,
-                                        proplists:delete(path, Phpl)))
-                            ]};
-                        _ ->
-                            {proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))}
-                    end
-                end, Phobjs)
-            };
+            {ok, get_handle_objs(Con, Phobjs, What, Fields, Req_width, Req_height)};
         Error ->
             Error
     end.
 
-    %empdb_dao_doc:get(?MODULE, Con, What).
+
+
+get_handle_objs(Con, Phobjs, What, Fields, Req_width, Req_height) ->
+    lists:map(
+        fun(Phobj)->
+            get_handle_obj(Con, Phobj, What, Fields, Req_width, Req_height)
+        end,
+        Phobjs
+    ).
+
+get_handle_obj(Con, {Phobjpl}, What, Fields, Req_width, Req_height) ->
+
+    File_id = proplists:get_value(file_id, Phobjpl),
+    Req_width     = proplists:get_value(image_width, What, null),
+    Req_height    = proplists:get_value(image_height, What, null),
+    
+
+    case empdb_dao_fileinfo:get(Con, [
+        {file_id, File_id},
+        {fileinfotype_alias, download},
+        {image_width, Req_width},
+        {image_height, Req_height},
+        {limit, 1}
+    ]) of
+        {ok, []} ->
+            io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
+            Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
+            Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
+            File_id  = proplists:get_value(file_id,      Phobjpl, null),
+            Doc_id   = proplists:get_value(doc_id,       Phobjpl, null),
+            Owner_id = proplists:get_value(owner_id,     Phobjpl, null),
+            Ext      = proplists:get_value(filetype_ext, Phobjpl, <<>>),
+            {ok, [{Copypl}]} =
+                empdb_biz_file:create_copy_worker([
+                    {connection,    Con},
+                    {fs_path,       Fs_path},
+                    {fs_dir,        Fs_dir},
+                    {file_id,       File_id},
+                    {doc_id,        Doc_id},
+                    {owner_id,      Owner_id},
+                    {fileextension, Ext},
+                    {image_width,   Req_width},
+                    {image_height,  Req_height}
+                ]),
+            get_transform(Copypl, Phobjpl, Fields);
+        {ok, [{Respl}]} ->
+            io:format("Respl = ~p~n~n", [Respl]),
+            
+            get_transform(Respl, Phobjpl, Fields);
+        Error ->
+            Error
+    end.
+
+get_transform(Res, Phobjpl, Fields) ->
+    Newphobjpl =
+        lists:keyreplace(path, 1,
+            lists:keyreplace(dir, 1,
+                lists:keyreplace(image_height, 1,
+                    lists:keyreplace(image_width, 1,
+                        Phobjpl,
+                        {image_width,
+                            proplists:get_value(image_width, Res)
+                        }
+                    ),
+                    {image_height,
+                        proplists:get_value(image_height, Res)
+                    }
+                ),
+                {dir,
+                    proplists:get_value(dir, Res)
+                }
+            ),
+            {path,
+                proplists:get_value(path, Res)
+            }
+        ),
+    get_handle_pl(Newphobjpl, Fields).
+
+
+get_handle_pl(Phpl, Fields) ->
+    io:format("Phpl = ~p ~n~n~n", [Phpl]),
+
+    get_handle_path((lists:member(path, Fields) or (Fields =:= [])), Phpl).
+
+get_handle_pathtuple(Phpl) ->
+   %0 io:format("Phpl = ~p ~n~n~n", [Phpl]),
+    {path,
+        <<  (proplists:get_value(dir, Phpl))/binary,
+            (proplists:get_value(path, Phpl))/binary
+        >>
+    }.
+
+get_handle_pathtuple(Name, Phpl) ->
+    {Name,
+        <<  (proplists:get_value(dir, Phpl))/binary,
+            (proplists:get_value(path, Phpl))/binary
+        >>
+    }.
+
+get_handle_path_(Phpl) ->
+    [
+        get_handle_pathtuple(Phpl) | Phpl
+    ].
+
+get_handle_path(true, Phpl) ->
+    {[
+        get_handle_pathtuple(Phpl)
+        | proplists:delete(dir,
+                    proplists:delete(path,
+                        proplists:delete(path,
+                            proplists:delete(fs_path_full,
+                                proplists:delete(fileextension, Phpl)))))
+    ]};
+
+get_handle_path(_, Phpl) ->
+    {proplists:delete(dir,
+        proplists:delete(path,
+            proplists:delete(fs_path_full,
+                proplists:delete(fileextension, Phpl))))}.
+
 
 get(Con, What, Afields)->
     get(Con, [{fields, Afields}|What]).

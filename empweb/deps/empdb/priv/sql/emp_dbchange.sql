@@ -1345,11 +1345,43 @@
     update filetype set mimesubtype  =  'png' where id  = 4;
 
 
-    alter table filetype add column
+    alter table fileinfo add column
         image_width decimal default null;
 
 
-    alter table filetype add column
+    alter table fileinfo add column
         image_height decimal default null;
+
+
+    alter table fileinfo add column
+        filetype_mime varchar(1024) default null;
+
+    alter table fileinfo add column
+        filetype_mimesuptype varchar(1024) default null;
+
+    alter table fileinfo add column
+        filetype_mimesubtype varchar(1024) default null;
+
+    alter table fileinfo add column
+        filetype_ext varchar(1024) default null;
+        
+
+    alter table file drop column ulfileinfo_id;
+
+    alter table file drop column dlfileinfo_id;
+
+    alter table file drop column fsfileinfo_id;
+
+
+    update fileinfo set filetype_mimesuptype = 'image' where filetype_alias like '%image%';
+
+    update fileinfo set filetype_mimesubtype = 'gif' where filetype_alias like '%gif%';
+
+    update fileinfo set filetype_mimesubtype = 'gif' where filetype_alias like '%png%';
+
+    update fileinfo set filetype_mimesubtype = 'png' where filetype_alias like '%png%';
+
+    update fileinfo set filetype_mimesubtype = 'jpeg' where filetype_alias like '%jpeg%';
+
 
         

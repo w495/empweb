@@ -92,6 +92,16 @@ part_to_tuple(X) ->
   {K1, converted_value(K1, V)}.
 
 %% Conversions for passed options
+
+converted_value(type, "PNG") ->
+  png;
+
+converted_value(type, "JPEG") ->
+  jpeg;
+
+converted_value(type, "GIF") ->
+  gif;
+
 converted_value(width, V) ->
   list_to_integer(V);
 converted_value(height, V) ->

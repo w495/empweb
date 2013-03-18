@@ -61,6 +61,8 @@ table({fields, all})->
         name_ti,
         alias,
         mime,
+        mimesubtype,
+        mimesuptype,
         ext,
         dir,
         created,

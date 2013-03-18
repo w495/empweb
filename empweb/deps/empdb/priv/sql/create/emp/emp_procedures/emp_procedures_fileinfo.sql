@@ -53,6 +53,23 @@ begin
                 where fileinfotype.alias = new.fileinfotype_alias);
     end if;
 
+    new.filetype_mime =
+        (select filetype.mime from filetype
+            where filetype.id = new.filetype_id);
+
+    new.filetype_mimesuptype =
+        (select filetype.mimesuptype from filetype
+            where filetype.id = new.filetype_id);
+
+    new.filetype_mimesubtype =
+        (select filetype.mimesubtype from filetype
+            where filetype.id = new.filetype_id);
+
+    new.filetype_ext =
+        (select filetype.ext from filetype
+            where filetype.id = new.filetype_id);
+
+
     return new;
 end;
 $$ language plpgsql;

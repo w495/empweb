@@ -7,11 +7,49 @@ opt({crop, Width, Height}) ->
     {width, integer_to_list(Width)},
     {height, integer_to_list(Height)}
   ]};
+opt({resize, Width}) ->
+  {"-resize", ":width", [
+    {width, integer_to_list(Width)}
+  ]};
 opt({resize, Width, Height}) ->
   {"-resize", ":widthx:height", [
     {width, integer_to_list(Width)},
     {height, integer_to_list(Height)}
   ]};
+
+opt({geometry, Geometry}) when erlang:is_binary(Geometry)->
+  {"-geometry", ":geometry", [
+    {geometry, Geometry}
+  ]};
+
+opt({scale, Scale}) when erlang:is_binary(Scale)->
+  {"-scale", ":scale", [
+    {scale, Scale}
+  ]};
+  
+opt({scale, Scale}) ->
+  {"-scale", ":scale", [
+    {scale, integer_to_list(Scale)}
+  ]};
+opt({scale, X, Y}) ->
+  {"-scale", ":xx:y", [
+    {x, integer_to_list(X)},
+    {y, integer_to_list(Y)}
+  ]};
+opt({scale, X, Y, A}) ->
+  {"-scale", ":xx:+y+:a", [
+    {x, integer_to_list(X)},
+    {y, integer_to_list(Y)},
+    {a, integer_to_list(A)}
+  ]};
+opt({scale, X, Y, A, B}) ->
+  {"-scale", ":xx:y+:a+:b", [
+    {x, integer_to_list(X)},
+    {y, integer_to_list(Y)},
+    {a, integer_to_list(A)},
+    {b, integer_to_list(B)}
+  ]};
+  
 opt({output_directory, Dir}) ->
   {"-output-directory", ":output_directory", [{output_directory, Dir}]};
 opt(create_directories) ->

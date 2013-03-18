@@ -73,6 +73,11 @@ table({fields, all})->
 
         filetype_id,
         filetype_alias,
+        filetype_mime,
+        filetype_mimesubtype,
+        filetype_mimesuptype,
+        filetype_ext,
+
         
         image_width,
         image_height,

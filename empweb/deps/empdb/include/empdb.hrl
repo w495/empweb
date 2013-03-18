@@ -45,3 +45,9 @@
 -define(EMPDB_BIZ_ROOMBET_EPSILON, 0.001).
 
 -define(EMPDB_BIZ_PERS_WHOSE_BIRTHDAY_TIMEOUT, 18000000). %% 5h
+
+
+
+
+-define(EMPDB_BIZ_FILE_FSDIR, <<"deps/empdb/priv/data/">>).
+-define(EMPDB_BIZ_FILE_DLDIR, <<"/jsonapi/photo/">>).
