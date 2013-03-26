@@ -106,7 +106,7 @@ get(Params)->
                                                     }
                                                     |Albumpl
                                                 ]};
-                                            {ok, [Photopl]} ->
+                                            {ok, [{Photopl}]} ->
                                                 Path = proplists:get_value(
                                                     path,
                                                     Photopl,
