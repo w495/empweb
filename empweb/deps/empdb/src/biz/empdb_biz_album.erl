@@ -51,7 +51,7 @@ get(Params)->
                                     undefined ->
                                         {[{path, null}|Albumpl]};
                                     Id ->
-                                        {ok, Defaultimage} =
+                                        {ok, [{Defaultimagepl}]} =
                                             empdb_biz_file:get_system_picture(
                                                 Con,
                                                 [
@@ -100,7 +100,7 @@ get(Params)->
                                                     {path,
                                                         proplists:get_value(
                                                             path,
-                                                            Defaultimage,
+                                                            Defaultimagepl,
                                                             null
                                                         )
                                                     }
@@ -110,7 +110,7 @@ get(Params)->
                                                 Path = proplists:get_value(
                                                     path,
                                                     Photopl,
-                                                    proplists:get_value(path, Defaultimage, null)
+                                                    proplists:get_value(path, Defaultimagepl, null)
                                                 ),
                                                 {[{path, Path}|Albumpl]};
                                             {Eclassp, Ereasonp} ->
