@@ -51,23 +51,67 @@ get(Params)->
                                     undefined ->
                                         {[{path, null}|Albumpl]};
                                     Id ->
+                                        {ok, Defaultimage} =
+                                            empdb_biz_file:get_system_picture(
+                                                Con,
+                                                [
+                                                    {image_width,
+                                                        proplists:get_value(
+                                                            image_width,
+                                                            Params,
+                                                            null
+                                                        )
+                                                    },
+                                                    {image_height,
+                                                        proplists:get_value(
+                                                            image_height,
+                                                            Params,
+                                                            null
+                                                        )
+                                                    },
+                                                    {limit, 1},
+                                                    {alias, default_album_image}
+                                                ]
+                                            ),
+                                    
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
                                             {order, {desc, 'photo.created'}},
                                             {parent_id, Id},
                                             {image_width,
-                                                proplists:get_value(image_width, Params, null)
+                                                proplists:get_value(
+                                                    image_width,
+                                                    Params,
+                                                    null
+                                                )
                                             },
                                             {image_height,
-                                                proplists:get_value(image_height, Params, null)
+                                                proplists:get_value(
+                                                    image_height,
+                                                    Params,
+                                                    null
+                                                )
                                             },
                                             {limit, 1},
                                             {fields, [path]}
                                         ]) of
                                             {ok, []} ->
-                                                {[{path, null}|Albumpl]};
+                                                {[
+                                                    {path,
+                                                        proplists:get_value(
+                                                            path,
+                                                            Defaultimage,
+                                                            null
+                                                        )
+                                                    }
+                                                    |Albumpl
+                                                ]};
                                             {ok, [Photopl]} ->
-                                                Path = proplists:get_value(path, Photopl, null),
+                                                Path = proplists:get_value(
+                                                    path,
+                                                    Photopl,
+                                                    proplists:get_value(path, Defaultimage, null)
+                                                ),
                                                 {[{path, Path}|Albumpl]};
                                             {Eclassp, Ereasonp} ->
                                                 {Eclassp, Ereasonp}

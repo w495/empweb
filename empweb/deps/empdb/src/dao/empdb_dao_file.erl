@@ -64,6 +64,7 @@ table({fields, all})->
         tokenlong,
         tokenstring,
         issystem,
+        alias,
         created,
         isdeleted
     ];

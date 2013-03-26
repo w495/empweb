@@ -24,7 +24,9 @@
     md5/1,
     get/1,
     get/2,
+    get_system_picture/2,
     create_copy_worker/1,
+    get_handle_pictures/6,
     create/1,
     delete/1,
     update/1
@@ -542,6 +544,180 @@ create_copy_worker(Params)->
             Daoaction(Con)
     end.
 
+
+
+get_handle_pictures(Con, Phobjs, What, Fields, Req_width, Req_height) ->
+    lists:map(
+        fun(Phobj)->
+            get_handle_picture(Con, Phobj, What, Fields, Req_width, Req_height)
+        end,
+        Phobjs
+    ).
+
+get_handle_picture(Con, {Phobjpl}, What, Fields, Req_width, Req_height) ->
+
+    File_id = proplists:get_value(file_id, Phobjpl),
+    Req_width     = proplists:get_value(image_width, What, null),
+    Req_height    = proplists:get_value(image_height, What, null),
+
+
+    case empdb_dao_fileinfo:get(Con, [
+        {file_id, File_id},
+        {fileinfotype_alias, download},
+        {image_width, Req_width},
+        {image_height, Req_height},
+        {limit, 1}
+    ]) of
+        {ok, []} ->
+            io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
+            Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
+            Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
+            File_id  = proplists:get_value(file_id,      Phobjpl, null),
+            Doc_id   = proplists:get_value(doc_id,       Phobjpl, null),
+            Owner_id = proplists:get_value(owner_id,     Phobjpl, null),
+            Ext      = proplists:get_value(filetype_ext, Phobjpl, <<>>),
+            {ok, [{Copypl}]} =
+                empdb_biz_file:create_copy_worker([
+                    {connection,    Con},
+                    {fs_path,       Fs_path},
+                    {fs_dir,        Fs_dir},
+                    {file_id,       File_id},
+                    {doc_id,        Doc_id},
+                    {owner_id,      Owner_id},
+                    {fileextension, Ext},
+                    {image_width,   Req_width},
+                    {image_height,  Req_height}
+                ]),
+            get_transform(Copypl, Phobjpl, Fields);
+        {ok, [{Respl}]} ->
+            io:format("Respl = ~p~n~n", [Respl]),
+
+            get_transform(Respl, Phobjpl, Fields);
+        Error ->
+            Error
+    end.
+
+get_transform(Res, Phobjpl, Fields) ->
+    Newphobjpl =
+        lists:keyreplace(path, 1,
+            lists:keyreplace(dir, 1,
+                lists:keyreplace(image_height, 1,
+                    lists:keyreplace(image_width, 1,
+                        Phobjpl,
+                        {image_width,
+                            proplists:get_value(image_width, Res)
+                        }
+                    ),
+                    {image_height,
+                        proplists:get_value(image_height, Res)
+                    }
+                ),
+                {dir,
+                    proplists:get_value(dir, Res)
+                }
+            ),
+            {path,
+                proplists:get_value(path, Res)
+            }
+        ),
+    get_handle_pl(Newphobjpl, Fields).
+
+
+get_handle_pl(Phpl, Fields) ->
+    io:format("Phpl = ~p ~n~n~n", [Phpl]),
+
+    get_handle_path((lists:member(path, Fields) or (Fields =:= [])), Phpl).
+
+get_handle_pathtuple(Phpl) ->
+   %0 io:format("Phpl = ~p ~n~n~n", [Phpl]),
+    {path,
+        <<  (proplists:get_value(dir, Phpl))/binary,
+            (proplists:get_value(path, Phpl))/binary
+        >>
+    }.
+
+get_handle_pathtuple(Name, Phpl) ->
+    {Name,
+        <<  (proplists:get_value(dir, Phpl))/binary,
+            (proplists:get_value(path, Phpl))/binary
+        >>
+    }.
+
+get_handle_path_(Phpl) ->
+    [
+        get_handle_pathtuple(Phpl) | Phpl
+    ].
+
+get_handle_path(true, Phpl) ->
+    {[
+        get_handle_pathtuple(Phpl)
+        | proplists:delete(dir,
+                    proplists:delete(path,
+                        proplists:delete(path,
+                            proplists:delete(fs_path_full,
+                                proplists:delete(fileextension, Phpl)))))
+    ]};
+
+get_handle_path(_, Phpl) ->
+    {proplists:delete(dir,
+        proplists:delete(path,
+            proplists:delete(fs_path_full,
+                proplists:delete(fileextension, Phpl))))}.
+
+
+get_system_picture(Con, What) ->
+
+    Fields =
+        proplists:get_value(
+            fields,
+            What,
+            [image_width, image_height, file_id, path]
+        ),
+
+    Req_width     = proplists:get_value(image_width, What, null),
+    Req_height    = proplists:get_value(image_height, What, null),
+
+    case empdb_dao:get([
+        {empdb_dao_file, id},
+        {empdb_dao_fileinfo, file_id}
+    ],Con,[
+        {fields, [
+            fileinfotype_alias,
+            fileinfo.filetype_ext,
+            {as, {fileinfo.path, path}},
+            {as, {fileinfo.dir,  dir}}
+            | proplists:delete(path, Fields)
+        ]},
+        {fileinfotype_alias, filesystem},
+        {image_height, null},
+        {image_width, null}
+
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %         {'or', [
+            %             {image_width, Req_width},
+            %             {image_width, null}
+            %         ]},
+            %         {'or', [
+            %             {image_height, Req_height},
+            %             {image_height, null}
+            %         ]}
+            % {image_width, proplists:get_value(image_width,      What, null)},
+            % {image_height, proplists:get_value(image_height,     What, null)},
+            % {fileinfotype_alias, download}
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
+
+    ]) of
+        {ok,Phobjs} ->
+            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, Req_width, Req_height)};
+        Error ->
+            Error
+    end.
+
+    
 update(Params)->
     ok.
 get(Params)->
