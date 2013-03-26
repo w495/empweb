@@ -54,6 +54,13 @@ get(Params)->
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
                                             {order, {desc, 'photo.created'}},
+                                            {parent_id, Id},
+                                            {image_width,
+                                                proplists:get_value(image_width, Params, null)
+                                            },
+                                            {image_height,
+                                                proplists:get_value(image_height, Params, null)
+                                            },
                                             {limit, 1},
                                             {fields, [path]}
                                         ]) of
@@ -77,45 +84,7 @@ get(Params)->
     end).
 
 get(Params, Fileds)->
-    empdb_dao:with_connection(fun(Con)->
-        empdb_dao_album:get_adds(Con,
-            case empdb_dao_album:get(Con, [
-                {isdeleted, false}
-                |Params
-            ], Fileds) of
-                {ok, Albums} ->
-                    {ok,
-                        lists:map(
-                            fun({Albumpl})->
-                                case proplists:get_value(id, Albumpl) of
-                                    undefined ->
-                                        {[{path, null}|Albumpl]};
-                                    Id ->
-                                        case empdb_dao_photo:get(Con, [
-                                            {isdeleted, false},
-                                            {order, {desc, 'photo.created'}},
-                                            {parent_id, Id},
-                                            {limit, 1},
-                                            {fields, [path]}
-                                        ]) of
-                                            {ok, []} ->
-                                                {[{path, null}|Albumpl]};
-                                            {ok, [{Photopl}]} ->
-                                                Path = proplists:get_value(path, Photopl, null),
-                                                {[{path, Path}|Albumpl]};
-                                            {Eclassp, Ereasonp} ->
-                                                {Eclassp, Ereasonp}
-                                        end
-                                end
-                            end,
-                            Albums
-                        )
-                    };
-                {Eclassa, Ereasona} ->
-                    {Eclassa, Ereasona}
-            end
-        )
-    end).
+   ?MODULE:get([{fileds, Fileds}|Params]).
 
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->

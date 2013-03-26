@@ -359,6 +359,7 @@ update(Params)->
             update_(Params);
         Mbpass ->   
             %% пытаемся поменять пароль
+            io:format("~n~n~n ~n~n~n Mbpass = ~p ~n~n~n ~n~n~n", [Mbpass]),
             case update_([
                 {phash, phash(Mbpass)}
                 |Params

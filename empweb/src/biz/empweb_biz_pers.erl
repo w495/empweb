@@ -373,6 +373,7 @@ restore_pass(Params) ->
                                 {false or Status, [{Type, Reason}|Reasons]}
                         end
                     end, {false, []}, [email, phone]),
+                    %io:format("~n~n~n ~n~n~n Status = ~p ~n~n~n ~n~n~n", [Status]),
                     case Status of
                         true ->
                             case empdb_biz_pers:update([
