@@ -1363,3 +1363,8 @@
 
     alter table file add column alias varchar(1024) default null;
 
+
+
+
+
+    alter table bitrate add created timestamp without time zone not null default utcnow(),

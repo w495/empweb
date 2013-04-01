@@ -281,6 +281,7 @@ get(Params) ->
             perspicbody,
             costume_thingbuy,
             friendtype_alias,
+            my_friendtype_alias,
             community
         ]
     ).

@@ -1561,6 +1561,63 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                         |Acc
                                     ]}])
                             end
+                    end;    
+                my_friendtype_alias ->
+                    io:format(
+                        " ~n~n~n                                       "
+                        "                       my_friendtype_alias ~n~n~n", []
+                    ),
+                    Selfpersid = proplists:get_value(self@pers_id, Params),
+                    Friendid = proplists:get_value(id, Acc),
+                    Friendnick = proplists:get_value(nick, Acc),
+                    io:format(" ~n~n~n _    = ~p  ~n~n~n", [{
+                        Selfpersid,
+                        Friendid,
+                        Friendnick
+                    }]),
+                    case {Selfpersid, Friendid, Friendnick} of
+                        {undefined,
+                            _,
+                            _
+                        } ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {_,
+                            undefined,
+                            undefined
+                        } ->
+                            get_opt(Con, Params, Options, [{Acc}]);
+                        {Selfpersid,
+                            Friendid,
+                            Friendnick
+                        } ->
+                            case empdb_dao:get(empdb_dao_friend, emp, [
+                                {friend_id,   Selfpersid},
+                                {'or', [
+                                    {pers_id, Friendid},
+                                    {pers_nick, Friendnick}
+                                ]},
+                                {fields, [
+                                    friendtype_alias,
+                                    friendtype_id
+                                ]}
+                            ]) of
+                                {ok,[]} ->
+                                    get_opt(Con, Params, Options, [{[
+                                        % {friendtype_id,     Friendtype_id},
+                                        {my_friendtype_alias,  null}
+                                        |Acc
+                                    ]}]);
+                                {ok,[{Friend}]} ->
+                                    Friendtype_id =
+                                        proplists:get_value(my_friendtype_id, Friend),
+                                    Friendtype_alias =
+                                        proplists:get_value(my_friendtype_alias, Friend),
+                                    get_opt(Con, Params, Options, [{[
+                                        % {my_friendtype_id,     Friendtype_id},
+                                        {my_friendtype_alias,  Friendtype_alias}
+                                        |Acc
+                                    ]}])
+                            end
                     end;
                 nfriends ->
                     case {proplists:get_value(id, Params), proplists:get_value(nick, Params)} of
