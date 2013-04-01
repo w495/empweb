@@ -1609,9 +1609,9 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     ]}]);
                                 {ok,[{Friend}]} ->
                                     Friendtype_id =
-                                        proplists:get_value(my_friendtype_id, Friend),
+                                        proplists:get_value(friendtype_id, Friend),
                                     Friendtype_alias =
-                                        proplists:get_value(my_friendtype_alias, Friend),
+                                        proplists:get_value(friendtype_alias, Friend),
                                     get_opt(Con, Params, Options, [{[
                                         % {my_friendtype_id,     Friendtype_id},
                                         {my_friendtype_alias,  Friendtype_alias}
