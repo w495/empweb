@@ -5,7 +5,7 @@
     {vsn, "0.1.0"},
     {modules, [
         % --------------------
-        empdb_biz_doc.erl,
+        empdb_biz_doc,
         empdb_biz_experbuy,
         empdb_biz_lang,
         empdb_biz_pers,

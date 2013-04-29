@@ -110,7 +110,9 @@ get(Con, What) ->
             {as, {fileinfo.path, fileinfopath}},
             {as, {fileinfo.dir,  fileinfodir}}
             | proplists:delete(path, Fields)
-        ]}
+        ]},
+        {image_width,  null}, 
+        {image_height, null}
         |proplists:delete(fields, What)
     ]) of
         {ok,Phobjs} ->
