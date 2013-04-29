@@ -8,11 +8,32 @@ string(Orgstring) ->
     string(Orgstring, []).
 
 string(Orgstring, Additions)->
+    Maximumnicksize  = proplists:get_value(maximumnicksize, Additions, null),
     {Year,Month,Day} = erlang:date(),
 
+    Leterslist = "etaoinshrdlcumwfgypbvkxjqz",
+    Leterslistsize = erlang:length(Leterslist),
+
+    Leters_ = 
+        lists:map(
+            fun(X)-> 
+                empdb_convert:to_binary([X]) 
+            end, 
+            Leterslist
+        ),
+        
+    Leters = 
+        [
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_)
+        ],
+        
     Seps = lists:usort([
-        <<"">>,
-        <<"-">>,
+        <<"">>
 %         <<"+">>,
 %         <<"$">>,
 %         <<"%">>,
@@ -21,18 +42,26 @@ string(Orgstring, Additions)->
 %         <<"#">>,
 %         <<"@">>,
 %         <<"&">>,
-        <<"_">>,
-        <<".">>
+%        <<"_">>,
+%        <<".">>
         | proplists:get_value(seps, Additions, [])
     ]),
 
+    
     Prewords = lists:usort([
         <<"re">>,
         <<"my">>,
-        <<"true">>,
-        <<"super">>,
+        <<"co">>,
+        <<"to">>,
+        <<"top">>,
+        <<"sup">>,
+        <<"sub">>,
         <<"cool">>
-        | proplists:get_value(prewords, Additions, [])
+        |  
+        lists:append([
+            Leters,
+            proplists:get_value(prewords, Additions, [])
+        ])
     ]),
 
     Postwords = lists:usort([
@@ -40,7 +69,11 @@ string(Orgstring, Additions)->
         empdb_convert:to_binary(empdb_convert:to_list(Month)),
         empdb_convert:to_binary(empdb_convert:to_list(Year)),
         empdb_convert:to_binary(empdb_convert:to_list(Year - 2000))
-        | proplists:get_value(postwords, Additions, [])
+        | 
+        lists:append([
+            Leters,
+            proplists:get_value(postwords, Additions, [])
+        ])
     ]),
 
     Stoppunkts = lists:append([
@@ -78,7 +111,7 @@ string(Orgstring, Additions)->
     ]),
 
     Stopwords = lists:append([
-        Prewords,
+        %Prewords,
         proplists:get_value(stopwords, Additions, [])
     ]),
 
@@ -117,16 +150,22 @@ string(Orgstring, Additions)->
         ] -- [Orgstring]
     ]),
 
-    Sugs = [
-        lgps_new({syllable, 2}),
-        lgps_new({ngram, 4, 1}),
-        lgps_new({syllable, 3}),
-        lgps_new({ngram, 6, 1}),
-        lgps_new({syllable, 4}),
-        lgps_new({ngram, 8, 1})
-        |Sugs_
-    ],
-    
+    Sugs =
+        sets:to_list(sets:from_list(lists:map(
+            fun(Word) ->
+                binary:part(Word,0,erlang:min(erlang:byte_size(Word), Maximumnicksize))
+            end,
+            [
+                lgps_new({syllable, 2}),
+                lgps_new({ngram, 4, 1}),
+                lgps_new({syllable, 3}),
+                lgps_new({ngram, 6, 1}),
+                lgps_new({syllable, 4}),
+                lgps_new({ngram, 8, 1})
+                |Sugs_
+            ]
+        ))),
+        
     lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
