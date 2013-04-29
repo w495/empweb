@@ -13,6 +13,7 @@
 %% Экспортируемые функции
 %% ===========================================================================
 
+-define(EMPDB_BIZ_PERS_MAXIMUMNICKSIZE, 6).
 
 %%
 %% Сам пользователь
@@ -256,7 +257,7 @@ register(Params)->
     end.
 
 
-suggest_nick(Con, Orgnick)->
+suggest_nick(Con, Orgnick, Maximumnicksize)->
     io:format("~n~n~n~nOrgnick = ~p ~n~n~n~n", [Orgnick]),
     lists:sort(
         fun(X, Y) ->
@@ -273,9 +274,13 @@ suggest_nick(Con, Orgnick)->
                     end
                 end,
                 empdb_suggest:string(Orgnick, [
+                    {maximumnicksize, 
+                        Maximumnicksize
+                    },
                     {postwords, [
-                        <<"s">>,
+                        <<"um">>,
                         <<"us">>,
+                        <<"ru">>,
                         <<"er">>,
                         <<"me">>,
                         <<"man">>,
@@ -324,7 +329,7 @@ create__(Pass, Params)->
                     empdb_dao_album:create(Con, [
                         {owner_id,  proplists:get_value(id, Perspl)},
                         {head, null},
-                        {body, nulg847l},
+                        {body, null},
                         {isrepostcont, true}
                         %{parent_id, proplists:get_value(id, Ownalbumpl)}
                     ]),
@@ -337,7 +342,7 @@ create__(Pass, Params)->
                 ]}]};
             {error,{not_unique,<<"nick">>}}->
                     Nick = proplists:get_value(nick, Params),
-                    Sugs = suggest_nick(Con, Nick),
+                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
                 {error,{not_unique_nick,Sugs}};
             {Eclass, Error} ->
                 {Eclass, Error}
@@ -487,7 +492,7 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
         %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
                     {ok, [{Item}]};
                 {error,{not_unique,<<"nick">>}}->
-                    Sugs = suggest_nick(Con, Nick),
+                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
                     {error,{not_unique_nick,Sugs}};
                 Error ->
                     Error
