@@ -33,7 +33,7 @@ string(Orgstring, Additions)->
         ],
         
     Seps = lists:usort([
-        <<"">>
+        <<"">>,
 %         <<"+">>,
 %         <<"$">>,
 %         <<"%">>,
@@ -42,8 +42,8 @@ string(Orgstring, Additions)->
 %         <<"#">>,
 %         <<"@">>,
 %         <<"&">>,
-%        <<"_">>,
-%        <<".">>
+        <<"_">>,
+        <<".">>
         | proplists:get_value(seps, Additions, [])
     ]),
 

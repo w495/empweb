@@ -13,7 +13,7 @@
 %% Экспортируемые функции
 %% ===========================================================================
 
--define(EMPDB_BIZ_PERS_MAXIMUMNICKSIZE, 6).
+-define(EMPDB_BIZ_PERS_MAXIMUMNICKSIZE, 10).
 
 %%
 %% Сам пользователь
@@ -300,52 +300,57 @@ suggest_nick(Con, Orgnick, Maximumnicksize)->
 
 create__(Pass, Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
-            {ok, Persobj}->
-                [{Perspl}|_] = Persobj,
-                {ok, [{Ownblogpl}]} =
-                    empdb_dao_blog:create(Con, [
-                        {owner_id,  proplists:get_value(id, Perspl)},
-                        {head, null},
-                        {body, null},
-                        {isrepostcont, false}
-                    ]),
-                {ok, [{Repostblogpl}]} =
-                    empdb_dao_blog:create(Con, [
-                        {owner_id,  proplists:get_value(id, Perspl)},
-                        {head, null},
-                        {body, null},
-                        {isrepostcont, true}
-                        %{parent_id, proplists:get_value(id, Ownblogpl)}
-                    ]),
-                {ok, [{Ownalbumpl}]} =
-                    empdb_dao_album:create(Con, [
-                        {owner_id,  proplists:get_value(id, Perspl)},
-                        {head, null},
-                        {body, null},
-                        {isrepostcont, false}
-                    ]),
-                {ok, [{Repostalbumpl}]} =
-                    empdb_dao_album:create(Con, [
-                        {owner_id,  proplists:get_value(id, Perspl)},
-                        {head, null},
-                        {body, null},
-                        {isrepostcont, true}
-                        %{parent_id, proplists:get_value(id, Ownalbumpl)}
-                    ]),
-                {ok, [{[
-                    {blog_id,   proplists:get_value(id, Ownblogpl)},
-                    {album_id,  proplists:get_value(id, Ownalbumpl)},
-                    {repost_blog_id,   proplists:get_value(id, Repostblogpl)},
-                    {repost_album_id,  proplists:get_value(id, Repostalbumpl)}
-                    |Perspl
-                ]}]};
-            {error,{not_unique,<<"nick">>}}->
-                    Nick = proplists:get_value(nick, Params),
-                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
-                {error,{not_unique_nick,Sugs}};
-            {Eclass, Error} ->
-                {Eclass, Error}
+        case (erlang:byte_size(proplists:get_value(nick, Params)) > ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE) of
+            true ->
+                {error,{nick_length_more_than,?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE}};
+            false ->
+                case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
+                    {ok, Persobj}->
+                        [{Perspl}|_] = Persobj,
+                        {ok, [{Ownblogpl}]} =
+                            empdb_dao_blog:create(Con, [
+                                {owner_id,  proplists:get_value(id, Perspl)},
+                                {head, null},
+                                {body, null},
+                                {isrepostcont, false}
+                            ]),
+                        {ok, [{Repostblogpl}]} =
+                            empdb_dao_blog:create(Con, [
+                                {owner_id,  proplists:get_value(id, Perspl)},
+                                {head, null},
+                                {body, null},
+                                {isrepostcont, true}
+                                %{parent_id, proplists:get_value(id, Ownblogpl)}
+                            ]),
+                        {ok, [{Ownalbumpl}]} =
+                            empdb_dao_album:create(Con, [
+                                {owner_id,  proplists:get_value(id, Perspl)},
+                                {head, null},
+                                {body, null},
+                                {isrepostcont, false}
+                            ]),
+                        {ok, [{Repostalbumpl}]} =
+                            empdb_dao_album:create(Con, [
+                                {owner_id,  proplists:get_value(id, Perspl)},
+                                {head, null},
+                                {body, null},
+                                {isrepostcont, true}
+                                %{parent_id, proplists:get_value(id, Ownalbumpl)}
+                            ]),
+                        {ok, [{[
+                            {blog_id,   proplists:get_value(id, Ownblogpl)},
+                            {album_id,  proplists:get_value(id, Ownalbumpl)},
+                            {repost_blog_id,   proplists:get_value(id, Repostblogpl)},
+                            {repost_album_id,  proplists:get_value(id, Repostalbumpl)}
+                            |Perspl
+                        ]}]};
+                    {error,{not_unique,<<"nick">>}}->
+                            Nick = proplists:get_value(nick, Params),
+                            Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
+                        {error,{not_unique_nick,Sugs}};
+                    {Eclass, Error} ->
+                        {Eclass, Error}
+                end
         end
     end).
 
