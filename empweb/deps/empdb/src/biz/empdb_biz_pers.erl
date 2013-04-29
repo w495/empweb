@@ -258,7 +258,6 @@ register(Params)->
 
 
 suggest_nick(Con, Orgnick, Maximumnicksize)->
-    io:format("~n~n~n~nOrgnick = ~p ~n~n~n~n", [Orgnick]),
     lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
@@ -302,7 +301,12 @@ create__(Pass, Params)->
     empdb_dao:with_connection(emp, fun(Con)->
         case (erlang:byte_size(proplists:get_value(nick, Params)) > ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE) of
             true ->
-                {error,{nick_length_more_than,?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE}};
+                Nick = proplists:get_value(nick, Params),
+                Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
+                {error,{nick_length, {[
+                    {more_than, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE}, 
+                    {suggestions, Sugs}
+                ]}}};
             false ->
                 case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
                     {ok, Persobj}->
