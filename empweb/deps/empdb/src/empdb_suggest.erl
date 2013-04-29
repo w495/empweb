@@ -189,12 +189,12 @@ string(Orgstring, Additions)->
             ]
         ))),
 
-    [Norgstring | lists:sort(
+    lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
         end,
         Sugs
-    )].
+    ).
 
 
 string_match(Str, Patterns) ->
