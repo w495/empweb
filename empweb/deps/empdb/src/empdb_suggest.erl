@@ -14,7 +14,7 @@ string(Orgstring, Additions)->
     Leterslist = "etaoinshrdlcumwfgypbvkxjqz",
     Leterslistsize = erlang:length(Leterslist),
 
-    Leters_ = 
+    Leters = 
         lists:map(
             fun(X)-> 
                 empdb_convert:to_binary([X]) 
@@ -22,15 +22,29 @@ string(Orgstring, Additions)->
             Leterslist
         ),
         
-    Leters = 
+    Digits = 
         [
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_),
-            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters_)
+            empdb_convert:to_binary(empdb_convert:to_list(X)) 
+            || X <- lists:seq(0, 9)
         ],
+
+    Random_leters = 
+        [
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
+            lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters)
+        ],
+
+    Random_digits = 
+        [
+            lists:nth(crypto:rand_uniform(1, 10), Digits),
+            lists:nth(crypto:rand_uniform(1, 10), Digits),
+            lists:nth(crypto:rand_uniform(1, 10), Digits)
+        ],
+
         
     Seps = lists:usort([
         <<"">>,
@@ -59,7 +73,7 @@ string(Orgstring, Additions)->
         <<"cool">>
         |  
         lists:append([
-            Leters,
+            Random_leters,
             proplists:get_value(prewords, Additions, [])
         ])
     ]),
@@ -71,7 +85,8 @@ string(Orgstring, Additions)->
         empdb_convert:to_binary(empdb_convert:to_list(Year - 2000))
         | 
         lists:append([
-            Leters,
+            Random_digits,
+            Random_leters,
             proplists:get_value(postwords, Additions, [])
         ])
     ]),
@@ -107,7 +122,7 @@ string(Orgstring, Additions)->
             <<"?">>
         ],
         Seps -- [<<"">>],
-        [empdb_convert:to_binary(empdb_convert:to_list(X)) || X <- lists:seq(0, 9)]
+        Digits
     ]),
 
     Stopwords = lists:append([
@@ -115,7 +130,15 @@ string(Orgstring, Additions)->
         proplists:get_value(stopwords, Additions, [])
     ]),
 
-    Norgstring = Orgstring,
+    Norgstring =  
+        binary:part(
+            Orgstring,
+            0,
+            erlang:min(
+                erlang:byte_size(Orgstring), 
+                Maximumnicksize
+            )
+        ),
 
     Strparts__ = binary:split(Norgstring, Stoppunkts, [global, trim]),
 
@@ -165,13 +188,13 @@ string(Orgstring, Additions)->
                 |Sugs_
             ]
         ))),
-        
-    lists:sort(
+
+    [Norgstring | lists:sort(
         fun(X, Y) ->
             erlang:byte_size(X) < erlang:byte_size(Y)
         end,
         Sugs
-    ).
+    )].
 
 
 string_match(Str, Patterns) ->
