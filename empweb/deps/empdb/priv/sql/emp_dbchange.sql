@@ -886,6 +886,7 @@
             ('delete_roomblacklist',        true, 2.0, false, true,  true);
 */
 
+
 -- 2013.01.30 18:50:23:043426130 ---------------------------------------------
 
 /*
@@ -1367,3 +1368,10 @@
 
     alter table perspicbody add column ismale boolean default null;
     alter table perspichead add column ismale boolean default null;
+
+    insert into actiontype(alias, ispaid, price, istoall, isforme, isfake)
+        values),
+            ('fly',        false, null, false, true,  true);
+
+    
+    
