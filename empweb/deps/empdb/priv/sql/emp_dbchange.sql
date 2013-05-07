@@ -693,7 +693,7 @@
     );
 
 
-            
+
     insert into actiontype(alias, ispaid, price, istoall)
         values
             ('advertisement',           false, null, false),
@@ -1358,13 +1358,12 @@
     update fileinfo set filetype_mimesubtype = 'jpeg' where filetype_alias like '%jpeg%';
 */
 
+-- 2013.05.07 14:54:00:909981100 ---------------------------------------------
 
-
-
+/*
     alter table file add column alias varchar(1024) default null;
-
-
-
-
-
     alter table bitrate add created timestamp without time zone not null default utcnow(),
+*/
+
+    alter table perspicbody add column ismale boolean default null;
+    alter table perspichead add column ismale boolean default null;
