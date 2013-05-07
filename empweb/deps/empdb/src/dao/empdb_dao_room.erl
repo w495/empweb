@@ -441,7 +441,12 @@ topic() ->
         ]},
         %% Список полей таблицы для обновления.
         {{table, fields, update},             [
-            name_ti, descr_ti, parent_id, alias, nchildtargets
+            name_ti, 
+            descr_ti, 
+            parent_id, 
+            alias,
+            nroomtargets,
+            nchildtargets
         ]},
         %% Cписок обязательных полей таблицы для создания.
         {{table, fields, insert, required},   [
