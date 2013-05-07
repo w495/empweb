@@ -39,6 +39,16 @@
 ]).
 
 
+%%
+%% Темы чата комнаты.
+%%
+-export([
+    update_topic/2,
+    create_topic/2,
+    get_topic/2,
+    get_topic/3
+]).
+
 
 
 %%
@@ -223,6 +233,23 @@ update_communitytype(Con, Proplist)->
     empdb_dao:get(communitytype(), Con, Proplist).
 
 
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Темы сообщества
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_topic(Con, What) ->
+    empdb_dao:get(topic(), Con, What).
+
+get_topic(Con, What, Fields)->
+    empdb_dao:get(topic(), Con, What, Fields).
+
+create_topic(Con, Proplist)->
+    empdb_dao:create(topic(), Con, Proplist).
+
+update_topic(Con, Proplist)->
+    empdb_dao:update(topic(), Con, Proplist).
+    
 
 %%
 %% Local Functions
