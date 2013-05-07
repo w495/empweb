@@ -2497,7 +2497,7 @@ empweb_jsonapi_map(Req, [{_}|_] = List, State) ->
             {[], Req},
             List
         ),
-    %io:format("Res = ~p~n~n~n", [Res]),
+    io:format("Res = ~p~n~n~n", [Res]),
     {lists:reverse(Res), Reqres};
 
 empweb_jsonapi_map(Req, List, State) ->

@@ -17,6 +17,8 @@
     get_blogs/1,
     get_posts/1,
     get_photos/1,
+    add_topic/1,
+    delete_topic/1,
     count/1,
     create/1,
     update/1,

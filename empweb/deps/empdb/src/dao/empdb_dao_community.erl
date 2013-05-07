@@ -20,6 +20,8 @@
     count/2,
     get_community_topic/2,
     get_community_topic/3,
+    add_community_topic/2,
+    delete_community_topic/2,
     get/2,
     get/3
 ]).
