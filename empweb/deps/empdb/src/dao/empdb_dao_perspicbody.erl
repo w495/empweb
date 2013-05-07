@@ -58,6 +58,7 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
+        ismale,
         x,
         y,
         file_id

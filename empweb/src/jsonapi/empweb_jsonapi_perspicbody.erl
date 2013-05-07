@@ -93,6 +93,11 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
                 key         = x,
                 required    = false,
                 types       = [nullable, integer]
@@ -127,6 +132,11 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params,[
+            #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = [nullable, boolean]
+            },
             #norm_rule{
                 key         = x,
                 required    = false,
@@ -165,6 +175,11 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params,[
             #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
                 key         = id,
                 required    = false,
                 types       = [integer]
@@ -202,6 +217,11 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
                 key         = x,
                 required    = false,
                 types       = [nullable, integer]
@@ -237,6 +257,11 @@ handle(_req, #empweb_hap{
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
+            #norm_rule{
+                key         = ismale,
+                required    = false,
+                types       = [nullable, boolean]
+            },
             #norm_rule{
                 key         = x,
                 required    = false,
