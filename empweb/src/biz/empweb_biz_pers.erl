@@ -279,6 +279,7 @@ get(Params) ->
             repost_album,
             perspichead,
             perspicbody,
+            perspicphoto_path,
             costume_thingbuy,
             friendtype_alias,
             my_friendtype_alias,

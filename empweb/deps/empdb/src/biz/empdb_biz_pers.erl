@@ -1498,11 +1498,13 @@ get_opt(Params1, Options)->
     Fields =
         lists:foldl(
             fun (perspichead, Acc)->
-                [perspichead, perspichead_id|Acc];
+                    [perspichead, perspichead_id|Acc];
                 (perspicbody, Acc)->
-                [perspicbody, perspicbody_id|Acc];
+                    [perspicbody, perspicbody_id|Acc];
+                (perspicphoto_path, Acc)->
+                    [perspicphoto_path, perspicphoto_id|Acc];
                 (costume_thingbuy, Acc)->
-                [costume_thingbuy, costume_thingbuy_id|Acc];
+                    [costume_thingbuy, costume_thingbuy_id|Acc];
                 (Field, Acc)->
                 [Field|Acc]
             end,
@@ -1860,6 +1862,59 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                 end,
                                 
                             get_opt(Con, Params, Options, [{[{perspicbody, Perspicbody}|Acc]}])
+                    end;
+                perspicphoto_path ->
+                    case proplists:get_value(perspicphoto_id, Acc) of
+                        undefined ->
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, null}|Acc]}]);
+                        null ->
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, null}|Acc]}]);
+                        Perspicphoto_id ->
+                            Perspicphotofields =
+                                lists:append([
+                                    empdb_dao_doc:table({fields, select}),
+                                    [image_width, image_height, file_id, path]
+                                ]),
+                            Req_width     = proplists:get_value(image_width, Params, null),
+                            Req_height    = proplists:get_value(image_height, Params, null),
+                            {ok, [{Perspicphoto}]} = 
+                                case empdb_dao:get([
+                                    {empdb_dao_file, id},
+                                    {empdb_dao_fileinfo, file_id}
+                                ],Con,[
+                                    {fields, [
+                                        fileinfotype_alias,
+                                        fileinfo.filetype_ext,
+                                        {as, {fileinfo.path, path}},
+                                        {as, {fileinfo.dir,  dir}}
+                                        | proplists:delete(path, Perspicphotofields)
+                                    ]},
+                                    {fileinfotype_alias,    filesystem},
+                                    {image_height,          null},
+                                    {image_width,           null},
+                                    {limit,                 1},
+                                    {'file.id',             Perspicphoto_id}
+                                ]) of
+                                    {ok,Phobjs} ->
+                                        What = [
+                                            {image_width,   Req_width},
+                                            {image_height,  Req_height}
+                                        ],
+                                        {ok, empdb_biz_file:get_handle_pictures(
+                                            Con, 
+                                            Phobjs, 
+                                            What, 
+                                            Perspicphotofields, 
+                                            Req_width, 
+                                            Req_height
+                                        )};
+                                    Error ->
+                                        Error
+                                end,
+                            io:format("~n~n~nPerspicphoto = ~p~n",[Perspicphoto]),
+                            
+                            Perspicphoto_path = proplists:get_value(path, Perspicphoto),
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, Perspicphoto_path}|Acc]}])
                     end;
                 costume_thingbuy ->
                     case proplists:get_value(costume_thingbuy_id, Acc) of

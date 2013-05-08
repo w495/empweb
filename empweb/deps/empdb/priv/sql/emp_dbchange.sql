@@ -1375,3 +1375,5 @@
 
     
     
+    alter table pers add column perspicphoto_id  decimal references file(id)   default null;
+    
