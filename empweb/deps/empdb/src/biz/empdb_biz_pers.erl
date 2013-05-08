@@ -374,11 +374,21 @@ update(Params)->
         Mbpass ->   
             %% пытаемся поменять пароль
             io:format("~n~n~n ~n~n~n Mbpass = ~p ~n~n~n ~n~n~n", [Mbpass]),
+            io:format("~n~n~n ~n~n~n Params = ~p ~n~n~n ~n~n~n", [Params]),
+            
             case update_([
-                {phash, phash(Mbpass)}
-                |Params
+                case proplists:get_value(values, Params) of
+                    undefined ->
+                        {phash, phash(Mbpass)};
+                    Values ->
+                        {values,
+                            [{phash, phash(Mbpass)}|Values]
+                        }
+                end
+                |proplists:delete(values,Params)
             ])  of
                 {ok, Persobj} ->
+                    io:format("~n~n~n ~n~n~n Persobj = ~p ~n~n~n ~n~n~n", [Persobj]),
                     [{Perspl}|_] = Persobj,
                     Id = proplists:get_value(id, Perspl),
                     %% изменяем запись в базе jabberd
