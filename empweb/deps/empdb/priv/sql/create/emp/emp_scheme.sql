@@ -530,6 +530,8 @@ create table pers(
     
     -- allowauctoffer      boolean default false,
 
+    
+    perspicphoto_id      decimal references perspichead(id)   default null,
     perspichead_id      decimal references perspichead(id)   default null,
     perspicbody_id      decimal references perspicbody(id)   default null,
 
