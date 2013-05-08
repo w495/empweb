@@ -221,6 +221,8 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_integer(Status) and erlang:is_list(Icookies) ->
 
+    io:format(" ~n~n~n Some = ~p ~n~n~n", [Status]),
+    
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
@@ -233,7 +235,27 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
         status=Status,
         headers=[resp_format(Format)|lists:append(Cookies, Headers)],
         body=Body
+    };
+    
+resp(Empwebresplist) when erlang:is_list(Empwebresplist) ->
+
+    Resresp_ = 
+        lists:foldl(
+            fun
+                (Empwebresp, #http_resp{body=Bodies})->
+                    Httpresp = #http_resp{body = Body} = resp(Empwebresp),
+                    Httpresp#http_resp{
+                        body    = [Body|Bodies]
+                    }
+            end, 
+            #http_resp{},
+            Empwebresplist
+        ),
+
+    Resresp_#http_resp{
+        body    = lists:reverse(Resresp_#http_resp.body)
     }.
+
 
 resp_format(json) ->    ?OUTPUT_JSON_HEADER_CTYPE;
 
@@ -304,5 +326,9 @@ status(variant_also_negotiates) ->          506;
 status(insufficient_storage) ->             507;
 status(not_extended) ->                     510;
 status(network_authentication_required) ->  511;
+
+
+status(Status) when erlang:is_integer(Status) ->
+    Status;
 
 status(X) ->                                   0.
