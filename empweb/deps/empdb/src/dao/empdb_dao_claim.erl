@@ -71,7 +71,8 @@ table({fields, all})->
         ss_pers_citizen_room_id,
         ss_pers_citizen_room_head,
         ss_pers_live_room_id,
-        ss_pers_live_room_head
+        ss_pers_live_room_head,
+        issystem
     ];
 
 %%
