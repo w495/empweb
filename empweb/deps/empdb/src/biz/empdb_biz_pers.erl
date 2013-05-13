@@ -190,7 +190,7 @@ whose_birthday() ->
                 ok;
             {ok, Birthdaylist}->
                 %% Выбирали всех у кого ДР сегодня.
-                %% Проходим по списку и отсылаем их друзьям 
+                %% Проходим по списку и отсылаем их друзьям
                 %% (подписчикам сообщения).
                 lists:map(
                     fun({Birthdaymanpl})->
@@ -273,7 +273,7 @@ suggest_nick(Con, Orgnick, Maximumnicksize)->
                     end
                 end,
                 empdb_suggest:string(Orgnick, [
-                    {maximumnicksize, 
+                    {maximumnicksize,
                         Maximumnicksize
                     },
                     {postwords, [
@@ -304,7 +304,7 @@ create__(Pass, Params)->
                 Nick = proplists:get_value(nick, Params),
                 Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
                 {error,{nick_length, {[
-                    {more_than, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE}, 
+                    {more_than, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE},
                     {suggestions, Sugs}
                 ]}}};
             false ->
@@ -358,7 +358,7 @@ create__(Pass, Params)->
         end
     end).
 
-    
+
 %%
 %% @doc Обновляет пользователя. Если у пользователя указан пароль,
 %% то обновляется хешь пароля в базе данных сервера приложений,
@@ -371,11 +371,11 @@ update(Params)->
         undefined ->
             %% не пытаемся поменять пароль
             update_(Params);
-        Mbpass ->   
+        Mbpass ->
             %% пытаемся поменять пароль
             io:format("~n~n~n ~n~n~n Mbpass = ~p ~n~n~n ~n~n~n", [Mbpass]),
             io:format("~n~n~n ~n~n~n Params = ~p ~n~n~n ~n~n~n", [Params]),
-            
+
             case update_([
                 case proplists:get_value(values, Params) of
                     undefined ->
@@ -525,10 +525,10 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
             ]}}}
     end;
 
-%% 
-%% Человек попросился в сообщество, 
+%%
+%% Человек попросился в сообщество,
 %% и стал кандидатом
-%% 
+%%
 update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) ->
     case {
         (proplists:get_value(live_community_id, Mbperspl) =/= Community_id),
@@ -717,7 +717,7 @@ update(Con, {live_community_id, Community_id}, {Function, [Params]}, Mbperspl) -
 
 %%
 %% Человека одобрили как члена сообщества
-%% 
+%%
 update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
     Pers_id   = proplists:get_value(id, Mbperspl),
     case proplists:get_value(live_community_id, Mbperspl) =/= null of
@@ -755,7 +755,7 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
                 {true, true} ->
                     case Function(Con, Params) of
                         {ok, Res} ->
-                            %% Создаем событие истории 
+                            %% Создаем событие истории
                             %% о том что пользователь стал членом
                             {ok, _} =
                                 empdb_dao_communityhist:create(Con, [
@@ -993,7 +993,7 @@ update(Con, {live_community_approved, _}, {Function, [Params]}, Mbperspl) ->
             {error, forbiden}
     end;
 
-    
+
 update(Con, {_pname, _pvalue}, {Function, [Params]}, Mbperspl) ->
     Function(Con, Params).
 
@@ -1016,7 +1016,7 @@ ca(L, R) ->
 
 %%
 %% @doc Вход пользователя. Создание сессии.
-%% Сначала определяет, какой из параметров был передан, 
+%% Сначала определяет, какой из параметров был передан,
 %% и логинит пользователя по этому параметру.
 %%
 login(Params) ->
@@ -1045,9 +1045,9 @@ login({Uf, Uv}, Params) ->
     Mbpass = proplists:get_value(pass, Params),
     Mbphash = phash(Mbpass),
     %% Фиктиные переменные, в логике реально не участвуют.
-    %% Нужны для быстрого построения проверки, 
+    %% Нужны для быстрого построения проверки,
     %% на количество ошибочных логинов.
-    Max_auth_error = 10,    
+    Max_auth_error = 10,
     EC = 0,
     empdb_dao:with_transaction(emp, fun(Con)->
         io:format("Params = ~p ~n~n~n~n", [Params]),
@@ -1345,6 +1345,56 @@ login({Uf, Uv}, Params) ->
                                     {ok, []} ->
                                         null
                                 end,
+                    Perspicphoto_path =
+                        case proplists:get_value(perspicphoto_id, Userpl) of
+                            undefined ->
+                                null;
+                            null ->
+                                null;
+                            Perspicphoto_id ->
+                                Perspicphotofields =
+                                    lists:append([
+                                        empdb_dao_doc:table({fields, select}),
+                                        [image_width, image_height, file_id, path]
+                                    ]),
+                                Req_width     = proplists:get_value(image_width, Params, null),
+                                Req_height    = proplists:get_value(image_height, Params, null),
+                                {ok, [{Perspicphoto}]} =
+                                    case empdb_dao:get([
+                                        {empdb_dao_file, id},
+                                        {empdb_dao_fileinfo, file_id}
+                                    ],Con,[
+                                        {fields, [
+                                            fileinfotype_alias,
+                                            fileinfo.filetype_ext,
+                                            {as, {fileinfo.path, path}},
+                                            {as, {fileinfo.dir,  dir}}
+                                            | proplists:delete(path, Perspicphotofields)
+                                        ]},
+                                        {fileinfotype_alias,    filesystem},
+                                        {image_height,          null},
+                                        {image_width,           null},
+                                        {limit,                 1},
+                                        {'file.id',             Perspicphoto_id}
+                                    ]) of
+                                        {ok,Phobjs} ->
+                                            What = [
+                                                {image_width,   Req_width},
+                                                {image_height,  Req_height}
+                                            ],
+                                            {ok, empdb_biz_file:get_handle_pictures(
+                                                Con,
+                                                Phobjs,
+                                                What,
+                                                Perspicphotofields,
+                                                Req_width,
+                                                Req_height
+                                            )};
+                                        Error ->
+                                            Error
+                                    end,
+                                proplists:get_value(path, Perspicphoto)
+                        end,
 
                         {ok,[{[{count,Nfriends}]}]} =
                             empdb_dao_friend:count(Con, [
@@ -1366,6 +1416,7 @@ login({Uf, Uv}, Params) ->
                                 ]}
                             ]),
                         {ok, [{[
+                            {perspicphoto_path, Perspicphoto_path},
                             {perspichead,       Perspichead},
                             {perspicbody,       Perspicbody},
                             {costume_thingbuy,     Costume_thingbuy},
@@ -1412,7 +1463,7 @@ login({Uf, Uv}, Params) ->
                 end
         end
     end).
-    
+
 logout(Params)->
     empdb_dao:with_transaction(emp, fun(Con)->
         {ok,[{Pstatuspl}]} =
@@ -1498,11 +1549,13 @@ get_opt(Params1, Options)->
     Fields =
         lists:foldl(
             fun (perspichead, Acc)->
-                [perspichead, perspichead_id|Acc];
+                    [perspichead, perspichead_id|Acc];
                 (perspicbody, Acc)->
-                [perspicbody, perspicbody_id|Acc];
+                    [perspicbody, perspicbody_id|Acc];
+                (perspicphoto_path, Acc)->
+                    [perspicphoto_path, perspicphoto_id|Acc];
                 (costume_thingbuy, Acc)->
-                [costume_thingbuy, costume_thingbuy_id|Acc];
+                    [costume_thingbuy, costume_thingbuy_id|Acc];
                 (Field, Acc)->
                 [Field|Acc]
             end,
@@ -1585,7 +1638,7 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                         |Acc
                                     ]}])
                             end
-                    end;    
+                    end;
                 my_friendtype_alias ->
                     io:format(
                         " ~n~n~n                                       "
@@ -1858,8 +1911,60 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {ok, []} ->
                                         null
                                 end,
-                                
+
                             get_opt(Con, Params, Options, [{[{perspicbody, Perspicbody}|Acc]}])
+                    end;
+                perspicphoto_path ->
+                    case proplists:get_value(perspicphoto_id, Acc) of
+                        undefined ->
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, null}|Acc]}]);
+                        null ->
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, null}|Acc]}]);
+                        Perspicphoto_id ->
+                            io:format(" ~n~n~n Perspicphoto_id = ~p ~n~n~n", [Perspicphoto_id]),
+                            Perspicphotofields =
+                                lists:append([
+                                    empdb_dao_doc:table({fields, select}),
+                                    [image_width, image_height, file_id, path]
+                                ]),
+                            Req_width     = proplists:get_value(image_width, Params, null),
+                            Req_height    = proplists:get_value(image_height, Params, null),
+                            {ok, [{Perspicphoto}]} =
+                                case empdb_dao:get([
+                                    {empdb_dao_file, id},
+                                    {empdb_dao_fileinfo, file_id}
+                                ],Con,[
+                                    {fields, [
+                                        fileinfotype_alias,
+                                        fileinfo.filetype_ext,
+                                        {as, {fileinfo.path, path}},
+                                        {as, {fileinfo.dir,  dir}}
+                                        | proplists:delete(path, Perspicphotofields)
+                                    ]},
+                                    {fileinfotype_alias,    filesystem},
+                                    {image_height,          null},
+                                    {image_width,           null},
+                                    {limit,                 1},
+                                    {'file.id',             Perspicphoto_id}
+                                ]) of
+                                    {ok,Phobjs} ->
+                                        What = [
+                                            {image_width,   Req_width},
+                                            {image_height,  Req_height}
+                                        ],
+                                        {ok, empdb_biz_file:get_handle_pictures(
+                                            Con,
+                                            Phobjs,
+                                            What,
+                                            Perspicphotofields,
+                                            Req_width,
+                                            Req_height
+                                        )};
+                                    Error ->
+                                        Error
+                                end,
+                            Perspicphoto_path = proplists:get_value(path, Perspicphoto),
+                            get_opt(Con, Params, Options, [{[{perspicphoto_path, Perspicphoto_path}|Acc]}])
                     end;
                 costume_thingbuy ->
                     case proplists:get_value(costume_thingbuy_id, Acc) of
@@ -2118,7 +2223,7 @@ get_friend(Params1)->
 
     Params =
         lists:keyreplace(fields, 1, Params1, {fields, Fields}),
-        
+
     empdb_dao:with_connection(emp, fun(Con)->
         {ok, Userpls} =
             empdb_dao_friend:get(Con, [
@@ -2186,7 +2291,7 @@ update_ostatus(Params)->
         empdb_dao_pers:update_ostatus(Con, Params)
     end).
 
-    
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Семейное положение пользователя
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

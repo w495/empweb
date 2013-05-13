@@ -231,6 +231,7 @@ table({fields, all})->
         own_room_id,
         own_room_head,
         
+        perspicphoto_id,
         perspichead_id,
         perspicbody_id,
         costume_thingbuy_id,

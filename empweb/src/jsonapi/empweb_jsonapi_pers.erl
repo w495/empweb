@@ -124,7 +124,7 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
     );
 
 
-% 
+%
 % handle(Req, #empweb_hap{
 %         action  =   nick,
 %         params  =   Params,
@@ -217,6 +217,16 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
                 #norm_rule{
                     key = nick,
                     types = [string]
+                },
+                #norm_rule{
+                    key         = image_width,
+                    required    = false,
+                    types       = empweb_norm:filter([nullable, integer])
+                },
+                #norm_rule{
+                    key         = image_height,
+                    required    = false,
+                    types       = empweb_norm:filter([nullable, integer])
                 }
             ]},
             #norm_rule{
@@ -261,7 +271,7 @@ handle(Req, #empweb_hap{
                 default = Pers_id
             }
         ]),
-        fun(Data)->        
+        fun(Data)->
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_pers:logout([Auth | Data#norm.return])
@@ -488,8 +498,8 @@ handle(_req, #empweb_hap{
         Hap
     );
 
-    
-% 
+
+%
 % %%
 % %% Функция отрабатывает только если пользователь идентифицирован
 % %%
@@ -538,6 +548,11 @@ handle(_req, #empweb_hap{
                     },
                     #norm_rule{
                         key         = perspicbody_id,
+                        required    = false,
+                        types       = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key         = perspicphoto_id,
                         required    = false,
                         types       = [nullable, integer]
                     },
@@ -887,7 +902,7 @@ handle(_req, #empweb_hap{
 
 terminate(_req, Hap)->
     ?evman_args(Hap, <<" = terminate">>),
-    
+
     ok.
 
 %% ---------------------------------------------------------------------------
