@@ -57,7 +57,7 @@ create(Params)->
     Ulsize  = erlang:byte_size(Ulbody),
 
 
-    
+
     Md5binary = md5(Ulbody),
     Path_binary  = rand_bytes(),
 
@@ -100,7 +100,7 @@ create(Params)->
             {ext, Ulext},
             {limit, 1}
         ]),
-        
+
         Filetype_id =
             proplists:get_value(id,           Filetypepl),
         Filetype_mimesuptype =
@@ -169,9 +169,9 @@ create(Params)->
                     ]
             end,
 
-            
+
         %% -------------------------------------------------------------------
-        %% Создаем описание файла, 
+        %% Создаем описание файла,
         %% который собираемся хранить в файловой системе
         %% -------------------------------------------------------------------
         {ok, [{Fsfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
@@ -229,8 +229,8 @@ create(Params)->
             {name,                  Ulname}
             |Whpl
         ]),
-% 
-%         
+%
+%
 %         spawn_link(fun()->
 %             lists:map(
 %                 fun({W, H})->
@@ -267,7 +267,7 @@ create(Params)->
 %                 ]
 %             )
 %         end),
-    
+
         case proplists:get_value(isres,   Params, null) of
             true ->
                 {ok, [{[
@@ -296,7 +296,7 @@ gm_convert_geometry(null, H) ->
             empdb_convert:to_binary(H)
         ])
     };
-    
+
 gm_convert_geometry(W, null) ->
     {ok,
         erlang:list_to_binary([
@@ -314,12 +314,12 @@ gm_convert_geometry(W, H) ->
         ])
     }.
 
-convert(Params)->
-    Orig_fs_path_full   = proplists:get_value(orig_fs_path_full, Params),
-    Fspath_full        = proplists:get_value(fs_path_full, Params),
-    Image_width         = proplists:get_value(image_width, Params),
-    Image_height         = proplists:get_value(image_height, Params),
-    
+gm_convert_geometry(
+    Orig_fs_path_full,
+    Fspath_full,
+    Image_width,
+    Image_height
+) ->
     case gm_convert_geometry(Image_width, Image_height) of
         {error, Reason} ->
             io:format("~n ~n Reason = ~p ~n ~n", [ Reason ]),
@@ -337,6 +337,63 @@ convert(Params)->
             )
     end.
 
+gm_convert_tge(
+    Orig_fs_path_full,
+    Fspath_full,
+    Image_width,
+    Image_height
+) ->
+    gm:convert(
+        Orig_fs_path_full,
+        Fspath_full,
+        [
+            {thumbnail, Image_width, Image_height},
+            {gravity, <<"center">>},
+            {extent, Image_width, Image_height}
+        ]
+    ).
+
+gm_convert(
+    Orig_fs_path_full,
+    Fspath_full,
+    null,
+    Image_height
+)->
+    gm_convert_geometry(Orig_fs_path_full,Fspath_full,null,Image_height);
+
+gm_convert(
+    Orig_fs_path_full,
+    Fspath_full,
+    Image_width,
+    null
+)->
+    gm_convert_geometry(Orig_fs_path_full,Fspath_full,Image_width,null);
+
+
+gm_convert(
+    Orig_fs_path_full,
+    Fspath_full,
+    Image_width,
+    Image_height
+)->
+    gm_convert_tge(Orig_fs_path_full,Fspath_full,Image_width,Image_height).
+
+
+convert(Params)->
+    Orig_fs_path_full   = proplists:get_value(orig_fs_path_full, Params),
+    Fspath_full        = proplists:get_value(fs_path_full, Params),
+    Image_width         = proplists:get_value(image_width, Params),
+    Image_height         = proplists:get_value(image_height, Params),
+
+    io:format("~n ~n convert(Params) = ~p ~n ~n", [ Params ]),
+
+    gm_convert(
+        Orig_fs_path_full,
+        Fspath_full,
+        Image_width,
+        Image_height
+    ).
+
 
 create_copy(Params)->
     Fspath_full     = proplists:get_value(fs_path_full, Params),
@@ -347,7 +404,7 @@ create_copy(Params)->
     Image_width     = proplists:get_value(image_width,      Params, null),
     Image_height    = proplists:get_value(image_height,     Params, null),
     Connection      = proplists:get_value(connection,       Params, null),
-    
+
     create_copy_worker([
         {connection,    Connection},
         {fs_path_full,  Fspath_full},
@@ -386,7 +443,7 @@ create_copy_worker(Params)->
 
     io:format("~n ~n Params = ~p ~n~n", [ Params ]),
 
-    
+
     File_id         = proplists:get_value(file_id,          Params, null),
     Doc_id          = proplists:get_value(doc_id,           Params, null),
     Owner_id        = proplists:get_value(owner_id,         Params, null),
@@ -403,14 +460,14 @@ create_copy_worker(Params)->
         << Orig_fs_dir/binary, Orig_fs_path/binary >>),
 
 
-    
+
     Path_binary  = rand_bytes(),
 
 
 
     io:format("~n ~n Image_width = ~p ~p ~n~n", [ Image_width, Image_height ]),
 
-    
+
     Path_list =
         [[ io_lib:format("~.36.0b", [X])] || <<X>> <=  Path_binary],
 
@@ -421,17 +478,17 @@ create_copy_worker(Params)->
 
     io:format("~n ~n Path_list = ~w ~n~n", [ Path_list ]),
 
-    
+
     %% Конструируем пути для файла в файловой системе.
     Fspath         = erlang:list_to_binary(filename:join(Path_list)),
 
     io:format("~n ~n Fspath = ~w ~n ~n", [ Fspath ]),
-    
+
     Fspath_ext     =  << Fspath/binary, $., Ext/binary >>,
 
     io:format("~n ~n Fspath_ext = ~w ~n ~n", [ Fspath_ext ]),
 
-    
+
     Fspath_full    =  << Fsdir/binary, Fspath_ext/binary >>,
 
     io:format("~n ~n Fspath_full = ~p ~n ~n", [ Fspath_full ]),
@@ -439,7 +496,7 @@ create_copy_worker(Params)->
 
     io:format("~n ~n Orig_fs_path_full = ~p ~n ~n", [ Orig_fs_path_full ]),
 
-    
+
     ok = filelib:ensure_dir(Fspath_full),
     convert([
         {orig_fs_path_full, Orig_fs_path_full},
@@ -447,12 +504,12 @@ create_copy_worker(Params)->
         {image_width,       Image_width},
         {image_height,      Image_height}
     ]),
-    
+
     {ok, Fsbody} = file:read_file(Fspath_full),
     Md5binary = md5(Fsbody),
 
     Fssize  = erlang:byte_size(Fsbody),
-       
+
     %% Конструируем пути для файла для скачивания.
     Dlpath         = erlang:list_to_binary(string:join(Path_list,[<<"/">>])),
     Dlpath_ext     = << Dlpath/binary, $., Ext/binary  >>,
@@ -717,7 +774,7 @@ get_system_picture(Con, What) ->
             Error
     end.
 
-    
+
 update(Params)->
     ok.
 get(Params)->
@@ -740,7 +797,7 @@ rand_bytes(Md5binary)->
         Md5binary/binary,
         (crypto:rand_bytes(crypto:rand_uniform(1, 8)))/binary
     >>.
-    
+
 md5(Bin) ->
     C1 = erlang:md5_init(),
     C2 = erlang:md5_update(C1, Bin),
