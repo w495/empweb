@@ -186,6 +186,11 @@ handle(_req, #empweb_hap{
                 key         = judge_authority_head,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = issystem,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -299,6 +304,11 @@ handle(_req, #empweb_hap{
                 key         = judge_authority_head,
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
+                key         = issystem,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -341,6 +351,11 @@ handle(_req, #empweb_hap{
                 key         = judge_nick,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = issystem,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('create')
         ]),
@@ -397,6 +412,11 @@ handle(_req, #empweb_hap{
                 key         = judge_nick,
                 required    = false,
                 types       = [string]
+            },
+            #norm_rule{
+                key         = issystem,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('update')
         ]),
@@ -448,6 +468,11 @@ handle(_req, #empweb_hap{
                 key         = judge_nick,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = issystem,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('delete')
         ]),
