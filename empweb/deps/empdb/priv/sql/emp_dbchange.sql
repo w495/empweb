@@ -1387,9 +1387,8 @@
 
     insert into paytype(alias, isincome)
         values  ('change_perspichead',     false),
-                ('roombet_in',      true ),
-                ('roomlot_in',      true ),
-                ('thing_out',       false),
-                ('exper_out',       false)
+                ('change_perspicbody',     false);
 
+
+    alter table claim add column issystem  boolean default null;
 
