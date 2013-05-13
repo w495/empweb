@@ -56,6 +56,7 @@ create(Params)->
             {ok, [{Perspl}]} ->
                 Id = proplists:get_value(id, Perspl),
                 create__(Con, [
+                    {isoffer,         false},
                     {pers_id, proplists:get_value(id, Perspl)},
                     {ss_pers_citizen_room_id,
                         proplists:get_value(citizen_room_id, Perspl)},
@@ -64,12 +65,20 @@ create(Params)->
                     {ss_pers_live_room_id,
                         proplists:get_value(live_room_id, Perspl)},
                     {ss_pers_live_room_head,
-                        proplists:get_value(live_room_head, Perspl)},
-                    {claimtype_alias, open}
+                        proplists:get_value(live_room_head, Perspl)}
                     |proplists:delete(pers_id, proplists:delete(pers_nick, Params))
                 ]);
             {ok, []} ->
-                {error, pers_does_not_exist};
+                create__(Con, [
+                    {isoffer,                   true},
+                    {pers_id,                   null},
+                    {ss_pers_citizen_room_id,   null},
+                    {ss_pers_citizen_room_head, null},
+                    {ss_pers_live_room_id,      null},
+                    {ss_pers_live_room_head,    null}
+                    |proplists:delete(pers_id, proplists:delete(pers_nick, Params))
+                ]);
+                %{error, pers_does_not_exist};
             Elsepers ->
                 Elsepers
         end

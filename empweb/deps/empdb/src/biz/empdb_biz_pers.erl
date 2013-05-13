@@ -472,7 +472,15 @@ update(Con, {nick, undefined},  {Function, [Params]}, Mbperspl) ->
     Function(Con, Params);
 
 update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
-    Price = 1.0,
+
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get( Con, [
+                {alias, change_nick_price},
+                {fields, [price]},
+                {limit, 1}
+        ]),
+    Price = proplists:get_value(price, Servicepl, 1.0),
+    %Price = 1.0,
     Money = proplists:get_value(money, Mbperspl),
     Oldnick = proplists:get_value(nick, Mbperspl),
     case {Price =< Money, Oldnick =:= Nick} of
@@ -513,6 +521,85 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
                 {error,{not_unique,<<"nick">>}}->
                     Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
                     {error,{not_unique_nick,Sugs}};
+                Error ->
+                    Error
+            end;
+        {true, _} ->
+            {ok, []};
+        {false, _} ->
+            {error, {not_enough_money, {[
+                {money, Money},
+                {price, Price}
+            ]}}}
+    end;
+
+update(Con, {perspichead_id, Perspicheadid},  {Function, [Params]}, Mbperspl) ->
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get( Con, [
+                {alias, change_perspichead_price},
+                {fields, [price]},
+                {limit, 1}
+        ]),
+    Price = proplists:get_value(price, Servicepl, 1.0),
+    Money = proplists:get_value(money, Mbperspl),
+    Oldperspicheadid = proplists:get_value(perspichead_id, Mbperspl),
+    case {Price =< Money, Oldperspicheadid =:= Perspicheadid} of
+        {true, false} ->
+            case Function(Con, Params) of
+                {ok, [{Item}]} ->
+                    {ok, _} =
+                        empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(id,   Item)},
+                            {paytype_alias,     change_perspichead},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
+                    {ok, _} =
+                        empdb_dao_pers:update(Con,[
+                            {id,    proplists:get_value(id,   Item)},
+                            {money, {decr, Price}}
+                        ]),
+                    {ok, [{Item}]};
+                Error ->
+                    Error
+            end;
+        {true, _} ->
+            {ok, []};
+        {false, _} ->
+            {error, {not_enough_money, {[
+                {money, Money},
+                {price, Price}
+            ]}}}
+    end;
+
+
+update(Con, {perspicbody_id, Perspicbodyid},  {Function, [Params]}, Mbperspl) ->
+    {ok,[{Servicepl}]} =
+        empdb_dao_service:get( Con, [
+                {alias, change_perspicbody_price},
+                {fields, [price]},
+                {limit, 1}
+        ]),
+    Price = proplists:get_value(price, Servicepl, 1.0),
+    Money = proplists:get_value(money, Mbperspl),
+    Oldperspicbodyid = proplists:get_value(perspicbody_id, Mbperspl),
+    case {Price =< Money, Oldperspicbodyid =:= Perspicbodyid} of
+        {true, false} ->
+            case Function(Con, Params) of
+                {ok, [{Item}]} ->
+                    {ok, _} =
+                        empdb_dao_pay:create(Con, [
+                            {pers_id,           proplists:get_value(id,   Item)},
+                            {paytype_alias,     change_perspicbody},
+                            {isincome,          false},
+                            {price,             Price}
+                        ]),
+                    {ok, _} =
+                        empdb_dao_pers:update(Con,[
+                            {id,    proplists:get_value(id,   Item)},
+                            {money, {decr, Price}}
+                        ]),
+                    {ok, [{Item}]};
                 Error ->
                     Error
             end;
