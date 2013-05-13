@@ -188,7 +188,7 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
-                key         = issystem,
+                key         = isoffer,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }
@@ -306,7 +306,7 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
-                key         = issystem,
+                key         = isoffer,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }
@@ -353,7 +353,7 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([string])
             },
             #norm_rule{
-                key         = issystem,
+                key         = isoffer,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }
@@ -414,7 +414,7 @@ handle(_req, #empweb_hap{
                 types       = [string]
             },
             #norm_rule{
-                key         = issystem,
+                key         = isoffer,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }
@@ -470,7 +470,7 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([string])
             },
             #norm_rule{
-                key         = issystem,
+                key         = isoffer,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
             }

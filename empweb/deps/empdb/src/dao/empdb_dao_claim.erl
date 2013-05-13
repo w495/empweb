@@ -57,6 +57,7 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
+        isoffer,
         doc_id,
         pers_id,
         pers_nick,
@@ -71,8 +72,7 @@ table({fields, all})->
         ss_pers_citizen_room_id,
         ss_pers_citizen_room_head,
         ss_pers_live_room_id,
-        ss_pers_live_room_head,
-        issystem
+        ss_pers_live_room_head
     ];
 
 %%
@@ -124,7 +124,7 @@ get(Con, What) ->
         {empdb_dao_doc,     id},
         {empdb_dao_claim,   doc_id},
         {{empdb_dao_pers, owner },   {id,   {doc,    owner_id}}},
-        {{empdb_dao_pers, pers  },   {id,   {claim,  pers_id}}},
+        {{empdb_dao_pers, pers  },   {left, {id, {claim,  pers_id}}}},
         {{empdb_dao_pers, judge },   {left, {id, {claim,  judge_id}}}}
     ],Con,[
         {fields, Fields}

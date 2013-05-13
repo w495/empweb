@@ -1390,5 +1390,5 @@
                 ('change_perspicbody',     false);
 
 
-    alter table claim add column issystem  boolean default null;
+    alter table claim add column  isoffer  boolean default null;
 
