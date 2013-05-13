@@ -27,6 +27,7 @@
     get_system_picture/2,
     create_copy_worker/1,
     get_handle_pictures/6,
+    get_handle_picture/6,
     create/1,
     delete/1,
     update/1
@@ -437,6 +438,24 @@ create_copy(Params)->
     ]),
     ok.
 
+
+find_ext(Filename)->
+    case re:run(Filename, ".+[.](.+)$", []) of
+        {match,[_,Poslen1]} ->
+            binary:part(Filename, Poslen1);
+        _ ->
+            <<"undefined">>
+    end.
+
+filter_value(null, Filename)->
+    find_ext(Filename);
+
+filter_value(<<>>, Filename)->
+    find_ext(Filename);
+
+filter_value(Result, _)->
+    Result.
+
 create_copy_worker(Params)->
     Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
     Dldir = ?EMPDB_BIZ_FILE_DLDIR,
@@ -447,7 +466,6 @@ create_copy_worker(Params)->
     File_id         = proplists:get_value(file_id,          Params, null),
     Doc_id          = proplists:get_value(doc_id,           Params, null),
     Owner_id        = proplists:get_value(owner_id,         Params, null),
-    Ext             = proplists:get_value(fileextension,    Params, <<>>),
     Image_width     = proplists:get_value(image_width,      Params, null),
     Image_height    = proplists:get_value(image_height,     Params, null),
     Connection      = proplists:get_value(connection,       Params, null),
@@ -459,6 +477,7 @@ create_copy_worker(Params)->
     Orig_fs_path_full = proplists:get_value(fs_path_full, Params,
         << Orig_fs_dir/binary, Orig_fs_path/binary >>),
 
+    Ext = filter_value(proplists:get_value(fileextension,    Params, <<>>), Orig_fs_path_full),
 
 
     Path_binary  = rand_bytes(),
@@ -617,6 +636,9 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, Req_width, Req_height) ->
     Req_width     = proplists:get_value(image_width, What, null),
     Req_height    = proplists:get_value(image_height, What, null),
 
+    Options    = proplists:get_value(options, What, []),
+
+
 
     case empdb_dao_fileinfo:get(Con, [
         {file_id, File_id},
@@ -645,16 +667,16 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, Req_width, Req_height) ->
                     {image_width,   Req_width},
                     {image_height,  Req_height}
                 ]),
-            get_transform(Copypl, Phobjpl, Fields);
+            get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->
             io:format("Respl = ~p~n~n", [Respl]),
 
-            get_transform(Respl, Phobjpl, Fields);
+            get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
             Error
     end.
 
-get_transform(Res, Phobjpl, Fields) ->
+get_transform(Res, Phobjpl, Fields, Options) ->
     Newphobjpl =
         lists:keyreplace(path, 1,
             lists:keyreplace(dir, 1,
@@ -677,37 +699,38 @@ get_transform(Res, Phobjpl, Fields) ->
                 proplists:get_value(path, Res)
             }
         ),
-    get_handle_pl(Newphobjpl, Fields).
+    get_handle_pl(Newphobjpl, Fields, Options).
 
 
-get_handle_pl(Phpl, Fields) ->
+get_handle_pl(Phpl, Fields, Options) ->
     io:format("Phpl = ~p ~n~n~n", [Phpl]),
 
-    get_handle_path((lists:member(path, Fields) or (Fields =:= [])), Phpl).
+    get_handle_path((lists:member(path, Fields) or (Fields =:= [])), Phpl, Options).
 
-get_handle_pathtuple(Phpl) ->
+get_handle_pathtuple(Phpl, Options) ->
    %0 io:format("Phpl = ~p ~n~n~n", [Phpl]),
-    {path,
+    Outpathname   = proplists:get_value(outpathname, Options, path),
+    {Outpathname,
         <<  (proplists:get_value(dir, Phpl))/binary,
             (proplists:get_value(path, Phpl))/binary
         >>
     }.
 
-get_handle_pathtuple(Name, Phpl) ->
-    {Name,
-        <<  (proplists:get_value(dir, Phpl))/binary,
-            (proplists:get_value(path, Phpl))/binary
-        >>
-    }.
+%get_handle_pathtuple(Name, Phpl) ->
+    %{Name,
+        %<<  (proplists:get_value(dir, Phpl))/binary,
+            %(proplists:get_value(path, Phpl))/binary
+        %>>
+    %}.
 
-get_handle_path_(Phpl) ->
+get_handle_path_(Phpl, Options) ->
     [
-        get_handle_pathtuple(Phpl) | Phpl
+        get_handle_pathtuple(Phpl, Options) | Phpl
     ].
 
-get_handle_path(true, Phpl) ->
+get_handle_path(true, Phpl, Options) ->
     {[
-        get_handle_pathtuple(Phpl)
+        get_handle_pathtuple(Phpl, Options)
         | proplists:delete(dir,
                     proplists:delete(path,
                         proplists:delete(path,
@@ -715,7 +738,7 @@ get_handle_path(true, Phpl) ->
                                 proplists:delete(fileextension, Phpl)))))
     ]};
 
-get_handle_path(_, Phpl) ->
+get_handle_path(_, Phpl, _) ->
     {proplists:delete(dir,
         proplists:delete(path,
             proplists:delete(fs_path_full,
