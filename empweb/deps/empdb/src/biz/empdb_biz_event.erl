@@ -85,7 +85,7 @@ get_pers_attr(Con, Events) ->
                     {Eventpl};
                 Pers_id ->
                     {ok, [{Perspl}]} =
-                        empdb_dao_pers:get(emp, [
+                        empdb_dao_pers:get(Con, [
                             {id,    Pers_id},
                             {limit, 1},
                             {fields, [
@@ -135,7 +135,7 @@ get(Params)->
         ]) of
             {ok, Ok} ->
                 delete_viewed(),
-                {ok, get_pers_attr(Ok)};
+                {ok, get_pers_attr(Con, Ok)};
             Else ->
                 Else
         end
@@ -151,7 +151,7 @@ get(Params, Fileds)->
         ], Fileds) of
             {ok, Ok} ->
                 delete_viewed(),
-                {ok, get_pers_attr(Ok)};
+                {ok, get_pers_attr(Con, Ok)};
             Else ->
                 Else
         end
