@@ -152,7 +152,7 @@
 ]).
 
 %%
-%% Посты 
+%% Посты
 %%
 -export([
     get_post/1,
@@ -193,10 +193,10 @@
     count_message_types/1,
     count_message_for_me/1,
     count_message_from_me/1,
-    
+
     create_message/1,
     update_message/1,
-    
+
     delete_message_for_me/1,
     delete_message_from_me/1,
     delete_message/1
@@ -243,8 +243,8 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
     {ok, [{Instpl}]} = Getmodule:Get(Con, [{id, Doc_id}]),
 
     %%
-    %% Репосты конкретного документа, 
-    %% конкретным пользователя 
+    %% Репосты конкретного документа,
+    %% конкретным пользователя
     %% должны быть уникальны
     %%
     case {proplists:get_value(isrepostable, Instpl), Mbrepostlist} of
@@ -306,7 +306,7 @@ repost({Getmodule, Get}, {Createmodule, Create}, Con, Params)->
                     Else
             end
     end.
-    
+
 repost_orig(Field, Orig_field, Instpl)->
     case
         proplists:get_value(Orig_field, Instpl,
@@ -684,7 +684,7 @@ is_blog_owner(Uid, Oid)->
     end).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Посты 
+%% Посты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
@@ -726,7 +726,7 @@ create_post(Params)->
                 ]),
                 {ok, [{Postpl}]};
             Else ->
-                Else 
+                Else
         end
     end).
 
@@ -736,26 +736,26 @@ update_post(Params)->
     end).
 
 %%
-%% @doc Удаляет пост. 
+%% @doc Удаляет пост.
 %% Все действия в одной транзакции.
 %%
 delete_post(Filter)->
     empdb_dao:with_transaction(fun(Con)->
         %% Удаляем
         empdb_dao_post:update(Con, [
-            {values, [{isdeleted, true}]}, 
+            {values, [{isdeleted, true}]},
             {filter, [{isdeleted, false}|Filter]}
         ])
     end).
 
 get_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        get_post_adds(Con, empdb_dao_post:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params]))
+        get_post_adds(Con, empdb_dao_post:get(Con, [{order, {desc, 'post.created'}}, {isdeleted, false}|Params]))
     end).
 
 get_post(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        get_post_adds(Con, empdb_dao_post:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds))
+        get_post_adds(Con, empdb_dao_post:get(Con, [{order,  {desc, 'post.created'}}, {isdeleted, false}|Params], Fileds))
     end).
 
 get_post_adds(Con, Getresult) ->
@@ -776,7 +776,7 @@ get_post_adds(Con, Getresult) ->
         {Eclass, Error} ->
             {Eclass, Error}
     end.
-    
+
 is_post_owner(Uid, Oid)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_post:is_owner(Con, Uid, Oid)
@@ -787,7 +787,7 @@ is_post_owner(Uid, Oid)->
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
-%% @doc Добавляет комментарий, 
+%% @doc Добавляет комментарий,
 %% Все действия в одной транзакции.
 %%
 
@@ -828,13 +828,13 @@ update_comment(Params)->
     end).
 
 %%
-%% @doc Удаляет комментарий, 
+%% @doc Удаляет комментарий,
 %% Все действия в одной транзакции.
 %%
 delete_comment(Filter)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_comment:update(Con, [
-            {values, [{isdeleted, true}]}, 
+            {values, [{isdeleted, true}]},
             {filter, [{isdeleted, false}|Filter]},
             {fields, [parent_id]}
         ])
@@ -854,8 +854,8 @@ is_comment_owner(Uid, Oid)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_comment:is_owner(Con, Uid, Oid)
     end).
-    
-    
+
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Чат-комнаты (комнаты)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -871,7 +871,7 @@ is_comment_owner(Uid, Oid)->
 %% Сообщения
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 
+%
 % filterfoe(Function, Options)->
 %     case {proplists:get_value(connection,      Options)} of
 %         undefined ->
@@ -883,7 +883,7 @@ is_comment_owner(Uid, Oid)->
 %         Connection ->
 %             filterfoe_(Connection, Function, Options)
 %     end.
-%     
+%
 % filterfoe(Connection, Function, Options)->
 %     Pers_id     = proplists:get_value(pers_id,      Options),
 %     Pers_nick   = proplists:get_value(pers_nick,    Options),
@@ -900,16 +900,16 @@ is_comment_owner(Uid, Oid)->
 %         ]},
 %         {friendtype_alias, foe}
 %     ]),
-% 
+%
 %     case Objs of
 %         [] ->
 %             Function()
 %         _ ->
 %             {error, forbiden}
 %     end.
-% 
+%
 
-    
+
 create_message(Params)->
     empdb_dao:with_transaction(empdb_biz_pers:wfoe(
         fun(Con)->
@@ -963,7 +963,7 @@ mk_message_read(Con, all, Reader_id, _fields) ->
             {oktype_alias, ok}
         ]}
     ]);
-    
+
 mk_message_read(Con, Id, Reader_id, Fields) ->
     case {Fields, lists:member(body, Fields)} of
         {[], _ } ->
@@ -982,7 +982,7 @@ mk_message_read(Con, Id, Reader_id, Fields) ->
             ok
     end.
 
-get_message(Params)-> 
+get_message(Params)->
     empdb_dao:with_transaction(fun(Con)->
         mk_message_read(Con,
             proplists:get_value(id,         Params),
@@ -1027,7 +1027,7 @@ readall_message_for_me(Params)->
             []
         )
     end).
-    
+
 get_message_for_me(Params)->
     Mparams =
         case proplists:get_value(pers_id, Params) of
@@ -1163,7 +1163,7 @@ count_message_for_me_(Con, Filter)->
         ]}
     ]).
 
-    
+
 count_message_from_me(Filter)->
     empdb_dao:with_transaction(fun(Con)->
         count_message_from_me_(Con, Filter)

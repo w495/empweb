@@ -99,7 +99,7 @@ get(Con, What) ->
 
     Req_width     = proplists:get_value(image_width, What, null),
     Req_height    = proplists:get_value(image_height, What, null),
-    
+
     case empdb_dao:get([
         {empdb_dao_doc, id},
         {empdb_dao_photo, {doc_id, file_id}},
@@ -116,7 +116,7 @@ get(Con, What) ->
         {fileinfotype_alias, filesystem},
         {image_height, null},
         {image_width, null}
-        
+
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %         {'or', [
             %             {image_width, Req_width},
@@ -130,14 +130,14 @@ get(Con, What) ->
             % {image_height, proplists:get_value(image_height,     What, null)},
             % {fileinfotype_alias, download}
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
         |proplists:delete(fields,
             proplists:delete(image_height,
                 proplists:delete(image_width, What)))
 
     ]) of
         {ok,Phobjs} ->
-            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, Req_width, Req_height)};
+            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], [])};
         Error ->
             Error
     end.
