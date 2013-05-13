@@ -1,6 +1,5 @@
 %% Author: w-495
 %% Created: 25.07.2012
-%% Description: TODO: Add description to biz_user
 -module(empdb_biz_experbuy).
 
 %% ===========================================================================
@@ -12,10 +11,9 @@
 %%
 -include("empdb.hrl").
 
-
-% 
+%
 % -define\(EXPER_COEF,  0.5).
-% 
+%
 
 %% ==========================================================================
 %% Экспортируемые функции
@@ -37,14 +35,11 @@
 %%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Покупки
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        %% Берем покупателя, и смотрим сколько у него денег
-        io:format("Params = ~p~n", [Params]),
+        %%
+        %% Берем покупателя, и смотрим сколько у него денег.
+        %%
         {ok, [{Mbbuyerpl}]} =
             empdb_dao_pers:get(Con, [
                 {'or', [
@@ -53,29 +48,53 @@ create(Params)->
                 ]},
                 {fields, [
                     id,
-                    experlack,
                     money
                 ]},
                 {limit, 1}
             ]),
-
+        %%
+        %% Берем получателя, и смотрим сколько у опыта
+        %% и недостатка опыта
+        %%
+        {ok, [{Mbownerpl}]} =
+            empdb_dao_pers:get(Con, [
+                {'or', [
+                    {id,    proplists:get_value(owner_id,   Params)},
+                    {nick,  proplists:get_value(owner_nick, Params)}
+                ]},
+                {fields, [
+                    id,
+                    experlack
+                ]},
+                {limit, 1}
+            ]),
+        %%
+        %% Смотрим какой недостаток опыта имеет получатель,
+        %% для перехода на следующий уровень.
+        %%
         Experlack =
-            case proplists:get_value(experlack,   Mbbuyerpl,    0) of
+            case proplists:get_value(experlack,   Mbownerpl,    0) of
                 null ->
                     0;
                 Val  ->
                     Val
             end,
-
+        %%
+        %% Смотрим на сколько требуется увеличить опыт.
+        %% Если не указан явно, то используется недостаток опыта
+        %% до следующего уговня.
+        %%
         Exper = proplists:get_value(exper,   Params,    Experlack),
+
+        %%
+        %% Вычислем стоймость опыта.
+        %%
         Price = exper2price(Con, Exper),
+
+        %%
+        %% Смотрим сколько денег у плательщика.
+        %%
         Money = proplists:get_value(money, Mbbuyerpl,   0),
-
-        ?empdb_debug("Experlack = ~p~n", [Experlack]),
-        ?empdb_debug("Exper = ~p~n", [Exper]),
-        ?empdb_debug("Price = ~p~n", [Price]),
-        ?empdb_debug("Money = ~p~n", [Money]),
-
         case {Exper, Price =< Money} of
             {0, _} ->
                 {error, {wrong_exper, {[
@@ -84,68 +103,83 @@ create(Params)->
                     {price, Price}
                 ]}}};
             {_, true} ->
-                % Newmoney = Money - Price,
-                {ok, [{Newpers}]} =
-                    empdb_dao_pers:update(Con,[
-                        {id,    proplists:get_value(id,   Mbbuyerpl)},
-                        {exper, {incr, Exper}},
-                        {money, {decr, Price}},
-                        {fields, [
-                            money,
-                            exper,
-                            experlack,
-                            experlackprice,
-                            authority_id,
-                            authority_alias
-                        ]}
-                    ]),
                 case empdb_dao_experbuy:create(Con,[
                     {price, Price}
                     |Params
                 ]) of
                     {ok, [{Respl}]} ->
-                        {ok, _} = empdb_dao_pay:create(Con, [
-                            {pers_id,           proplists:get_value(buyer_id,   Params)},
-                            {paytype_alias,     exper_out},
-                            {isincome,          false},
-                            {price,             Price}
-                        ]),
+                        %%
+                        %% Изменим состояние плательшика.
+                        %%
+                        {ok, [{Newbuyerpl}]} =
+                            empdb_dao_pers:update(Con,[
+                                {id,    proplists:get_value(id,   Mbbuyerpl)},
+                                {money, {decr, Price}},
+                                {fields, [
+                                    money
+                                ]}
+                            ]),
+                        %%
+                        %% Изменим состояние получателя.
+                        %%
+                        {ok, [{Newownerpl}]} =
+                            empdb_dao_pers:update(Con,[
+                                {id,    proplists:get_value(id,   Mbownerpl)},
+                                {exper, {incr, Exper}},
+                                {fields, [
+                                    exper,
+                                    experlack,
+                                    experlackprice,
+                                    authority_id,
+                                    authority_alias
+                                ]}
+                            ]),
+                        %%
+                        %% Cоздадим информацию о платежеы
+                        %%
+                        {ok, _} =
+                            empdb_dao_pay:create(Con, [
+                                {pers_id,           proplists:get_value(id,   Mbbuyerpl)},
+                                {paytype_alias,     exper_out},
+                                {isincome,          false},
+                                {price,             Price}
+                            ]),
                         {ok, [
                             {[
                                 {authority_alias,
                                     proplists:get_value(
                                         authority_alias,
-                                        Newpers
+                                        Newownerpl
                                     )
                                 },
                                 {authority_id,
                                     proplists:get_value(
                                         authority_id,
-                                        Newpers
+                                        Newownerpl
                                     )
                                 },
                                 {experlackprice,
                                     proplists:get_value(
                                         experlackprice,
-                                        Newpers
+                                        Newownerpl
                                     )
                                 },
                                 {experlack,
                                     proplists:get_value(
                                         experlack,
-                                        Newpers
+                                        Newownerpl
                                     )
                                 },
                                 {exper,
                                     proplists:get_value(
                                         exper,
-                                        Newpers
+                                        Newownerpl
                                     )
                                 },
                                 {money,
                                     proplists:get_value(
                                         money,
-                                        Newpers
+                                        Newbuyerpl
                                     )
                                 },
                                 {price, Price}
