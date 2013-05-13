@@ -135,7 +135,7 @@ get(Params)->
         ]) of
             {ok, Ok} ->
                 delete_viewed(),
-                {ok, Ok};
+                {ok, get_pers_attr(Ok)};
             Else ->
                 Else
         end
@@ -151,7 +151,7 @@ get(Params, Fileds)->
         ], Fileds) of
             {ok, Ok} ->
                 delete_viewed(),
-                {ok, Ok};
+                {ok, get_pers_attr(Ok)};
             Else ->
                 Else
         end
