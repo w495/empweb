@@ -1,7 +1,7 @@
 %% @file    empdb_biz_event.erl
 %%          Описание бизнес логики работы с фотографиями.
 %%          Фотография это просто документ.
-%% 
+%%
 -module(empdb_biz_event).
 
 %% ===========================================================================
@@ -41,7 +41,7 @@ update(Params)->
     end).
 
 count(Params)->
-    
+
     empdb_dao:with_connection(fun(Con)->
         case empdb_dao_event:count(Con, [{isdeleted, false}|Params]) of
             {ok, [{Allcountpl}]}->
@@ -77,8 +77,54 @@ count(Params)->
         end
     end).
 
+get_pers_attr(Con, Events) ->
+    lists:map(
+        fun({Eventpl})->
+            case proplists:get_value(pers_id, Eventpl) of
+                undefined ->
+                    {Eventpl};
+                Pers_id ->
+                    {ok, [{Perspl}]} =
+                        empdb_dao_pers:get(emp, [
+                            {id,    Pers_id},
+                            {limit, 1},
+                            {fields, [
+                                citizen_room_id,
+                                live_room_id,
+                                own_room_id,
+                                citizen_room_head,
+                                live_room_head,
+                                own_room_head
+                            ]}
+                        ]),
+                    {[
+                        {pers_citizen_room_id,
+                            proplists:get_value(citizen_room_id,    Perspl)
+                        },
+                        {pers_live_room_id,
+                            proplists:get_value(live_room_id,       Perspl)
+                        },
+                        {pers_own_room_id,
+                            proplists:get_value(own_room_id,        Perspl)
+                        },
+                        {pers_citizen_room_head,
+                            proplists:get_value(citizen_room_head,  Perspl)
+                        },
+                        {pers_live_room_head,
+                            proplists:get_value(live_room_head,     Perspl)
+                        },
+                        {pers_own_room_head,
+                            proplists:get_value(own_room_head,      Perspl)
+                        }
+                        | Eventpl
+                    ]}
+            end
+        end,
+        Events
+    ).
 
-    
+
+
 get(Params)->
     empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_connection(fun(Con)->
