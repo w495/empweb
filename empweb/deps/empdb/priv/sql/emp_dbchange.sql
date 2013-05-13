@@ -1064,7 +1064,6 @@
     insert into eventtype (alias) values ('create_mail');
 */
 
-
 -- 2013.02.21 17:25:58:980890996 ---------------------------------------------
 
 /*
@@ -1364,16 +1363,33 @@
 /*
     alter table file add column alias varchar(1024) default null;
     alter table bitrate add created timestamp without time zone not null default utcnow(),
-*/
-
     alter table perspicbody add column ismale boolean default null;
     alter table perspichead add column ismale boolean default null;
-
     insert into actiontype(alias, ispaid, price, istoall, isforme, isfake)
         values),
             ('fly',        false, null, false, true,  true);
-
-    
-    
     alter table pers add column perspicphoto_id  decimal references file(id)   default null;
-    
+*/
+
+-- 2013.05.13 19:02:23:330929088 ---------------------------------------------
+
+
+    insert into service(alias, price, isonce)
+        values ('change_nick_price', 1.0,       true);
+
+
+    insert into service(alias, price, isonce)
+        values ('change_perspichead_price', 1.0,       true);
+
+    insert into service(alias, price, isonce)
+        values ('change_perspicbody_price', 1.0,       true);
+
+
+    insert into paytype(alias, isincome)
+        values  ('change_perspichead',     false),
+                ('roombet_in',      true ),
+                ('roomlot_in',      true ),
+                ('thing_out',       false),
+                ('exper_out',       false)
+
+
