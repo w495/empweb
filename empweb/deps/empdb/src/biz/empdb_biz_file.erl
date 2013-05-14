@@ -622,15 +622,15 @@ create_copy_worker(Params)->
 
 
 
-get_handle_pictures(Con, Phobjs, What, Fields, Req_width, Req_height) ->
+get_handle_pictures(Con, Phobjs, What, Fields, _, _) ->
     lists:map(
         fun(Phobj)->
-            get_handle_picture(Con, Phobj, What, Fields, Req_width, Req_height)
+            get_handle_picture(Con, Phobj, What, Fields, [], [])
         end,
         Phobjs
     ).
 
-get_handle_picture(Con, {Phobjpl}, What, Fields, Req_width, Req_height) ->
+get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
 
     File_id = proplists:get_value(file_id, Phobjpl),
     Req_width     = proplists:get_value(image_width, What, null),
