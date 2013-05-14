@@ -93,7 +93,7 @@ get(Con, What) ->
             lists:append([
                 empdb_dao_photo:table({fields, select}),
                 empdb_dao_doc:table({fields, select}),
-                [image_width, image_height, file_id]
+                [image_width, image_height, file_id, path]
             ])
         ),
 
