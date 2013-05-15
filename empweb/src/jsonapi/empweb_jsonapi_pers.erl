@@ -473,6 +473,43 @@ handle(_req, #empweb_hap{
         Hap
     );
 
+
+
+%%
+%% Функция отрабатывает только если пользователь идентифицирован
+%%
+handle(_req, #empweb_hap{
+        action  = get_lavishget,
+        params  = Params,
+        is_auth = true,
+        pers_id = Pers_id
+    } = Hap) ->
+    ?evman_args(Hap, <<" = get pers">>),
+    % io:format("Params = ~p~n~n", [Params]),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = toptime,
+                required    = false,
+                types       = [atom]
+            }
+            |empweb_norm_pers:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_pers:get_lavishget([
+                        {self@pers_id, Pers_id}
+                        | Data#norm.return
+                    ])
+                ),
+                Hap
+            }
+        end,
+        Hap
+    );
+
 %%
 %% Функция отрабатывает только если пользователь идентифицирован
 %%

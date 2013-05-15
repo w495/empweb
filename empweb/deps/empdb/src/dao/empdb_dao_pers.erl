@@ -319,9 +319,15 @@ get_lavishget(Con, What)->
     empdb_dao:pgret(
         empdb_dao:equery(Con,[
             <<"select pers_id, sum(price) from pay ">>,
-            <<"where paytype_alias = 'thing_out' ">>,
-            <<"group by pers_id order by sum desc ">>,
-            <<"limit $limit">>
+            <<"where paytype_alias = 'thing_out' and ">>,
+            <<"created > $toptime ">>,
+            <<"group by pers_id order by sum desc ">>
+            |   case proplists:get_value(limit, What) of
+                    undefined ->
+                        [];
+                    Limit ->
+                        [<<"limit ">>, empdb_convert:to_binary(Limit)]
+                end
             ],
             What
         )

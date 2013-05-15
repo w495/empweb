@@ -29,6 +29,7 @@
     get/2,
     count/1,
     get_opt/2,
+    get_lavishget_opt/2,
     get_opt/3,
     wfoe/2,
     whose_birthday/0,
@@ -1630,7 +1631,65 @@ get_tfparams(Con, {geo_id, Geo_id}, Acc1)->
 get_tfparams(Con, {Key, Value}, Acc1)->
     [{Key, Value}|Acc1].
 
-
+get_lavishget_opt(Params1, Options)->
+    Fields =
+        lists:foldl(
+            fun (perspichead, Acc)->
+                    [perspichead, perspichead_id|Acc];
+                (perspicbody, Acc)->
+                    [perspicbody, perspicbody_id|Acc];
+                (perspicphoto_path, Acc)->
+                    [perspicphoto_path, perspicphoto_id|Acc];
+                (costume_thingbuy, Acc)->
+                    [costume_thingbuy, costume_thingbuy_id|Acc];
+                (Field, Acc)->
+                [Field|Acc]
+            end,
+            [],
+            proplists:get_value(fields, Params1, [])
+        ),
+    Params =
+        lists:keyreplace(fields, 1, Params1, {fields, Fields}),
+    empdb_dao:with_connection(emp, fun(Con)->
+        {ok, Lavishgetlist} =
+            empdb_dao_pers:get_lavishget(Con, [
+                {toptime,
+                    empdb_convert:now_minus(
+                        proplists:get_value(toptime, Params1, week)
+                    )
+                }
+                |Params
+            ]),
+        Lavishgetidlist =
+            lists:foldr(
+                fun({X}, Acc) ->
+                    [proplists:get_value(pers_id, X)| Acc]
+                end,
+                [],
+                Lavishgetlist
+            ),
+        {ok, Userpls} =
+            empdb_dao_pers:get(
+                Con,
+                [
+                    {id, {in, Lavishgetidlist}},
+                    {isdeleted, false}
+                    |get_tfparams(Con, Params)
+                ]
+            ),
+        Userpls_ =
+            lists:zipwith(
+                fun({Userpl}, {Lavishgetpl})->
+                    {[
+                        {sum, proplists:get_value(sum, Lavishgetpl, 0)}
+                        |Userpl
+                    ]}
+                end,
+                Userpls,
+                Lavishgetlist
+            ),
+        get_opt(Con, Params, Options, Userpls_)
+    end).
 
 get_opt(Params1, Options)->
     Fields =

@@ -59,6 +59,7 @@
     get_pers_id/1,
     get_pers_nick/1,
     get/1,
+    get_lavishget/1,
     count/1,
     pass/1
 ]).
@@ -215,8 +216,8 @@ get_pers_nick({session_id, Session_id})->
 register(Params)->
     ?evman_args(Params, <<"pers try to register">>),
     empdb_biz_pers:register(Params).
-% 
-% 
+%
+%
 %     case empdb_biz_pers:login(Params) of
 %         {ok, [{Userpl}]} ->
 %             Id          = proplists:get_value(id,           Userpl),
@@ -229,9 +230,9 @@ register(Params)->
 %                 login       =   Login,
 %                 perm_names  =   Perm_names
 %             }),
-% 
+%
 %             io:format("Session_id = ~p~n", [Session_id]),
-% 
+%
 %             ?evman_info({login, [
 %                 {pers,          Userpl},
 %                 {session_id,    Session_id}
@@ -288,6 +289,28 @@ get(Params) ->
     ).
 
 
+get_lavishget(Params) ->
+    ?evman_args(Params, <<"get lavishget opt">>),
+    empdb_biz_pers:get_lavishget_opt(
+        Params,
+        [   without_phash,
+            blog,
+            album,
+            nfriends,
+            nfoes,
+            repost_blog,
+            repost_album,
+            perspichead,
+            perspicbody,
+            perspicphoto_path,
+            costume_thingbuy,
+            friendtype_alias,
+            my_friendtype_alias,
+            community
+        ]
+    ).
+
+
 count(Params) ->
     ?evman_args(Params, <<"count pers">>),
     empdb_biz_pers:count(Params).
@@ -311,7 +334,7 @@ login(Params) ->
             }),
 
             io:format("Session_id = ~p~n", [Session_id]),
-            
+
             ?evman_info({login, [
                 {pers,          Userpl},
                 {session_id,    Session_id}
@@ -393,7 +416,7 @@ restore_pass(Params) ->
                         false ->
                             {error,{no_enough_info,{[{nick, Ppnick}]}}}
                     end;
-                _ -> 
+                _ ->
                     io:format("~n ==> ~p ~n", [Perspl]),
                     {error,{bad_pers,{[{nick, Ppnick}, {email,Email}]}}}
             end;
@@ -547,7 +570,7 @@ get_mstatus(Params) ->
 create_mstatus(Params) ->
     ?evman_args(Params, <<"create mstatus">>),
     empdb_biz_pers:create_mstatus(Params).
-    
+
 update_mstatus(Params) ->
     ?evman_args(Params, <<"update mstatus">>),
     empdb_biz_pers:update_mstatus(Params).
