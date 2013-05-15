@@ -137,14 +137,19 @@ handle(_req, #empweb_hap{
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
             #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
                 key         = path,
                 required    = false,
                 types       = [string]
             },
             #norm_rule{
-                key         = file_id,
+                key         = toptime,
                 required    = false,
-                types       = [integer]
+                types       = [atom]
             },
             #norm_rule{
                 key         = is_cover,
