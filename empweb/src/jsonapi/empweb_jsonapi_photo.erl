@@ -125,6 +125,50 @@ handle(_req, #empweb_hap{
         end
     );
 
+
+
+
+handle(_req, #empweb_hap{
+        action='get_top', params=Params, pers_id=Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get photo">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = path,
+                required    = false,
+                types       = [string]
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = [integer]
+            },
+            #norm_rule{
+                key         = is_cover,
+                required    = false,
+                types       = [boolean]
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_photo:get_top(
+                        empweb_norm:filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
 handle(_req, #empweb_hap{
         action=create, params=Params, pers_id=Pers_id
     } = Hap) ->
@@ -281,7 +325,7 @@ handle(_req, #empweb_hap{
             }
         end
     );
-    
+
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
     } = Hap) ->

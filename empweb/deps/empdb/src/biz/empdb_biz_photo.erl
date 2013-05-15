@@ -1,7 +1,7 @@
 %% @file    empdb_biz_photo.erl
 %%          Описание бизнес логики работы с фотографиями.
 %%          Фотография это просто документ.
-%% 
+%%
 -module(empdb_biz_photo).
 
 %% ===========================================================================
@@ -22,6 +22,7 @@
 %% Блоги
 %%
 -export([
+    get_top/1,
     get/1,
     get/2,
     create/1,
@@ -94,13 +95,22 @@ get(Params)->
     end).
 
 
-% get_(Con, Params) ->
+get_top(Params)->
+    empdb_biz:nviewsupm(?MODULE, [Params]),
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_photo:get_adds(Con,
+            empdb_dao_photo:get_top(Con, [
+                {isdeleted, false}
+                |Params
+            ]),
+            Params
+        )
+    end).
 
 
 
-    
 get(Params, Fields)->
-    ?MODULE:sget([{fields, Fields}|Params]).
+    ?MODULE:get([{fields, Fields}|Params]).
 
 delete(Params)->
     empdb_dao:with_transaction(fun(Con)->
@@ -111,3 +121,5 @@ is_owner(Uid, Oid)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_photo:is_owner(Con, Uid, Oid)
     end).
+
+

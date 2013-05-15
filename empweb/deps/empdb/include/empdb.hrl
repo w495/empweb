@@ -28,7 +28,7 @@
 -endif.
 
 
-% 
+%
 %     -define(empdb_debug(F),  spawn_link(fun()-> ok end)).
 %     -define(empdb_debug(F, P),  spawn_link(fun()-> ok end)).
 
@@ -37,8 +37,10 @@
 
 
 
--define(EMPDB_UNIXTIMEWEEK,  604800). % 60*60*24*7.
--define(EMPDB_UNIXTIMEDAY,   86400). % 60*60*24
+-define(EMPDB_UNIXTIMEYEAR,     31536000).  % 60*60*24*365.
+-define(EMPDB_UNIXTIMEMONTH,    2592000).  % 60*60*24*30.
+-define(EMPDB_UNIXTIMEWEEK,     604800).   % 60*60*24*7.
+-define(EMPDB_UNIXTIMEDAY,      86400).    % 60*60*24
 
 
 

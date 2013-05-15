@@ -15,7 +15,8 @@
     repost/1,
     delete/1,
     get/1,
-    get/2
+    get/2,
+    get_top/1
 ]).
 
 
@@ -38,6 +39,10 @@ update(Params)->
 
 delete(Params)->
     empdb_biz_photo:delete(Params).
+
+
+get_top(Params)->
+    empdb_biz_photo:get_top(Params).
 
 get(Params)->
     empdb_biz_photo:get(Params).

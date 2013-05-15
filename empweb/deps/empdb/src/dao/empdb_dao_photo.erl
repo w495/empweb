@@ -19,7 +19,8 @@
     count_comments/2,
     get_adds/3,
     get/2,
-    get/3
+    get/3,
+    get_top/2
 ]).
 
 
@@ -146,6 +147,70 @@ get(Con, What) ->
 
 get(Con, What, Afields)->
     get(Con, [{fields, Afields}|What]).
+
+
+
+
+
+get_top(Con, What) ->
+
+    Fields =
+        proplists:get_value(
+            fields,
+            What,
+            lists:append([
+                empdb_dao_photo:table({fields, select}),
+                empdb_dao_doc:table({fields, select}),
+                [image_width, image_height, file_id, path]
+            ])
+        ),
+
+    Req_width   = proplists:get_value(image_width,  What, null),
+    Req_height  = proplists:get_value(image_height, What, null),
+    Toptime     = proplists:get_value(toptime,      What, week),
+
+    case empdb_dao:get([
+        {empdb_dao_doc, id},
+        {empdb_dao_photo, {doc_id, file_id}},
+        {empdb_dao_file, id},
+        {empdb_dao_fileinfo, file_id},
+        {{empdb_dao_vote,  vote},
+            {left, {doc_id,   {doc, id}}}}
+    ],Con,[
+        {fields, [
+            fileinfotype_alias,
+            fileinfo.filetype_ext,
+            {as, {fileinfo.path, path}},
+            {as, {fileinfo.dir,  dir}}
+            | proplists:delete(path, Fields)
+        ]},
+        {fileinfotype_alias, filesystem},
+        {image_height, null},
+        {image_width, null},
+        {order, {desc, 'doc.nvotes'}},
+        {'vote.created',
+            {gt, empdb_convert:now_minus(Toptime)}
+        }
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
+
+    ]) of
+        {ok,Phobjs} ->
+            {ok,
+                empdb_biz_file:get_handle_pictures(
+                    Con,
+                    Phobjs,
+                    What,
+                    Fields,
+                    [],
+                    []
+                )
+            };
+        Error ->
+            Error
+    end.
+
 
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).

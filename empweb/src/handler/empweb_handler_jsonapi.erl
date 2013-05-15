@@ -16,7 +16,7 @@
 
 
 %%
-%% Трансформация для получения имени функции. 
+%% Трансформация для получения имени функции.
 %%
 -include_lib("evman/include/evman_transform.hrl").
 
@@ -31,9 +31,9 @@
 }).
 
 
-% 
+%
 % -define(APPLICATION, application:get_application(?MODULE)).
-% 
+%
 
 
 init(_, Req, _Opts) ->
@@ -70,7 +70,7 @@ handle(Req, State) ->
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
 
     % io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
-    
+
     Reply =
         empweb_http:reply(
             Http_resp#http_resp{body = Http_resp_json},
@@ -210,7 +210,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_thingtype,
                     action          =   delete
                 };
-                
+
             <<"get_thing">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,
@@ -584,7 +584,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete_blog
                 };
             %%
-            %% Посты 
+            %% Посты
             %%
             <<"get_post">> ->
                 Eh#empweb_hap{
@@ -781,7 +781,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_invisbuy,
                     action          =   delete
                 };
-                
+
             %%
             %% Чат-комнаты (страны)
             %%
@@ -1009,6 +1009,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %% фото
             %%
             <<"get_photo">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_photo,
+                    action          =   'get'
+                };
+            <<"get_photo_top">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_photo,
                     action          =   'get'
@@ -1276,7 +1281,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_pers,
                     action          =   'get_ostatus'
                 };
-                
+
             <<"get_all_mstatuses">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
@@ -1287,7 +1292,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_pers,
                     action          =   'get_mstatus'
                 };
-                
+
 
             <<"get_all_pstatuses">> ->
                 Eh#empweb_hap{
@@ -1317,7 +1322,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   'register'
                 };
             %%
-            %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}} 
+            %% {"fname": "login", "params":{"nick":"admin", "pass":"admin"}}
             %%
             <<"login">> ->
                 Eh#empweb_hap{
@@ -1403,7 +1408,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
             %% ==================================================
-            
+
             %%
             %% {"fname": "get_friend", "params":{"pers_id":1}}
             %%
@@ -1434,9 +1439,9 @@ empweb_jsonapi_map(Req, {List}, State) ->
             %%  {
             %%      "fname": "delete_friend",
             %%      "params":{"pers_id":1, "friend_id":1}
-            %%  } 
+            %%  }
             %%
-            <<"delete_friend">> ->  
+            <<"delete_friend">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_pers,
                     action          =   delete_friend
@@ -1581,7 +1586,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_roomexperbuy,
                     action          =   delete
                 };
-            
+
             %% ==================================================
             <<"count_roomlot">> ->
                 Eh#empweb_hap{
@@ -1696,7 +1701,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_action,
                     action          =   delete
                 };
-                
+
             %% ==================================================
             <<"get_paytype">> ->
                 Eh#empweb_hap{
@@ -1860,7 +1865,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_transtype,
                     action          =   delete
                 };
-                
+
             %% ==================================================
             <<"get_rptrans">> ->
                 Eh#empweb_hap{
@@ -1916,7 +1921,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_cptrans,
                     action          =   delete
                 };
-                
+
             %% ==================================================
             <<"get_communitymemb">> ->
                 Eh#empweb_hap{
@@ -2268,7 +2273,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_event,
                     action          =   delete
                 };
-                
+
         %% ==================================================
             <<"count_communityhist">> ->
                 Eh#empweb_hap{

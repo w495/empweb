@@ -33,8 +33,16 @@
             int2universal_datetime/1,
             nullable_datetime2int/1,
             int2local_datetime/1,
+            now_plus_day/0,
+            now_minus_day/0,
             now_plus_week/0,
             now_minus_week/0,
+            now_plus_month/0,
+            now_minus_month/0,
+            now_plus_year/0,
+            now_minus_year/0,
+            now_plus/1,
+            now_minus/1,
             to_money/1,
             test/0
         ]
@@ -46,18 +54,86 @@
 -define(EMPDB_CONVERT_TIMEMICROREST,    1000).
 -define(EMPDB_CONVERT_TIMEMACROREST,    1000000).
 
+
+now_plus(day) ->
+    now_plus_day();
+
+now_plus(week) ->
+    now_plus_week();
+
+now_plus(month) ->
+    now_plus_month();
+
+now_plus(year) ->
+    now_plus_year();
+
+now_plus(_) ->
+    now_plus_day().
+
+
+now_minus(day) ->
+    now_minus_day();
+
+now_minus(week) ->
+    now_minus_week();
+
+now_minus(month) ->
+    now_minus_month();
+
+now_minus(year) ->
+    now_minus_year();
+
+now_minus(_) ->
+    now_minus_day().
+
+
+now_plus_day() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y + ?EMPDB_UNIXTIMEDAY
+    ).
+
+now_minus_day() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y - ?EMPDB_UNIXTIMEDAY
+    ).
+
 now_plus_week() ->
     {X,Y,_} = now(),
     empdb_convert:int2datetime(
         X * 1000000 + Y + ?EMPDB_UNIXTIMEWEEK
     ).
-    
+
 now_minus_week() ->
     {X,Y,_} = now(),
     empdb_convert:int2datetime(
         X * 1000000 + Y - ?EMPDB_UNIXTIMEWEEK
     ).
 
+now_plus_month() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y + ?EMPDB_UNIXTIMEMONTH
+    ).
+
+now_minus_month() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y - ?EMPDB_UNIXTIMEMONTH
+    ).
+
+now_plus_year() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y + ?EMPDB_UNIXTIMEYEAR
+    ).
+
+now_minus_year() ->
+    {X,Y,_} = now(),
+    empdb_convert:int2datetime(
+        X * 1000000 + Y - ?EMPDB_UNIXTIMEYEAR
+    ).
 
 
 nullable_datetime2int(null) ->
@@ -116,10 +192,10 @@ to_money(Value) ->
 to_plain(Val) ->
     lists:flatten(io_lib:format("~p", [Val])).
 
-%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+%% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 %%   to_string != to_plain (см ниже [test()] почему ),
 %%      выбирайте иные пути, или используйте sformat.
-%% 
+%%
 %% 1> io_lib:format("foo ~p bar~n", [42]).
 %% [102,111,111,32,"42",32,98,97,114,"\n"]
 %% 2> erlang:iolist_to_binary(v(1)).
@@ -182,7 +258,7 @@ to_list(Val) when is_binary(Val) ->
 
 % ---------------------------------------------------------------------------
 
-to_float(Val) when is_binary(Val) -> 
+to_float(Val) when is_binary(Val) ->
     to_float(erlang:binary_to_list(Val));
 
 to_float(Val) when is_list(Val) ->
@@ -245,7 +321,7 @@ from_plain(String) -> string_to_term(String).
 -include_lib("eunit/include/eunit.hrl").
 test()->
 
-    % TO_PLAIN 
+    % TO_PLAIN
     % ----------------------------------
     ?assertEqual("1",               to_plain(1)),
     ?assertEqual("1.0",             to_plain(1.0)),
@@ -263,7 +339,7 @@ test()->
     % assertEqual_failed
     % ?assertEqual("мама мыла раму", to_plain("мама мыла раму")),
 
-    % assertEqual_failed 
+    % assertEqual_failed
     % ?assertEqual([1084,1072,1084,1072],
     %    lists:flatten(io_lib:format("~ts", ["мама"]))),
 
@@ -275,14 +351,14 @@ test()->
     %    1084,1099,1083,1072,32,1088,1072,1084,1091]",
     %       to_plain("мама мыла раму")),
 
-    % TO_INTEGER 
+    % TO_INTEGER
     % ----------------------------------
     ?assertEqual(1, to_integer(1)),
     ?assertEqual(1, to_integer("1")),
     ?assertEqual(1, to_integer(1.0)),
     ?assertEqual(1, to_integer(<<"1">>)),
 
-    % TO_ATOM 
+    % TO_ATOM
     % ----------------------------------
     ?assertEqual(atom,          to_atom(atom)),
     ?assertEqual('atom ',       to_atom('atom ')),
@@ -301,7 +377,7 @@ test()->
     % ----------------------------------
     ?assertEqual(<<"atom atom">>,       to_binary('atom atom')),
     ?assertEqual(<<"atom">>,            to_binary(atom)),
-    % assertEqual_failed 
+    % assertEqual_failed
     % ?assertEqual(<<"atom">>,          to_binary([atom])),
     ?assertEqual(<<"string">>,          to_binary("string")),
     ?assertEqual(<<1,2,3,4>>,           to_binary([1, 2, 3, 4])),
@@ -329,7 +405,7 @@ test()->
         [[<<"$">>,"4",<<"\r\n">>,<<"atom">>,<<"\r\n">>]]],
         eredis_to_multibulk([atom])),
 
-    % STRING_TO_TERM 
+    % STRING_TO_TERM
     % ----------------------------------
     ?assertEqual([1, 2],                    string_to_term("[1, 2]")),
     ?assertEqual([a, 2],                    string_to_term("[a, 2]")),
