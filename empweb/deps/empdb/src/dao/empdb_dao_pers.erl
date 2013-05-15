@@ -25,6 +25,7 @@
     update/3,
     get/2,
     get/3,
+    get_lavishget/2,
     whose_birthday/1,
     whose_birthday/2,
     count/2,
@@ -116,7 +117,7 @@
 %% Внешние функции
 %% ===========================================================================
 
-%% 
+%%
 %% @doc Возвращает список обязательных полей таблицы для создания
 %%
 table({fields, insert, required})->
@@ -184,16 +185,16 @@ table({fields, all})->
         ostatus_id,
         ostatus_alias,
         isostatusable,
-        
+
         authority_id,
         authority_alias,
         authority_level,
         position,
-        
+
         exper,
         experlack,
         experlackprice,
-        
+
         emotion_id,
         emotion_alias,
 
@@ -207,7 +208,7 @@ table({fields, all})->
         married_id,
         mother_id,
         father_id,
-        
+
         live_community_id,
         live_community_approved,
         live_community_rejectreason,
@@ -227,10 +228,10 @@ table({fields, all})->
         citizen_room_id,
         citizen_room_head,
         citizen_room_fromdatetime,
-  
+
         own_room_id,
         own_room_head,
-        
+
         perspicphoto_id,
         perspichead_id,
         perspicbody_id,
@@ -246,7 +247,7 @@ table({fields, all})->
         get_thingbuy_acctype_id,
         get_thingbuy_acctype_alias,
 
-    
+
         istimeover,
         isdeleted
     ];
@@ -292,7 +293,7 @@ whose_birthday(Con, month)->
                 "extract(month from birthday) = extract(month from now())"
         ";">>
     );
-    
+
 whose_birthday(Con, doy)->
     empdb_dao:eqret(Con,
         <<"select "
@@ -314,6 +315,19 @@ get(Con, What) ->
 get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, What, Fields).
 
+get_lavishget(Con, What)->
+    empdb_dao:pgret(
+        empdb_dao:equery(Con,[
+            <<"select pers_id, sum(price) from pay ">>,
+            <<"where paytype_alias = 'thing_out' ">>,
+            <<"group by pers_id order by sum desc ">>,
+            <<"limit $limit">>
+            ],
+            What
+        )
+    ).
+
+
 create(Con, Proplist)->
     empdb_dao:create(?MODULE, Con, Proplist).
 
@@ -322,7 +336,7 @@ update(Con, Proplist)->
 
 update(Con, Proplist, Where)->
     empdb_dao:update(?MODULE, Con, Proplist, Where).
-    
+
 is_owner(Con, Id, Id)->
     true;
 is_owner(Con, _, _)->
@@ -402,10 +416,10 @@ get_perm(Con, {nick, Nick}, Fields) ->
             ],[Nick]
         )
     ).
-    
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Группы пользователя (доступ конкретно по id пользователя)
-%% 
+%%
 %% WARNING: По написаниею оно похоже на на опирации с группами непосредственно.
 %%          Возможно, надо перекидать сущности по модулям.
 %%
@@ -480,7 +494,7 @@ update_pgroup(Con, Proplist)->
 % %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% Друзья пользователя
 % %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
+%
 % add_friend(Con, Proplist)->
 %     case empdb_dao:pgret(
 %         empdb_dao:equery(Con,
@@ -495,7 +509,7 @@ update_pgroup(Con, Proplist)->
 %         Res ->
 %             Res
 %     end.
-% 
+%
 % delete_friend(Con, Proplist)->
 %     case empdb_dao:pgret(
 %         empdb_dao:equery(Con,
@@ -610,7 +624,7 @@ update_ejabberd(Con, Proplist)->
 %% Внутренние функции
 %% ===========================================================================
 
-%% 
+%%
 %% @doc Описывает группу пользователя
 %%
 pgroup() ->
