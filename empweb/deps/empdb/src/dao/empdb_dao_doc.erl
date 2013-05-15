@@ -82,7 +82,7 @@ table({fields, all})->
     [
         id,
         orig_id,
-        
+
         head,
         body,
         read_acctype_id,
@@ -172,7 +172,7 @@ get(Module, Con, What) when erlang:is_atom(Con) orelse erlang:is_pid(Con) ->
 %         {ok, Doc} ->
 %             {ok, id2alias_pl(Doc, [])};
 %         Error ->
-%             Error 
+%             Error
 %     end;
 
 get(Con, What, Fields)->
@@ -247,14 +247,14 @@ id2alias_pl(Doc, Options) ->
                     |Acc
                 ];
             ({doctype_id, Id}, Acc)->
-                [   
+                [
                     {doctype_id, Id},
                     {doctype,       empdb_dao:id2alias(doctype, Id, Options)}
                     |Acc
                 ];
             (X, Acc)->
                 [X|Acc]
-        end, [], Proplist)}    
+        end, [], Proplist)}
     end,Doc).
 
 %%

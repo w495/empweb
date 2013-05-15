@@ -591,6 +591,12 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_doc,
                     action          =   get_post
                 };
+            <<"get_post_top">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_doc,
+                    action          =   get_post_top
+                };
+
             <<"get_all_posts">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_doc,

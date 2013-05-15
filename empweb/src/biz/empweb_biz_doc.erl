@@ -2,7 +2,7 @@
 %% @file    empweb_biz_doc.erl
 %%          Бизнес логика по работе с документами,
 %%          и связанными с ними объектами.
-%% 
+%%
 %%          Зависит от модуля empdb_biz_doc. Все внешние функуции принимают
 %%              proplist()
 %%          и возвращают:
@@ -152,6 +152,7 @@
 %% Посты \ коменты
 %%
 -export([
+    get_post_top/1,
     get_post/1,
     get_post/2,
     create_post/1,
@@ -403,7 +404,7 @@ update_blog(Params)->
 delete_blog(Params)->
     empdb_biz_doc:delete_blog(Params).
 
-    
+
 get_blog(Params)->
     get_blog(Params, []).
 
@@ -427,6 +428,9 @@ update_post(Params)->
 
 delete_post(Params)->
     empdb_biz_doc:delete_post(Params).
+
+get_post_top(Params)->
+    empdb_biz_doc:get_post_top(Params).
 
 get_post(Params)->
     empdb_biz_doc:get_post(Params).
@@ -494,7 +498,7 @@ update_message(Params)->
 get_message(Params)->
     empdb_biz_doc:get_message(Params).
 
-get_message(Params, Fields)->    
+get_message(Params, Fields)->
     empdb_biz_doc:get_message(Params, Fields).
 
 get_message_for_me(Params)->

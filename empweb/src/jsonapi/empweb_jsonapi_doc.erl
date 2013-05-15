@@ -481,7 +481,7 @@ handle(_req, #empweb_hap{
             }
         end
     );
-    
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Типы сообществ (обычные, тайные)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -726,7 +726,7 @@ handle(_req, #empweb_hap{
     );
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Посты 
+%% Посты
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 handle(_req, #empweb_hap{
@@ -759,6 +759,49 @@ handle(_req, #empweb_hap{
                             |Data#norm.return
                         ]),
                         proplists:get_value(fields, Data#norm.return, [])
+                    )
+                ),
+                Hap
+            }
+        end
+    );
+
+
+
+handle(_req, #empweb_hap{
+        is_auth =   true,
+        action  =   get_post_top,
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = get post[s]">>),
+    empweb_jsonapi:handle_params(
+        norm:norm(Params, [
+            #norm_rule{
+                key         = pic_file_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = toptime,
+                required    = false,
+                types       = [atom]
+            },
+            #norm_rule{
+                key         = pic_file_path,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            }
+            |empweb_norm_doc:norm('get')
+        ]),
+        fun(Data)->
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_doc:get_post_top(
+                        empweb_norm:filter_owner([
+                            {pers_id, Pers_id}
+                            |Data#norm.return
+                        ])
                     )
                 ),
                 Hap
@@ -1361,7 +1404,7 @@ handle(_req, #empweb_hap{
                     empweb_biz_doc:create_room([
                         {owner_id, Pers_id}
                         |Data#norm.return
-                    ])  
+                    ])
                 ),
                 Hap
             }
@@ -1632,7 +1675,7 @@ handle(_req, #empweb_hap{
         end
     );
 
-    
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create_community,
@@ -1787,9 +1830,9 @@ handle(_req, #empweb_hap{
         params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
-    %% 
+    %%
     %% Pers_id при получении сообщения смысла не имеет.
-    %% т.к. мы смысл имеет получать как своих сообщений, 
+    %% т.к. мы смысл имеет получать как своих сообщений,
     %% так и чужих, которые отпарвлены мне.
     %% Отправителя и получателя надо указывать явно.
     %%
@@ -2038,7 +2081,7 @@ handle(_req, #empweb_hap{
         end
     );
 
-    
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create_message,
@@ -2092,7 +2135,7 @@ handle(_req, #empweb_hap{
 
             io:format(" ~n~n~n Params = ~p ~n~n~n", [Params]),
 
-            
+
     empweb_jsonapi:handle_params(
         %% проверка входных параметров и приведение к нужному типу
         norm:norm(Params, [
@@ -2105,7 +2148,7 @@ handle(_req, #empweb_hap{
                 key         = reader_nick,
                 required    = false,
                 types       = [string]
-            },  
+            },
             #norm_rule{
                 key         = type_id,
                 required    = false,
@@ -2128,7 +2171,7 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   delete_message_for_me,
-        params  =   Params, 
+        params  =   Params,
         pers_id =   Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = delete message for me">>),
@@ -2209,7 +2252,7 @@ handle(_req, #empweb_hap{
 %             }
 %         end
 %     );
-    
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% То что не прошло сопоставления с образцом.
 %% В частности, неавторизованого пользователя

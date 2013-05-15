@@ -157,6 +157,7 @@
 -export([
     get_post/1,
     get_post/2,
+    get_post_top/1,
     create_post/1,
     repost_post/1,
     update_post/1,
@@ -746,6 +747,12 @@ delete_post(Filter)->
             {values, [{isdeleted, true}]},
             {filter, [{isdeleted, false}|Filter]}
         ])
+    end).
+
+
+get_post_top(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        get_post_adds(Con, empdb_dao_post:get_top(Con, [{order, {desc, 'post.created'}}, {isdeleted, false}|Params]))
     end).
 
 get_post(Params)->
