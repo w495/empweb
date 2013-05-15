@@ -1685,8 +1685,9 @@ get_lavishget_opt(Params1, Options)->
                         |Userpl
                     ]}
                 end,
-                Userpls,
-                Lavishgetlist
+                lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
+                lists:sublist(Lavishgetlist, erlang:length(Userpls))
+
             ),
         get_opt(Con, Params, Options, Userpls_)
     end).
