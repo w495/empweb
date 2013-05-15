@@ -1016,7 +1016,7 @@ empweb_jsonapi_map(Req, {List}, State) ->
             <<"get_photo_top">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_photo,
-                    action          =   'get_photo_top'
+                    action          =   'get_top'
                 };
             <<"get_all_photos">> ->
                 Eh#empweb_hap{
