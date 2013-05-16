@@ -1689,6 +1689,19 @@ get_lavishget_opt(Params1, Options)->
                 lists:sublist(Lavishgetlist, erlang:length(Userpls))
 
             ),
+
+        io:format(" ~n~n~n Userpls = ~p ~n~n~n", [Userpls]),
+        io:format(" ~n~n~n Lavishgetlist = ~p ~n~n~n", [Lavishgetlist]),
+
+
+        io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
+        io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
+
+
+        io:format(" ~n~n~n lists:sublist(Userpls,  erlang:length(Lavishgetlist)) = ~p ~n~n~n", [lists:sublist(Userpls,  erlang:length(Lavishgetlist))]),
+        io:format(" ~n~n~n  lists:sublist(Lavishgetlist, erlang:length(Userpls)) = ~p ~n~n~n", [ lists:sublist(Lavishgetlist, erlang:length(Userpls))]),
+
+
         get_opt(Con, Params, Options, Userpls_)
     end).
 
