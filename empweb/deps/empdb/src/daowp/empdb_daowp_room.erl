@@ -98,7 +98,7 @@ get_adds(Con, {ok, Rooms}, Params) ->
 
 
 
-                Backfilepath = filepath(Con, Nroompl, back_file_id),
+                Backfilepath = filepath(Con, Nroompl, back_file_id, default_room_background),
                 Wallfilepath = filepath(Con, Nroompl, wall_file_id),
                 Flagfilepath = filepath(Con, Nroompl, flag_file_id),
                 Armsfilepath = filepath(Con, Nroompl, arms_file_id),
