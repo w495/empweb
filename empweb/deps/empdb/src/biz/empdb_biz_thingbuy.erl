@@ -47,8 +47,8 @@ create(Params)->
                 %% Берем вещь, и смотрим сколько она стоит
                 empdb_dao_thing:get(Con, [
                     {'or', [
-                        {id,    proplists:get_value(thing_id,   Params)},
-                        {alias,  proplists:get_value(thing_alias, Params)}
+                        {id,    proplists:get_value(thing_id,   Params, 0)},
+                        {alias,  proplists:get_value(thing_alias, Params, "x")}
                     ]},
                     {fields, [
                         rent,
