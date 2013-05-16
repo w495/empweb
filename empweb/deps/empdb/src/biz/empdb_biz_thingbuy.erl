@@ -96,8 +96,20 @@ create(Params)->
                     %% Берем получателя, и смотрим
                     empdb_dao_pers:get(Con, [
                         {'or', [
-                            {id,    proplists:get_value(owner_id,   Params)},
-                            {nick,  proplists:get_value(owner_nick, Params)}
+                            {id,
+                                proplists:get_value(
+                                    owner_id,
+                                    Params,
+                                    null
+                                )
+                            },
+                            {nick,
+                                proplists:get_value(
+                                    owner_nick,
+                                    Params,
+                                    null
+                                )
+                            }
                         ]},
                         {fields, [
                             id
