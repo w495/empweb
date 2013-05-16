@@ -72,6 +72,7 @@ table({fields, all})->
         counter,
         rent,
         price,
+        costs,
         expired,
         isdeleted
     ];

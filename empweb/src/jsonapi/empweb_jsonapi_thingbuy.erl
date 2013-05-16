@@ -126,12 +126,27 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
                 key         = price,
                 required    = false,
                 types       = empweb_norm:filter([nullable, float])
             },
             #norm_rule{
                 key         = rent,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = costs,
                 required    = false,
                 types       = empweb_norm:filter([nullable, float])
             },
@@ -203,7 +218,22 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
                 key         = price,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = costs,
                 required    = false,
                 types       = empweb_norm:filter([nullable, float])
             },
@@ -241,13 +271,13 @@ handle(_req, #empweb_hap{
         ]),
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
-            
+
             io:format("~n~n~n Data#norm.return = ~p ~n~n~n", [Data#norm.return]),
 
             io:format("~n~n~n Params = ~p ~n~n~n", [Params]),
 
 
-            
+
             {ok,
                 empweb_jsonapi:resp(
                     empweb_biz_thingbuy:get(Data#norm.return)
@@ -274,6 +304,16 @@ handle(_req, #empweb_hap{
             },
             #norm_rule{
                 key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_head,
                 required    = false,
                 types       = [nullable, string]
             },
@@ -344,6 +384,16 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = [nullable, string]
+            },
+            #norm_rule{
                 key         = thing_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -399,6 +449,16 @@ handle(_req, #empweb_hap{
                 key         = thing_id,
                 required    = false,
                 types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+            #norm_rule{
+                key         = room_head,
+                required    = false,
+                types       = [nullable, string]
             },
             #norm_rule{
                 key         = thing_alias,

@@ -1392,4 +1392,13 @@
 
     alter table thingbuy add column  room_id decimal references doc(id)   default null;
     alter table thingbuy add column  room_head varchar(1024)  default null;
+    alter table thingbuy add column  costs  numeric(1000, 2)  default null;
 
+
+
+    insert into or(alias, isincome)
+        values  ('thingforme_out',     false);
+    insert into or(alias, isincome)
+        values  ('thingforhim_out',     false);
+    insert into or(alias, isincome)
+        values  ('thingforit_out',     false);
