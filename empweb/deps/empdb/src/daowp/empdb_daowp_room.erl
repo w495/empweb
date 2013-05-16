@@ -55,16 +55,37 @@ get_adds(Con, {ok, Rooms}, Params) ->
                     ]),
 
 
-%empdb_dao_thingbuy:get(emp, [
-    %{room_id, proplists:get_value(id, Roompl)},
-    %{fields, [file_id]}
-%]),
+                empdb_dao_thingbuy:get(emp, [
+                    {room_id, 10622},
+                    {file_id, 1071},
+                    {limit, 1},
+                    {fields, [file_id]}
+                ]).
 
 
-                Backfilepath = filepath(Con, Roompl, back_file_id),
-                Wallfilepath = filepath(Con, Roompl, wall_file_id),
-                Flagfilepath = filepath(Con, Roompl, flag_file_id),
-                Armsfilepath = filepath(Con, Roompl, arms_file_id),
+                Nroompl =
+                    case empdb_dao_thingbuy:get(Con, [
+                        {room_id, proplists:get_value(id, Roompl)},
+                        {file_id, proplists:get_value(back_file_id, Roompl)},
+                        {limit, 1},
+                        {fields, [file_id]}
+                    ]) of
+                        {ok, []} ->
+                            Default_room_background = empdb_dao_file:get(Con, [{alias, default_room_background}]),
+                            [
+                                {back_file_id, proplists:get_value(id, Default_room_background)}
+                                |proplists:delete(back_file_id, Roompl)
+                            ];
+                        _ ->
+                            Roompl
+                    end,
+
+
+
+                Backfilepath = filepath(Con, Nroompl, back_file_id, default_room_background),
+                Wallfilepath = filepath(Con, Nroompl, wall_file_id),
+                Flagfilepath = filepath(Con, Nroompl, flag_file_id),
+                Armsfilepath = filepath(Con, Nroompl, arms_file_id),
 
                 {
                     lists:foldl(
@@ -77,7 +98,7 @@ get_adds(Con, {ok, Rooms}, Params) ->
                                         Acc
                                 end
                         end,
-                        Roompl,
+                        Nroompl,
                         [
                             {topic_list,        Topiclist},
                             {back_file_path,    Backfilepath},
@@ -95,13 +116,22 @@ get_adds(Con, {ok, Rooms}, Params) ->
 get_adds(_con, Else, _params) ->
     Else.
 
+
 filepath(Con, Roompl, Idfield) ->
+    filepath(Con, Roompl, Idfield, null).
+
+filepath(Con, Roompl, Idfield, Alias) ->
     case empdb_dao:get([
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
-        {file.id,
-            proplists:get_value(Idfield, Roompl)},
+        {'or', [
+            {'file.id', proplists:get_value(Idfield, Roompl)},
+            {'and', [
+                {'file.alias', {'neq', null}},
+                {'file.alias', Alias}
+            ]}
+        ]},
         {fileinfotype_alias,
             download},
         {image_width,  null},

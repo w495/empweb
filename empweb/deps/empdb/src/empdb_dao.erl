@@ -63,15 +63,15 @@ notify(To, Mess) ->
 %%
 %%
 %% @spec id2alias(
-%%      Object::atom(), 
-%%      Id::integer(), 
+%%      Object::atom(),
+%%      Id::integer(),
 %%      Options::proplists:proplist()
 %% ) -> Alias::atom()
-%% 
+%%
 %% @param Object    atom()                  имя таблицы
 %% @param Id        integer()               id объекта
 %% @param Options   proplists:proplist()    настройки преобразования
-%% 
+%%
 
 
 id2alias(doctype, _, _options) ->
@@ -79,7 +79,7 @@ id2alias(doctype, _, _options) ->
 
 id2alias(contype, _, _options) ->
     null;
-    
+
 id2alias(oktype, 3, _options) ->
     ok;
 
@@ -92,15 +92,15 @@ id2alias(_object, _id, _options) ->
 %%
 %%
 %% @spec id2alias(
-%%      Object::atom(), 
-%%      Alias::atom(), 
+%%      Object::atom(),
+%%      Alias::atom(),
 %%      Options::proplists:proplist()
 %% ) -> Alias::atom()
-%% 
+%%
 %% @param Object    atom()                  имя таблицы
 %% @param Alias     atom()                  id объекта
 %% @param Options   proplists:proplist()    настройки преобразования
-%% 
+%%
 
 
 alias2id(doctype, _, _options) ->
@@ -108,7 +108,7 @@ alias2id(doctype, _, _options) ->
 
 alias2id(contype, _, _options) ->
     null;
-    
+
 alias2id(oktype, ok, _options) ->
     3;
 
@@ -138,7 +138,7 @@ fields(all, Default, Additions) ->
 
 fields(Fields, Default, Additions) ->
     fields_([], Fields, Default, Additions).
-    
+
 %%% -----------------------------------------------------------------------
 
 table_fields(Table, Fields) ->
@@ -189,7 +189,7 @@ fields_1(Table, {distinct, Field}) ->
         empdb_convert:to_binary(Field),
         <<") ">>
     ];
-    
+
 fields_1(Table, Field) ->
     [
         empdb_convert:to_binary(Table),
@@ -226,8 +226,8 @@ fields_fieldvars(Fields, _default, Additions) ->
     end,Fields),
     [<<" ">>, [First|Res], <<" ">>].
 
-    
-    
+
+
 
 fieldtuples_fieldvars(Fields)->
     fieldtuples_fieldvars(Fields, []).
@@ -237,50 +237,50 @@ fieldtuples_fieldvars(Fields, Default)->
 
 fieldtuples_fieldvars([], Default, _additions) ->
     Default;
-    
+
 fieldtuples_fieldvars(Fields, _default, Additions) ->
     [[_|First]|Res] = lists:map(
         fun
             ({Field, {incr, Num}})->
-                [   <<",">> , 
-                    [   empdb_convert:to_binary(Field), 
-                        <<" = ">>, 
+                [   <<",">> ,
+                    [   empdb_convert:to_binary(Field),
+                        <<" = ">>,
                         empdb_convert:to_binary(Field),
-                        <<" + ">>, 
+                        <<" + ">>,
                         empdb_convert:to_list(Num)
                     ]
                 ];
             ({Field, {decr, Num}})->
-                [   <<",">> , 
-                    [   empdb_convert:to_binary(Field), 
-                        <<" = ">>, 
+                [   <<",">> ,
+                    [   empdb_convert:to_binary(Field),
+                        <<" = ">>,
                         empdb_convert:to_binary(Field),
-                        <<" - ">>, 
+                        <<" - ">>,
                         empdb_convert:to_list(Num)
                     ]
                 ];
             ({incr, {Field, Num}})->
-                [   <<",">> , 
-                    [   empdb_convert:to_binary(Field), 
-                        <<" = ">>, 
+                [   <<",">> ,
+                    [   empdb_convert:to_binary(Field),
+                        <<" = ">>,
                         empdb_convert:to_binary(Field),
-                        <<" + ">>, 
+                        <<" + ">>,
                         empdb_convert:to_list(Num)
                     ]
                 ];
             ({decr, {Field, Num}})->
-                [   <<",">> , 
-                    [   empdb_convert:to_binary(Field), 
-                        <<" = ">>, 
+                [   <<",">> ,
+                    [   empdb_convert:to_binary(Field),
+                        <<" = ">>,
                         empdb_convert:to_binary(Field),
-                        <<" - ">>, 
+                        <<" - ">>,
                         empdb_convert:to_list(Num)
                     ]
                 ];
             ({Field, _})->
-                [   <<",">> , 
-                    [   empdb_convert:to_binary(Field), 
-                        <<"=$">>, 
+                [   <<",">> ,
+                    [   empdb_convert:to_binary(Field),
+                        <<"=$">>,
                         empdb_convert:to_binary(Field)
                     ]
                 ]
@@ -289,7 +289,7 @@ fieldtuples_fieldvars(Fields, _default, Additions) ->
     ),
     [<<" ">>, [First|Res], <<" ">>].
 
-    
+
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
 %%% -----------------------------------------------------------------------
@@ -334,7 +334,7 @@ sql_cond({Ff, {[{X, C}]}})->
 sql_cond({Ff, {X, C}}) when erlang:is_list(X) orelse erlang:is_binary(X)->
     ?empdb_debug("{Ff, {X, C}} = ~p~n", [ {Ff, {X, C}} ]),
     sql_cond({Ff, {empdb_convert:to_atom(X), C}});
-    
+
 sql_cond({Ff, {'and', Conds}})->
     X =
         {   'and',
@@ -363,7 +363,7 @@ sql_cond({Ff, {'or', Conds}})->
 
 % sql_cond({Ff, {between, [_left, undefined]}}) ->
 %     {[], []};
-% 
+%
 % sql_cond({Ff, {between, [undefined, _right]}}) ->
 %     {[], []};
 
@@ -448,7 +448,7 @@ sql_cond({Ff, {eq, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {eq, null}})  ->
-    {[{cond_atom(Ff), null}], [
+    {[], [
         empdb_convert:to_binary(Ff),
         <<" is null">>
     ]};
@@ -465,7 +465,7 @@ sql_cond({Ff, {neq, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {neq, null}})  ->
-    {[{cond_atom(Ff), null}], [
+    {[], [
         empdb_convert:to_binary(Ff),
         <<" is not null">>
     ]};
@@ -483,7 +483,7 @@ sql_cond({Ff, {ne, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {ne, null}})  ->
-    {[{cond_atom(Ff), null}], [
+    {[], [
         empdb_convert:to_binary(Ff),
         <<" is not null">>
     ]};
@@ -495,7 +495,7 @@ sql_cond({Ff, {ne, Val}}) ->
             empdb_convert:to_binary(cond_atom(Ff))
         ]
     };
-    
+
 sql_cond({Ff, {lt, undefined}}) ->
     {[], []};
 
@@ -509,7 +509,7 @@ sql_cond({Ff, {lt, Val}}) ->
 
 sql_cond({Ff, {lte, undefined}}) ->
     {[], []};
-    
+
 sql_cond({Ff, {lte, Val}}) ->
     {   [{cond_atom(Ff), Val}],
         [   empdb_convert:to_binary(Ff),
@@ -531,7 +531,7 @@ sql_cond({Ff, {gt, Val}}) ->
 
 sql_cond({Ff, {gte, undefined}}) ->
     {[], []};
-    
+
 sql_cond({Ff, {gte, Val}}) ->
     {   [{cond_atom(Ff), Val}],
         [empdb_convert:to_binary(Ff),<<" >= $">>,empdb_convert:to_binary(cond_atom(Ff))]
@@ -573,7 +573,7 @@ sql_cond({Ff, Val} = Tuple) ->
 cond_atom(Ff)->
     erlang:list_to_atom("`" ++ erlang:atom_to_list(Ff) ++ "@filter`").
 
-    
+
 sql_where(<<>>)->
     {[], []};
 
@@ -686,14 +686,14 @@ sql_order_one({O, desc})
 sql_order_one(O) ->
     sql_order_one({asc, O}).
 
-% 
+%
 % sql_order([O|Rorder] = Order, Direction)
 %     when (
 %         erlang:is_atom(O)
 %         orelse erlang:is_list(O)
 %         orelse erlang:is_binary(O)
 %     ) andalso (
-%         Direction =:= asc orelse Direction =:= desc 
+%         Direction =:= asc orelse Direction =:= desc
 %     )->
 %     [   <<" order by ">>,
 %         string:join(
@@ -792,7 +792,7 @@ table_alias({Current, As}) ->
 table_alias(Current)  ->
     empdb_convert:to_binary(table_options({table, name},Current)).
 
-    
+
 table_options({Current, _}) ->
     table_options(Current);
 
@@ -830,11 +830,11 @@ table_options(Oname,      Current) ->
     proplists:get_value(Oname, table_options(Current)).
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% @doc Выполняет select. Позволяет получить одну сущность 
+%% @doc Выполняет select. Позволяет получить одну сущность
 %%      единственной таблицы.
 %%
 %%      Операторы:
-%%              and 
+%%              and
 %%              or
 %%
 %%          Операторы надо строками, префикс i в начале означает,
@@ -856,8 +856,8 @@ table_options(Oname,      Current) ->
 %%      Примеры:
 %%          ----------------------------------------------------------------
 %%          empdb_dao_some:get(Connection,
-%%              [ 
-%%                  {'or', 
+%%              [
+%%                  {'or',
 %%                      [
 %%                          {name, {contains, <<"lennon">>}},
 %%                          {name, {startswith, <<"jo">>}}
@@ -869,9 +869,9 @@ table_options(Oname,      Current) ->
 %%          empdb_dao_some:get(Connection,
 %%              [
 %%                  {'fname',
-%%                      {'or', 
+%%                      {'or',
 %%                          [
-%%                              {contains, <<"lennon">>}, 
+%%                              {contains, <<"lennon">>},
 %%                              {startswith, <<"jo">>}
 %%                          ]
 %%                      }
@@ -963,7 +963,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         ],
                         {Afilteri2, Input_fieldsi2}
                     };
-                    
+
                 ({Current, Current_field}, {Acc, F}) when erlang:is_atom(Current) ->
                     {
                         [
@@ -1066,7 +1066,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 Op
             )
         ),
-        Current_select_fields_ = 
+        Current_select_fields_ =
             lists:filter(
                 fun ({as, {{Ag, F}, N}})->
                         lists:member(F, Common_select_fields ++ Common_select_fields_);
@@ -1328,7 +1328,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 <<" count(*) ">>
             ], [
             ]),
-            
+
         {Query, Querycnt, Pfields}
     end),
 
@@ -2314,12 +2314,12 @@ delete(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
         }
     ).
 
-% 
+%
 % %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% @doc Выполняет select join для таблиц описанных через
 % %%      {Parent, Parent_field}, {Current, Current_field}
 % %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
+%
 % % get(Parent, Current, Con, Opts#queryobj{
 % %         filter  =   Filter,
 % %         fields  =   Fields,
@@ -2327,7 +2327,7 @@ delete(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 % %         offset  =   Offset
 % %     })->
 % %     get(Current,Con,Filter,Fields,Limit,Offset);
-% % 
+% %
 % % get([Parent, Current], Con, Opts) when erlang:is_list(Opts) ->
 % %     As_filter =
 % %         case proplists:get_value(filter, Opts, undefined) of
@@ -2339,7 +2339,7 @@ delete(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 % %         proplists:get_value(limit,   Opts, []),
 % %         proplists:get_value(offset,  Opts, []),
 % %     ).
-% % 
+% %
 % % get([Parent, Current], Con, Opts, Fields) when erlang:is_list(Opts) ->
 % %     As_filter =
 % %         case proplists:get_value(filter, Opts, undefined) of
@@ -2350,7 +2350,7 @@ delete(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
 % %         proplists:get_value(limit,   Opts, []),
 % %         proplists:get_value(offset,  Opts, []),
 % %     ).
-% % 
+% %
 % % get(Par, Cur, Con, {Key, Value}, Fields,Limit,Offset)->
 % %     get(Par, Cur, Con, [{Key, Value}], Fields,Limit,Offset).
 
@@ -2369,8 +2369,8 @@ create(Current, Con, #queryobj{fields=Fields}=Obj)
     when erlang:is_atom(Fields) orelse erlang:is_tuple(Fields) ->
     ?empdb_debug("Fields = ~p~n~n", [Fields]),
     create(Current, Con, Obj#queryobj{fields=[Fields]});
-    
-    
+
+
 %%
 %% TODO: только для двух таблиц
 %%
@@ -2427,7 +2427,7 @@ create(Current, Con, #queryobj{
         end,
         Values
     ),
-    Current_returning_fields = 
+    Current_returning_fields =
         case Current_select_fields of
             [] ->
                 case lists:member(id, Common_select_fields) of
@@ -2450,7 +2450,7 @@ create(Current, Con, #queryobj{
             Common_required_fields
         ),
 
- 
+
     case {Has_required, Current_insert_fields_keys} of
         {true, []} ->
             {error, {empty, Common_required_fields}};
@@ -2574,7 +2574,7 @@ update([{Parent, Parent_field}, {Current, Current_field}], Con, #queryobj{
         ),
 
         %% empdb_dao:table_alias(empdb_dao_doc).
-    
+
     case Current_field_vals of
         [] ->
             {ok,[]};
@@ -2672,7 +2672,7 @@ update(Current, Con, #queryobj{
             Returning
         ),
 %     ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
-    
+
     Current_all_fields =
         lists:filter(
             fun({F, _})->
@@ -2682,7 +2682,7 @@ update(Current, Con, #queryobj{
         ),
 
     % ?empdb_debug("Current_all_fields = ~p~n~n~n", [Current_all_fields]),
-    
+
     Current_update_fields =
         lists:filter(
             fun
@@ -2698,14 +2698,14 @@ update(Current, Con, #queryobj{
             end,
             Values
         ),
-% 
+%
 %     ?empdb_debug("Values = ~p~n~n~n", [Values]),
 %     ?empdb_debug("Common_update_fields = ~p~n~n~n", [Common_update_fields]),
 %     ?empdb_debug("Current_update_fields = ~p~n~n~n", [Current_update_fields]),
 %     % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
 %     % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
 
-     
+
     case Current_update_fields of
         [] ->
             %{ok, [{[]}]};
@@ -2717,7 +2717,7 @@ update(Current, Con, #queryobj{
                     % ?empdb_debug("Returning = ~p~n~n~n", [Returning]),
                     % ?empdb_debug("Current_select_fields = ~p~n~n~n", [Current_select_fields]),
                     get(Current, Con, #queryobj{
-                        filter=Filter, 
+                        filter=Filter,
                         fields=Current_select_fields
                     })
             end;
@@ -2896,7 +2896,7 @@ to_type(V,  timestamp) ->
     Cur = calendar:datetime_to_gregorian_seconds({X, {H, M, Ts}}),
     trunc((Cur - Bas));
 
-    
+
 to_type(V, int4) ->
     empdb_convert:to_integer(V);
 
@@ -2923,7 +2923,7 @@ to_type(V, Type) ->
 
 % name_columns([{column, Name, Type, _P3, _P4, _P5}|Ct], [V|Vt], Ret) ->
 %     name_columns(Ct, Vt, [{binary_to_list(Name), to_type(V, Type)}|Ret]);
-    
+
 name_columns([{column, Name, Type, _P3, _P4, _P5}|Ct], [V|Vt], Ret) ->
     name_columns(
         Ct,
@@ -2938,7 +2938,7 @@ name_columns([{column, Name, Type, _P3, _P4, _P5}|Ct], [V|Vt], Ret) ->
             | Ret
         ]
     );
-    
+
 name_columns([], [], Ret) ->
     {Ret};
 name_columns([], V, Ret) ->
@@ -2954,7 +2954,7 @@ make_proplist(_C, [], Ret) ->
     lists:reverse(Ret).
 
 pgret(returning, {ok, Id}) ->
-    
+
     {ok, Id};
 
 pgret(returning, {ok, 1, _, [{Value}]}) ->
@@ -2973,14 +2973,14 @@ pgret({return, Value}) ->
 %%% select sq & eq
 %%%
 pgret({ok, Columns, Vals}) ->
-    
+
     {ok, make_proplist(Columns, Vals, [])};
 
 
 pgret([{ok, _columns, _vals}|_rest] = List) ->
 
     pgret_mult(List, []);
-    
+
 %%%
 %%% update sq & eq
 %%%
@@ -3001,7 +3001,7 @@ pgret({ok, 1, Columns, Vals}) ->
 pgret({ok, _Count, Columns, Vals}) ->
     {ok, make_proplist(Columns, Vals, [])};
 
-%%% 
+%%%
 %%% @doc    Ошибка сиквела - неожиданный возврат в функции
 %%%         дает ошибку ожидаемого возврата.
 %%%
@@ -3078,14 +3078,14 @@ pgreterr(E) ->
 
 
 %%
-%% 
+%%
 %%
 with_connection(Function) ->
     with_connection(emp, Function).
 
 with_connection(Pool, Function) ->
     psqlcp:with_connection(Pool, Function).
-    
+
 %%
 %%
 %%
@@ -3112,7 +3112,7 @@ one({ok, [Some]})     -> {ok, Some};
 one({ok, Several})    -> {ok, Several};
 one(Error)            -> Error.
 
-%%% 
+%%%
 %%% @doc    Выполняет простой запрос и возвращает его результат в виде
 %%%         {ok, Result} | {error, Error}
 %%%         Может возвращать результат побочного действия.
@@ -3151,7 +3151,7 @@ simple_bulk(Query)
     empdb_dao:with_connection(fun(Con)->sqret(Con,Query)end).
 
 
-%%% 
+%%%
 %%% @doc    Выполняет простой запрос и возвращает его результат в виде
 %%%         {ok, Result} | {error, Error}
 %%%         Может возвращать результат побочного действия.
@@ -3162,7 +3162,7 @@ simple(Query, Params) ->
 
 %%%
 %%% @doc    Выполняет простой запрос и возвращает его результат в виде
-%%%         {ok, Result} | {error, Error} 
+%%%         {ok, Result} | {error, Error}
 %%%         Может возвращать результат побочного действия.
 %%%         Обертка для функции ?MODULE:equery/2 -> ?MODULE:pgret/1
 %%%         Кроме запроса необходимо еще указать соединение.
@@ -3215,7 +3215,7 @@ eqret(Con, Query, Params)->
 %     end.
 % ---------------------------------------------------------------------------
 
-%%% 
+%%%
 %%% @doc    Обертка для функции ?MODULE:equery/3 c функцией запроса
 %%%         Выполныет запрос заданный функцией.
 %%%         После самого запроса выполняется Callback
@@ -3243,7 +3243,7 @@ equery(Con, {Qfunction, Callback}, Params)
     ),
     Result;
 
-%%% 
+%%%
 %%% @doc    Обертка для функции ?MODULE:equery/3
 %%%         Выполныет запрос заданный функцией.
 %%%         Функция обязана возвращать строку.
@@ -3251,7 +3251,7 @@ equery(Con, {Qfunction, Callback}, Params)
 equery(Con, Qfunction, Params) when erlang:is_function(Qfunction) ->
     equery(Con, fquery(Con, Qfunction, Params), Params);
 
-%%% 
+%%%
 %%% @doc    Обертка для стандвартной функции psqlcp
 %%%         Выполныет заданный запрос
 %%%         Если параметры функции являются proplist
@@ -3279,7 +3279,7 @@ equery(Con, Query, Params) when erlang:is_list(Query);erlang:is_binary(Query) ->
     end),
     psqlcp:equery(Con, Nq, Val).
 
-%%% 
+%%%
 %%% @doc    Обертка для функции ?MODULE:equery/2
 %%%         Выполныет запрос заданный функцией.
 %%%         Функция обязана возвращать строку.
@@ -3335,7 +3335,7 @@ squery(Con, Query) when erlang:is_list(Query) ->
     psqlcp:squery(Con, Query).
 
 
-%%% 
+%%%
 %%% @doc    Функция преобразования запроса с буквенными именами к числовым.
 %%%         Запрос: empdb_dao:equery_pl(
 %%%                     "select id from customer where id = $id and uid = $uid",
@@ -3396,10 +3396,10 @@ equery_variable(Valriant, Current)->
 %%%     Изменять не следование переменных в запросе,
 %%%     а следование параметров в списке параметров.
 %%%
-% 
+%
 % equery_pl(Query, [], _, Values) ->
 %     {Query, Values};
-% 
+%
 % equery_pl(Query, [{Name, Value}|Rest], Cnt, Values) ->
 %     %%%
 %     %%% Мемоизациия для вычисления 1 раз.
@@ -3411,17 +3411,17 @@ equery_variable(Valriant, Current)->
 %         _ ->
 %             equery_pl(Newquery, Rest, Cnt + 1, lists:append(Values, [Value]))
 %     end;
-% 
+%
 % equery_pl(Query, List, _, _) when erlang:is_list(List) ->
 %     {Query, List}.
-% 
+%
 % %%%
 % %%% @doc
 % %%%     Функция преобразования запроса,
 % %%%     Подстановка.
 % %%%
 % equery_construct(Query, Name, Cnt) ->
-%     %%% 
+%     %%%
 %     %%% Мемоизациия для вычисления 1 раз.
 %     %%% Многие паттерны встречаются достаточно часто,
 %     %%%     более чем в одном запросе
@@ -3433,7 +3433,7 @@ equery_variable(Valriant, Current)->
 %         ?SVAR ++ empdb_convert:to_list(Cnt),
 %         [global, {return,list}]
 %     ).
-% 
+%
 % %%%
 % %%% @doc
 % %%%     Функция преобразования запроса,
@@ -3449,7 +3449,7 @@ equery_variable(Valriant, Current)->
 %         ),
 %     Cre.
 
-%%% 
+%%%
 %%% @doc
 %%%     Конструирует запрос, заданный функцией.
 %%%     Кеширует резльтат выполнения функции.
