@@ -1678,10 +1678,10 @@ get_lavishget_opt(Params1, Options)->
                 ]
             ),
 
-        Fuserpls =
-            lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
-        Flavishgetlist =
-            lists:sublist(Lavishgetlist, erlang:length(Userpls)),
+        Fuserpls = Userpls,
+            %lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
+        Flavishgetlist = Lavishgetlist,
+            %lists:sublist(Lavishgetlist, erlang:length(Userpls)),
 
         Userpls_ =
             lists:foldr(
