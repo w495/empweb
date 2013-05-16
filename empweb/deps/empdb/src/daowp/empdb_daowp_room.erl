@@ -42,7 +42,7 @@ get(Con, Params, Fields)->
         [{fields, Fields}| Params]
     ).
 
-        
+
 get_adds(Con, {ok, Rooms}, Params) ->
     Fields = proplists:get_value(fields, Params, []),
     {ok,
@@ -97,6 +97,8 @@ filepath(Con, Roompl, Idfield) ->
             proplists:get_value(Idfield, Roompl)},
         {fileinfotype_alias,
             download},
+        {image_width,  null},
+        {image_height, null},
         {limit, 1},
         {fields, [
             {as, {fileinfo.path, fileinfopath}},

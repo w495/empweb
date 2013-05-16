@@ -158,7 +158,9 @@ get(Con, What, Truefields)->
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
-        {fileinfotype_alias, download}
+        {fileinfotype_alias, download},
+        {image_width,  null},
+        {image_height, null}
         |What
     ], [
         {as, {fileinfo.path, fileinfopath}},

@@ -59,8 +59,20 @@ create(Params)->
         {ok, [{Mbownerpl}]} =
             empdb_dao_pers:get(Con, [
                 {'or', [
-                    {id,    proplists:get_value(owner_id,   Params)},
-                    {nick,  proplists:get_value(owner_nick, Params)}
+                    {id,
+                        proplists:get_value(
+                            owner_id,
+                            Params,
+                            proplists:get_value(buyer_id,   Params)
+                        )
+                    },
+                    {nick,
+                        proplists:get_value(
+                            owner_nick,
+                            Params,
+                            proplists:get_value(buyer_nick, Params)
+                        )
+                    }
                 ]},
                 {fields, [
                     id,
