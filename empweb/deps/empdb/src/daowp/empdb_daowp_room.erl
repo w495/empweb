@@ -55,6 +55,8 @@ get_adds(Con, {ok, Rooms}, Params) ->
                     ]),
 
 
+                Nroompl = Roompl,
+
                 %Room_id = proplists:get_value(id, Roompl, null),
                 %Old_back_file_id =
                     %proplists:get_value(back_file_id, Roompl)
