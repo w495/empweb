@@ -116,6 +116,8 @@ get(Con, What) ->
             {fileinfotype_alias, download},
             {thing.file_id, null}
         ]},
+        {image_width,  null},
+        {image_height, null},
         {fields, [
             {as, {fileinfo.path, fileinfopath}},
             {as, {fileinfo.dir,  fileinfodir}}
