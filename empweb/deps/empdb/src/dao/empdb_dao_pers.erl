@@ -320,7 +320,8 @@ get_lavishget(Con, What)->
         empdb_dao:equery(Con,[
             <<"select pers_id, sum(price) from pay ">>,
             <<"where paytype_alias = 'thing_out' and ">>,
-            <<"created > $toptime ">>,
+            <<"created > $toptime and ">>,
+            <<"isdeleted = false ">>,
             <<"group by pers_id order by sum desc ">>
             |   case proplists:get_value(limit, What) of
                     undefined ->
