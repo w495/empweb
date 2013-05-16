@@ -21,7 +21,8 @@
     MAIN_APP=$NAME"_app"
 
     CTRL_NODE="$NAME`date +_nodeclt_%H_%M_%S_%N`b@$IP"
-    ERL_ARGS="+K true +A 128 +P 134217727"
+    #ERL_ARGS="+K true +A 128 +P 134217727"
+    ERL_ARGS=""
     ERL_MAX_ETS_TABLES=140000
     export ERL_MAX_ETS_TABLES
 
