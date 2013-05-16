@@ -13,6 +13,8 @@
 -include("empdb.hrl").
 
 
+-define(UNIQ_UNDEFINED, undefined_empdb_biz_thingbuy_1368715868302572).
+
 %% ==========================================================================
 %% Экспортируемые функции
 %% ==========================================================================
@@ -130,7 +132,7 @@ create(Params)->
                                 proplists:get_value(
                                     room_head,
                                     Params,
-                                    null
+                                    ?UNIQ_UNDEFINED
                                 )
                             }
                         ]},

@@ -54,6 +54,13 @@ get_adds(Con, {ok, Rooms}, Params) ->
                         {room_id,proplists:get_value(id, Roompl)}
                     ]),
 
+
+%empdb_dao_thingbuy:get(emp, [
+    %{room_id, proplists:get_value(id, Roompl)},
+    %{fields, [file_id]}
+%]),
+
+
                 Backfilepath = filepath(Con, Roompl, back_file_id),
                 Wallfilepath = filepath(Con, Roompl, wall_file_id),
                 Flagfilepath = filepath(Con, Roompl, flag_file_id),
