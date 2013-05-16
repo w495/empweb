@@ -58,7 +58,7 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        alias, 
+        alias,
         name_ti,
         descr_ti,
         thingtype_id,
@@ -109,6 +109,8 @@ get(Con, What) ->
             {fileinfotype_alias,    download},
             {thing.file_id,     null}
         ]},
+        {image_width,  null},
+        {image_height, null},
         {fields, [
             {as, {fileinfo.path, fileinfopath}},
             {as, {fileinfo.dir,  fileinfodir}}

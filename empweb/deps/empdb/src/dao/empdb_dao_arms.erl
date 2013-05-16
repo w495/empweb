@@ -103,6 +103,8 @@ get(Con, What) ->
         {empdb_dao_fileinfo, file_id}
     ],Con,[
         {fileinfotype_alias, download},
+        {image_width,  null},
+        {image_height, null},
         {fields, [
             {as, {fileinfo.path, fileinfopath}},
             {as, {fileinfo.dir,  fileinfodir}}
@@ -149,7 +151,7 @@ get(Con, What, Truefields)->
             _ ->
                 Truefields
         end,
-        
+
     case empdb_dao:get([
         {empdb_dao_doc, id},
         {empdb_dao_arms, {doc_id, file_id}},
@@ -161,7 +163,7 @@ get(Con, What, Truefields)->
     ], [
         {as, {fileinfo.path, fileinfopath}},
         {as, {fileinfo.dir,  fileinfodir}}
-        | proplists:delete(path, Fields) 
+        | proplists:delete(path, Fields)
     ]) of
         {ok,Phobjs} ->
             {ok,

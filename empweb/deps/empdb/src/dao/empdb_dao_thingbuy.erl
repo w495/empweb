@@ -62,6 +62,8 @@ table({fields, all})->
         buyer_nick,
         owner_id,
         owner_nick,
+        %room_id,
+        %room_head,
         thing_id,
         thing_alias,
         thingtype_id,
@@ -158,7 +160,7 @@ get(Con, What) ->
 
 get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, [{fields, Fields}|What]).
-    
+
 create(Con, Proplist)->
     empdb_dao:create(?MODULE, Con, Proplist).
 
