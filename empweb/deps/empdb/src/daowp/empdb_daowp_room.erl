@@ -55,12 +55,12 @@ get_adds(Con, {ok, Rooms}, Params) ->
                     ]),
 
 
-                empdb_dao_thingbuy:get(emp, [
-                    {room_id, 10622},
-                    {file_id, 1071},
-                    {limit, 1},
-                    {fields, [file_id]}
-                ]).
+                %empdb_dao_thingbuy:get(emp, [
+                    %{room_id, 10622},
+                    %{file_id, 1071},
+                    %{limit, 1},
+                    %{fields, [file_id]}
+                %]).
 
 
                 Nroompl =
