@@ -42,7 +42,7 @@
 create(Params)->
     empdb_dao:with_transaction(empdb_biz_pers:wfoe(
         fun(Con)->
-            create_check_thing(
+            create_check(
                 Con,
                 %% Берем вещь, и смотрим сколько она стоит
                 empdb_dao_thing:get(Con, [
@@ -56,6 +56,43 @@ create(Params)->
                     ]},
                     {limit, 1}
                 ]),
+                %% Берем покупателя, и смотрим сколько у него денег
+                empdb_dao_pers:get(Con, [
+                    {'or', [
+                        {id,    proplists:get_value(buyer_id,   Params)},
+                        {nick,  proplists:get_value(buyer_nick, Params)}
+                    ]},
+                    {fields, [
+                        id,
+                        money
+                    ]},
+                    {limit, 1}
+                ]),
+                {
+                    %% Берем получателя, и смотрим
+                    empdb_dao_pers:get(Con, [
+                        {'or', [
+                            {id,    proplists:get_value(owner_id,   Params)},
+                            {nick,  proplists:get_value(owner_nick, Params)}
+                        ]},
+                        {fields, [
+                            id
+                        ]},
+                        {limit, 1}
+                    ]),
+                    %% Берем получателя (страну), и смотрим
+                    empdb_dao_room:get(Con, [
+                        {'or', [
+                            {id,    proplists:get_value(room_id,   Params)},
+                            {head,  proplists:get_value(room_head, Params)}
+                        ]},
+                        {fields, [
+                            id,
+                            owner_id
+                        ]},
+                        {limit, 1}
+                    ])
+                },
                 Params
             )
         end,
@@ -67,25 +104,75 @@ create(Params)->
         ]
     )).
 
-
-create_check_thing(Con, {ok, []}, Params)->
+create_check(
+    Con,
+    {ok, []},
+    _,
+    _,
+    Params
+)->
     {error, no_such_thing};
 
-create_check_thing(Con, {ok, [{Mbthingpl}]}, Params)->
-    %% Берем покупателя, и смотрим сколько у него денег
-    {ok, [{Mbbuyerpl}]} =
-        empdb_dao_pers:get(Con, [
-            {'or', [
-                {id,    proplists:get_value(buyer_id,   Params)},
-                {nick,  proplists:get_value(buyer_nick, Params)}
-            ]},
-            {fields, [
-                id,
-                money
-            ]},
-            {limit, 1}
-        ]),
+create_check(
+    Con,
+    _,
+    {ok, []},
+    _,
+    Params
+)->
+    {error, no_such_buyer};
 
+create_check(
+    Con,
+    {ok, [{Mbthingpl}]},
+    {ok, [{Mbbuyerpl}]},
+    {
+        {ok, []},
+        {ok, []}
+    },
+    Params
+)->
+    create_do_(
+        Con,
+        {ok, [{Mbthingpl}]},
+        {ok, [{Mbbuyerpl}]},
+        [
+            {owner_id, proplists:get_value(id,   Mbbuyerpl)}
+            |   proplists:delete(owner_id,
+                    proplists:delete(owner_nick, Params)
+                )
+        ]
+    );
+
+create_check(
+    Con,
+    {ok, [{Mbthingpl}]},
+    {ok, [{Mbbuyerpl}]},
+    {
+        _,
+        {ok, [{Mbroom}]}
+    },
+    Params
+)->
+    create_do_(
+        Con,
+        {ok, [{Mbthingpl}]},
+        {ok, [{Mbbuyerpl}]},
+        [
+            {room_id, proplists:get_value(id,   Mbroom)}
+            |   proplists:delete(room_id,
+                    proplists:delete(room_head, Params)
+                )
+        ]
+    ).
+
+
+create_do_(
+    Con,
+    {ok, [{Mbthingpl}]},
+    {ok, [{Mbbuyerpl}]},
+    Params
+)->
     Now = erlang:universaltime(),
     Nowint  = empdb_convert:datetime2int(Now),
     Expired = proplists:get_value(expired, Params, null),
