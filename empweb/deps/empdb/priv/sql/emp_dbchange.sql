@@ -1396,9 +1396,19 @@
 
 
 
-    insert into or(alias, isincome)
+    insert into paytype(alias, isincome)
         values  ('thingforme_out',     false);
-    insert into or(alias, isincome)
+    insert into paytype(alias, isincome)
         values  ('thingforhim_out',     false);
-    insert into or(alias, isincome)
+    insert into paytype(alias, isincome)
         values  ('thingforit_out',     false);
+
+
+
+    alter TABLE thingbuy alter column buyer_id  drop not null;
+    alter TABLE thingbuy alter column buyer_nick  drop not null;
+    alter TABLE thingbuy alter column owner_nick  drop not null;
+    alter TABLE thingbuy alter column owner_id  drop not null;
+    alter TABLE thingbuy alter column thing_id  drop not null;
+    alter TABLE thingbuy alter column thing_alias  drop not null;
+

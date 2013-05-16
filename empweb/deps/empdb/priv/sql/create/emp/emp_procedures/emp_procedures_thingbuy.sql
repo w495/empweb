@@ -31,11 +31,11 @@ begin
         if not (new.owner_id is null) then
             new.owner_nick =
                 (select pers.nick from pers where pers.id = new.owner_id);
-        else
-            /**
-                если владелец не указан, то им становится, тот кто покупает
-            **/
-            new.owner_nick        = new.buyer_nick;
+        --else
+            --/**
+                --если владелец не указан, то им становится, тот кто покупает
+            --**/
+            --new.owner_nick        = new.buyer_nick;
         end if;
     end if;
     if (new.owner_id is null) then
