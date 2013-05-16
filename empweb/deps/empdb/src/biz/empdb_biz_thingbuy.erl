@@ -119,8 +119,20 @@ create(Params)->
                     %% Берем получателя (страну), и смотрим
                     empdb_dao_room:get(Con, [
                         {'or', [
-                            {id,    proplists:get_value(room_id,   Params)},
-                            {head,  proplists:get_value(room_head, Params)}
+                            {id,
+                                proplists:get_value(
+                                    room_id,
+                                    Params,
+                                    null
+                                )
+                            },
+                            {head,
+                                proplists:get_value(
+                                    room_head,
+                                    Params,
+                                    null
+                                )
+                            }
                         ]},
                         {fields, [
                             id,
