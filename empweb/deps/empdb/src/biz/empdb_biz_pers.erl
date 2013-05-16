@@ -1677,29 +1677,59 @@ get_lavishget_opt(Params1, Options)->
                     |get_tfparams(Con, Params)
                 ]
             ),
-        Userpls_ =
-            lists:zipwith(
-                fun({Userpl}, {Lavishgetpl})->
-                    {[
-                        {sum, proplists:get_value(sum, Lavishgetpl, 0)}
-                        |Userpl
-                    ]}
-                end,
-                lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
-                lists:sublist(Lavishgetlist, erlang:length(Userpls))
 
+        Fuserpls =
+            lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
+        Flavishgetlist =
+            lists:sublist(Lavishgetlist, erlang:length(Userpls)),
+
+        Userpls_ =
+            lists:foldr(
+                fun({Flavishgetpl}, Res1) ->
+                    Pers_id =
+                        proplists:get_value(pers_id, Flavishgetpl),
+                    Sum =
+                        proplists:get_value(sum, Flavishgetpl),
+                    lists:append([
+                        lists:foldr(
+                            fun({Fuserpl}, Res2)->
+                                case proplists:get_value(id, Fuserpl) of
+                                    Pers_id ->
+                                        [{[{sum, Sum}|Fuserpl]}|Res2];
+                                    _ ->
+                                        Res2
+                                end
+                            end,
+                            [],
+                            Fuserpls
+                        ),
+                        Res1
+                    ])
+                end,
+                [],
+                Flavishgetlist
             ),
 
-        io:format(" ~n~n~n Userpls = ~p ~n~n~n", [Userpls]),
-        io:format(" ~n~n~n Lavishgetlist = ~p ~n~n~n", [Lavishgetlist]),
 
+        %Userpls_ =
+            %lists:zipwith(
+                %fun({Userpl}, {Lavishgetpl})->
+                    %{[
+                        %{sum, proplists:get_value(sum, Lavishgetpl, 0)}
+                        %|Userpl
+                    %]}
+                %end,
+                %lists:sublist(Userpls,  erlang:length(Lavishgetlist)),
+                %lists:sublist(Lavishgetlist, erlang:length(Userpls))
 
-        io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
-        io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
+            %),
 
-
-        io:format(" ~n~n~n lists:sublist(Userpls,  erlang:length(Lavishgetlist)) = ~p ~n~n~n", [lists:sublist(Userpls,  erlang:length(Lavishgetlist))]),
-        io:format(" ~n~n~n  lists:sublist(Lavishgetlist, erlang:length(Userpls)) = ~p ~n~n~n", [ lists:sublist(Lavishgetlist, erlang:length(Userpls))]),
+        %io:format(" ~n~n~n Userpls = ~p ~n~n~n", [Userpls]),
+        %io:format(" ~n~n~n Lavishgetlist = ~p ~n~n~n", [Lavishgetlist]),
+        %io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
+        %io:format(" ~n~n~n erlang:length(Lavishgetlist) = ~p ~n~n~n", [erlang:length(Lavishgetlist)]),
+        %io:format(" ~n~n~n lists:sublist(Userpls,  erlang:length(Lavishgetlist)) = ~p ~n~n~n", [lists:sublist(Userpls,  erlang:length(Lavishgetlist))]),
+        %io:format(" ~n~n~n  lists:sublist(Lavishgetlist, erlang:length(Userpls)) = ~p ~n~n~n", [ lists:sublist(Lavishgetlist, erlang:length(Userpls))]),
 
 
         get_opt(Con, Params, Options, Userpls_)

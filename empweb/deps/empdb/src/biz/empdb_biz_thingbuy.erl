@@ -75,7 +75,7 @@ create(Params)->
             Thingprice = proplists:get_value(price, Mbthingpl, null),
             Thingrent = proplists:get_value(rent, Mbthingpl, null),
             Expiredint = empdb_convert:nullable_datetime2int(Expired),
-            
+
             {Costserror, Costs} =
                 case {Expired, Thingprice, Thingrent} of
                     {null, null, _} ->
@@ -89,7 +89,7 @@ create(Params)->
                 end,
 
             io:format("~n~n~n Costs = ~p ~n~n~n", [Costs]),
-            
+
             Money = proplists:get_value(money, Mbbuyerpl),
             case {Costserror, Costs} of
                 {error, no_price} ->
@@ -125,7 +125,8 @@ create(Params)->
                     case empdb_dao_thingbuy:create(Con,[
                         {price,     Thingprice},
                         {expired,   Expired},
-                        {rent,      Thingrent}
+                        {rent,      Thingrent},
+                        {costs,     Costs}
                         |Params
                     ]) of
                         {ok, [{Respl}]} ->

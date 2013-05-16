@@ -1374,21 +1374,22 @@
 -- 2013.05.13 19:02:23:330929088 ---------------------------------------------
 
 
+/*
     insert into service(alias, price, isonce)
         values ('change_nick_price', 1.0,       true);
-
-
     insert into service(alias, price, isonce)
         values ('change_perspichead_price', 1.0,       true);
-
     insert into service(alias, price, isonce)
         values ('change_perspicbody_price', 1.0,       true);
-
-
     insert into paytype(alias, isincome)
         values  ('change_perspichead',     false),
                 ('change_perspicbody',     false);
-
-
     alter table claim add column  isoffer  boolean default null;
+*/
+
+
+-- 2013.05.16 12:40:40:891241891 ---------------------------------------------
+
+    alter table thingbuy add column  room_id decimal references doc(id)   default null;
+    alter table thingbuy add column  room_head varchar(1024)  default null;
 
