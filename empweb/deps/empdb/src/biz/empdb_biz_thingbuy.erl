@@ -65,6 +65,8 @@ create(Params)->
                         }
                     ]},
                     {fields, [
+                        id,
+                        file_id,
                         rent,
                         price
                     ]},
@@ -147,10 +149,42 @@ create(Params)->
             )
         end,
         [
-            {friend_id,   proplists:get_value(buyer_id,     Params)},
-            {friend_nick, proplists:get_value(buyer_nick,   Params)},
-            {pers_id,     proplists:get_value(owner_id,     Params, proplists:get_value(buyer_id,     Params))},
-            {pers_nick,   proplists:get_value(owner_nick,   Params, proplists:get_value(buyer_id,     Params))}
+            {friend_id,
+                proplists:get_value(
+                    buyer_id,
+                    Params,
+                    null
+                )
+            },
+            {friend_nick,
+                proplists:get_value(
+                    buyer_nick,
+                    Params,
+                    null
+                )
+            },
+            {pers_id,
+                proplists:get_value(
+                    owner_id,
+                    Params,
+                    proplists:get_value(
+                        buyer_id,
+                        Params,
+                        null
+                    )
+                )
+            },
+            {pers_nick,
+                proplists:get_value(
+                    owner_nick,
+                    Params,
+                    proplists:get_value(
+                        buyer_id,
+                        Params,
+                        null
+                    )
+                )
+            }
         ]
     )).
 
@@ -204,7 +238,7 @@ create_check(
     },
     Params
 )->
-    create_do_(
+    case create_do_(
         Con,
         {ok, [{Mbthingpl}]},
         {ok, [{Mbbuyerpl}]},
@@ -214,7 +248,24 @@ create_check(
                     proplists:delete(room_head, Params)
                 )
         ]
-    ).
+    ) of
+        {ok, Ok}->
+            Thfile_id = proplists:get_value(file_id, Mbthingpl),
+            Room_id = proplists:get_value(id,   Mbroom),
+
+            {ok, _} =
+                empdb_dao_room:update(
+                    Con,
+                    [
+                        {id, Room_id},
+                        {back_file_id, Thfile_id}
+                    ]
+                ),
+
+            {ok, Ok};
+        Else ->
+            Else
+    end.
 
 
 create_do_(
