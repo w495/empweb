@@ -79,16 +79,16 @@ get_adds(Con, {ok, Rooms}, Params) ->
                                 default_room_background
                             );
                         _ ->
-                            %filepath(Con, Nroompl, back_file_id, null)
-                            filepath(
-                                Con,
-                                [
-                                    {back_file_id, null}
-                                    |proplists:delete(back_file_id, Nroompl)
-                                ],
-                                back_file_id,
-                                default_room_background
-                            )
+                            filepath(Con, Nroompl, back_file_id, null)
+                            %filepath(
+                                %Con,
+                                %[
+                                    %{back_file_id, null}
+                                    %|proplists:delete(back_file_id, Nroompl)
+                                %],
+                                %back_file_id,
+                                %default_room_background
+                            %)
                     end,
 
 
