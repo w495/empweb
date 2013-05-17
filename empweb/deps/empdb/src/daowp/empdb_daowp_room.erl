@@ -118,16 +118,17 @@ filepath(Con, Roompl, Idfield, Alias) ->
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
-        {'or', [
-            {'and', [
-                {'file.id',     proplists:get_value(Idfield, Roompl, null)},
-                {'file.alias',  null}
-            ]},
-            {'and', [
-                {'file.alias', {'neq', null}},
-                {'file.alias', Alias}
-            ]}
-        ]},
+        %{'or', [
+            %{'and', [
+                %{'file.id',     proplists:get_value(Idfield, Roompl, null)},
+                %{'file.alias',  null}
+            %]},
+            %{'and', [
+                %{'file.alias', {'neq', null}},
+                %{'file.alias', Alias}
+            %]}
+        %]},
+        {'file.id',     proplists:get_value(Idfield, Roompl, null)},
         {fileinfotype_alias,
             download},
         {image_width,  null},
