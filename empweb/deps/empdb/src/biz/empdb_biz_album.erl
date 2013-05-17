@@ -92,8 +92,7 @@ get(Params)->
                                                     null
                                                 )
                                             },
-                                            {limit, 1},
-                                            {fields, [path]}
+                                            {limit, 1}
                                         ]) of
                                             {ok, []} ->
                                                 {[
