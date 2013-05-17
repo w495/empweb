@@ -350,7 +350,8 @@ gm_convert_tge(
         [
             {thumbnail, Image_width, Image_height},
             {gravity, <<"center">>},
-            {extent, Image_width, Image_height}
+            {extent, Image_width, Image_height},
+            {background, transparent}
         ]
     ).
 

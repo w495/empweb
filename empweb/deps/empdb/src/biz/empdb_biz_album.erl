@@ -1,7 +1,7 @@
 %% @file    empdb_biz_album.erl
 %%          Описание бизнес логики работы с альбомами.
 %%          Альбом это просто документ.
-%% 
+%%
 -module(empdb_biz_album).
 
 %% ===========================================================================
@@ -73,7 +73,7 @@ get(Params)->
                                                     {alias, default_album_image}
                                                 ]
                                             ),
-                                    
+
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
                                             {order, {desc, 'photo.created'}},
@@ -110,7 +110,11 @@ get(Params)->
                                                 Path = proplists:get_value(
                                                     path,
                                                     Photopl,
-                                                    proplists:get_value(path, Defaultimagepl, null)
+                                                    proplists:get_value(
+                                                        path,
+                                                        Defaultimagepl,
+                                                        null
+                                                    )
                                                 ),
                                                 {[{path, Path}|Albumpl]};
                                             {Eclassp, Ereasonp} ->

@@ -1,11 +1,14 @@
 -module(gm_options).
 -export([opt/1]).
 
-
 opt({crop, Width, Height}) ->
   {"-crop", ":widthx:height", [
     {width, integer_to_list(Width)},
     {height, integer_to_list(Height)}
+  ]};
+opt({background, Background}) ->
+  {"-background", ":background", [
+    {background, Background}
   ]};
 opt({resize, Width}) ->
   {"-resize", ":width", [
@@ -26,7 +29,7 @@ opt({scale, Scale}) when erlang:is_binary(Scale)->
   {"-scale", ":scale", [
     {scale, Scale}
   ]};
-  
+
 opt({scale, Scale}) ->
   {"-scale", ":scale", [
     {scale, integer_to_list(Scale)}
@@ -49,7 +52,7 @@ opt({scale, X, Y, A, B}) ->
     {a, integer_to_list(A)},
     {b, integer_to_list(B)}
   ]};
-  
+
 opt({output_directory, Dir}) ->
   {"-output-directory", ":output_directory", [{output_directory, Dir}]};
 opt(create_directories) ->
