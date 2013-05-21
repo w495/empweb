@@ -172,7 +172,7 @@ create(Params)->
                         end,
                         %%
                         %% Списываем деньги у участника аукциона.
-                        %% Если он станет победителем, 
+                        %% Если он станет победителем,
                         %% то это будет плата за товар.
                         %% Если кто-то сделает большую ставку,
                         %% то эти деньги вернем на следующей итерации.
@@ -187,7 +187,7 @@ create(Params)->
                             {isincome,          false},
                             {price,             Price}
                         ]),
-                        Roombet = empdb_dao_roombet:create(Con,[
+                        {ok, [{Roombet}]} = empdb_dao_roombet:create(Con,[
                             {filter, [
                                 id
                             ]}
@@ -195,13 +195,13 @@ create(Params)->
                         ]),
                         case Price =:= Betmax of
                             true ->
-                                %% 
-                                %% Назначена цена выкупа. 
+                                %%
+                                %% Назначена цена выкупа.
                                 %% Человек автоматически становится победителем.
-                                %% 
+                                %%
                                 %% 1) Старому владельцу зачисляются деньги.
                                 %% 2) Меняется владельца страны.
-                                %% 
+                                %%
                                 {ok, _} = empdb_dao_pay:create(Con, [
                                     {pers_id,           Roomlot_owner_id},
                                     {paytype_alias,     roomlot_in},
@@ -258,13 +258,13 @@ create(Params)->
                                         {isdeleted, true}
                                     ]}
                                 ]),
-                                Roombet;
-                            false -> 
+                                 {ok, [{Roombet}]};
+                            false ->
                                 %%
-                                %% Штатная ситуация. 
+                                %% Штатная ситуация.
                                 %% Человек (пока) не победил.
                                 %%
-                                Roombet
+                                 {ok, [{Roombet}]}
                         end;
                     _ ->
                         {error, {something_wrong, {[
