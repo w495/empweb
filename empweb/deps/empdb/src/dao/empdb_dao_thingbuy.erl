@@ -101,60 +101,71 @@ get(Con, What) ->
     Fields =
         case Truefields of
             [] ->
-                empdb_dao_thingbuy:table({fields, select});
+                lists:append([
+                    empdb_dao_thing:table({fields, select}),
+                    empdb_dao_thingbuy:table({fields, select}),
+                    [image_width, image_height, file_id, path]
+                ]);
             _ ->
                 Truefields
         end,
+
+    Req_width     = proplists:get_value(image_width, What, null),
+    Req_height    = proplists:get_value(image_height, What, null),
+
 
     case empdb_dao:get([
         {empdb_dao_thingbuy, thing_id},
         {empdb_dao_thing, {id, file_id}},
         {empdb_dao_file, {left, id}},
         {empdb_dao_fileinfo, {left, file_id}}
-    ],Con,[
+    ],Con,[        {fields, [
+            fileinfotype_alias,
+            fileinfo.filetype_ext,
+            {as, {fileinfo.path, path}},
+            {as, {fileinfo.dir,  dir}}
+            | proplists:delete(path, Fields)
+        ]},
         {'or', [
-            {fileinfotype_alias, download},
+            {fileinfotype_alias, filesystem},
             {thing.file_id, null}
         ]},
-        {image_width,  null},
         {image_height, null},
-        {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
-            | proplists:delete(path, Fields)
-        ]}
-        |proplists:delete(fields, What)
+        {image_width, null}
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
     ]) of
         {ok,Phobjs} ->
             {ok,
-                lists:map(fun({Phpl})->
-                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
-                        true ->
-                            {[
-                                {path,
-                                    case {
-                                        proplists:get_value(fileinfodir, Phpl),
-                                        proplists:get_value(fileinfopath, Phpl)
-                                    } of
-                                        {null, _} ->
-                                            null;
-                                        {_, null} ->
-                                            null;
-                                        {Fileinfodir, Fileinfopath} ->
-                                            <<  (Fileinfodir)/binary,
-                                                (Fileinfopath)/binary
-                                            >>
-                                    end
-                                }
-                                | proplists:delete(fileinfodir,
-                                    proplists:delete(fileinfopath,
-                                        proplists:delete(path, Phpl)))
-                            ]};
-                        _ ->
-                            {proplists:delete(fileinfodir,
-                                proplists:delete(fileinfopath, Phpl))}
-                    end
-                end, Phobjs)
+                lists:map(
+                    fun({Phpl})->
+                        case (lists:member(path, Truefields) or (Truefields =:= []))
+                            and (proplists:get_value(path, Phpl) =/= null)
+                            and (proplists:get_value(dir, Phpl) =/= null) of
+                            true ->
+                                empdb_biz_file:get_handle_picture(
+                                    Con,
+                                    {Phpl},
+                                    [
+                                        {options, [
+                                            {outpathname, path}
+                                        ]}
+                                        |What
+                                    ],
+                                    Fields,
+                                    Req_width,
+                                    Req_height
+                                );
+                            _ ->
+                                {[
+                                    {path, null}
+                                    |proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))
+                                ]}
+                        end
+                    end,
+                    Phobjs
+                )
             };
         Error ->
             Error
