@@ -48,6 +48,15 @@ get_adds(Con, {ok, Rooms}, Params) ->
     {ok,
         lists:map(
             fun({Roompl})->
+
+
+                {ok,[{[{count,Nops}]}]} =
+                    empdb_dao_pers:count(Con, [
+                        {isdeleted, false},
+                        {pstatus_alias, online},
+                        {live_room_id, proplists:get_value(id, Roompl)}
+                    ]),
+
                 {ok, Topiclist} =
                     empdb_dao_room:get_room_topic(Con, [
                         {isdeleted, false},
@@ -55,7 +64,7 @@ get_adds(Con, {ok, Rooms}, Params) ->
                     ]),
 
 
-                Nroompl = Roompl,
+                Nroompl = [{nops, Nops}|Roompl],
 
                 Room_id = proplists:get_value(id, Roompl, null),
                 Old_back_file_id =
@@ -107,7 +116,10 @@ get_adds(Con, {ok, Rooms}, Params) ->
                                         Acc
                                 end
                         end,
-                        proplists:delete(back_file_id, Nroompl),
+                        proplists:delete(
+                            back_file_id,
+                            Nroompl
+                        ),
                         [
                             {topic_list,        Topiclist},
                             {back_file_id,      Backfileid},
