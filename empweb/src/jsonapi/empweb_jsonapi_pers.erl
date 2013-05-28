@@ -115,6 +115,93 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
                 key = phone,
                 required = false,
                 types = [integer]
+            },
+            #norm_rule{
+                key         = perspicphoto_id,
+                required    = false,
+                types       = [nullable, integer]
+            },
+        %% Имя
+            #norm_rule{
+                key = fname,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Фамилия
+            #norm_rule{
+                key = sname,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Работает или нет
+            #norm_rule{
+                key = isempl,
+                required    = false,
+                types = [nullable, boolean]
+            },
+        %% Род занятий
+            #norm_rule{
+                key = empl,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Xобби
+            #norm_rule{
+                key = hobby,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Интерес
+            #norm_rule{
+                key         = interest,
+                required    = false,
+                types       = [nullable, string]
+            },
+        %% Oписание
+            #norm_rule{
+                key = descr,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Регион pregion_id
+            #norm_rule{
+                key = pregion_id,
+                required    = false,
+                types = [nullable, integer]
+            },
+        %% Дата рождения
+            #norm_rule{
+                key = birthday,
+                required    = false,
+                types = [nullable, unixdatetime]
+            },
+        %% Флаг пола
+            #norm_rule{
+                key = ismale,
+                required    = false,
+                types = [nullable, boolean]
+            },
+        %% Эмоции пользователя.
+            #norm_rule{
+                key = emotion_id,
+                required    = false,
+                types = [nullable, integer]
+            },
+            #norm_rule{
+                key = emotion_alias,
+                required    = false,
+                types = [nullable, string]
+            },
+        %% Язык пользователя.
+            #norm_rule{
+                key = lang_id,
+                required    = false,
+                types = [nullable, integer]
+            },
+            #norm_rule{
+                key = lang_alias,
+                required    = false,
+                types = [nullable, string]
             }
         ]),
         fun(Data)->
