@@ -1697,7 +1697,7 @@ get_lavishget_opt(Params1, Options)->
                         lists:foldr(
                             fun({Fuserpl_}, Res2)->
                                 Fuserpl =
-                                    proplists:delete('@', [{'@', Lavishgetlistcount}|Fuserpl_]),
+                                    [{'@', Lavishgetlistcount}|proplists:delete('@', Fuserpl_)],
                                 case proplists:get_value(id, Fuserpl) of
                                     Pers_id ->
                                         [{[{sum, Sum}|Fuserpl]}|Res2];
