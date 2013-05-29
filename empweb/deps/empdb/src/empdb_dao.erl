@@ -944,6 +944,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         lists:map(
                             fun ({as, I, A}) ->
                                     {as, I, A};
+                                ({distinct, I}) ->
+                                    {distinct, I};
                                 (I)->
                                     Il = empdb_convert:to_list(I),
                                     case lists:prefix(Asl_, Il) of
@@ -1072,6 +1074,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         lists:member(F, Common_select_fields ++ Common_select_fields_);
                     ({as, {F, N}})->
                         lists:member(F, Common_select_fields ++ Common_select_fields_);
+                    ({distinct, F})->
+                        lists:member(F, Common_select_fields ++ Common_select_fields_);
                     ({Ag, F})->
                         lists:member(F, Common_select_fields ++ Common_select_fields_);
                     (F)->
@@ -1092,6 +1096,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
             lists:map(
                 fun ({as, {F, N}}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    ({distinct, {F, N}}) ->
+                        {distinct, empdb_orm_util:current_select_fields(F, Op)};
                     (F) ->
                         empdb_orm_util:current_select_fields(F, Op)
 %                     (Else)  ->
@@ -1493,6 +1499,8 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         lists:map(
                             fun ({as, I, A}) ->
                                     {as, I, A};
+                                ({distinct, I}) ->
+                                    {distinct, I};
                                 (I)->
                                     Il = empdb_convert:to_list(I),
                                     case lists:prefix(Asl_, Il) of
@@ -1621,6 +1629,9 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                     ({as, {F, N}})->
                         lists:member(F, Common_select_fields
                             ++ Common_select_fields_);
+                    ({distinct, {F, N}})->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
                     ({F, as, N})->
                         lists:member(F, Common_select_fields
                             ++ Common_select_fields_);
@@ -1645,6 +1656,8 @@ count([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     ({as, F, N}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    ({distinct, F}) ->
+                        {distinct, empdb_orm_util:current_select_fields(F, Op)};
                     ({F, as, N}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     (F) ->
@@ -2084,6 +2097,9 @@ delete([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                     ({as, {F, N}})->
                         lists:member(F, Common_select_fields
                             ++ Common_select_fields_);
+                    ({distinct, F})->
+                        lists:member(F, Common_select_fields
+                            ++ Common_select_fields_);
                     ({F, as, N})->
                         lists:member(F, Common_select_fields
                             ++ Common_select_fields_);
@@ -2108,6 +2124,8 @@ delete([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     ({as, F, N}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
+                    ({distinct, F}) ->
+                        {distinct, empdb_orm_util:current_select_fields(F)};
                     ({F, as, N}) ->
                         {as, {empdb_orm_util:current_select_fields(F, Op), N}};
                     (F) ->

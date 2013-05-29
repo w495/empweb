@@ -178,9 +178,9 @@ get_top(Con, What) ->
             {left, {doc_id,   {doc, id}}}}
     ],Con,[
         {fields, [
+            {distinct, id},
             fileinfotype_alias,
             fileinfo.filetype_ext,
-            'distinct(doc.id) as doc.id',
             {as, {fileinfo.path, path}},
             {as, {fileinfo.dir,  dir}}
             | proplists:delete(
