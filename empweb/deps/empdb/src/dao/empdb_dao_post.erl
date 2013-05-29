@@ -103,15 +103,11 @@ get(Con, What) ->
         {empdb_dao_fileinfo, {left, file_id}}
     ],Con,[
         {fields, [
-            {distinct, id},
             fileinfotype_alias,
             fileinfo.filetype_ext,
             {as, {fileinfo.path, path}},
             {as, {fileinfo.dir,  dir}}
-            | proplists:delete(
-                path,
-                proplists:delete(id, Fields)
-            )
+            | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
@@ -187,11 +183,15 @@ get_top(Con, What) ->
             {left, {doc_id,   {doc, id}}}}
     ],Con,[
         {fields, [
+            {distinct, id},
             fileinfotype_alias,
             fileinfo.filetype_ext,
             {as, {fileinfo.path, path}},
             {as, {fileinfo.dir,  dir}}
-            | proplists:delete(path, Fields)
+            | proplists:delete(
+                path,
+                proplists:delete(id, Fields)
+            )
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
