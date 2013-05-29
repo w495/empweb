@@ -316,23 +316,43 @@ get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, What, Fields).
 
 get_lavishget(Con, What)->
-    empdb_dao:pgret(
-        empdb_dao:equery(Con,[
-            <<"select pers_id, sum(price) from pay ">>,
-            <<"where paytype_alias = 'thing_out' and ">>,
-            <<"created > $toptime and ">>,
-            <<"isdeleted = false ">>,
-            <<"group by pers_id order by sum desc ">>
-            |   case proplists:get_value(limit, What) of
-                    undefined ->
-                        [];
-                    Limit ->
-                        [<<"limit ">>, empdb_convert:to_binary(Limit)]
-                end
-            ],
-            What
+    Expression =[
+        <<"select ">>,
+        <<" pers_id, sum(price) ">>,
+        <<" from pay ">>,
+        <<"where paytype_alias = 'thing_out' and ">>,
+        <<"created > $toptime and ">>,
+        <<"isdeleted = false ">>,
+        <<"group by pers_id order by sum desc ">>
+    ],
+    {
+        empdb_dao:pgret(
+            empdb_dao:equery(
+                Con,
+                [
+                    Expression
+                    |   case proplists:get_value(limit, What) of
+                            undefined ->
+                                [];
+                            Limit ->
+                                [<<"limit ">>, empdb_convert:to_binary(Limit)]
+                        end
+                ],
+                What
+            )
+        ),
+        empdb_dao:pgret(
+            empdb_dao:equery(
+                Con,
+                [
+                    <<"select count(*) from  (">>,
+                    Expression,
+                    <<") as x">>
+                ],
+                What
+            )
         )
-    ).
+    }.
 
 
 create(Con, Proplist)->

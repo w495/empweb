@@ -1328,6 +1328,9 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                 sql_offset(Offset)
             ]),
 
+        io:format("~n~n Distinct = ~p ~n~n", [Distinct]),
+       % 1 / 0,
+
         Querycnt =
             Querycons([
                 <<" select ">>,

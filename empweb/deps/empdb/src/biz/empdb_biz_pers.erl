@@ -1651,7 +1651,10 @@ get_lavishget_opt(Params1, Options)->
     Params =
         lists:keyreplace(fields, 1, Params1, {fields, Fields}),
     empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Lavishgetlist} =
+        {
+            {ok, Lavishgetlist},
+            {ok, [{[{count, Lavishgetlistcount}]}]}
+        } =
             empdb_dao_pers:get_lavishget(Con, [
                 {toptime,
                     empdb_convert:now_minus(
@@ -1692,7 +1695,9 @@ get_lavishget_opt(Params1, Options)->
                         proplists:get_value(sum, Flavishgetpl),
                     lists:append([
                         lists:foldr(
-                            fun({Fuserpl}, Res2)->
+                            fun({Fuserpl_}, Res2)->
+                                Fuserpl =
+                                    proplists:delete('@', [{'@', Lavishgetlistcount}|Fuserpl_]),
                                 case proplists:get_value(id, Fuserpl) of
                                     Pers_id ->
                                         [{[{sum, Sum}|Fuserpl]}|Res2];
