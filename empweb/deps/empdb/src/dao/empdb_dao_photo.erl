@@ -187,7 +187,7 @@ get_top(Con, What) ->
                 proplists:delete(id, Fields)
             )
         ]},
-        {distinct, [id]},
+        {distinct, ['doc.id']},
         {fileinfotype_alias, filesystem},
         {image_height, null},
         {image_width, null},
