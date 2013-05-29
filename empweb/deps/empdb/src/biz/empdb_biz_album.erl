@@ -40,6 +40,7 @@ get(Params)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_album:get_adds(Con,
             case empdb_dao_album:get(Con, [
+                {order, {desc, created}},
                 {isdeleted, false}
                 |Params
             ]) of
