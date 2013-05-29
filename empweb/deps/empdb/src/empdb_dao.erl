@@ -1331,7 +1331,26 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
         Querycnt =
             Querycons([
                 <<" select ">>,
-                <<" count(*) ">>
+                <<" count(">>,
+                case Distinct of
+                    [] ->
+                        <<" * ">>;
+                    _ ->
+                        string:join([[
+                            <<"distinct ( ">>,
+                            string:join(
+                                lists:map(
+                                    fun(X) ->
+                                        [empdb_convert:to_binary(X)]
+                                    end,
+                                    Distinct
+                                ),
+                                [<<",">>]
+                            ),
+                            <<")">>
+                        ], [Binary_select_fields]], [<<",">>])
+                end,
+                <<") ">>
             ], [
             ]),
 

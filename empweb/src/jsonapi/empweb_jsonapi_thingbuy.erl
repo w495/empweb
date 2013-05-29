@@ -240,6 +240,16 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = community_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = community_head,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
+            },
+            #norm_rule{
                 key         = price,
                 required    = false,
                 types       = empweb_norm:filter([nullable, float])
