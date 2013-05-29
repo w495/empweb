@@ -199,8 +199,7 @@ create(Params)->
                                 %% Назначена цена выкупа.
                                 %% Человек автоматически становится победителем.
                                 %%
-                                %% 1) Старому владельцу зачисляются деньги.
-                                %% 2) Меняется владельца страны.
+                                %% Старому владельцу зачисляются деньги.
                                 %%
                                 {ok, _} = empdb_dao_pay:create(Con, [
                                     {pers_id,           Roomlot_owner_id},
@@ -208,6 +207,9 @@ create(Params)->
                                     {isincome,          true},
                                     {price,             Price}
                                 ]),
+                                %%
+                                %% Меняется владельца страны.
+                                %%
                                 {ok, [{Roompl}]} =
                                     empdb_dao_room:update(Con, [
                                         {id,                Room_id},
@@ -222,13 +224,25 @@ create(Params)->
                                         {roombet_price,     null},
                                         {owner_id,          Roombet_owner_id}
                                     ]),
+                                %%
+                                %%  Меняется владельца страны.
+                                %%  Отбираем страну у старого владельца.
+                                %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
-                                    {id,        Roomlot_owner_id},
+                                    {id,            Roomlot_owner_id},
+                                    {own_room_id,   null},
+                                    {money,         {incr, Price}}
+                                ]),
+                                %%
+                                %%  Меняется владельца страны.
+                                %%  ОТдаем страну новому владельцу.
+                                %%
+                                {ok, _} = empdb_dao_pers:update(Con, [
+                                    {id,            Roombet_owner_id},
                                     {own_room_id,
                                         proplists:get_value(id, Roompl)},
                                     {citizen_room_id,
-                                        proplists:get_value(id, Roompl)},
-                                    {money,     {incr, Price}}
+                                        proplists:get_value(id, Roompl)}
                                 ]),
                                 %% Победителю шлем сообщение, что он победил
                                 {ok, _} = empdb_dao_event:create(Con, [
