@@ -1339,7 +1339,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                     [] ->
                         <<" * ">>;
                     _ ->
-                        string:join([[
+                        [
                             <<"distinct ( ">>,
                             string:join(
                                 lists:map(
@@ -1351,7 +1351,7 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                 [<<",">>]
                             ),
                             <<")">>
-                        ], [Binary_select_fields]], [<<",">>])
+                        ]
                 end,
                 <<") ">>
             ], [
