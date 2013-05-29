@@ -1379,8 +1379,8 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             Number + 1,
                                             [
                                                 {[
-                                                    {"#", Number + Offsetnum},
-                                                    {"@", Count}
+                                                    {'#', Number + Offsetnum},
+                                                    {'@', Count}
                                                     |lists:reverse(Itempl)
                                                 ]}
                                                 |Restlist
