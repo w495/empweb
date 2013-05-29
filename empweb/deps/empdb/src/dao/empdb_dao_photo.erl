@@ -182,7 +182,10 @@ get_top(Con, What) ->
             fileinfo.filetype_ext,
             {as, {fileinfo.path, path}},
             {as, {fileinfo.dir,  dir}}
-            | proplists:delete(path, Fields)
+            | proplists:delete(
+                path,
+                proplists:delete(id, ['distinct(doc.id)'|Fields])
+            )
         ]},
         {fileinfotype_alias, filesystem},
         {image_height, null},
