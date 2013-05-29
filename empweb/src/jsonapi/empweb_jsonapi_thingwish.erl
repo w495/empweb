@@ -168,6 +168,18 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = image_width,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
+            },
+            #norm_rule{
+                key         = image_height,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
             }
             |empweb_norm:norm('get')
         ]),
