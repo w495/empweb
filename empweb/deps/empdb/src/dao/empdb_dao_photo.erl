@@ -184,7 +184,7 @@ get_top(Con, What) ->
             {as, {fileinfo.dir,  dir}}
             | proplists:delete(
                 path,
-                proplists:delete(id, ['distinct(doc.id)'|Fields])
+                proplists:delete(id, ['distinct(doc.id) as id'|Fields])
             )
         ]},
         {fileinfotype_alias, filesystem},
