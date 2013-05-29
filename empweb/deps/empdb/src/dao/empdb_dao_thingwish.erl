@@ -93,7 +93,7 @@ get(Con, What) ->
             [] ->
                 lists:append([
                     empdb_dao_thing:table({fields, select}),
-                    empdb_dao_thingbuy:table({fields, select}),
+                    empdb_dao_thingwish:table({fields, select}),
                     [image_width, image_height, file_id, path]
                 ]);
             _ ->
@@ -105,7 +105,7 @@ get(Con, What) ->
 
 
     case empdb_dao:get([
-        {empdb_dao_thingbuy, thing_id},
+        {empdb_dao_thingwish, thing_id},
         {empdb_dao_thing, {id, file_id}},
         {empdb_dao_file, {left, id}},
         {empdb_dao_fileinfo, {left, file_id}}
@@ -161,7 +161,8 @@ get(Con, What) ->
             Error
     end.
 
-get___(Con, What) ->
+
+get__(Con, What) ->
     Truefields = proplists:get_value(fields,What,[]),
 
     Fields =
