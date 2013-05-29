@@ -228,6 +228,30 @@ create_check(
         ]
     );
 
+
+create_check(
+    Con,
+    {ok, [{Mbthingpl}]},
+    {ok, [{Mbbuyerpl}]},
+    {
+        {ok, [{Mbownerpl}]},
+        {ok, []}
+    },
+    Params
+)->
+    create_do_(
+        Con,
+        {ok, [{Mbthingpl}]},
+        {ok, [{Mbbuyerpl}]},
+        [
+            {owner_id, proplists:get_value(id,   Mbownerpl)}
+            |   proplists:delete(owner_id,
+                    proplists:delete(owner_nick, Params)
+                )
+        ]
+    );
+
+
 create_check(
     Con,
     {ok, [{Mbthingpl}]},
