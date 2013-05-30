@@ -640,7 +640,7 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport},
     %% We just want to skip so no need to stream data here.
     {ok, _Data} = Transport:recv(Socket, Length, 5000),
     {eof, Req#http_req{body_state=done}};
-multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
+multipart_data(Req, Length, {more, Parser})  ->
     io:format("~n~n 9 ~n~n"),
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
