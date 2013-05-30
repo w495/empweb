@@ -606,7 +606,7 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
     {Length, Req3} =
         case parse_header('Content-Length',Req2) of
             {undefined, Req2_} ->
-                {_, L, Req2__} = parse_header(<<"X-Content-Length">>,Req2_),
+                {undefined, L, Req2__} = parse_header(<<"X-Content-Length">>,Req2_),
                 {erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
             {Length_, Req2_}->
                 {Length_, Req2_}
@@ -631,16 +631,13 @@ multipart_data(Req, Length, {end_of_part, Cont}) ->
 multipart_data(Req, 0, eof) ->
     io:format("~n~n 7 ~n~n"),
     {eof, Req#http_req{body_state=done}};
-multipart_data(Req, _, eof) ->
-    io:format("~n~n 7.1 ~n~n"),
-    {eof, Req#http_req{body_state=done}};
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         Length, eof) ->
     io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
     {ok, _Data} = Transport:recv(Socket, Length, 5000),
     {eof, Req#http_req{body_state=done}};
-multipart_data(Req, Length, {more, Parser})  ->
+multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
     io:format("~n~n 9 ~n~n"),
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
