@@ -603,8 +603,13 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
     {{<<"multipart">>, _SubType, Params}, Req2} =
         parse_header('Content-Type', Req),
     {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
-    {Length, Req3} = parse_header('Content-Length', Req2),
-
+    {Length, Req3} =
+        case parse_header('Content-Length',Req2) of
+            {undefined, Req2_} ->
+                parse_header(<<"X-Content-Length">>,Req2_);
+            {Length_, Req2_}->
+                {Length_, Req2_}
+        end,
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)});
 multipart_data(Req=#http_req{body_state={multipart, Length, Cont}}) ->
     io:format("~n~n 2 ~n~n"),
@@ -639,7 +644,6 @@ multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
         {ok, Data, Req2} ->
             io:format("~n~n 9.1 ~n~n"),
             io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
-            %io:format("~n~n 9.1  Data = ~p ~n~n", [Data]),
             io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
 
             multipart_data(Req2, Length - byte_size(Data), Parser(Data))
