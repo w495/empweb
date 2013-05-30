@@ -606,7 +606,7 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
     {Length, Req3} =
         case parse_header('Content-Length',Req2) of
             {undefined, Req2_} ->
-                {L, Req2__} = parse_header(<<"X-Content-Length">>,Req2_),
+                {_, L, Req2__} = parse_header(<<"X-Content-Length">>,Req2_),
                 {erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
             {Length_, Req2_}->
                 {Length_, Req2_}
