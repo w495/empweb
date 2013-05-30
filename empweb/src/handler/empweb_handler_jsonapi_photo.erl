@@ -16,7 +16,7 @@
 
 
 %%
-%% Трансформация для получения имени функции. 
+%% Трансформация для получения имени функции.
 %%
 -include_lib("evman/include/evman_transform.hrl").
 
@@ -86,7 +86,8 @@ terminate(_Req, _State) ->
 
 handle_post(Req, State) ->
     case catch empweb_http:multipart_data(Req) of
-        {'EXIT', _} ->
+        {'EXIT', Reason} ->
+            io:format("~n~n~n Reason = ~p ~n~n~n", [Reason]),
             {empweb_jsonapi:not_extended(no_files), Req};
         {Pbody, Req1} ->
             handle_body(Req1, Pbody, State)
