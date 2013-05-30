@@ -631,6 +631,9 @@ multipart_data(Req, Length, {end_of_part, Cont}) ->
 multipart_data(Req, 0, eof) ->
     io:format("~n~n 7 ~n~n"),
     {eof, Req#http_req{body_state=done}};
+multipart_data(Req, 0, _) ->
+    io:format("~n~n 7.1 ~n~n"),
+    {eof, Req#http_req{body_state=done}};
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         Length, eof) ->
     io:format("~n~n 8 ~n~n"),
