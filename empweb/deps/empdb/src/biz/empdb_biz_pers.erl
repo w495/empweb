@@ -1710,7 +1710,7 @@ get_lavishget_opt(Params1, Options)->
                                     ],
                                 case proplists:get_value(id, Fuserpl) of
                                     Pers_id ->
-                                        {[{[{sum, Sum}|Fuserpl]}|Res2], Num2 + 1};
+                                        {[{[{sum, Sum}|Fuserpl]}|Res2], Num2 - 1};
                                     _ ->
                                         {Res2, Num2}
                                 end
@@ -1726,7 +1726,7 @@ get_lavishget_opt(Params1, Options)->
                         Foldr2num
                     }
                 end,
-                {[], 1},
+                {[], Lavishgetlistcount},
                 Flavishgetlist
             ),
 
