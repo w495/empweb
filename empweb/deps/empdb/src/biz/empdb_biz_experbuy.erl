@@ -63,14 +63,14 @@ create(Params)->
                         proplists:get_value(
                             owner_id,
                             Params,
-                            proplists:get_value(buyer_id,   Params)
+                            proplists:get_value(owner_id,   Params)
                         )
                     },
                     {nick,
                         proplists:get_value(
                             owner_nick,
                             Params,
-                            proplists:get_value(buyer_nick, Params)
+                            proplists:get_value(owner_nick, Params)
                         )
                     }
                 ]},
