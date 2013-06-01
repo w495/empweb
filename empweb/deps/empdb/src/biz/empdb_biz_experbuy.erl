@@ -145,7 +145,7 @@ create(Params)->
                                             false ->
                                                 decr
                                         end,
-                                        Exper
+                                        erlang:abs(Exper)
                                     }
                                 },
                                 {fields, [
