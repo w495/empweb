@@ -1686,32 +1686,47 @@ get_lavishget_opt(Params1, Options)->
         Flavishgetlist = Lavishgetlist,
             %lists:sublist(Lavishgetlist, erlang:length(Userpls)),
 
-        Userpls_ =
+        {Userpls_, _}=
             lists:foldr(
-                fun({Flavishgetpl}, Res1) ->
+                fun({Flavishgetpl}, {Res1, Num1}) ->
                     Pers_id =
                         proplists:get_value(pers_id, Flavishgetpl),
                     Sum =
                         proplists:get_value(sum, Flavishgetpl),
-                    lists:append([
+                    {Foldr2, Foldr2num} =
                         lists:foldr(
-                            fun({Fuserpl_}, Res2)->
+                            fun({Fuserpl_}, {Res2, Num2})->
                                 Fuserpl =
-                                    [{'@', Lavishgetlistcount}|proplists:delete('@', Fuserpl_)],
+                                    [
+                                        {'@', Lavishgetlistcount},
+                                        {'#', Num2}
+                                        |proplists:delete(
+                                            '@',
+                                            proplists:delete(
+                                                '#',
+                                                Fuserpl_
+                                            )
+                                        )
+                                    ],
                                 case proplists:get_value(id, Fuserpl) of
                                     Pers_id ->
-                                        [{[{sum, Sum}|Fuserpl]}|Res2];
+                                        {[{[{sum, Sum}|Fuserpl]}|Res2], Num2 + 1};
                                     _ ->
-                                        Res2
+                                        {Res2, Num2}
                                 end
                             end,
-                            [],
+                            {[], Num1},
                             Fuserpls
                         ),
-                        Res1
-                    ])
+                    {
+                        lists:append([
+                            Foldr2,
+                            Res1
+                        ]),
+                        Foldr2num
+                    }
                 end,
-                [],
+                {[], 1},
                 Flavishgetlist
             ),
 
