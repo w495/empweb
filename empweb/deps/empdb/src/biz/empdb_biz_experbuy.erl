@@ -137,7 +137,17 @@ create(Params)->
                         {ok, [{Newownerpl}]} =
                             empdb_dao_pers:update(Con,[
                                 {id,    proplists:get_value(id,   Mbownerpl)},
-                                {exper, {incr, Exper}},
+                                {exper,
+                                    {
+                                        case Exper > 0 of
+                                            true ->
+                                                incr;
+                                            false ->
+                                                decr
+                                        end,
+                                        Exper
+                                    }
+                                },
                                 {fields, [
                                     exper,
                                     experlack,
