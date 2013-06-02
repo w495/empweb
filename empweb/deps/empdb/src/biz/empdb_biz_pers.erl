@@ -1686,7 +1686,16 @@ get_lavishget_opt(Params1, Options)->
         Flavishgetlist = Lavishgetlist,
             %lists:sublist(Lavishgetlist, erlang:length(Userpls)),
 
-        Lavishgetlistcountcur = proplists:get_value(limit, Params, Lavishgetlistcount),
+        Limit = proplists:get_value(limit, Params),
+        Offset = proplists:get_value(offset, Params, 0),
+
+        Lavishgetlistcountcur =
+            case Limit of
+                undefined ->
+                    Lavishgetlistcount;
+                _ ->
+                    Limit + Offset
+            end,
 
         {Userpls_, _}=
             lists:foldr(
