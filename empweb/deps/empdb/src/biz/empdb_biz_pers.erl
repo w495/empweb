@@ -1686,6 +1686,8 @@ get_lavishget_opt(Params1, Options)->
         Flavishgetlist = Lavishgetlist,
             %lists:sublist(Lavishgetlist, erlang:length(Userpls)),
 
+        Lavishgetlistcountcur = proplists:get_value(limit, Params, Lavishgetlistcount),
+
         {Userpls_, _}=
             lists:foldr(
                 fun({Flavishgetpl}, {Res1, Num1}) ->
@@ -1726,7 +1728,7 @@ get_lavishget_opt(Params1, Options)->
                         Foldr2num
                     }
                 end,
-                {[], Lavishgetlistcount},
+                {[], Lavishgetlistcountcur},
                 Flavishgetlist
             ),
 
