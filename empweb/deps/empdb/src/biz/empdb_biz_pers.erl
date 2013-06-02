@@ -1694,7 +1694,7 @@ get_lavishget_opt(Params1, Options)->
                 undefined ->
                     Lavishgetlistcount;
                 _ ->
-                    Limit + Offset + 1
+                    Limit + Offset
             end,
 
         {Userpls_, _}=
