@@ -95,22 +95,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = alias,
                 required    = false,
-                types       = [string]
+                types       = empweb_norm:filter([string])
             },
             #norm_rule{
                 key         = parent_id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = file_id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             }
             |empweb_norm:norm('get')
         ]),
