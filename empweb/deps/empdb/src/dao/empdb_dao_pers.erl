@@ -331,12 +331,20 @@ get_lavishget(Con, What)->
                 Con,
                 [
                     Expression
-                    |   case proplists:get_value(limit, What) of
-                            undefined ->
-                                [];
-                            Limit ->
-                                [<<"limit ">>, empdb_convert:to_binary(Limit)]
-                        end
+                    |   lists:append([
+                            case proplists:get_value(limit, What) of
+                                undefined ->
+                                    [];
+                                Limit ->
+                                    [<<" limit ">>, empdb_convert:to_binary(Limit)]
+                            end,
+                            case proplists:get_value(offset, What) of
+                                undefined ->
+                                    [];
+                                Offset ->
+                                    [<<" offset ">>, empdb_convert:to_binary(Offset)]
+                            end
+                        ])
                 ],
                 What
             )
