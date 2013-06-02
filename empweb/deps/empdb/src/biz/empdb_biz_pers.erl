@@ -1677,7 +1677,9 @@ get_lavishget_opt(Params1, Options)->
                 [
                     {id, {in, Lavishgetidlist}},
                     {isdeleted, false}
-                    |get_tfparams(Con, Params)
+                    |get_tfparams(Con,
+                        proplists:delete(limit, proplists:delete(offset, Params))
+                    )
                 ]
             ),
 
