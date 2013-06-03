@@ -25,7 +25,9 @@
     create/1,
     delete/1,
     get/1,
-    get/2
+    get/2,
+    count/1,
+    scroll/1
 ]).
 
 
@@ -51,3 +53,9 @@ get(Params)->
 
 get(Params, Fields)->
     empdb_biz_thing:get(Params, Fields).
+
+count(Params)->
+    empdb_biz_thing:count(Params).
+
+scroll(Params)->
+    empdb_biz_thing:scroll(Params).

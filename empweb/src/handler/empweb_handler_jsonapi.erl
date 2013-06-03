@@ -211,6 +211,12 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+            <<"scroll_thing">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thing,
+                    action          =   scroll
+                };
             <<"get_thing">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thing,

@@ -53,6 +53,19 @@ get(Params)->
         empdb_dao_thing:get(Con, [{isdeleted, false}|Params])
     end).
 
+
+count(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_thing:count(Con, [{isdeleted, false}|Params])
+    end).
+
+
+count(Params)->
+    empdb_dao:with_connection(fun(Con)->
+        empdb_dao_thing:get(Con, [{isdeleted, false}|Params])
+    end).
+
+
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
         empdb_dao_thing:get(Con, [{isdeleted, false}|Params], Fileds)

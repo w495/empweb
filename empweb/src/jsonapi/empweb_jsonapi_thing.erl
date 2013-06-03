@@ -85,6 +85,69 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
+        action='count', params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = count thing">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = alias,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = rent,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = image_width,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
+            },
+            #norm_rule{
+                key         = image_height,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,empweb_jsonapi:resp(empweb_biz_thing:count(Data#norm.return)),Hap}
+        end
+    );
+
+handle(_req, #empweb_hap{
         action='get', params=Params, pers_id=Owner_id
     } = Hap) ->
     ?evman_args([Hap], <<" = get thing">>),
@@ -144,6 +207,71 @@ handle(_req, #empweb_hap{
         fun(Data)->
             ?evman_debug(Data, <<" = Data">>),
             {ok,empweb_jsonapi:resp(empweb_biz_thing:get(Data#norm.return)),Hap}
+        end
+    );
+
+
+
+handle(_req, #empweb_hap{
+        action='scroll', params=Params, pers_id=Owner_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = scroll thing">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = alias,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = price,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = rent,
+                required    = false,
+                types       = empweb_norm:filter([nullable, float])
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = file_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = image_width,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
+            },
+            #norm_rule{
+                key         = image_height,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+                %default     = null
+            }
+            |empweb_norm:norm('get')
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,empweb_jsonapi:resp(empweb_biz_thing:scroll(Data#norm.return)),Hap}
         end
     );
 
