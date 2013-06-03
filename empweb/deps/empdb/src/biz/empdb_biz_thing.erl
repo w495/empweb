@@ -42,7 +42,21 @@
 
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_thing:create(Con, Params)
+        case empdb_dao_thingtype:get(Con, [
+            {'or', [
+                {id, proplists:get_value(thingtype_id, Params, null)},
+                {alias, proplists:get_value(thingtype_alias, Params, null)}
+            ]},
+            {limit, 1}
+        ]) of
+            {ok, [{Ok}]} ->
+                empdb_dao_thing:create(Con, [
+                    {thingtype_id, proplists:get_value(id, Ok, null)}
+                    |Params
+                ]);
+            Else ->
+                Else
+        end
     end).
 
 update(Params)->

@@ -205,7 +205,28 @@ get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, [{fields, Fields}|What]).
 
 create(Con, Proplist)->
-    empdb_dao:create(?MODULE, Con, Proplist).
+    {ok,[{[{nextval,Nextval}]}]} =
+        empdb_dao:eqret(Con,[
+            <<"(select nextval('seq_thing_aliasnum_at_thingtype_">>,
+            empdb_convert:to_binary(
+                proplists:get_value(thingtype_id, Proplist)
+            ),
+            <<"_'))">>
+        ]),
+
+    Alias =
+        case proplists:get_value(alias, Proplist) of
+            undefined ->
+                erlang:iolist_to_binary(io_lib:format("~4.36.0b", [Nextval]));
+            Alias_ ->
+                Alias_
+        end,
+
+    empdb_dao:create(?MODULE, Con, [
+        {aliasnum,  Nextval},
+        {alias,     Alias}
+        |Proplist
+    ]).
 
 update(Con, Proplist)->
     empdb_dao:update(?MODULE, Con, Proplist).

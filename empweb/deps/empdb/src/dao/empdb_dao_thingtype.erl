@@ -57,7 +57,7 @@ table({fields, insert})->
 table({fields, all})->
     [
         id,
-        alias, 
+        alias,
         name_ti,
         descr_ti,
         parent_id,
@@ -149,9 +149,27 @@ get(Con, What) ->
 get(Con, What, Fields)->
     empdb_dao:get(?MODULE, Con, [{fields, Fields}|What]).
 
-    
+
 create(Con, Proplist)->
-    empdb_dao:create(?MODULE, Con, Proplist).
+    case empdb_dao:create(?MODULE, Con, Proplist) of
+        {ok, Results} ->
+            lists:map(
+                fun({Result})->
+                    io:format("~n~n~n~n Result = ~p ~n~n~n~n", [Result]),
+                    empdb_dao:eqret(Con, [
+                        <<"create sequence seq_thing_aliasnum_at_thingtype_">>,
+                        empdb_convert:to_binary(
+                            proplists:get_value(id, Result)
+                        ),
+                        <<"_ ;">>
+                     ])
+                end,
+                Results
+            ),
+            {ok, Results};
+        Else ->
+            Else
+    end.
 
 update(Con, Proplist)->
     empdb_dao:update(?MODULE, Con, Proplist).
