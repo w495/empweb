@@ -59,6 +59,7 @@ table({fields, all})->
     [
         id,
         alias,
+        aliasnum,
         name_ti,
         descr_ti,
         thingtype_id,

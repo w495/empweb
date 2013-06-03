@@ -1412,3 +1412,12 @@
     alter TABLE thingbuy alter column thing_id  drop not null;
     alter TABLE thingbuy alter column thing_alias  drop not null;
 
+
+    alter TABLE thingbuy alter column thing_alias  drop not null;
+
+
+
+    alter table thing add column aliasnum numeric default null;
+
+
+

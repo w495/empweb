@@ -43,6 +43,9 @@ init(_, Req, _Opts) ->
     Pid             =   empweb_biz_pers:get_pers_id(Auth),
     Pnick           =   empweb_biz_pers:get_pers_nick(Auth),
     Pperm_names     =   empweb_biz_pers:get_perm_names(Auth),
+
+    spawn_link(empweb_biz_pers, make_online, [[{id, Pid}]]),
+
     {ok, Req1, #state{
         empweb_hap  =
             #empweb_hap {

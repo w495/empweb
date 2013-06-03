@@ -60,6 +60,7 @@
     get_pers_nick/1,
     get/1,
     get_lavishget/1,
+    make_online/1,
     count/1,
     pass/1
 ]).
@@ -266,6 +267,10 @@ update(Params)->
             Else
     end.
     % empdb_biz_pers:update(Params).
+
+make_online(Params) ->
+    empdb_biz_pers:make_online(Params).
+
 
 get(Params) ->
     ?evman_args(Params, <<"get pers">>),

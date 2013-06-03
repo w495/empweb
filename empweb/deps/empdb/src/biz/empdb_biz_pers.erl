@@ -34,6 +34,7 @@
     wfoe/2,
     whose_birthday/0,
     make_offline/0,
+    make_online/1,
     timeout/0
 ]).
 
@@ -123,17 +124,34 @@ start(_)->
     ),
 
     timer:apply_interval(
-        120000,
+        240000,
         ?MODULE,
         make_offline,
         []
     ),
     ok.
 
-make_offline()->
+make_online(Params)->
     empdb_dao:with_transaction(emp, fun(Conupdate) ->
         %%
         %% Ставим пользователю статус online
+        %%
+        {ok, _} =
+            empdb_dao_pers:update(Conupdate, [
+                {filter, [
+                    {pstatus_alias, offline},
+                    {id,            proplists:get_value(id, Params)}
+                ]},
+                {values, [
+                    {pstatus_alias, online}
+                ]}
+            ])
+    end).
+
+make_offline()->
+    empdb_dao:with_transaction(emp, fun(Conupdate) ->
+        %%
+        %% Ставим пользователю статус offline
         %%
         {ok, _} =
             empdb_dao_pers:update(Conupdate, [

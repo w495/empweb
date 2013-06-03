@@ -103,6 +103,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([string])
             },
             #norm_rule{
+                key         = aliasnum,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
                 key         = price,
                 required    = false,
                 types       = empweb_norm:filter([nullable, float])
@@ -164,6 +169,11 @@ handle(_req, #empweb_hap{
                 key         = alias,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = aliasnum,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = price,
@@ -229,6 +239,11 @@ handle(_req, #empweb_hap{
                 key         = alias,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = aliasnum,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = price,
