@@ -21,6 +21,8 @@
 %% Блоги
 %%
 -export([
+    count/1,
+    scroll/1,
     get/1,
     get/2,
     create/1,
@@ -60,9 +62,9 @@ count(Params)->
     end).
 
 
-count(Params)->
+scroll(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_thing:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_thing:scroll(Con, [{isdeleted, false}|Params])
     end).
 
 
