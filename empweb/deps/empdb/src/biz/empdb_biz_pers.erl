@@ -138,7 +138,7 @@ make_online(Params)->
         %%
         case proplists:get_value(id, Params) of
             undefined ->
-                ok;
+                {ok, []};
             Id ->
                 {ok, _} =
                     empdb_dao_pers:update(Conupdate, [
