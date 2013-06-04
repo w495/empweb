@@ -94,10 +94,18 @@ get_pers_attr(Con, Events) ->
                                 own_room_id,
                                 citizen_room_head,
                                 live_room_head,
-                                own_room_head
+                                own_room_head,
+                                pstatus_alias,
+                                pstatus_id
                             ]}
                         ]),
                     {[
+                        {pers_pstatus_id,
+                            proplists:get_value(pstatus_id,    Perspl)
+                        },
+                        {pers_pstatus_alias,
+                            proplists:get_value(pstatus_alias,    Perspl)
+                        },
                         {pers_citizen_room_id,
                             proplists:get_value(citizen_room_id,    Perspl)
                         },
