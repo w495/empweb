@@ -1261,6 +1261,7 @@
         thingtype_alias    varchar(1024)                    default null;
     alter table thingbuy add column
         thingtype_alias    varchar(1024)                    default null;
+
     alter table claim add column
         room_id decimal references doc(id) default null;
     alter table claim add column
@@ -1418,6 +1419,12 @@
 
 
 
+    alter table doc add column  lang_id  decimal references chatlang(id)     default null;
+    alter table doc add column  lang_alias      varchar(1024)   references chatlang(alias)  default null;
 
-    alter table doc add column lang_id
-        decimal references doc(id) default null;
+
+
+alter table thingwish add column
+    thingtype_id       decimal references thingtype(id) default null;
+alter table thingwish add column
+    thingtype_alias    varchar(1024)                    default null;
