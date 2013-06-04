@@ -32,6 +32,16 @@ norm('get') ->
             types = empweb_norm:filter([integer])
         },
         #norm_rule{
+            key         = lang_id,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+        },
+        #norm_rule{
+            key         = lang_alias,
+            required    = false,
+            types       = empweb_norm:filter([nullable, atom])
+        },
+        #norm_rule{
             key         = owner_id,
             required    = false,
             types       = empweb_norm:filter([nullable, allable, integer])
@@ -186,6 +196,16 @@ norm('create') ->
 %             default     = null
 %         },
         #norm_rule{
+            key         = lang_id,
+            required    = false,
+            types       = [nullable, integer]
+        },
+        #norm_rule{
+            key         = lang_alias,
+            required    = false,
+            types       = [nullable, atom]
+        },
+        #norm_rule{
             key         = orig_id,
             required    = false,
             types       = [nullable, integer],
@@ -330,6 +350,16 @@ norm('update') ->
             key         = values,
             required    = false,
             types       = any
+        },
+        #norm_rule{
+            key         = lang_id,
+            required    = false,
+            types       = [nullable, integer]
+        },
+        #norm_rule{
+            key         = lang_alias,
+            required    = false,
+            types       = [nullable, atom]
         },
         #norm_rule{
             key         = fields,
@@ -618,8 +648,8 @@ norm([])->
             types       = empweb_norm:filter([nullable, boolean]),
             default     = true
         }
-        
-        
+
+
         %%
         %% | empweb_norm:norm([])
         %%

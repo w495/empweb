@@ -61,7 +61,7 @@ begin
                     authority.alias = new.cands_gte_authority_alias);
     end if;
 
-    
+
     if new.read_gte_authority_id is distinct from  old.read_gte_authority_id then
         new.read_gte_authority_alias =
             (select authority.alias
@@ -90,7 +90,7 @@ begin
                 where
                     authority.alias = new.read_gte_authority_alias);
     end if;
-    
+
     return new;
 end;
 $$ language plpgsql;
@@ -130,7 +130,7 @@ begin
     if (new.cands_gte_authority_id is not  null) and (new.cands_gte_authority_alias is not  null) then
         new.read_gte_authority_alias = 'noob';
     end if;
-    
+
     if (not (new.cands_gte_authority_id is null))
         and (new.cands_gte_authority_alias is null) then
         new.cands_gte_authority_alias =
@@ -167,7 +167,7 @@ begin
     if (new.read_gte_authority_id is not  null) and (new.read_gte_authority_alias is not  null) then
         new.read_gte_authority_alias = 'noob';
     end if;
-    
+
     if (not (new.read_gte_authority_id is null))
         and (new.read_gte_authority_alias is null) then
         new.read_gte_authority_alias =
@@ -198,7 +198,7 @@ begin
                 where
                     authority.alias = new.read_gte_authority_alias);
     end if;
-    
+
     return new;
 end;
 $$ language plpgsql;

@@ -96,6 +96,9 @@ table({fields, all})->
         contype_id,
         contype_alias,
 
+        lang_id,
+        lang_alias,
+
         owner_id,
         owner_nick,
 
@@ -111,7 +114,6 @@ table({fields, all})->
 
         nviews,
         nvotes,
-
         created,
         nchildren,  %% количество детей
         nnodes,     %% количество потомков

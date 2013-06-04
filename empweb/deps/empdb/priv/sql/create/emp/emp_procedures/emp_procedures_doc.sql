@@ -115,6 +115,25 @@ on doc for each row execute procedure doc_util_fields_on_insert();
 create or replace function doc_util_fields_on_update() returns "trigger" as $$
 begin
     /**
+        Язык документа
+    **/
+    if new.lang_id != old.lang_id then
+        new.lang_alias =
+            (select lang.alias
+                from
+                    lang
+                where
+                    lang.id = new.lang_id);
+    end if;
+    if new.lang_alias != old.lang_alias then
+        new.lang_id =
+            (select lang.id
+                from
+                    lang
+                where
+                    lang.alias = new.lang_alias);
+    end if;
+    /**
         Владелец документа
     **/
     if new.owner_id != old.owner_id then
@@ -138,7 +157,7 @@ begin
             (select pers.id from pers where pers.nick = new.orig_owner_nick);
     end if;
 
-    
+
     if new.head != old.head then
         if new.doctype_alias = 'room' then
             update pers set live_room_head = new.head

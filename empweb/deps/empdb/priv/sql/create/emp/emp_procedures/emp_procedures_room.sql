@@ -73,8 +73,8 @@ begin
                 where
                     authority.alias = new.authority_alias);
     end if;
-    
-    
+
+
     /**
     *  Типы чат-комнат. (страна, тюрьма, ад, рай)
     **/
@@ -95,7 +95,7 @@ begin
                     roomtype.alias = new.roomtype_alias);
     end if;
     /**
-        Язык комнаты
+        Язык чата комнаты
     **/
     if new.chatlang_id != old.chatlang_id then
         new.chatlang_alias =
@@ -222,7 +222,7 @@ begin
     else
         new.experlackprice  = null;
     end if;
-    
+
     /**
     *  Типы чат-комнат. (страна, тюрьма, ад, рай)
     **/
