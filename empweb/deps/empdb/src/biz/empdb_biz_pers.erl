@@ -136,16 +136,21 @@ make_online(Params)->
         %%
         %% Ставим пользователю статус online
         %%
-        {ok, _} =
-            empdb_dao_pers:update(Conupdate, [
-                {filter, [
-                    {pstatus_alias, offline},
-                    {id,            proplists:get_value(id, Params)}
-                ]},
-                {values, [
-                    {pstatus_alias, online}
-                ]}
-            ])
+        case proplists:get_value(id, Params) of
+            undefined ->
+                ok;
+            Id ->
+                {ok, _} =
+                    empdb_dao_pers:update(Conupdate, [
+                        {filter, [
+                            {pstatus_alias, offline},
+                            {id,            Id}
+                        ]},
+                        {values, [
+                            {pstatus_alias, online}
+                        ]}
+                    ])
+        end
     end).
 
 make_offline()->
