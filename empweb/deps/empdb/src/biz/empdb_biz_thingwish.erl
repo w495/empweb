@@ -92,16 +92,14 @@ count_by_thingtype(Params)->
                     lists:map(
                         fun({Result1})->
                             Count1 = proplists:get_value(count, Result1),
-                            %Thingtype_alias = proplists:get_value(thingtype_alias, Result),
+                            Thingtype_alias1 = proplists:get_value(thingtype_alias, Result),
                             Thingtype_parent_alias1 = proplists:get_value(thingtype_parent_alias, Result1),
-
-                            %Thingtype_id = proplists:get_value(thingtype_id, Result),
+                            Thingtype_id1 = proplists:get_value(thingtype_id, Result),
                             Thingtype_parent_id1 = proplists:get_value(thingtype_parent_id, Result1),
-
                             All =
                                 lists:foldl(
                                     fun({Result2}, Acc)->
-                                        case Thingtype_parent_id1 == proplists:get_value(thingtype_id, Result2) of
+                                        case Thingtype_id1 == proplists:get_value(thingtype_parent_id, Result2) of
                                             true ->
                                                 proplists:get_value(count, Result2) + Acc;
                                             false ->
