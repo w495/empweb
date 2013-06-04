@@ -86,7 +86,39 @@ delete(Params)->
 
 count_by_thingtype(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params])
+        case empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params]) of
+            {ok, Results} ->
+                Nresults =
+                    lists:map(
+                        fun({Result1})->
+                            Count1 = proplists:get_value(count, Result1),
+                            %Thingtype_alias = proplists:get_value(thingtype_alias, Result),
+                            Thingtype_parent_alias1 = proplists:get_value(thingtype_parent_alias, Result1),
+
+                            %Thingtype_id = proplists:get_value(thingtype_id, Result),
+                            Thingtype_parent_id1 = proplists:get_value(thingtype_parent_id, Result1),
+
+                            All =
+                                lists:foldl(
+                                    fun({Result2}, Acc)->
+                                        case Thingtype_parent_id1 == proplists:get_value(thingtype_alias, Result2) of
+                                            true ->
+                                                proplists:get_value(count, Result2) + Acc;
+                                            false ->
+                                                Acc
+                                        end
+                                    end,
+                                    Count1,
+                                    Results
+                                ),
+                            {[{all, All}|Result1]}
+                        end,
+                        Results
+                    ),
+                {ok, Nresults};
+            Else ->
+                Else
+        end
     end).
 
 count(Params)->
