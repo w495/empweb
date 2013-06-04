@@ -19,6 +19,7 @@
     create/2,
     update/2,
     count/2,
+    count_by_thingtype/2,
     get/2,
     get/3,
     is_owner/3
@@ -62,8 +63,8 @@ table({fields, all})->
         owner_nick,
         thing_id,
         thing_alias,
-        %thingtype_id,
-        %thingtype_alias,
+        thingtype_id,
+        thingtype_alias,
         created,
         isdeleted
     ];
@@ -85,6 +86,42 @@ table()->
 
 count(Con, What) ->
     empdb_dao:count(?MODULE, Con, What).
+
+
+count_by_thingtype(Con, What) ->
+    Expression = [
+        <<"select ">>,
+            <<"count(thingwish.id), ">>,
+            <<"thingwish.thingtype_id, ">>,
+            <<"thingwish.thingtype_alias, ">>,
+            <<"parentthingtype.alias as thingtype_parent_alias, ">>,
+            <<"childthingtype.parent_id as thingtype_parent_id ">>,
+        <<"from thingwish ">>,
+            <<"left join thingtype as childthingtype on ">>,
+                <<"thingwish.thingtype_id = childthingtype.id">>,
+            <<" left join thingtype as parentthingtype on ">>,
+                <<"parentthingtype.id = childthingtype.parent_id ">>,
+            <<"where ">>,
+                <<"thingwish.isdeleted = $isdeleted and ">>,
+                <<"( ">>,
+                    <<"thingwish.owner_id     =   $owner_id   or  ">>,
+                    <<"thingwish.owner_nick   =   $owner_nick      ">>,
+                <<") ">>,
+            <<"group by ">>,
+                <<"thingwish.thingtype_id, ">>,
+                <<"thingwish.thingtype_alias, ">>,
+                <<"thingtype_parent_id, ">>,
+                <<"thingtype_parent_alias;">>
+    ],
+    empdb_dao:eqret(
+        Con,
+        Expression,
+        [
+            {owner_id,      proplists:get_value(owner_id,   What, null)},
+            {owner_nick,    proplists:get_value(owner_nick, What, null)},
+            {isdeleted,     proplists:get_value(isdeleted,  What, null)}
+        ]
+    ).
 
 
 get(Con, What) ->

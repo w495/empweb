@@ -85,6 +85,39 @@ init(_, Req, #empweb_hap{
 
 
 handle(_req, #empweb_hap{
+        action  =   'count_by_thingtype',
+        params  =   Params,
+        pers_id =   Pers_id
+    } = Hap) ->
+    ?evman_args([Hap], <<" = count_by_thingtype">>),
+
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, [
+            #norm_rule{
+                key         = owner_id,
+                required    = false,
+                types       = [nullable, integer],
+                default     = Pers_id
+            },
+            #norm_rule{
+                key         = owner_nick,
+                required    = false,
+                types       = [nullable, string]
+            }
+        ]),
+        fun(Data)->
+            ?evman_debug(Data, <<" = Data">>),
+            {ok,
+                empweb_jsonapi:resp(
+                    empweb_biz_thingwish:count_by_thingtype(Data#norm.return)
+                ),
+                Hap
+            }
+        end
+    );
+
+handle(_req, #empweb_hap{
         action  =   'count',
         params  =   Params,
         pers_id =   Pers_id

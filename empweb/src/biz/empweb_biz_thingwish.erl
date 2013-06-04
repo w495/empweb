@@ -13,6 +13,7 @@
     update/1,
     create/1,
     count/1,
+    count_by_thingtype/1,
     get/1,
     get/2,
     delete/1
@@ -38,6 +39,9 @@ delete(Params)->
 
 count(Params)->
     empdb_biz_thingwish:count(Params).
+
+count_by_thingtype(Params) ->
+    empdb_biz_thingwish:count_by_thingtype(Params).
 
 get(Params)->
     empdb_biz_thingwish:get(Params).

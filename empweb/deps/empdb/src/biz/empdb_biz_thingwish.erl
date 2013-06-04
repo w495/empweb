@@ -22,6 +22,7 @@
 %%
 -export([
     count/1,
+    count_by_thingtype/1,
     get/1,
     get/2,
     create/1,
@@ -41,7 +42,7 @@
 
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        
+
         case empdb_dao_thingwish:get(Con, [
             {'and', [
                 {'or', [
@@ -83,10 +84,16 @@ delete(Params)->
     end).
 
 
+count_by_thingtype(Params)->
+    empdb_dao:with_transaction(fun(Con)->
+        empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params])
+    end).
+
 count(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_dao_thingwish:count(Con, [{isdeleted, false}|Params])
     end).
+
 
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->

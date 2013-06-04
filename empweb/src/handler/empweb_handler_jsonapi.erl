@@ -1509,6 +1509,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
             %% ==================================================
 
+            <<"count_thingwish_by_thingtype">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_thingwish,
+                    action          =   count_by_thingtype
+                };
             <<"count_thingwish">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_thingwish,
