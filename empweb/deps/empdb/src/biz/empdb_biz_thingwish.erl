@@ -89,28 +89,36 @@ count_by_thingtype(Params)->
         case empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params]) of
             {ok, Results} ->
                 Nresults =
-                    lists:map(
-                        fun({Result1})->
+                    lists:foldr(
+                        fun({Result1}, Acclist)->
                             Count1 = proplists:get_value(count, Result1),
-                            Thingtype_alias1 =          proplists:get_value(thingtype_alias,        Result1),
-                            Thingtype_parent_alias1 =   proplists:get_value(thingtype_parent_alias, Result1),
-                            Thingtype_id1 =             proplists:get_value(thingtype_id,           Result1),
-                            Thingtype_parent_id1 =      proplists:get_value(thingtype_parent_id,    Result1),
-                            All =
-                                lists:foldl(
-                                    fun({Result2}, Acc)->
-                                        case Thingtype_id1 == proplists:get_value(thingtype_parent_id, Result2) of
+                            Thingtype_id1 =             proplists:get_value(id,         Result1),
+                            PThingtype_id1 =             proplists:get_value(parent_id,  Result1),
+
+                            {Sum, List} =
+                                lists:foldr(
+                                    fun({Result2}, {Sum2, List2})->
+                                        case PThingtype_id1 == proplists:get_value(id, Result2) of
                                             true ->
-                                                proplists:get_value(count, Result2) + Acc;
+                                                Nsum =
+                                                    proplists:get_value(all, Result1, 0) +
+                                                    proplists:get_value(count, Result2) +
+                                                    Sum2,
+                                                io:format(" ~n~n~n Nsum = ~p  ~p ~n~n~n", [Nsum, proplists:get_value(id, Result2)]),
+                                                {   Nsum,
+                                                    [{[{all,Nsum}|proplists:delete(all, Result2)]}|List2]
+                                                };
                                             false ->
-                                                Acc
+                                                {Sum2, [{[{all,Sum2}|proplists:delete(all, Result2)]}|List2]}
                                         end
                                     end,
-                                    Count1,
-                                    Results
+                                    {Count1, []},
+                                    Acclist
                                 ),
-                            {[{all, All}|Result1]}
+                            io:format("List = ~p ", [List]),
+                            List
                         end,
+                        Results,
                         Results
                     ),
                 {ok, Nresults};
