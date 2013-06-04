@@ -119,6 +119,16 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             }
             |empweb_norm:norm('get')
         ]),
@@ -180,6 +190,16 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
                 %default     = null
+            },
+            #norm_rule{
+                key         = thingtype_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = thingtype_alias,
+                required    = false,
+                types       = empweb_norm:filter([nullable, string])
             }
             |empweb_norm:norm('get')
         ]),
