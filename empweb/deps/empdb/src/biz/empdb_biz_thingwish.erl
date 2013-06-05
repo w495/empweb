@@ -87,32 +87,42 @@ delete(Params)->
 count_by_thingtype(Params)->
     empdb_dao:with_transaction(fun(Con)->
         case empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params]) of
-            {ok, Results} ->
+            {ok, Results_} ->
+                %io:format("List = ~p ", [Results]),
+                Results =
+                    [
+                        {[{all,0},{alias,<<"all">>},{parent_id,null},{id,1},{count,0}]},
+                        {[{all,0},{alias,<<"counter">>},{parent_id,1},{id,2},{count,10}]},
+                        {[{all,0},{alias,<<"closes">>},{parent_id,1},{id,3},{count,20}]}
+                    ],
+
                 Nresults =
-                    lists:foldr(
+                    lists:foldl(
                         fun({Result1}, Acclist)->
                             Count1 = proplists:get_value(count, Result1),
                             Thingtype_id1 =             proplists:get_value(id,         Result1),
                             PThingtype_id1 =             proplists:get_value(parent_id,  Result1),
 
                             {Sum, List} =
-                                lists:foldr(
+                                lists:foldl(
                                     fun({Result2}, {Sum2, List2})->
                                         case PThingtype_id1 == proplists:get_value(id, Result2) of
                                             true ->
                                                 Nsum =
-                                                    proplists:get_value(all, Result1, 0) +
+                                                   % proplists:get_value(all, Result1, 0) +
                                                     proplists:get_value(count, Result2) +
                                                     Sum2,
-                                                io:format(" ~n~n~n Nsum = ~p  ~p ~n~n~n", [Nsum, proplists:get_value(id, Result2)]),
+                                                io:format(" ~n~n~n Nsum = ~p ~p ~p ~n~n~n", [Nsum, Thingtype_id1, proplists:get_value(parent_id, Result2)]),
                                                 {   Nsum,
                                                     [{[{all,Nsum}|proplists:delete(all, Result2)]}|List2]
                                                 };
                                             false ->
+                                            io:format(" ~n~n~n Nsum = x0 ~p ~p ~n~n~n", [Thingtype_id1, proplists:get_value(parent_id, Result2)]),
                                                 {Sum2, [{[{all,Sum2}|proplists:delete(all, Result2)]}|List2]}
                                         end
                                     end,
                                     {Count1, []},
+                                    %[{Result1}|Acclist]
                                     Acclist
                                 ),
                             io:format("List = ~p ", [List]),
