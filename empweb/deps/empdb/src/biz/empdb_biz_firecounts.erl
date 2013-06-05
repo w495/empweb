@@ -1,7 +1,7 @@
 %% @file    empdb_biz_event.erl
 %%          Описание бизнес логики работы с фотографиями.
 %%          Фотография это просто документ.
-%% 
+%%
 -module(empdb_biz_firecounts).
 
 %% ===========================================================================
@@ -54,8 +54,9 @@ get(Params)->
                 {ok, [{Exile}]}
             } ->
                 {ok, [{[
-                    {event_count,  proplists:get_value(count, Event, null)},
-                    {exile_count,  proplists:get_value(count, Exile, null)}
+                    {event_count,   proplists:get_value(count, Event, null)},
+                    {exile_count,   proplists:get_value(count, Exile, null)},
+                    {'now',         empdb_convert:datetime2int(erlang:universaltime())}
                 ]}]};
             {
                 Error,

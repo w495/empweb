@@ -136,7 +136,7 @@ fname(Res, Fname) ->
     Res#empweb_resp{body = {[{fname, Fname}|Rpl]}}.
 
 
-    
+
 bad_request()->
     bad_request(bad_request).
 
@@ -393,10 +393,21 @@ ok(Code, {ok, Body}) ->
         %status  = Code,
         status  = 200,
         format  = json,
-        body    = {[{'length', erlang:length(Body)}, {ok, Body}]}
+        body    =
+        {[
+            {'utc',     nowsec()},
+            {'length',  erlang:length(Body)},
+            {ok,        Body}
+        ]}
     };
 ok(Code, Body) ->
     ok(Code, {ok, Body}).
+
+nowsec() ->
+    {Mgs,Sec, _mis} = erlang:now(),
+    Now = Mgs * 1000000 + Sec,
+    Now.
+
 
 %%% -------------------------------------------------------------------------
 
@@ -428,18 +439,18 @@ format(Trem) ->
 
 format(Format, List) when erlang:is_list(List) ->
     erlang:list_to_binary(io_lib:format(Format,List));
-    
+
 format(Format, Trem) ->
     format(Format, [Trem]).
-    
+
 %%% -------------------------------------------------------------------------
-% 
+%
 % resp({error, {not_unique_nick, Object}}) ->
 %     gone({[{not_unique_nick, Object}]});
-%     
+%
 resp({error, {not_exists, Object}}) ->
     gone({[{not_exists, Object}]});
-    
+
 resp({error, {bad_session, Object}}) ->
     forbidden({[{bad_session, Object}]});
 
@@ -448,7 +459,7 @@ resp({error, {bad_user, Object}}) ->
 
 resp({error, {bad_password, Object}}) ->
     forbidden({[{bad_password, Object}]});
-    
+
 resp({error, {Reason, Object}}) ->
     not_extended({[{Reason, Object}]});
 resp({error, Error}) ->

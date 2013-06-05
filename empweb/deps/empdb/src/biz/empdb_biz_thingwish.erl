@@ -91,41 +91,66 @@ count_by_thingtype(Params)->
                 %io:format("List = ~p ", [Results]),
                 Results =
                     [
-                        {[{all,0},{alias,<<"all">>},{parent_id,null},{id,1},{count,0}]},
+                        {[{all,0},{alias,<<"all">>},{parent_id,null},{id,1},{count,5}]},
                         {[{all,0},{alias,<<"counter">>},{parent_id,1},{id,2},{count,10}]},
                         {[{all,0},{alias,<<"closes">>},{parent_id,1},{id,3},{count,20}]}
                     ],
 
                 Nresults =
-                    lists:foldl(
+                    lists:foldr(
                         fun({Result1}, Acclist)->
-                            Count1 = proplists:get_value(count, Result1),
-                            Thingtype_id1 =             proplists:get_value(id,         Result1),
-                            PThingtype_id1 =             proplists:get_value(parent_id,  Result1),
+                            Id1 =           proplists:get_value(id,         Result1),
+                            Parent_id1 =    proplists:get_value(parent_id,  Result1),
+                            Count1 =        proplists:get_value(count,  Result1),
+                            All1 =          proplists:get_value(all,  Result1),
 
                             {Sum, List} =
-                                lists:foldl(
+                                lists:foldr(
                                     fun({Result2}, {Sum2, List2})->
-                                        case PThingtype_id1 == proplists:get_value(id, Result2) of
-                                            true ->
-                                                Nsum =
-                                                   % proplists:get_value(all, Result1, 0) +
-                                                    proplists:get_value(count, Result2) +
-                                                    Sum2,
-                                                io:format(" ~n~n~n Nsum = ~p ~p ~p ~n~n~n", [Nsum, Thingtype_id1, proplists:get_value(parent_id, Result2)]),
-                                                {   Nsum,
-                                                    [{[{all,Nsum}|proplists:delete(all, Result2)]}|List2]
-                                                };
-                                            false ->
-                                            io:format(" ~n~n~n Nsum = x0 ~p ~p ~n~n~n", [Thingtype_id1, proplists:get_value(parent_id, Result2)]),
-                                                {Sum2, [{[{all,Sum2}|proplists:delete(all, Result2)]}|List2]}
+                                        Id2 =           proplists:get_value(id,         Result2),
+                                        Parent_id2 =    proplists:get_value(parent_id,  Result2),
+                                        Count2 =        proplists:get_value(count,      Result2),
+                                        All2 =          proplists:get_value(all,        Result2),
+
+                                        io:format("~n~n~n~n", []),
+                                        io:format("x Id1 =        ~p ~n", [Id1]),
+                                        io:format("x Parent_id1 = ~p ~n", [Parent_id1]),
+                                        io:format("x Count1 =     ~p ~n", [Count1]),
+                                        io:format("x Id2 =        ~p ~n", [Id2]),
+                                        io:format("x Parent_id2 = ~p ~n", [Parent_id2]),
+                                        io:format("x Count2 =     ~p ~n", [Count2]),
+                                        io:format("x Sum2 =       ~p ~n", [Sum2]),
+
+
+                                        io:format("x ~n~n~n~n", []),
+
+                                        case Parent_id1 of
+                                            Id2 ->
+                                                {Sum2 + Count2, List2};
+                                            _ ->
+                                                {Sum2, List2}
                                         end
                                     end,
-                                    {Count1, []},
+                                    %fun({Result2}, {Sum2, List2})->
+                                        %case PThingtype_id1 == proplists:get_value(id, Result2) of
+                                            %true ->
+                                                %Nsum =
+                                                   %% proplists:get_value(all, Result1, 0) +
+                                                    %proplists:get_value(count, Result2) +
+                                                    %Sum2,
+                                                %io:format(" ~n~n~n Nsum = ~p ~p ~p ~n~n~n", [Nsum, Thingtype_id1, proplists:get_value(parent_id, Result2)]),
+                                                %{   Nsum,
+                                                    %[{[{all,Nsum}|proplists:delete(all, Result2)]}|List2]
+                                                %};
+                                            %false ->
+                                            %io:format(" ~n~n~n Nsum = x0 ~p ~p ~n~n~n", [Thingtype_id1, proplists:get_value(parent_id, Result2)]),
+                                                %{Sum2, [{[{all,Sum2}|proplists:delete(all, Result2)]}|List2]}
+                                        %end
+                                    %end,
+                                    {Count1, Results},
                                     %[{Result1}|Acclist]
                                     Acclist
                                 ),
-                            io:format("List = ~p ", [List]),
                             List
                         end,
                         Results,
