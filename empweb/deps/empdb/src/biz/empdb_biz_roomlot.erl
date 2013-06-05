@@ -45,10 +45,10 @@ create(Params)->
         case empdb_dao_roomlot:get(Con,[
             {   filter,
                 [
-                    proplists:get_value(filter, Params, [
-                        {room_id, proplists:get_value(room_id, Params)}
-                    ]),
                     {isdeleted, true}
+                    |proplists:get_value(filter, Params, [
+                        {room_id, proplists:get_value(room_id, Params)}
+                    ])
                 ]
             }
         ]) of
