@@ -84,76 +84,55 @@ delete(Params)->
     end).
 
 
+wfoldr(F, Accu) ->
+    foldr(F, Accu, 1, Accu).
+foldr(F, Accu, _N, []) ->
+    Accu;
+foldr(F, Accu, N, [Hd|Tail]) ->
+    Accx = foldr(F, Accu, N + 1, Tail),
+    [HAccx|TAccx] = lists:reverse(Accx),
+    [HAccx|F(HAccx, lists:reverse(TAccx))].
+
 count_by_thingtype(Params)->
     empdb_dao:with_transaction(fun(Con)->
         case empdb_dao_thingwish:count_by_thingtype(Con, [{isdeleted, false}|Params]) of
-            {ok, Results_} ->
+            {ok, Results} ->
                 %io:format("List = ~p ", [Results]),
-                Results =
-                    [
-                        {[{all,0},{alias,<<"all">>},{parent_id,null},{id,1},{count,5}]},
-                        {[{all,0},{alias,<<"counter">>},{parent_id,1},{id,2},{count,10}]},
-                        {[{all,0},{alias,<<"closes">>},{parent_id,1},{id,3},{count,20}]}
-                    ],
-
+                %Results =
+                    %[
+                        %{[{alias,<<"all">>},{parent_id,null},{id,1},{count,0}]},
+                        %{[{alias,<<"counter">>},{parent_id,1},{id,2},{count,10}]},
+                        %{[{alias,<<"counterx">>},{parent_id,2},{id,3},{count,5}]},
+                        %{[{alias,<<"closes">>},{parent_id,1},{id,100},{count,20}]},
+                        %{[{alias,<<"counterx">>},{parent_id,2},{id,200},{count,5}]}
+                    %],
                 Nresults =
-                    lists:foldr(
+                    wfoldr(
                         fun({Result1}, Acclist)->
                             Id1 =           proplists:get_value(id,         Result1),
                             Parent_id1 =    proplists:get_value(parent_id,  Result1),
-                            Count1 =        proplists:get_value(count,  Result1),
-                            All1 =          proplists:get_value(all,  Result1),
+                            Count1 =        proplists:get_value(count,      Result1),
+                            All1 =          proplists:get_value(all,        Result1, Count1),
 
-                            {Sum, List} =
-                                lists:foldr(
-                                    fun({Result2}, {Sum2, List2})->
-                                        Id2 =           proplists:get_value(id,         Result2),
-                                        Parent_id2 =    proplists:get_value(parent_id,  Result2),
-                                        Count2 =        proplists:get_value(count,      Result2),
-                                        All2 =          proplists:get_value(all,        Result2),
-
-                                        io:format("~n~n~n~n", []),
-                                        io:format("x Id1 =        ~p ~n", [Id1]),
-                                        io:format("x Parent_id1 = ~p ~n", [Parent_id1]),
-                                        io:format("x Count1 =     ~p ~n", [Count1]),
-                                        io:format("x Id2 =        ~p ~n", [Id2]),
-                                        io:format("x Parent_id2 = ~p ~n", [Parent_id2]),
-                                        io:format("x Count2 =     ~p ~n", [Count2]),
-                                        io:format("x Sum2 =       ~p ~n", [Sum2]),
-
-
-                                        io:format("x ~n~n~n~n", []),
-
+                            lists:foldr(
+                                fun({Result2}, List2)->
+                                    Id2 =           proplists:get_value(id,         Result2),
+                                    Parent_id2 =    proplists:get_value(parent_id,  Result2),
+                                    Count2 =        proplists:get_value(count,      Result2),
+                                    All2 =          proplists:get_value(all,        Result2,  Count2),
+                                    Nall =
                                         case Parent_id1 of
                                             Id2 ->
-                                                {Sum2 + Count2, List2};
+                                                All1 + All2;
                                             _ ->
-                                                {Sum2, List2}
-                                        end
-                                    end,
-                                    %fun({Result2}, {Sum2, List2})->
-                                        %case PThingtype_id1 == proplists:get_value(id, Result2) of
-                                            %true ->
-                                                %Nsum =
-                                                   %% proplists:get_value(all, Result1, 0) +
-                                                    %proplists:get_value(count, Result2) +
-                                                    %Sum2,
-                                                %io:format(" ~n~n~n Nsum = ~p ~p ~p ~n~n~n", [Nsum, Thingtype_id1, proplists:get_value(parent_id, Result2)]),
-                                                %{   Nsum,
-                                                    %[{[{all,Nsum}|proplists:delete(all, Result2)]}|List2]
-                                                %};
-                                            %false ->
-                                            %io:format(" ~n~n~n Nsum = x0 ~p ~p ~n~n~n", [Thingtype_id1, proplists:get_value(parent_id, Result2)]),
-                                                %{Sum2, [{[{all,Sum2}|proplists:delete(all, Result2)]}|List2]}
-                                        %end
-                                    %end,
-                                    {Count1, Results},
-                                    %[{Result1}|Acclist]
-                                    Acclist
-                                ),
-                            List
+                                                All2
+                                        end,
+                                    [{[{all, Nall}|proplists:delete(all, Result2)]}|List2]
+                                end,
+                                [],
+                                Acclist
+                            )
                         end,
-                        Results,
                         Results
                     ),
                 {ok, Nresults};
