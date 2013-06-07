@@ -5,7 +5,6 @@
 -export([start/0, start/2, stop/1]).
 
 start() ->
-    application:start(psqlcp),
     application:start(empdb).
 
 start(_Type, _Args) ->

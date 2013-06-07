@@ -1475,10 +1475,9 @@ login({Uf, Uv}, Params) ->
                                         {empdb_dao_fileinfo, file_id}
                                     ],Con,[
                                         {fields, [
-                                            fileinfotype_alias,
-                                            fileinfo.filetype_ext,
-                                            {as, {fileinfo.path, path}},
-                                            {as, {fileinfo.dir,  dir}}
+                                            fileinfotype_alias,'fileinfo.filetype_ext',
+                                            {as, {'fileinfo.path', path}},
+                                            {as, {'fileinfo.dir',  dir}}
                                             | proplists:delete(path, Perspicphotofields)
                                         ]},
                                         {fileinfotype_alias,    filesystem},
@@ -2180,10 +2179,9 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     {empdb_dao_fileinfo, file_id}
                                 ],Con,[
                                     {fields, [
-                                        fileinfotype_alias,
-                                        fileinfo.filetype_ext,
-                                        {as, {fileinfo.path, path}},
-                                        {as, {fileinfo.dir,  dir}}
+                                        fileinfotype_alias,'fileinfo.filetype_ext',
+                                        {as, {'fileinfo.path', path}},
+                                        {as, {'fileinfo.dir',  dir}}
                                         | proplists:delete(path, Perspicphotofields)
                                     ]},
                                     {fileinfotype_alias,    filesystem},

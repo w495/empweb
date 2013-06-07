@@ -91,56 +91,56 @@ count(Con, What) ->
 count_by_thingtype(Con, What) ->
     %Expression = [
         %<<"select ">>,
-            %<<"count(thingwish.id), ">>,
-            %<<"thingwish.thingtype_id, ">>,
-            %<<"thingwish.thingtype_alias, ">>,
-            %<<"parentthingtype.alias as thingtype_parent_alias, ">>,
-            %<<"childthingtype.parent_id as thingtype_parent_id ">>,
+            %<<"count('thingwish.id'), ">>,
+            %<<"'thingwish.thingtype_id', ">>,
+            %<<"'thingwish.thingtype_alias', ">>,
+            %<<"'parentthingtype.alias'as thingtype_parent_alias, ">>,
+            %<<"'childthingtype.parent_id'as thingtype_parent_id ">>,
         %<<"from thingwish ">>,
             %<<"left join thingtype as childthingtype on ">>,
-                %<<"thingwish.thingtype_id = childthingtype.id and ">>,
-                %<<"childthingtype.isdeleted = false ">>,
+                %<<"'thingwish.thingtype_id'='childthingtype.id'and ">>,
+                %<<"'childthingtype.isdeleted'= false ">>,
             %<<"left join thingtype as parentthingtype on ">>,
-                %<<"parentthingtype.id = childthingtype.parent_id and ">>,
-                %<<"parentthingtype.isdeleted = false ">>,
+                %<<"'parentthingtype.id'='childthingtype.parent_id'and ">>,
+                %<<"'parentthingtype.isdeleted'= false ">>,
             %<<"where ">>,
                 %<<"thingtype_id is null or ">>,
                 %<<"( ">>,
-                    %<<"thingwish.isdeleted = $isdeleted and ">>,
+                    %<<"'thingwish.isdeleted'= $isdeleted and ">>,
                     %<<"( ">>,
-                        %<<"thingwish.owner_id     =   $owner_id   or  ">>,
-                        %<<"thingwish.owner_nick   =   $owner_nick      ">>,
+                        %<<"'thingwish.owner_id'=   $owner_id   or  ">>,
+                        %<<"'thingwish.owner_nick'=   $owner_nick      ">>,
                     %<<") ">>,
                 %<<") ">>,
             %<<"group by ">>,
-                %<<"thingwish.thingtype_id, ">>,
-                %<<"thingwish.thingtype_alias, ">>,
+                %<<"'thingwish.thingtype_id', ">>,
+                %<<"'thingwish.thingtype_alias', ">>,
                 %<<"thingtype_parent_id, ">>,
                 %<<"thingtype_parent_alias;">>
     %],
 
     Expression = [
         <<"select ">>,
-            <<"count(thingwish.id), ">>,
-            <<"thingtype.id, ">>,
+            <<"count('thingwish.id'), ">>,
+            <<"'thingtype.id', ">>,
             <<"parent_id, ">>,
             <<"alias ">>,
         <<"from thingtype ">>,
             <<"left join thingwish on ">>,
-                <<"thingwish.thingtype_id = thingtype.id and ">>,
+                <<"'thingwish.thingtype_id'='thingtype.id'and ">>,
                 <<"( ">>,
-                    <<"thingwish.isdeleted = $isdeleted and ">>,
+                    <<"'thingwish.isdeleted'= $isdeleted and ">>,
                     <<"( ">>,
-                        <<"thingwish.owner_id     =   $owner_id   or  ">>,
-                        <<"thingwish.owner_nick   =   $owner_nick      ">>,
+                        <<"'thingwish.owner_id'=   $owner_id   or  ">>,
+                        <<"'thingwish.owner_nick'=   $owner_nick      ">>,
                     <<") ">>,
                 <<") ">>,
         <<"group by ">>,
-            <<"thingtype.id, ">>,
+            <<"'thingtype.id', ">>,
             <<"parent_id, ">>,
             <<"alias ">>,
         <<"order by ">>,
-            <<"thingtype.id;">>
+            <<"'thingtype.id';">>
     ],
 
     empdb_dao:eqret(
@@ -179,15 +179,14 @@ get(Con, What) ->
         {empdb_dao_file, {left, id}},
         {empdb_dao_fileinfo, {left, file_id}}
     ],Con,[        {fields, [
-            fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            fileinfotype_alias,'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {thing.file_id, null}
+            {'thing.file_id', null}
         ]},
         {image_height, null},
         {image_width, null}
@@ -250,11 +249,11 @@ get__(Con, What) ->
     ],Con,[
         {'or', [
             {fileinfotype_alias, download},
-            {thing.file_id, null}
+            {'thing.file_id', null}
         ]},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(path, Fields)
         ]}
         |proplists:delete(fields, What)

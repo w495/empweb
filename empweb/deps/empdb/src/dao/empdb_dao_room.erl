@@ -251,9 +251,9 @@ get(Con, What, Fields)->
 %         " id, head "
 %     " from doc "
 %     " join pers on
-%         " pers.id = doc.owner_id "
+%         "'pers.id'='doc.owner_id'"
 %     " where "
-%         " doc.doctype_alias = 'blog' and doc.owner_id = "
+%         "'doc.doctype_alias'= 'blog' and'doc.owner_id'= "
 
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).

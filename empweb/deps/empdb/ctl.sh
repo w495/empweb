@@ -12,9 +12,15 @@
     IP=`ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1'  --max-count=1 | \
         cut -d: -f2 | awk '{print $1}'`
 
-    if [ "" = "$IP" ]; then
+    if [ x"" = x"${IP}" ]; then
+        IP=`ifconfig  | grep 'inet '| grep -v '127.0.0.1'  --max-count=1 |  \
+            cut -d\  -f10`
+    fi;
+
+    if [ x"" = "${IP}" ]; then
         IP="localhost"
-    fi
+    fi;
+
 
 
     MAIN_NODE="$NAME@$IP"

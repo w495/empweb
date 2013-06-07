@@ -76,12 +76,12 @@ table()->
     table(name).
 
 get(Con, What) ->
-    %     <<  "   select  fileinfo.path,fileinfo.dir from doc "
-    %         "   join arms on arms.doc_id = doc.id "
-    %         "   join file on file.id = arms.file_id "
-    %         "   join fileinfo on fileinfo.file_id = file.id "
-    %         "   where (fileinfo.fileinfotype_alias "
-    %         "       = $`fileinfo.fileinfotype_alias@filter`)"   >>
+    %     <<  "   select'fileinfo.path','fileinfo.dir'from doc "
+    %         "   join arms on'arms.doc_id'='doc.id'"
+    %         "   join file on'file.id'='arms.file_id'"
+    %         "   join fileinfo on'fileinfo.file_id'='file.id'"
+    %         "   where ('fileinfo.fileinfotype_alias'"
+    %         "       = $`'fileinfo.fileinfotype_alias'@filter`)"   >>
 
     Truefields = proplists:get_value(fields,What,[]),
 
@@ -106,8 +106,8 @@ get(Con, What) ->
         {image_width,  null},
         {image_height, null},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(path, Fields)
         ]}
         |proplists:delete(fields, What)
@@ -161,8 +161,8 @@ get(Con, What, Truefields)->
         {fileinfotype_alias, download}
         |What
     ], [
-        {as, {fileinfo.path, fileinfopath}},
-        {as, {fileinfo.dir,  fileinfodir}}
+        {as, {'fileinfo.path', fileinfopath}},
+        {as, {'fileinfo.dir',  fileinfodir}}
         | proplists:delete(path, Fields)
     ]) of
         {ok,Phobjs} ->
@@ -203,13 +203,13 @@ is_owner(Con, Owner_id, Obj_id) ->
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count(doc_comment.id) "
+            " count('doc_comment.id') "
         " from "
             " doc as doc_comment "
         " where "
-            "       doc_comment.doctype_alias  = 'comment' "
-            " and   doc_comment.isdeleted      = false "
-            " and   doc_comment.parent_id      = $id ",
+            "'doc_comment.doctype_alias'= 'comment' "
+            " and'doc_comment.isdeleted'= false "
+            " and'doc_comment.parent_id'= $id ",
         Params
     ).
 

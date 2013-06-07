@@ -510,11 +510,8 @@ get_blogs(Params) ->
                             end,
                             [
                                 case Isweek of
-                                    false  ->
-                                        doc.created;
-                                    true ->
-                                        doc.nvotes
-                                end
+                                    false  ->'doc.created';
+                                    true ->'doc.nvotes'end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -535,22 +532,22 @@ get_blogs(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fields, Fields},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc,'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc,'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -603,11 +600,8 @@ get_posts(Params) ->
                             end,
                             [
                                 case Isweek of
-                                    false  ->
-                                        doc.created;
-                                    true ->
-                                        doc.nvotes
-                                end
+                                    false  ->'doc.created';
+                                    true ->'doc.nvotes'end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -628,22 +622,22 @@ get_posts(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fields, Fields},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc,'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc,'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -696,11 +690,8 @@ get_photos(Params) ->
                             end,
                             [
                                 case Isweek of
-                                    false  ->
-                                        doc.created;
-                                    true ->
-                                        doc.nvotes
-                                end
+                                    false  ->'doc.created';
+                                    true ->'doc.nvotes'end
                             ],
                             empdb_dao_doc:table({fields, select})
                         )
@@ -723,27 +714,27 @@ get_photos(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fileinfotype_alias, download},
             {fields, [
-                {as, {fileinfo.path, fileinfopath}},
-                {as, {fileinfo.dir,  fileinfodir}}
+                {as, {'fileinfo.path', fileinfopath}},
+                {as, {'fileinfo.dir',  fileinfodir}}
                 | proplists:delete(path, Fields)
             ]},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc,'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc,'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -753,7 +744,7 @@ get_photos(Params) ->
             {ok,Phobjs} ->
                 {ok,
                     lists:map(fun({Phpl})->
-                        case (lists:member(photo.path, Fields) or (Fields =:= [])) of
+                        case (lists:member('photo.path', Fields) or (Fields =:= [])) of
                             true ->
                                 {[
                                     {path,
@@ -828,14 +819,14 @@ filepath(Con, Communitypl, Idfield) ->
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
-        {file.id,
+        {'file.id',
             proplists:get_value(Idfield, Communitypl)},
         {fileinfotype_alias,
             download},
         {limit, 1},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
         ]}
     ]) of
         {ok, []} ->

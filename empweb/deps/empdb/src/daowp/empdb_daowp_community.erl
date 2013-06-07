@@ -37,7 +37,7 @@ get(Con, Params, Fields)->
             {isdeleted, false}
             |Params
         ] ++ [
-            {order, {desc, doc.created}}
+            {order, {desc,'doc.created'}}
         ], Fields),
         [{fields, Fields}| Params]
     ).
@@ -164,8 +164,8 @@ filepath(Con, Roompl, Idfield, Alias) ->
         {image_height, null},
         {limit, 1},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}},
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}},
             file_id
         ]}
     ]) of

@@ -96,7 +96,7 @@ create(Params)->
                 {alias, Room_authority_alias},
                 {limit, 1}
             ]),
-            
+
         Price = proplists:get_value(price, Servicepl),
         Money = proplists:get_value(money, Mbownerpl),
 
@@ -278,18 +278,22 @@ join(Params)->
     empdb_dao:with_transaction(fun(Con)->
         Pers_id = proplists:get_value(pers_id, Params),
         Room_id = proplists:get_value(id, Params),
-        {ok, [{[{ulimit, Ulimit}]}]} = empdb_dao_room:get(Con, [
-            {filter, [
-                {id, Room_id}
-            ]},
-            {fields, [ulimit]},
-            {limit, 1}
-        ]),
-        {ok, [{[{count, Count}]}]} = empdb_dao_pers:count(Con, [
-            {filter, [
-                {live_room_id, Room_id}
-            ]}
-        ]),
+        {ok, [{Ulimitpl}]} =
+            empdb_dao_room:get(Con, [
+                {filter, [
+                    {id, Room_id}
+                ]},
+                {fields, [ulimit]},
+                {limit, 1}
+            ]),
+        Ulimit = proplists:get_value(ulimit, Ulimitpl),
+        {ok, [{Countpl}]} =
+            empdb_dao_pers:count(Con, [
+                {filter, [
+                    {live_room_id, Room_id}
+                ]}
+            ]),
+        Count = proplists:get_value(count, Countpl),
         case ((Count + 1) =< (Ulimit)) of
             false ->
                 {error, {user_overflow, {[
@@ -404,9 +408,9 @@ get_blogs(Params) ->
                             [
                                 case Isweek of
                                     false  ->
-                                        doc.created;
+                                        'doc.created';
                                     true ->
-                                        doc.nvotes
+                                        'doc.nvotes'
                                 end
                             ],
                             empdb_dao_doc:table({fields, select})
@@ -428,22 +432,22 @@ get_blogs(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fields, Fields},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc, 'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc, 'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -497,9 +501,9 @@ get_posts(Params) ->
                             [
                                 case Isweek of
                                     false  ->
-                                        doc.created;
+                                        'doc.created';
                                     true ->
-                                        doc.nvotes
+                                        'doc.nvotes'
                                 end
                             ],
                             empdb_dao_doc:table({fields, select})
@@ -521,22 +525,22 @@ get_posts(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fields, Fields},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc, 'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc, 'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -590,9 +594,9 @@ get_photos(Params) ->
                             [
                                 case Isweek of
                                     false  ->
-                                        doc.created;
+                                        'doc.created';
                                     true ->
-                                        doc.nvotes
+                                        'doc.nvotes'
                                 end
                             ],
                             empdb_dao_doc:table({fields, select})
@@ -616,27 +620,27 @@ get_photos(Params) ->
                     [{{empdb_dao_vote,  vote},  {left, {doc_id,   {doc, id}}}}]
             end
         ],Con,[
-            {distinct, [doc.id]},
+            {distinct, ['doc.id']},
             {fileinfotype_alias, download},
             {fields, [
-                {as, {fileinfo.path, fileinfopath}},
-                {as, {fileinfo.dir,  fileinfodir}}
+                {as, {'fileinfo.path', fileinfopath}},
+                {as, {'fileinfo.dir',  fileinfodir}}
                 | proplists:delete(path, Fields)
             ]},
-            {doc.isdeleted,false},
-            {doc.isrepost,false},
-            {doc.isrepostcont,false}
+            {'doc.isdeleted',false},
+            {'doc.isrepost',false},
+            {'doc.isrepostcont',false}
             |
             case Isweek of
                 false  ->
                     [
-                        {order, {desc, doc.created}}
+                        {order, {desc, 'doc.created'}}
                         | What_
                     ];
                 true  ->
                     [
-                        {order, {desc, doc.nvotes}},
-                        {vote.created,
+                        {order, {desc, 'doc.nvotes'}},
+                        {'vote.created',
                             {gt, empdb_convert:now_minus_week()}
                         }
                         | What_
@@ -646,7 +650,7 @@ get_photos(Params) ->
             {ok,Phobjs} ->
                 {ok,
                     lists:map(fun({Phpl})->
-                        case (lists:member(photo.path, Fields) or (Fields =:= [])) of
+                        case (lists:member('photo.path', Fields) or (Fields =:= [])) of
                             true ->
                                 {[
                                     {path,
@@ -671,7 +675,7 @@ get_photos(Params) ->
 
 
 
-    
+
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
         empdb_daowp_room:get(Con, Params)

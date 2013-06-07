@@ -636,7 +636,15 @@ get_blog(Params)->
 get_blog(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
         get_blog_adds(Con,
-            empdb_dao_blog:get(Con, [{order, {desc, created}}, {isdeleted, false}|Params], Fileds)
+            empdb_dao_blog:get(
+                Con,
+                [
+                    {order, {desc, created}},
+                    {isdeleted, false}
+                    |Params
+                ],
+                Fileds
+            )
         )
     end).
 
@@ -762,7 +770,9 @@ get_post(Params)->
 
 get_post(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        get_post_adds(Con, empdb_dao_post:get(Con, [{order,  {desc, 'post.created'}}, {isdeleted, false}|Params], Fileds))
+        get_post_adds(
+            Con, empdb_dao_post:get(Con, [{order,  {desc, 'post.created'}}, {isdeleted, false}|Params], Fileds)
+        )
     end).
 
 get_post_adds(Con, Getresult) ->

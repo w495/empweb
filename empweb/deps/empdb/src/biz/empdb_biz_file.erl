@@ -763,10 +763,9 @@ get_system_picture(Con, What) ->
         {empdb_dao_fileinfo, file_id}
     ],Con,[
         {fields, [
-            fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            fileinfotype_alias,'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {fileinfotype_alias, filesystem},

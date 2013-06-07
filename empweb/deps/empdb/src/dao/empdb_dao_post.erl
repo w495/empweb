@@ -103,15 +103,14 @@ get(Con, What) ->
         {empdb_dao_fileinfo, {left, file_id}}
     ],Con,[
         {fields, [
-            fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            fileinfotype_alias,'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {image_height, null},
         {image_width, null}
@@ -183,10 +182,9 @@ get_top(Con, What) ->
             {left, {doc_id,   {doc, id}}}}
     ],Con,[
         {fields, [
-            fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            fileinfotype_alias,'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(
                 path,
                 proplists:delete(id, Fields)
@@ -195,7 +193,7 @@ get_top(Con, What) ->
         {distinct, ['doc.id']},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {image_height,      null},
         {image_width,       null},
@@ -270,11 +268,11 @@ get__(Con, What) ->
     ],Con,[
         {'or', [
             {fileinfotype_alias, download},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(pic_file_path, Fields)
         ]}
         |proplists:delete(fields, What)
@@ -324,14 +322,14 @@ is_owner(Con, Owner_id, Obj_id) ->
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count(doc_comment.id) "
+            " count('doc_comment.id') "
         " from "
             " doc as doc_comment "
         " where "
-            "       doc_comment.doctype_alias  = 'comment' "
-            " and   doc_comment.isdeleted      = false "
-            " and   doc_comment.isrepostcont   = false "
-            " and   doc_comment.parent_id      = $id ",
+            "'doc_comment.doctype_alias'= 'comment' "
+            " and'doc_comment.isdeleted'= false "
+            " and'doc_comment.isrepostcont'= false "
+            " and'doc_comment.parent_id'= $id ",
         Params
     ).
 
