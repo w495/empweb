@@ -1,3 +1,9 @@
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Генерации "похожих" строк,
+%% используется для предложения новых имен пользователей.
+%%
+
 -module(empdb_suggest).
 -export([
     string/1,
@@ -14,21 +20,21 @@ string(Orgstring, Additions)->
     Leterslist = "etaoinshrdlcumwfgypbvkxjqz",
     Leterslistsize = erlang:length(Leterslist),
 
-    Leters = 
+    Leters =
         lists:map(
-            fun(X)-> 
-                empdb_convert:to_binary([X]) 
-            end, 
+            fun(X)->
+                empdb_convert:to_binary([X])
+            end,
             Leterslist
         ),
-        
-    Digits = 
+
+    Digits =
         [
-            empdb_convert:to_binary(empdb_convert:to_list(X)) 
+            empdb_convert:to_binary(empdb_convert:to_list(X))
             || X <- lists:seq(0, 9)
         ],
 
-    Random_leters = 
+    Random_leters =
         [
             lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
             lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters),
@@ -38,14 +44,14 @@ string(Orgstring, Additions)->
             lists:nth(crypto:rand_uniform(1, Leterslistsize), Leters)
         ],
 
-    Random_digits = 
+    Random_digits =
         [
             lists:nth(crypto:rand_uniform(1, 10), Digits),
             lists:nth(crypto:rand_uniform(1, 10), Digits),
             lists:nth(crypto:rand_uniform(1, 10), Digits)
         ],
 
-        
+
     Seps = lists:usort([
         <<"">>,
 %         <<"+">>,
@@ -61,7 +67,7 @@ string(Orgstring, Additions)->
         | proplists:get_value(seps, Additions, [])
     ]),
 
-    
+
     Prewords = lists:usort([
         <<"re">>,
         <<"my">>,
@@ -71,7 +77,7 @@ string(Orgstring, Additions)->
         <<"sup">>,
         <<"sub">>,
         <<"cool">>
-        |  
+        |
         lists:append([
             Random_leters,
             proplists:get_value(prewords, Additions, [])
@@ -83,7 +89,7 @@ string(Orgstring, Additions)->
         empdb_convert:to_binary(empdb_convert:to_list(Month)),
         empdb_convert:to_binary(empdb_convert:to_list(Year)),
         empdb_convert:to_binary(empdb_convert:to_list(Year - 2000))
-        | 
+        |
         lists:append([
             Random_digits,
             Random_leters,
@@ -130,12 +136,12 @@ string(Orgstring, Additions)->
         proplists:get_value(stopwords, Additions, [])
     ]),
 
-    Norgstring =  
+    Norgstring =
         binary:part(
             Orgstring,
             0,
             erlang:min(
-                erlang:byte_size(Orgstring), 
+                erlang:byte_size(Orgstring),
                 Maximumnicksize
             )
         ),

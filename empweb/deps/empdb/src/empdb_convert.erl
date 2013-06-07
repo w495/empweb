@@ -1,58 +1,48 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%
-%%% ФУНКЦИИ КОНВЕРТАЦИИ
-%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Функции конвертации различных типов данных и величин.
+%%
 
 -module(empdb_convert).
 
-
 %%
-%% Структры для работы с запросами к базе данных
+%% Структуры для работы с запросами к базе данных
 %%
 -include("empdb.hrl").
 
-
 -export([
-            to_plain/1,
-            from_plain/1,
-            to_integer/1,
-            to_atom/1,
-            to_list/1,
-            to_float/1,
-            string_to_term/1,
-            to_binary/1,
-            to_local_datetime/1,
-            to_universal_datetime/1,
-            to_datetime/1,
-            to_local_date/1,
-            to_universal_date/1,
-            to_date/1,
-            datetime2int/1,
-            int2datetime/1,
-            int2universal_datetime/1,
-            nullable_datetime2int/1,
-            int2local_datetime/1,
-            now_plus_day/0,
-            now_minus_day/0,
-            now_plus_week/0,
-            now_minus_week/0,
-            now_plus_month/0,
-            now_minus_month/0,
-            now_plus_year/0,
-            now_minus_year/0,
-            now_plus/1,
-            now_minus/1,
-            to_money/1,
-            test/0
-        ]
-).
-
-
--define(EMPDB_CONVERT_UNIXTIMESTART,    {{1970,1,1},{0,0,0}}).
--define(EMPDB_CONVERT_MONEYDIMENSION,   100).
--define(EMPDB_CONVERT_TIMEMICROREST,    1000).
--define(EMPDB_CONVERT_TIMEMACROREST,    1000000).
+    to_plain/1,
+    from_plain/1,
+    to_integer/1,
+    to_atom/1,
+    to_list/1,
+    to_float/1,
+    string_to_term/1,
+    to_binary/1,
+    to_local_datetime/1,
+    to_universal_datetime/1,
+    to_datetime/1,
+    to_local_date/1,
+    to_universal_date/1,
+    to_date/1,
+    datetime2int/1,
+    int2datetime/1,
+    int2universal_datetime/1,
+    nullable_datetime2int/1,
+    int2local_datetime/1,
+    now_plus_day/0,
+    now_minus_day/0,
+    now_plus_week/0,
+    now_minus_week/0,
+    now_plus_month/0,
+    now_minus_month/0,
+    now_plus_year/0,
+    now_minus_year/0,
+    now_plus/1,
+    now_minus/1,
+    to_money/1,
+    test/0
+]).
 
 
 now_plus(day) ->

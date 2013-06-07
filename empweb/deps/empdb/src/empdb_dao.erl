@@ -1,5 +1,10 @@
--module(empdb_dao).
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Общие функции взаимодействия с БД,
+%% содержит реализацию простейшей ORM. Модуль сам по себе грязный
+%% и должен быть разнесен на несколько.
 
+-module(empdb_dao).
 
 -include_lib("epgsql/include/pgsql.hrl").
 
@@ -31,8 +36,7 @@ behaviour_info(callbacks) ->
         {create,    2},
         {update,    2},
         {get,       2},
-        {get,       3},
-        {is_owner,  2}
+        {get,       3}
     ];
 behaviour_info(_Other) ->
     undefined.

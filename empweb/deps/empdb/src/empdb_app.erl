@@ -1,8 +1,17 @@
-%% Feel free to use, reuse and abuse the code in this file.
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Модуль, стартующий приложение.
+%%
 
 -module(empdb_app).
+
 -behaviour(application).
--export([start/0, start/2, stop/1]).
+
+-export([
+    start/0,
+    start/2,
+    stop/1
+]).
 
 start() ->
     application:start(empdb).

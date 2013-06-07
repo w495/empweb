@@ -1,13 +1,13 @@
-%% abase62 encoding - initial idea based on riak's encoding, with no if's and fixed base
-%% gleicon - 2010
-%%
-%% testing:
-%% 0> c(abase62.erl).
-%% 1> abase62:decode(abase62:encode(1000)) == 1000.
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Кодирование в `base62` [НЕ ИСПОЛЬЗУЕТСЯ!].
 %%
 
 -module(empdb_base62).
--export([encode/1, decode/1]).
+-export([
+    encode/1,
+    decode/1
+]).
 
 nthchar(N) when N =< 9 -> $0 + N;
 nthchar(N) when N =< 35 -> $A +N - 10;

@@ -1,3 +1,8 @@
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Вспомогательный модуль для `empdb_dao.erl`
+%% предполагается, что часть функция будут перенесены сюда.
+
 -module(empdb_orm_util).
 
 
@@ -5,8 +10,6 @@
     current_all_fields/2,
     current_select_fields/2
 ]).
-
-
 
 current_select_fields({Ag, Filtername}, Op) ->
     empdb_convert:to_atom(empdb_convert:to_list(Ag)
@@ -75,7 +78,7 @@ current_select_fields(Filtername, Op) ->
             end
     end.
 
-    
+
 current_all_fields(Current_all_fields_, Op) ->
     lists:map(
         fun ({Filtername, Filterval}) when is_atom(Filtername) ->
