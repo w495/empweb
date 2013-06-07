@@ -24,6 +24,8 @@ app_dev.config
 *cbin/*
 *priv/db/*
 *priv/session-db/*
+*priv/data/*
+
 
 .pydevproject
 .project
