@@ -503,7 +503,7 @@ get_group(Con, {login, Login}, Fields) ->
                 "join pers2pgroup on "
                     " pers2pgroup.group_id = pers_group.id"
                 "join pers on "
-                    "pers2pgroup.pers_id = pers.id"
+                    "pers2pgroup.pers_id = pers.id "
                     "and pers.login = $1">>
             ],[Login]
         )
