@@ -1,4 +1,5 @@
-%% @file'empdb_dao_album.erl'%%          Описание доступа к базе данных для альбомамов.
+%% @file    empdb_dao_album.erl
+%%          Описание доступа к базе данных для альбомамов.
 %%          Альбом это просто документ.
 %% 
 -module(empdb_dao_album).
@@ -98,14 +99,14 @@ is_owner(Con, Owner_id, Obj_id) ->
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count('doc_comment.id') "
+            " count(doc_comment.id) "
         " from "
             " doc as doc_comment "
         " where "
-            "'doc_comment.doctype_alias'= 'comment' "
-            " and'doc_comment.isdeleted'= false "
-            " and'doc_comment.isrepostcont'= false "
-            " and'doc_comment.parent_id'= $id ",
+            "       doc_comment.doctype_alias  = 'comment' "
+            " and   doc_comment.isdeleted      = false "
+            " and   doc_comment.isrepostcont   = false "
+            " and   doc_comment.parent_id      = $id ",
         Params
     ).
 %%
@@ -114,14 +115,14 @@ count_comments(Con, Params)->
 count_photos(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count('doc_photo.id') "
+            " count(doc_photo.id) "
         " from "
             " doc as doc_photo "
         " where "
-            "'doc_photo.doctype_alias'= 'photo' "
-            " and'doc_photo.isdeleted'= false "
-            " and'doc_photo.isrepostcont'= false "
-            " and'doc_photo.parent_id'= $id ",
+            "       doc_photo.doctype_alias  = 'photo' "
+            " and   doc_photo.isdeleted      = false "
+            " and   doc_photo.isrepostcont   = false "
+            " and   doc_photo.parent_id      = $id ",
         Params
     ).
 %%
@@ -130,17 +131,17 @@ count_photos(Con, Params)->
 count_albums(Con, Params)->
     case empdb_dao:eqret(Con,
         " select "
-            " count('doc_album.id'), "
-            "'doc_album.read_acctype_alias'"
+            " count(doc_album.id), "
+            " doc_album.read_acctype_alias "
         " from "
             " doc as doc_album "
         " where "
-            "'doc_album.doctype_alias'= 'album' "
-            " and'doc_album.isdeleted'= false "
-            " and'doc_album.isrepostcont'= false "
-            " and'doc_album.parent_id'= $id "
+            "       doc_album.doctype_alias  = 'album' "
+            " and   doc_album.isdeleted      = false "
+            " and   doc_album.isrepostcont   = false "
+            " and   doc_album.parent_id      = $id "
         " group by "
-            "'doc_album.read_acctype_alias'; ",
+            " doc_album.read_acctype_alias; ",
         Params
     ) of
         {ok, Sqlist} ->

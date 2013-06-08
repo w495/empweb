@@ -90,17 +90,17 @@ get(Con, What, Fields)->
 count_posts(Con, Params)->
     case empdb_dao:eqret(Con,
         " select "
-            " count('doc_post.id'), "
-            "'doc_post.read_acctype_alias'"
+            " count(doc_post.id), "
+            " doc_post.read_acctype_alias "
         " from "
             " doc as doc_post "
         " where "
-            "'doc_post.doctype_alias'= 'post' "
-            " and'doc_post.isdeleted'= false "
-            " and'doc_post.isrepostcont'= false "
-            " and'doc_post.parent_id'= $id "
+            "       doc_post.doctype_alias  = 'post' "
+            " and   doc_post.isdeleted      = false "
+            " and   doc_post.isrepostcont   = false "
+            " and   doc_post.parent_id      = $id "
         " group by "
-            "'doc_post.read_acctype_alias'; ",
+            " doc_post.read_acctype_alias; ",
         Params
     ) of
         {ok, Sqlist} ->
@@ -132,19 +132,19 @@ count_posts(Con, Params)->
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count('doc_comment.id') "
+            " count(doc_comment.id) "
         " from "
             " doc as doc_comment "
         " join "
             " doc as doc_post "
         " on "
-            "'doc_post.id'='doc_comment.parent_id'"
-            " and'doc_post.isdeleted'= false "
-            " and'doc_comment.isdeleted'= false "
-            " and'doc_post.doctype_alias'= 'post' "
-            " and'doc_comment.doctype_alias'= 'comment' "
+            "       doc_post.id                 = doc_comment.parent_id "
+            " and   doc_post.isdeleted          = false "
+            " and   doc_comment.isdeleted       = false "
+            " and   doc_post.doctype_alias      = 'post' "
+            " and   doc_comment.doctype_alias   = 'comment' "
         " where "
-            "'doc_post.parent_id'= $id ",
+            " doc_post.parent_id = $id ",
         Params
     ).
 

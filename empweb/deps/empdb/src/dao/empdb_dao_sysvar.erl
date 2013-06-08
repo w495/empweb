@@ -1,4 +1,5 @@
-%%% @file'empdb_dao_sysvar.erl'%%%
+%%% @file empdb_dao_sysvar.erl
+%%%
 %%%    Работа с системными переменными.
 %%%
 
@@ -70,22 +71,22 @@ get_sysvars(Arg) ->
 get_sysvars(Con, {perm, Perm}) ->
     Query =
         " select "
-            "'sysvar.id', "
-            "'sysvar_type.name'as type, "
-            "'sysvar.name', "
-            "'sysvar.value', "
-            "'sysvar.description'"
+            " sysvar.id, "
+            " sysvar_type.name as type, "
+            " sysvar.name, "
+            " sysvar.value, "
+            " sysvar.description "
         " from "
             " sysvar "
         " join "
             " sysvar_type "
         " on "
-            "'sysvar_type.id'='sysvar.type_id'"
+            " sysvar_type.id = sysvar.type_id "
         " join "
             " permission "
         " on "
-            "'permission.id'='sysvar.perm_id'"
-            " and'permission.name'= $1"
+            " permission.id = sysvar.perm_id "
+            " and permission.name = $1"
         " ; ",
     empdb_dao:eqret(Con, Query, [empdb_convert:to_list(Perm)]);
 
@@ -95,22 +96,22 @@ get_sysvars(Con, {perm, Perm}) ->
 get_sysvars(Con, _) ->
     Query =
         " select "
-            "'sysvar.id', "
-            "'sysvar_type.name'as type, "
-            "'permission.name'as permission, "
-            "'sysvar.name', "
-            "'sysvar.value', "
-            "'sysvar.description'"
+            " sysvar.id, "
+            " sysvar_type.name as type, "
+            " permission.name  as permission, "
+            " sysvar.name, "
+            " sysvar.value, "
+            " sysvar.description "
         " from "
             " sysvar "
         " join "
             " sysvar_type "
         " on "
-            "'sysvar_type.id'='sysvar.type_id'"
+            " sysvar_type.id = sysvar.type_id "
         " join "
             " permission "
         " on "
-            "'permission.id'='sysvar.perm_id'"
+            " permission.id = sysvar.perm_id "
         " ; ",
     empdb_dao:eqret(Con, Query).
     
@@ -128,41 +129,41 @@ get_sysvar(Con, Name) when erlang:is_atom(Name) ->
 get_sysvar(Con, Id) when erlang:is_integer(Id) ->
     Query =
         " select "
-            "'sysvar.id', "
-            "'sysvar_type.name'as type, "
-            "'permission.name'as permission, "
-            "'sysvar.name', "
-            "'sysvar.value', "
-            "'sysvar.description'"
+            " sysvar.id, "
+            " sysvar_type.name as type, "
+            " permission.name  as permission, "
+            " sysvar.name, "
+            " sysvar.value, "
+            " sysvar.description "
         " from "
             " sysvar "
         " join "
             " sysvar_type "
         " on "
-            "'sysvar_type.id'='sysvar.type_id'"
+            " sysvar_type.id = sysvar.type_id "
         " join "
             " permission "
         " on "
-            "'permission.id'='sysvar.perm_id'"
+            " permission.id = sysvar.perm_id "
         " where "
-            "'sysvar.id'= $1; ",
+            " sysvar.id = $1; ",
     empdb_dao:eqret(Con, Query, [Id]);
 
 get_sysvar(Con, Name) when erlang:is_list(Name) ->
     Query =
         " select "
-            "'sysvar.id', "
-            "'sysvar_type.name'as type, "
-            "'permission.name'as permission, "
-            "'sysvar.name', "
-            "'sysvar.value', "
-            "'sysvar.description'"
+            " sysvar.id, "
+            " sysvar_type.name as type, "
+            " permission.name  as permission, "
+            " sysvar.name, "
+            " sysvar.value, "
+            " sysvar.description "
         " from "
             " sysvar "
         " join "
             " sysvar_type "
         " on "
-            "'sysvar_type.id'='sysvar.type_id'"
+            " sysvar_type.id = sysvar.type_id "
         " join "
             " permission "
         " on "

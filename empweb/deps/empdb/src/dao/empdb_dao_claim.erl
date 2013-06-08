@@ -182,13 +182,13 @@ is_owner(Con, Owner_id, Obj_id) ->
 count_comments(Con, Params)->
     empdb_dao:eqret(Con,
         " select "
-            " count('doc_comment.id') "
+            " count(doc_comment.id) "
         " from "
             " doc as doc_comment "
         " where "
-            "'doc_comment.doctype_alias'= 'comment' "
-            " and'doc_comment.isdeleted'= false "
-            " and'doc_comment.parent_id'= $id ",
+            "       doc_comment.doctype_alias  = 'comment' "
+            " and   doc_comment.isdeleted      = false "
+            " and   doc_comment.parent_id      = $id ",
         Params
     ).
 
