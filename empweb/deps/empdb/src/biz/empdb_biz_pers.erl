@@ -586,7 +586,7 @@ update(Con, {perspichead_id, Perspicheadid},  {Function, [Params]}, Mbperspl) ->
                     Error
             end;
         {true, _} ->
-            {ok, []};
+            Function(Con, Params);
         {false, _} ->
             {error, {not_enough_money, {[
                 {money, Money},
@@ -626,7 +626,7 @@ update(Con, {perspicbody_id, Perspicbodyid},  {Function, [Params]}, Mbperspl) ->
                     Error
             end;
         {true, _} ->
-            {ok, []};
+            Function(Con, Params);
         {false, _} ->
             {error, {not_enough_money, {[
                 {money, Money},
