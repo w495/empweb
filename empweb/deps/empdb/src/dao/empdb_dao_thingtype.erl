@@ -101,11 +101,11 @@ get(Con, What) ->
     ],Con,[
         {'or', [
             {fileinfotype_alias, download},
-            {thingtype.file_id, null}
+            {'thingtype.file_id', null}
         ]},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(path, Fields)
         ]}
         |proplists:delete(fields, What)

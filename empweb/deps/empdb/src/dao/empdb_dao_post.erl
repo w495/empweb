@@ -104,14 +104,14 @@ get(Con, What) ->
     ],Con,[
         {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {image_height, null},
         {image_width, null}
@@ -184,9 +184,9 @@ get_top(Con, What) ->
     ],Con,[
         {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(
                 path,
                 proplists:delete(id, Fields)
@@ -195,7 +195,7 @@ get_top(Con, What) ->
         {distinct, ['doc.id']},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {image_height,      null},
         {image_width,       null},
@@ -270,11 +270,11 @@ get__(Con, What) ->
     ],Con,[
         {'or', [
             {fileinfotype_alias, download},
-            {post.pic_file_id, null}
+            {'post.pic_file_id', null}
         ]},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(pic_file_path, Fields)
         ]}
         |proplists:delete(fields, What)

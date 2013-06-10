@@ -109,9 +109,9 @@ get(Con, What) ->
     ],Con,[
         {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {fileinfotype_alias, filesystem},
@@ -179,9 +179,9 @@ get_top(Con, What) ->
     ],Con,[
         {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(
                 path,
                 proplists:delete(id, Fields)

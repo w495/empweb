@@ -180,14 +180,14 @@ get(Con, What) ->
         {empdb_dao_fileinfo, {left, file_id}}
     ],Con,[        {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {thing.file_id, null}
+            {'thing.file_id', null}
         ]},
         {image_height, null},
         {image_width, null}
@@ -250,11 +250,11 @@ get__(Con, What) ->
     ],Con,[
         {'or', [
             {fileinfotype_alias, download},
-            {thing.file_id, null}
+            {'thing.file_id', null}
         ]},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(path, Fields)
         ]}
         |proplists:delete(fields, What)

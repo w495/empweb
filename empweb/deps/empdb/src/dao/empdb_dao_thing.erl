@@ -116,14 +116,14 @@ get(Con, What) ->
     ],Con,[
         {fields, [
             fileinfotype_alias,
-            fileinfo.filetype_ext,
-            {as, {fileinfo.path, path}},
-            {as, {fileinfo.dir,  dir}}
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
         {'or', [
             {fileinfotype_alias, filesystem},
-            {thing.file_id, null}
+            {'thing.file_id', null}
         ]},
         {image_height, null},
         {image_width, null}

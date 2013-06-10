@@ -76,12 +76,29 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_roomlot:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_roomlot:get(
+            Con,
+            [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {desc, created}}
+            ]
+        )
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_roomlot:get(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_roomlot:get(
+            Con,
+            [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {desc, created}}
+            ],
+            Fileds
+        )
     end).
 
 is_owner(Uid, Oid)->

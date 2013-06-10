@@ -108,11 +108,11 @@ get(Con, What) ->
     ],Con,[
         {fileinfotype_alias, download},
         {fields, [
-            {as, {fileinfo.path, fileinfopath}},
-            {as, {fileinfo.dir,  fileinfodir}}
+            {as, {'fileinfo.path', fileinfopath}},
+            {as, {'fileinfo.dir',  fileinfodir}}
             | proplists:delete(path, Fields)
         ]},
-        {image_width,  null}, 
+        {image_width,  null},
         {image_height, null}
         |proplists:delete(fields, What)
     ]) of
@@ -164,9 +164,9 @@ get(Con, What, Truefields)->
         {fileinfotype_alias, download}
         |What
     ], [
-        {as, {fileinfo.path, fileinfopath}},
-        {as, {fileinfo.dir,  fileinfodir}}
-        | proplists:delete(path, Fields) 
+        {as, {'fileinfo.path', fileinfopath}},
+        {as, {'fileinfo.dir',  fileinfodir}}
+        | proplists:delete(path, Fields)
     ]) of
         {ok,Phobjs} ->
             {ok,
