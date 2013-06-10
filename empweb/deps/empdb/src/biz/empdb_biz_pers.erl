@@ -1621,7 +1621,9 @@ get_tfparams(Con, Params) ->
         fun({Key, Value}, Acc)->
             get_tfparams(Con, {Key, Value}, Acc)
         end,
-        [],
+        [
+            {order, {desc, 'nick'}}
+        ],
         Params
     ).
 
