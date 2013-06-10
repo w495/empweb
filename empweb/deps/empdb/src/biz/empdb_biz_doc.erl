@@ -765,13 +765,32 @@ get_post_top(Params)->
 
 get_post(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        get_post_adds(Con, empdb_dao_post:get(Con, [{order, {desc, 'post.created'}}, {isdeleted, false}|Params]))
+        get_post_adds(
+            Con,
+            empdb_dao_post:get(
+                Con,
+                [
+                    {order, {desc, created}},
+                    {isdeleted, false}
+                    |Params
+                ]
+            )
+        )
     end).
 
 get_post(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
         get_post_adds(
-            Con, empdb_dao_post:get(Con, [{order,  {desc, 'post.created'}}, {isdeleted, false}|Params], Fileds)
+            Con,
+            empdb_dao_post:get(
+                Con,
+                [
+                    {order, {desc, created}},
+                    {isdeleted, false}
+                    |Params
+                ],
+                Fileds
+            )
         )
     end).
 
