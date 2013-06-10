@@ -26,7 +26,7 @@ get(Con, Params)->
             {isdeleted, false}
             |Params
         ] ++ [
-            {order, {desc, 'doc.created'}}
+            {order, {desc, 'doc.head'}}
         ]),
         Params
     ).
@@ -37,7 +37,7 @@ get(Con, Params, Fields)->
             {isdeleted, false}
             |Params
         ] ++ [
-            {order, {desc,'doc.created'}}
+            {order, {desc,'doc.head'}}
         ], Fields),
         [{fields, Fields}| Params]
     ).
