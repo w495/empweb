@@ -312,12 +312,29 @@ update(Params)->
 
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_roombet:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_roombet:get(
+            Con,
+            [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {desc, created}}
+            ]
+        )
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_roombet:get(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_roombet:get(
+            Con,
+            [
+                {isdeleted, false}
+                |Params
+            ] ++ [
+                {order, {desc, created}}
+            ],
+            Fileds
+        )
     end).
 
 is_blog_owner(Uid, Oid)->
