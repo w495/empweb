@@ -1807,7 +1807,14 @@ get_opt(Params1, Options)->
     Params =
         lists:keyreplace(fields, 1, Params1, {fields, Fields}),
     empdb_dao:with_connection(emp, fun(Con)->
-        {ok, Userpls} = empdb_dao_pers:get(Con, [{isdeleted, false}|get_tfparams(Con, Params)]),
+        {ok, Userpls} =
+            empdb_dao_pers:get(
+                Con,
+                [
+                    {isdeleted, false}
+                    |get_tfparams(Con, Params)
+                ]
+            ),
         get_opt(Con, Params, Options, Userpls)
     end).
 
