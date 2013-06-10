@@ -632,11 +632,13 @@ multipart_data(Req, 0, eof) ->
     io:format("~n~n 7 ~n~n"),
     {eof, Req#http_req{body_state=done}};
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
-        Length, eof) ->
+        _Length, eof) ->
     io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
-    {ok, _Data} = Transport:recv(Socket, Length, 5000),
+    %% {ok, _Data} = Transport:recv(Socket, Length, 5000),
+    {ok, _Data} = Transport:recv(Socket, 0, 5000),
     {eof, Req#http_req{body_state=done}};
+
 multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
     io:format("~n~n 9 ~n~n"),
     case stream_body(Req) of
