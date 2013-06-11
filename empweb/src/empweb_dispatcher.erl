@@ -21,13 +21,20 @@ dispatch()->
                 ]
             },
 
+            {   [<<"jsonapi">>, <<"photo">>, <<"upload">>, <<"demo">>],
+                empweb_handler_jsonapi_photo_demo,
+                [   {action, upload},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
+
             {   [<<"jsonapi">>, <<"res">>, <<"upload">>],
                 empweb_handler_jsonapi_res,
                 [   {action, upload},
                     {path, <<"priv/files/photo">>}
                 ]
             },
-            
+
             {   [<<"jsonapi">>, <<"photo">>, '...'],
                 empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}, {is_auth, true}]
             },
@@ -35,7 +42,7 @@ dispatch()->
             {   [<<"jsonapi">>, <<"res">>, '...'],
                 empweb_handler_static, [{path, <<"priv/data/res/">>}, {is_auth, true}]
             },
-            
+
             {   [<<"jsonapi">>],
                 empweb_handler_jsonapi,
                 []
@@ -60,7 +67,7 @@ dispatch()->
 
             {[<<"static">>, '...'],
                 empweb_handler_static, [{path, <<"priv/static">>}, {is_auth, true}]},
-            
+
             {[<<"logs">>, '...'],
                 empweb_handler_static, [{path, <<"priv/logs">>}]},
             {'_', empweb_handler_default, []}
@@ -73,19 +80,19 @@ dispatch()->
 %% dispatch()->
 %%     [
 %%         {[<<"static">> , '_'], [
-%% 
+%%
 %%             {['...'], handler_static, [{path, <<"priv/static">>}]},
 %%             {'_', handler_default, []}
 %%         ]},
-%%         
+%%
 %%         {'_', [
 %% %%             {[<<"websocket">>], handler_websocket, []},
 %% %%             {[<<"eventsource">>], handler_eventsource, []},
 %% %%             {[<<"eventsource">>, <<"live">>], handler_eventsource_emitter, []},
-%% 
+%%
 %%             {[<<"api">>, '...'],    handler_api,    []},
 %%             {[<<"static">>, '...'], handler_static, [{path, <<"priv/static">>}]},
 %%             {'_', handler_default, []}
 %%         ]}
 %%     ].
-%% 
+%%
