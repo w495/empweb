@@ -642,7 +642,7 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport},
     Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
     {eof, Req#http_req{body_state=done}};
 
-multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
+multipart_data(Req, Length, {more, Parser}) ->
     io:format("~n~n 9 ~n~n"),
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
