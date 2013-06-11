@@ -53,6 +53,9 @@
 
 -include("http.hrl").
 
+
+-define(COWBOY_RECV_TIMEOUT, 30000).
+
 %% Request API.
 
 %% @doc Return the HTTP method of the request.
@@ -475,7 +478,7 @@ stream_body(Req=#http_req{body_state=done}) ->
     {done, Req};
 stream_body(Req=#http_req{body_state={multipart, _N, _Fun},
         transport=Transport, socket=Socket}) ->
-    case Transport:recv(Socket, 0, 5000) of
+    case Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT) of
         {ok, Data} -> {ok, Data, Req};
         {error, Reason} -> {error, Reason}
     end.
@@ -485,7 +488,7 @@ stream_body(Req=#http_req{body_state={multipart, _N, _Fun},
 stream_body_recv(Req=#http_req{
         transport=Transport, socket=Socket, buffer=Buffer}) ->
     %% @todo Allow configuring the timeout.
-    case Transport:recv(Socket, 0, 5000) of
+    case Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT) of
         {ok, Data} -> transfer_decode(<< Buffer/binary, Data/binary >>, Req);
         {error, Reason} -> {error, Reason}
     end.
@@ -635,8 +638,8 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         Length, eof) ->
     io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
-    {ok, _Data} = Transport:recv(Socket, Length, 5000),
-    %% {ok, _Data} = Transport:recv(Socket, 0, 5000),
+    {ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
+    %% {ok, _Data} = Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
