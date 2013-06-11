@@ -1,0 +1,91 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru"><head xml:lang="ru"><meta xmlns="" http-equiv="Content-Type" content="text/html;charset=UTF-8" charset="UTF-8"/><meta xmlns="" http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><meta xmlns="" data-name="author" content="ζAVρ λαβ"/><meta xmlns="" data-name="description" content="adv com system"/><meta xmlns="" data-name="viewport" content="width=device-width, initial-scale=1.0"/><title xmlns="">Ручной тест</title>
+    <head>
+        <style>
+            *{
+                margin:0;
+                padding:0;
+            }
+            body{
+                padding-left: 30px;
+            }
+            .about{
+                font-size: 80%;
+                margin: 20px 20px 30px 200px;
+                padding:5px 5px 5px 5px;
+                width: 900px;
+                word-wrap: break-word;
+                border: 1px solid black;
+            }
+            .as{
+                margin: 10px 0px 0px 20px;
+                padding:5px 5px 5px 5px;
+            }
+            .asd{
+                margin: 5px 0px 5px 20px;
+            }
+            .test-set{
+                padding-left: 30px;
+            }
+            .test-set h2{
+                margin: 20px 0 20px 0;
+            }
+            .form-textarea{
+                margin: 20px 0 20px 0;
+                width:  800px;
+                height: 400px;
+            }
+        </style>
+    </head>
+<body>
+    <h1 class="gh">Ручное тестирование</h1>
+    <nav><a href="test-plain.html">plain</a>&nbsp;<a href="test-ajax.html">ajax</a>&nbsp;<a href="test-auto.html">auto</a>&nbsp;<a href="test-hl.html">hl</a></nav>
+    <section class="test-set">
+        <h2>Прямой вариант</h2>
+        <form  enctype="multipart/form-data" class="form" action="http://127.0.0.1:8001/jsonapi/photo/upload/demo" method="POST">
+            <p><input type="submit" ></p>
+            <!-- <p><input type="text" name="text" value="test-text" ></p> -->
+            <p><input type="file" name="file" ></p>
+            <!-- <p><input type="file" name="file2" ></p> -->
+        </form>
+    </section>
+        <!-- ============================================================== -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+// ------------------------------------------------------------------------------------
+var default_url  =  "" + window.location.protocol + "//"+ window.location.host +"/jsonapi/photo/upload/demo";
+
+mark_err = function(test){
+    $(".output", test).css("color", "red");
+    $("h3", test)
+        .css("color", "red")
+        .html($("h3", test).html()+ " [OШИБКА]");
+}
+mark_suc = function(test){
+    $(".output", test).css("color", "green")
+}
+ups = function(){
+    var urlParams = {};
+    (function () {
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+    })();
+    return urlParams;
+};
+jQuery(document).ready(function($) {
+    var url = ups().url;
+    if(!url)
+        url = default_url;
+    $(".form").attr("action", url)
+
+});
+// ------------------------------------------------------------------------------------
+        </script>
+</body>
+</html>
