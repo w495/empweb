@@ -651,8 +651,9 @@ multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
             io:format("~n~n 9.1 ~n~n"),
             io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
             io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
-
-            multipart_data(Req2, Length - byte_size(Data), Parser(Data))
+            multipart_data(Req2, Length - byte_size(Data), Parser(Data));
+        _ ->
+            {eof, Req#http_req{body_state=done}}
     end.
 
 %% @doc Skip a part returned by the multipart parser.
