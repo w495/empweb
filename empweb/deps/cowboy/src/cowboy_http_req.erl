@@ -638,11 +638,19 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         _Length, eof) ->
     io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
-    %%{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
+    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
     Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
     {eof, Req#http_req{body_state=done}};
 
-multipart_data(Req, Length, {more, Parser}) ->
+multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
+    io:format("~n~n 8 ~n~n"),
+    %% We just want to skip so no need to stream data here.
+    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
+    Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
+    {eof, Req#http_req{body_state=done}};
+
+
+multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
     io:format("~n~n 9 ~n~n"),
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
@@ -651,12 +659,8 @@ multipart_data(Req, Length, {more, Parser}) ->
             io:format("~n~n 9.1 ~n~n"),
             io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
             io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
-            multipart_data(Req2, Length - byte_size(Data), Parser(Data));
-        Else ->
-            io:format("~n~n 9.2  Else = ~p ~n~n", [Else]),
-            io:format("~n~n 9.2  Length = ~p ~n~n", [Length]),
-            io:format("~n~n 9.2  Req = ~p ~n~n", [Req]),
-            {eof, Req#http_req{body_state=done}}
+
+            multipart_data(Req2, Length - byte_size(Data), Parser(Data))
     end.
 
 %% @doc Skip a part returned by the multipart parser.
