@@ -1392,39 +1392,32 @@
 -- 2013.05.16 12:40:40:891241891 ---------------------------------------------
 
 /*
-    alter table thingbuy add column  room_id decimal references doc(id)   default null;
-    alter table thingbuy add column  room_head varchar(1024)  default null;
-    alter table thingbuy add column  costs  numeric(1000, 2)  default null;
-
-
-
+    alter table thingbuy add column  
+        room_id decimal references doc(id)   default null;
+    alter table thingbuy add column  
+        room_head varchar(1024)  default null;
+    alter table thingbuy add column  
+        costs  numeric(1000, 2)  default null;
     insert into paytype(alias, isincome)
         values  ('thingforme_out',     false);
     insert into paytype(alias, isincome)
         values  ('thingforhim_out',     false);
     insert into paytype(alias, isincome)
         values  ('thingforit_out',     false);
-
-
     alter TABLE thingbuy alter column buyer_id  drop not null;
     alter TABLE thingbuy alter column buyer_nick  drop not null;
     alter TABLE thingbuy alter column owner_nick  drop not null;
     alter TABLE thingbuy alter column owner_id  drop not null;
     alter TABLE thingbuy alter column thing_id  drop not null;
     alter TABLE thingbuy alter column thing_alias  drop not null;
-
     alter TABLE thingbuy alter column thing_alias  drop not null;
     alter table thing add column aliasnum numeric default null;
-*/
-
-
-
-    alter table doc add column  lang_id  decimal references chatlang(id)     default null;
-    alter table doc add column  lang_alias      varchar(1024)   references chatlang(alias)  default null;
-
-
-
-alter table thingwish add column
+    alter table doc add column  
+        lang_id  decimal references chatlang(id) default null;
+    alter table doc add column  
+        lang_alias varchar(1024) references chatlang(alias) default null;
+    alter table thingwish add column
     thingtype_id       decimal references thingtype(id) default null;
-alter table thingwish add column
+    alter table thingwish add column
     thingtype_alias    varchar(1024)                    default null;
+*/

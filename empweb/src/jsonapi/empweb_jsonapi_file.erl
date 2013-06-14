@@ -80,13 +80,21 @@ init(_, Req, #empweb_hap{
     }.
 
 handle(_req, #empweb_hap{
-        action=create, params=Params, pers_id=Pers_id, is_auth=true
+        action=create, params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create file">>),
     {ok,
         empweb_jsonapi:resp(
             empweb_biz_file:create([
-                {owner_id, Pers_id}|Params
+                {owner_id,
+                    case Pers_id of
+                        undefined ->
+                            -100500;
+                        _ ->
+                            Pers_id
+                    end
+                }
+                |Params
             ])
         ),
         Hap
