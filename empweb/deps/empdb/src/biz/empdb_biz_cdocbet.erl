@@ -55,7 +55,7 @@ create(Params)->
             %%
             empdb_dao_cdoclot:get(Con, [
                 {isdeleted, false},
-                {id, cdoclot_id},
+                {id, Cdoclot_id},
                 {fields, [
                     cdoc_id,
                     owner_id,
@@ -82,12 +82,12 @@ create(Params)->
             {   {ok, [{Cdoclotpl}]},
                 {ok, [{Userpl}]}
             } ->
-                Cdoclot_owner_id    = proplists:get_value(owner_id, cdoclotpl),
-                Cdoc_id             = proplists:get_value(cdoc_id,  cdoclotpl),
-                Betmin              = proplists:get_value(betmin,   cdoclotpl),
-                Betmax              = proplists:get_value(betmax,   cdoclotpl),
-                Dtstart             = proplists:get_value(dtstart,  cdoclotpl),
-                Dtstop              = proplists:get_value(dtstop,   cdoclotpl),
+                Cdoclot_owner_id    = proplists:get_value(owner_id, Cdoclotpl),
+                Cdoc_id             = proplists:get_value(cdoc_id,  Cdoclotpl),
+                Betmin              = proplists:get_value(betmin,   Cdoclotpl),
+                Betmax              = proplists:get_value(betmax,   Cdoclotpl),
+                Dtstart             = proplists:get_value(dtstart,  Cdoclotpl),
+                Dtstop              = proplists:get_value(dtstop,   Cdoclotpl),
                 Money               = proplists:get_value(money,    Userpl),
                 Newmoney            = Money - Price,
                 %%
@@ -96,7 +96,7 @@ create(Params)->
                 Mbmaxprev = empdb_dao_cdocbet:get(Con, [
                     {isdeleted, false},
                     {price, {lt, Price + ?EMPDB_BIZ_CDOCBET_EPSILON}},
-                    {cdoclot_id, cdoclot_id},
+                    {cdoclot_id, Cdoclot_id},
                     {limit, 1},
                     {order, [
                         {desc, price}
