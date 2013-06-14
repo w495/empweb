@@ -249,7 +249,7 @@ create(Params)->
                                     {eventobj_alias,    cdocbet},
                                     {eventact_alias,    create},
                                     {owner_id,          Cdocbet_owner_id},
-                                    {target_id,         proplists:get_value(id, cdocbet)},
+                                    {target_id,         proplists:get_value(id, Cdocbet)},
                                     {pers_id,           Cdoclot_owner_id},
                                     {eventtype_alias,   create_cdocbet_win}
                                 ]),
