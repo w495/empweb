@@ -1614,6 +1614,38 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
 
             %% ==================================================
+            <<"count_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   count
+                };
+            <<"get_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   'get'
+                };
+            <<"get_all_roomlots">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   'get'
+                };
+            <<"create_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   create
+                };
+            <<"update_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   update
+                };
+            <<"delete_roomlot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomlot,
+                    action          =   delete
+                };
+
+            %% ==================================================
             <<"get_roombet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_roombet,
