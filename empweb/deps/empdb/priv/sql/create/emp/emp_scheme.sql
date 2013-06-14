@@ -237,13 +237,13 @@ create table authority(
     **/
     name_ti     decimal unique      default nextval('seq_any_ti'),
     alias       varchar(1024)   unique,
-    
+
 --     next_id     decimal         references authority(id) default null,
 --     next_alias  varchar(1024)   references authority(alias) default null,
--- 
+--
 --     prev_id     decimal         references authority(id) default null,
 --     prev_alias  varchar(1024)   references authority(alias) default null,
-    
+
     level       decimal default 0,
     created     timestamp without time zone not null default utcnow(),
     isdeleted   boolean default false
@@ -422,11 +422,11 @@ create table pers(
     hobby       varchar(1024)   default null,
     descr       varchar(1024)   default null,
     interest    varchar(1024)   default null,
-    
+
 
     geo_id  decimal references  geo(id)     default null,
 
-    
+
     birthday    timestamp       without time zone default null,
     -- gender_id           decimal references gender(id)      default null,
     ismale      boolean    default true,
@@ -471,7 +471,7 @@ create table pers(
         Сколько стоит то, что не хватает для перехода на следующий уровень.
     **/
     experlackprice      numeric(1000, 2)         default null,
-    
+
     /**
         Эмоции пользователя
     **/
@@ -497,40 +497,40 @@ create table pers(
     live_community_head         varchar(1024) /*references doc(head)*/ default null,
     live_community_approved     boolean  default null,
     live_community_rejectreason text default null,
-    
+
     /** Общество которое он создал
         [см далее]: own_community_id decimal references community(id) default null,
     **/
     own_community_head      varchar(1024) /*references doc(head)*/ default null,
-    
+
     /** Страна \ рай \ aд, где он сейчас находится
         [см далее]: live_room_id decimal references room(id) default null,
-    **/ 
+    **/
     live_room_head          varchar(1024) /*references doc(head)*/ default null,
     live_room_approved      boolean  default true,
 
     /** Страна \ рай \ aд, гражданином которой он является
         [см далее]: citizen_room_id decimal references room(id) default null,
-    **/ 
+    **/
     citizen_room_head   varchar(1024) /*references doc(head)*/ default null,
-    
+
     citizen_room_fromdatetime       timestamp without time zone default null,
-      
+
     /**
         позиция в списке
     **/
     live_room_pos       numeric default 0,
 
-    
+
     /** Страна \ рай \ aд
         [см далее]: own_room_id decimal references room(id) default null,
     **/
-    
+
     own_room_head       varchar(1024) /*references doc(head)*/ default null,
-    
+
     -- allowauctoffer      boolean default false,
 
-    
+
     perspicphoto_id      decimal references perspichead(id)   default null,
     perspichead_id      decimal references perspichead(id)   default null,
     perspicbody_id      decimal references perspicbody(id)   default null,
@@ -576,10 +576,10 @@ create table pers(
         флаг удаления по времени
     **/
     istimeover          boolean default false,
-    
+
     /**
         флаг удаления
-    **/    
+    **/
     isdeleted           boolean default false
 );
 
@@ -690,7 +690,7 @@ create table friend(
     friend_nick         varchar(1024)                                   default null,
     friendtype_id       decimal         references friendtype(id)       default null,
     friendtype_alias    varchar(1024)   references friendtype(alias)    default null,
-    
+
     created             timestamp       without time zone not null      default utcnow(),
     constraint          friend_pers_id_friend_id_many_key unique (pers_id, friend_id)
 );
@@ -834,7 +834,7 @@ create table doc(
     **/
     doctype_id          decimal         references doctype(id)    default null,
     doctype_alias       varchar(1024)   references doctype(alias) default null,
-    
+
     /**
         Типы контента: Обычный, эротический
     **/
@@ -901,7 +901,7 @@ create table doc(
     isrepost            boolean default false,
     isrepostcont        boolean default false,
     isrepostable        boolean default true,
-    
+
     /**
         флаг удаления
     **/
@@ -942,7 +942,7 @@ create table attach(
 ------------------------------------------------------------------------------
 
 
-create sequence seq_repost_id;    
+create sequence seq_repost_id;
 create table repost(
     id                decimal   primary key default nextval('seq_repost_id'),
     doc_id            decimal         references doc(id)      default null,
@@ -978,7 +978,7 @@ create table blog(
 );
 
 /**
- *  Запись блога 
+ *  Запись блога
 **/
 create table post(
     doc_id              decimal unique references doc(id),
@@ -1161,7 +1161,7 @@ create table chatlang(
 );
 
 /**
- *  Дерево тем чата. Редактируется администраторами и пользователями. 
+ *  Дерево тем чата. Редактируется администраторами и пользователями.
 **/
 create sequence seq_topic_id;
 create table topic(
@@ -1197,7 +1197,7 @@ create table topic(
     **/
     ncommunitytargets   decimal default 0,
 
-    
+
     /**
         целевых ссылок на эту сущность и ее детей
     **/
@@ -1243,31 +1243,31 @@ create table room(
     **/
     chatlang_id         decimal         references chatlang(id)     default null,
     chatlang_alias      varchar(1024)   references chatlang(alias)  default null,
-    
+
     /**
         Фон комнаты
     **/
     back_file_id        decimal references file(id)     default null,
     back_path           varchar(1024)                   default null,
-    
+
     /**
         Обои комнаты
     **/
     wall_file_id        decimal references file(id)     default null,
     wall_path           varchar(1024)                   default null,
-    
+
     /**
         Флаг комнаты
     **/
     flag_file_id        decimal references file(id)     default null,
     flag_path           varchar(1024)                   default null,
-    
+
     /**
         Герб комнаты
     **/
     arms_file_id        decimal references file(id)     default null,
     arms_path           varchar(1024)                   default null,
-    
+
     /**
         Режим комнаты
     **/
@@ -1299,10 +1299,10 @@ create table room(
     experlackprice      numeric(1000, 2)         default null,
     treas               numeric(1000, 2) default 1
 
-    
-    
 
-    
+
+
+
 --     bearing - герб
 --     flag - ссылка на картинку флага
 --     wallpaper - ссылка на картинку фона ?????? не закончено
@@ -1339,7 +1339,7 @@ create table roomlist(
 
     roomlisttype_id        decimal         references roomlisttype(id)        default null,
     roomlisttype_alias     varchar(1024)   references roomlisttype(alias)     default null,
-    
+
     text default null,
     created     timestamp without time zone not null default utcnow(),
     isdeleted   boolean default false
@@ -1522,7 +1522,7 @@ create table action(
 ------------------------------------------------------------------------------
 -- События
 ------------------------------------------------------------------------------
-    
+
 create sequence seq_eventtype_id;
 create table eventtype(
     id          decimal primary key default nextval('seq_eventtype_id'),
@@ -1572,7 +1572,7 @@ create table message(
     **/
     messagetype_id      decimal         references messagetype(id)      default null,
     messagetype_alias   varchar(1024)   references messagetype(alias)   default null,
-    
+
     reader_id           decimal         references pers(id) default null,
     reader_nick         varchar(1024)   default null default null,
     /**
@@ -1601,6 +1601,18 @@ create table roomlot(
     betmax          numeric(1000, 2) default 100
 );
 
+
+
+create table communitylot(
+    doc_id          decimal unique references doc(id),
+    room_id         decimal references room(doc_id)        default null,
+    room_head       varchar(1024) /*references doc(head)*/ default null,
+    dtstart         timestamp without time zone not null default utcnow(),
+    dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+    betmin          numeric(1000, 2) default 0,
+    betcur          numeric(1000, 2) default 0,
+    betmax          numeric(1000, 2) default 100
+);
 
 -- create table roomlot_log(
 --     doc_id          decimal unique references doc(id),
@@ -1643,9 +1655,40 @@ alter table room add column roomlot_dtstart     timestamp without time zone not 
 alter table room add column roomlot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
 alter table room add column roombet_id          decimal        references roombet(id)       default null;
 alter table room add column roombet_owner_id    decimal        references pers(id)          default null;
-alter table room add column roombet_owner_nick  varchar(1024)       default null   default null;
+alter table room add column roombet_owner_nick  varchar(1024)                               default null;
 alter table room add column roombet_price       decimal                                     default null;
 
+
+
+create sequence seq_communitybet_id;
+create table communitybet(
+    id              decimal primary key default nextval('seq_communitybet_id'),
+
+    communitylot_id      decimal         references communitylot(doc_id)      default null,
+    community_id         decimal        /*  references communitylot(community_id)  */ default null,
+    community_head       varchar(1024)  /* references communitylot(community_head) */ default null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id        decimal             references pers(id)     not null,
+    owner_nick      varchar(1024)       default null   not null,
+    price           numeric(1000, 2)    default 0,
+
+    created         timestamp without time zone not null    default utcnow(),
+    isdeleted       boolean    default false
+);
+
+
+alter table community add column communitylot_id          decimal         references communitylot(doc_id)  default null;
+alter table community add column communitylot_betmin      numeric(1000, 2)                            default null;
+alter table community add column communitylot_betmax      numeric(1000, 2)                            default null;
+alter table community add column communitylot_dtstart     timestamp without time zone not null default utcnow();
+alter table community add column communitylot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+alter table community add column communitybet_id          decimal        references communitybet(id)       default null;
+alter table community add column communitybet_owner_id    decimal        references pers(id)          default null;
+alter table community add column communitybet_owner_nick  varchar(1024)                               default null;
+alter table community add column communitybet_price       decimal                                     default null;
 
 /*
 create sequence seq_roomoffer_id;
@@ -1713,7 +1756,7 @@ create table thingtype(
     nnodes              decimal default 0,
 
     file_id         references file(id) default null,
-    
+
     created         timestamp without time zone not null default utcnow(),
     isdeleted       boolean    default false
 );
@@ -1737,7 +1780,7 @@ create table thing(
         Номер языковой сущности
     **/
     descr_ti        decimal unique      default nextval('seq_any_ti'),
-    
+
     /**
         Ccылка на вершину дерева типов вещей
     **/
@@ -1898,7 +1941,7 @@ create table thingwish (
 
     price               numeric(1000, 2) default null,
     rent                numeric(1000, 2) default null,
-    
+
     counter             timestamp without time zone not null default utcnow(),
 
     -- expired             timestamp without time zone          default null,
@@ -1945,7 +1988,7 @@ create table roomexperbuy (
     **/
     room_id            decimal         references room(id)      default null,
     room_head          varchar(1024)                            default null,
-    
+
     /**
         Вещь которую приобрели --- опыт.
         Нужно знать, какой количество

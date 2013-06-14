@@ -33,12 +33,12 @@ drop function make_plpgsql();
 \set FILE :SECTIONPATH /emp_procedures_countchildren.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_tr.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_pers.sql \i :FILE
 
@@ -49,12 +49,12 @@ drop function make_plpgsql();
 
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_doc.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_room.sql \i :FILE
 
@@ -68,32 +68,32 @@ drop function make_plpgsql();
 
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_attach.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_community.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_message.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_event.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_thing.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_thingbuy.sql \i :FILE
 
@@ -104,27 +104,38 @@ drop function make_plpgsql();
 
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_experbuy.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_roomlot.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_roombet.sql \i :FILE
 
+
 /**
-    @doc 
+    @doc
+**/
+\set FILE :SECTIONPATH /emp_procedures_communitylot.sql \i :FILE
+
+/**
+    @doc
+**/
+\set FILE :SECTIONPATH /emp_procedures_communitybet.sql \i :FILE
+
+/**
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_pay.sql \i :FILE
 
 /**
-    @doc 
+    @doc
 **/
 \set FILE :SECTIONPATH /emp_procedures_roomtreas.sql \i :FILE
 

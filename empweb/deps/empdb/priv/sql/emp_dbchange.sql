@@ -1392,11 +1392,11 @@
 -- 2013.05.16 12:40:40:891241891 ---------------------------------------------
 
 /*
-    alter table thingbuy add column  
+    alter table thingbuy add column
         room_id decimal references doc(id)   default null;
-    alter table thingbuy add column  
+    alter table thingbuy add column
         room_head varchar(1024)  default null;
-    alter table thingbuy add column  
+    alter table thingbuy add column
         costs  numeric(1000, 2)  default null;
     insert into paytype(alias, isincome)
         values  ('thingforme_out',     false);
@@ -1412,12 +1412,59 @@
     alter TABLE thingbuy alter column thing_alias  drop not null;
     alter TABLE thingbuy alter column thing_alias  drop not null;
     alter table thing add column aliasnum numeric default null;
-    alter table doc add column  
+    alter table doc add column
         lang_id  decimal references chatlang(id) default null;
-    alter table doc add column  
+    alter table doc add column
         lang_alias varchar(1024) references chatlang(alias) default null;
     alter table thingwish add column
     thingtype_id       decimal references thingtype(id) default null;
     alter table thingwish add column
     thingtype_alias    varchar(1024)                    default null;
 */
+
+
+
+
+create table communitylot(
+    doc_id          decimal unique references doc(id),
+    room_id         decimal references room(doc_id)        default null,
+    room_head       varchar(1024) /*references doc(head)*/ default null,
+    dtstart         timestamp without time zone not null default utcnow(),
+    dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+    betmin          numeric(1000, 2) default 0,
+    betcur          numeric(1000, 2) default 0,
+    betmax          numeric(1000, 2) default 100
+);
+
+
+create sequence seq_communitybet_id;
+create table communitybet(
+    id              decimal primary key default nextval('seq_communitybet_id'),
+
+    communitylot_id      decimal         references communitylot(doc_id)      default null,
+    community_id         decimal        /*  references communitylot(community_id)  */ default null,
+    community_head       varchar(1024)  /* references communitylot(community_head) */ default null,
+
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id        decimal             references pers(id)     not null,
+    owner_nick      varchar(1024)       default null   not null,
+    price           numeric(1000, 2)    default 0,
+
+    created         timestamp without time zone not null    default utcnow(),
+    isdeleted       boolean    default false
+);
+
+
+alter table community add column communitylot_id          decimal         references communitylot(doc_id)  default null;
+alter table community add column communitylot_betmin      numeric(1000, 2)                            default null;
+alter table community add column communitylot_betmax      numeric(1000, 2)                            default null;
+alter table community add column communitylot_dtstart     timestamp without time zone not null default utcnow();
+alter table community add column communitylot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+alter table community add column communitybet_id          decimal        references communitybet(id)       default null;
+alter table community add column communitybet_owner_id    decimal        references pers(id)          default null;
+alter table community add column communitybet_owner_nick  varchar(1024)                               default null;
+alter table community add column communitybet_price       decimal                                     default null;
+
+
