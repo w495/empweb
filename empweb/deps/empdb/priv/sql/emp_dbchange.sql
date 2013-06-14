@@ -1485,3 +1485,5 @@ alter table community add column communitybet_price       decimal               
     insert into eventtype (alias, isnews) values ('delete_communitybet_beatrate', false);
     insert into eventtype (alias, isnews) values ('create_communitybet_win', false);
     insert into eventtype (alias, isnews) values ('delete_communitylot_win', false);
+
+
