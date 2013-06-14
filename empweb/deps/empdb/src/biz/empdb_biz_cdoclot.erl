@@ -124,7 +124,7 @@ delete(Filter)->
                 cdoclot_id          = proplists:get_value(id,       cdoclotpl),
                 cdoc_id             = proplists:get_value(cdoc_id,  cdoclotpl),
                 {ok, _} =
-                    empdb_dao_cdoc:update(Con, [
+                    empdb_dao_doc:update(Con, [
                         {id,                cdoc_id},
                         {cdoclot_id,        null},
                         {cdoclot_betmin,    null},
@@ -223,7 +223,7 @@ remove_expired()->
                                 {price,             Price}
                             ]),
                         {ok, [{cdocpl}]} =
-                            empdb_dao_cdoc:update(Con, [
+                            empdb_dao_doc:update(Con, [
                                 {id,                cdoc_id},
                                 {cdoclot_id,        null},
                                 {cdoclot_betmin,    null},
