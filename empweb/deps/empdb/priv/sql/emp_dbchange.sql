@@ -1427,14 +1427,18 @@
 
 create table communitylot(
     doc_id          decimal unique references doc(id),
-    room_id         decimal references room(doc_id)        default null,
-    room_head       varchar(1024) /*references doc(head)*/ default null,
+    community_id         decimal references community(doc_id)        default null,
+    community_head       varchar(1024) /*references doc(head)*/ default null,
     dtstart         timestamp without time zone not null default utcnow(),
     dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
     betmin          numeric(1000, 2) default 0,
     betcur          numeric(1000, 2) default 0,
     betmax          numeric(1000, 2) default 100
 );
+
+alter table communitylot add column community_id          decimal         references community(doc_id)   default null;
+
+alter table communitylot add column community_head       varchar(1024) /*references doc(head)*/ default null;
 
 
 create sequence seq_communitybet_id;
@@ -1468,3 +1472,16 @@ alter table community add column communitybet_owner_nick  varchar(1024)         
 alter table community add column communitybet_price       decimal                                     default null;
 
 
+    insert into paytype(alias, isincome)
+        values  ('communitybet_out',     false),
+                ('communitybet_in',      true ),
+                ('communitylot_in',      true );
+
+
+
+    insert into eventobj (alias) values ('communitylot');
+    insert into eventobj (alias) values ('communitybet');
+    insert into eventtype (alias, isnews) values ('delete_communitylot_expired', false);
+    insert into eventtype (alias, isnews) values ('delete_communitybet_beatrate', false);
+    insert into eventtype (alias, isnews) values ('create_communitybet_win', false);
+    insert into eventtype (alias, isnews) values ('delete_communitylot_win', false);

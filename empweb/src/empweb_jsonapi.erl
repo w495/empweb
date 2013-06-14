@@ -427,7 +427,10 @@ error(Code, {error, Error}) ->
         %status  = Code,
         status  = 200,
         format  = json,
-        body    = {[{error, Error}]}
+        body    = {[
+            {'utc',     nowsec()},
+            {error, Error}
+        ]}
     };
 error(Code, Error) ->
     ?MODULE:error(Code, {error, Error}).
