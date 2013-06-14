@@ -45,8 +45,8 @@ nowsec() ->
 
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        cdoclot_id  = proplists:get_value(cdoclot_id, Params),
-        cdocbet_owner_id   = proplists:get_value(owner_id, Params),
+        Cdoclot_id  = proplists:get_value(cdoclot_id, Params),
+        Cdocbet_owner_id   = proplists:get_value(owner_id, Params),
         Price              = proplists:get_value(price, Params, 0),
         Now                = nowsec(),
         case {
@@ -79,11 +79,11 @@ create(Params)->
                 {limit, 1}
             ])
         } of
-            {   {ok, [{cdoclotpl}]},
+            {   {ok, [{Cdoclotpl}]},
                 {ok, [{Userpl}]}
             } ->
-                cdoclot_owner_id    = proplists:get_value(owner_id, cdoclotpl),
-                cdoc_id             = proplists:get_value(cdoc_id,  cdoclotpl),
+                Cdoclot_owner_id    = proplists:get_value(owner_id, cdoclotpl),
+                Cdoc_id             = proplists:get_value(cdoc_id,  cdoclotpl),
                 Betmin              = proplists:get_value(betmin,   cdoclotpl),
                 Betmax              = proplists:get_value(betmax,   cdoclotpl),
                 Dtstart             = proplists:get_value(dtstart,  cdoclotpl),
@@ -117,7 +117,7 @@ create(Params)->
                     end,
                 case (
                     (
-                        cdocbet_owner_id =/= cdoclot_owner_id
+                        Cdocbet_owner_id =/= Cdoclot_owner_id
                     ) and (
                         Price =< Money
                     ) and (
@@ -147,7 +147,7 @@ create(Params)->
                                     {eventact_alias,    delete},
                                     {owner_id,          Maxprev_owner_id},
                                     {target_id,         proplists:get_value(id, Maxprev)},
-                                    {pers_id,           cdoclot_owner_id},
+                                    {pers_id,           Cdoclot_owner_id},
                                     {eventtype_alias,   delete_cdocbet_beatrate}
                                 ]),
                                 %% Шлем сообщение, что ставка бита
@@ -155,9 +155,9 @@ create(Params)->
                                 {ok, _} = empdb_dao_event:create(Con, [
                                     {eventobj_alias,    cdocbet},
                                     {eventact_alias,    delete},
-                                    {owner_id,          cdoclot_owner_id},
+                                    {owner_id,          Cdoclot_owner_id},
                                     {target_id,         proplists:get_value(id, Maxprev)},
-                                    {pers_id,           cdocbet_owner_id},
+                                    {pers_id,           Cdocbet_owner_id},
                                     {eventtype_alias,   delete_cdocbet_beatrate}
                                 ]),
                                 {ok, _} = empdb_dao_pay:create(Con, [
@@ -187,7 +187,7 @@ create(Params)->
                             {isincome,          false},
                             {price,             Price}
                         ]),
-                        {ok, [{cdocbet}]} = empdb_dao_cdocbet:create(Con,[
+                        {ok, [{Cdocbet}]} = empdb_dao_cdocbet:create(Con,[
                             {filter, [
                                 id
                             ]}
@@ -210,9 +210,9 @@ create(Params)->
                                 %%
                                 %% Меняется владельца страны.
                                 %%
-                                {ok, [{cdocpl}]} =
+                                {ok, [{Cdocpl}]} =
                                     empdb_dao_cdoc:update(Con, [
-                                        {id,                cdoc_id},
+                                        {id,                Cdoc_id},
                                         {cdoclot_id,        null},
                                         {cdoclot_betmin,    null},
                                         {cdoclot_betmax,    null},
@@ -222,14 +222,14 @@ create(Params)->
                                         {cdocbet_owner_id,  null},
                                         {cdocbet_owner_nick,null},
                                         {cdocbet_price,     null},
-                                        {owner_id,          cdocbet_owner_id}
+                                        {owner_id,          Cdocbet_owner_id}
                                     ]),
                                 %%
                                 %%  Меняется владельца страны.
                                 %%  Отбираем страну у старого владельца.
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
-                                    {id,            cdoclot_owner_id},
+                                    {id,            Cdoclot_owner_id},
                                     {own_cdoc_id,   null},
                                     {money,         {incr, Price}}
                                 ]),
@@ -238,19 +238,19 @@ create(Params)->
                                 %%  ОТдаем страну новому владельцу.
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
-                                    {id,            cdocbet_owner_id},
+                                    {id,            Cdocbet_owner_id},
                                     {own_cdoc_id,
-                                        proplists:get_value(id, cdocpl)},
+                                        proplists:get_value(id, Cdocpl)},
                                     {citizen_cdoc_id,
-                                        proplists:get_value(id, cdocpl)}
+                                        proplists:get_value(id, Cdocpl)}
                                 ]),
                                 %% Победителю шлем сообщение, что он победил
                                 {ok, _} = empdb_dao_event:create(Con, [
                                     {eventobj_alias,    cdocbet},
                                     {eventact_alias,    create},
-                                    {owner_id,          cdocbet_owner_id},
+                                    {owner_id,          Cdocbet_owner_id},
                                     {target_id,         proplists:get_value(id, cdocbet)},
-                                    {pers_id,           cdoclot_owner_id},
+                                    {pers_id,           Cdoclot_owner_id},
                                     {eventtype_alias,   create_cdocbet_win}
                                 ]),
                                 %% Владельцу аукциона шлем сообщение,
@@ -258,33 +258,33 @@ create(Params)->
                                 {ok, _} = empdb_dao_event:create(Con, [
                                     {eventobj_alias,    cdoclot},
                                     {eventact_alias,    delete},
-                                    {owner_id,          cdoclot_owner_id},
-                                    {doc_id,            cdoclot_id},
-                                    {pers_id,           cdocbet_owner_id},
+                                    {owner_id,          Cdoclot_owner_id},
+                                    {doc_id,            Cdoclot_id},
+                                    {pers_id,           Cdocbet_owner_id},
                                     {eventtype_alias,   delete_cdoclot_win}
                                 ]),
                                 {ok, _} = empdb_dao_cdoclot:update(Con,[
                                     {filter, [
                                         {isdeleted, false},
-                                        {id, cdoclot_id}
+                                        {id, Cdoclot_id}
                                     ]},
                                     {values, [
                                         {isdeleted, true}
                                     ]}
                                 ]),
-                                 {ok, [{cdocbet}]};
+                                 {ok, [{Cdocbet}]};
                             false ->
                                 %%
                                 %% Штатная ситуация.
                                 %% Человек (пока) не победил.
                                 %%
-                                 {ok, [{cdocbet}]}
+                                 {ok, [{Cdocbet}]}
                         end;
                     _ ->
                         {error, {something_wrong, {[
                             {'now',             Now},
-                            {cdocbet_owner_id,  cdocbet_owner_id},
-                            {cdoclot_owner_id,  cdoclot_owner_id},
+                            {cdocbet_owner_id,  Cdocbet_owner_id},
+                            {cdoclot_owner_id,  Cdoclot_owner_id},
                             {money,             Money},
                             {price,             Price},
                             {betmin,            Betmin},
