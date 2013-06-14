@@ -1612,37 +1612,6 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
-            %% ==================================================
-            <<"count_roomlot">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   count
-                };
-            <<"get_roomlot">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   'get'
-                };
-            <<"get_all_roomlots">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   'get'
-                };
-            <<"create_roomlot">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   create
-                };
-            <<"update_roomlot">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   update
-                };
-            <<"delete_roomlot">> ->
-                Eh#empweb_hap{
-                    handler         =   empweb_jsonapi_roomlot,
-                    action          =   delete
-                };
 
             %% ==================================================
             <<"get_roombet">> ->
@@ -1671,6 +1640,65 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+            %% ==================================================
+            <<"count_communitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   count
+                };
+            <<"get_communitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   'get'
+                };
+            <<"get_all_communitylots">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   'get'
+                };
+            <<"create_communitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   create
+                };
+            <<"update_communitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   update
+                };
+            <<"delete_communitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitylot,
+                    action          =   delete
+                };
+
+            %% ==================================================
+            <<"get_communitybet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitybet,
+                    action          =   'get'
+                };
+            <<"get_all_communitybets">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitybet,
+                    action          =   'get'
+                };
+            <<"create_communitybet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitybet,
+                    action          =   create
+                };
+            <<"update_communitybet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitybet,
+                    action          =   update
+                };
+            <<"delete_communitybet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_communitybet,
+                    action          =   delete
+                };
 
             %% ==================================================
             <<"get_actiontype">> ->
