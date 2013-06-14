@@ -202,7 +202,7 @@ create(Params)->
                                 %% Старому владельцу зачисляются деньги.
                                 %%
                                 {ok, _} = empdb_dao_pay:create(Con, [
-                                    {pers_id,           cdoclot_owner_id},
+                                    {pers_id,           Cdoclot_owner_id},
                                     {paytype_alias,     cdoclot_in},
                                     {isincome,          true},
                                     {price,             Price}

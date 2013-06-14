@@ -1499,7 +1499,7 @@
     create sequence seq_cdocbet_id;
     create table cdocbet(
         id              decimal primary key default nextval('seq_cdocbet_id'),
-        doclot_id      decimal         references cdoclot(doc_id)      default null,
+        cdoclot_id      decimal         references cdoclot(doc_id)      default null,
         cdoc_id         decimal             default null,
         cdoc_head       varchar(1024)  default null,
         owner_id        decimal             references pers(id)     not null,
@@ -1508,6 +1508,9 @@
         created         timestamp without time zone not null    default utcnow(),
         isdeleted       boolean    default false
     );
+
+   alter table cdocbet add column
+        cdoclot_id      decimal         references cdoclot(doc_id)      default null;
 
 
     alter table doc add column
