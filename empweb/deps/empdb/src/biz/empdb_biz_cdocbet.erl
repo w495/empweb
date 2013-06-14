@@ -211,7 +211,7 @@ create(Params)->
                                 %% Меняется владельца страны.
                                 %%
                                 {ok, [{Cdocpl}]} =
-                                    empdb_dao_cdoc:update(Con, [
+                                    empdb_dao_doc:update(Con, [
                                         {id,                Cdoc_id},
                                         {cdoclot_id,        null},
                                         {cdoclot_betmin,    null},

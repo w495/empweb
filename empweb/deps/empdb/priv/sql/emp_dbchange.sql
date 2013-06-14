@@ -1519,10 +1519,13 @@
         cdoclot_betmin      numeric(1000, 2)                            default null;
     alter table doc add column
         cdoclot_betmax      numeric(1000, 2)                            default null;
+
     alter table doc add column
-        ommunitylot_dtstart     timestamp without time zone not null default utcnow();
+        cdoclot_dtstart     timestamp without time zone not null default utcnow();
     alter table doc add column
         cdoclot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+
+
     alter table doc add column
         cdocbet_id          decimal        references cdocbet(id)       default null;
     alter table doc add column
