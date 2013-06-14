@@ -118,7 +118,6 @@ drop function make_plpgsql();
 **/
 \set FILE :SECTIONPATH /emp_procedures_roombet.sql \i :FILE
 
-
 /**
     @doc
 **/
