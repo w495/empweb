@@ -1423,62 +1423,56 @@
 */
 
 
+-- 2013.06.14 16:37:49:884106689 ---------------------------------------------
 
 
-create table communitylot(
-    doc_id          decimal unique references doc(id),
-    community_id         decimal references community(doc_id)        default null,
-    community_head       varchar(1024) /*references doc(head)*/ default null,
-    dtstart         timestamp without time zone not null default utcnow(),
-    dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
-    betmin          numeric(1000, 2) default 0,
-    betcur          numeric(1000, 2) default 0,
-    betmax          numeric(1000, 2) default 100
-);
-
-alter table communitylot add column community_id          decimal         references community(doc_id)   default null;
-
-alter table communitylot add column community_head       varchar(1024) /*references doc(head)*/ default null;
-
-
-create sequence seq_communitybet_id;
-create table communitybet(
-    id              decimal primary key default nextval('seq_communitybet_id'),
-
-    communitylot_id      decimal         references communitylot(doc_id)      default null,
-    community_id         decimal        /*  references communitylot(community_id)  */ default null,
-    community_head       varchar(1024)  /* references communitylot(community_head) */ default null,
-
-    /**
-        Владелец, тот кто обладает товаром после покупки
-    **/
-    owner_id        decimal             references pers(id)     not null,
-    owner_nick      varchar(1024)       default null   not null,
-    price           numeric(1000, 2)    default 0,
-
-    created         timestamp without time zone not null    default utcnow(),
-    isdeleted       boolean    default false
-);
-
-
-alter table community add column communitylot_id          decimal         references communitylot(doc_id)  default null;
-alter table community add column communitylot_betmin      numeric(1000, 2)                            default null;
-alter table community add column communitylot_betmax      numeric(1000, 2)                            default null;
-alter table community add column communitylot_dtstart     timestamp without time zone not null default utcnow();
-alter table community add column communitylot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
-alter table community add column communitybet_id          decimal        references communitybet(id)       default null;
-alter table community add column communitybet_owner_id    decimal        references pers(id)          default null;
-alter table community add column communitybet_owner_nick  varchar(1024)                               default null;
-alter table community add column communitybet_price       decimal                                     default null;
-
-
+/*
+    create table communitylot(
+        doc_id          decimal unique references doc(id),
+        community_id         decimal references community(doc_id)        default null,
+        community_head       varchar(1024)  default null,
+        dtstart         timestamp without time zone not null default utcnow(),
+        dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+        betmin          numeric(1000, 2) default 0,
+        betcur          numeric(1000, 2) default 0,
+        betmax          numeric(1000, 2) default 100
+    );
+    alter table communitylot add column community_id          decimal         references community(doc_id)   default null;
+    alter table communitylot add column community_head       varchar(1024)  default null;
+    create sequence seq_communitybet_id;
+    create table communitybet(
+        id              decimal primary key default nextval('seq_communitybet_id'),
+        communitylot_id      decimal         references communitylot(doc_id)      default null,
+        community_id         decimal             default null,
+        community_head       varchar(1024)  default null,
+        owner_id        decimal             references pers(id)     not null,
+        owner_nick      varchar(1024)       default null   not null,
+        price           numeric(1000, 2)    default 0,
+        created         timestamp without time zone not null    default utcnow(),
+        isdeleted       boolean    default false
+    );
+    alter table community add column
+        communitylot_id          decimal         references communitylot(doc_id)  default null;
+    alter table community add column
+        communitylot_betmin      numeric(1000, 2)                            default null;
+    alter table community add column
+        communitylot_betmax      numeric(1000, 2)                            default null;
+    alter table community add column
+        ommunitylot_dtstart     timestamp without time zone not null default utcnow();
+    alter table community add column
+        communitylot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+    alter table community add column
+        communitybet_id          decimal        references communitybet(id)       default null;
+    alter table community add column
+        communitybet_owner_id    decimal        references pers(id)          default null;
+    alter table community add column
+        communitybet_owner_nick  varchar(1024)                               default null;
+    alter table community add column
+        communitybet_price       decimal                                     default null;
     insert into paytype(alias, isincome)
         values  ('communitybet_out',     false),
                 ('communitybet_in',      true ),
                 ('communitylot_in',      true );
-
-
-
     insert into eventobj (alias) values ('communitylot');
     insert into eventobj (alias) values ('communitybet');
     insert into eventtype (alias, isnews) values ('delete_communitylot_expired', false);
@@ -1486,4 +1480,64 @@ alter table community add column communitybet_price       decimal               
     insert into eventtype (alias, isnews) values ('create_communitybet_win', false);
     insert into eventtype (alias, isnews) values ('delete_communitylot_win', false);
 
+*/
 
+
+--
+
+
+    create table cdoclot(
+        doc_id          decimal unique references doc(id),
+        cdoc_id         decimal references doc(id)        default null,
+        cdoc_head       varchar(1024)  default null,
+        dtstart         timestamp without time zone not null default utcnow(),
+        dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
+        betmin          numeric(1000, 2) default 0,
+        betcur          numeric(1000, 2) default 0,
+        betmax          numeric(1000, 2) default 100
+    );
+    create sequence seq_cdocbet_id;
+    create table cdocbet(
+        id              decimal primary key default nextval('seq_cdocbet_id'),
+        doclot_id      decimal         references cdoclot(doc_id)      default null,
+        cdoc_id         decimal             default null,
+        cdoc_head       varchar(1024)  default null,
+        owner_id        decimal             references pers(id)     not null,
+        owner_nick      varchar(1024)       default null   not null,
+        price           numeric(1000, 2)    default 0,
+        created         timestamp without time zone not null    default utcnow(),
+        isdeleted       boolean    default false
+    );
+
+
+    alter table doc add column
+        cdoclot_id          decimal         references cdoclot(doc_id)  default null;
+    alter table doc add column
+        cdoclot_betmin      numeric(1000, 2)                            default null;
+    alter table doc add column
+        cdoclot_betmax      numeric(1000, 2)                            default null;
+    alter table doc add column
+        ommunitylot_dtstart     timestamp without time zone not null default utcnow();
+    alter table doc add column
+        cdoclot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
+    alter table doc add column
+        cdocbet_id          decimal        references cdocbet(id)       default null;
+    alter table doc add column
+        cdocbet_owner_id    decimal        references pers(id)          default null;
+    alter table doc add column
+        cdocbet_owner_nick  varchar(1024)                               default null;
+    alter table doc add column
+        cdocbet_price       decimal                                     default null;
+
+
+
+    insert into paytype(alias, isincome)
+        values  ('cdocbet_out',     false),
+                ('cdocbet_in',      true ),
+                ('cdoclot_in',      true );
+    insert into eventobj (alias) values ('cdoclot');
+    insert into eventobj (alias) values ('cdocbet');
+    insert into eventtype (alias, isnews) values ('delete_cdoclot_expired', false);
+    insert into eventtype (alias, isnews) values ('delete_cdocbet_beatrate', false);
+    insert into eventtype (alias, isnews) values ('create_cdocbet_win', false);
+    insert into eventtype (alias, isnews) values ('delete_cdoclot_win', false);

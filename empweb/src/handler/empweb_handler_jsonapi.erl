@@ -1612,6 +1612,11 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+            <<"get_roomandcommunitylot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_roomcommunitylot,
+                    action          =   'get'
+                };
 
             %% ==================================================
             <<"count_roomlot">> ->
@@ -1729,6 +1734,68 @@ empweb_jsonapi_map(Req, {List}, State) ->
             <<"delete_communitybet">> ->
                 Eh#empweb_hap{
                     handler         =   empweb_jsonapi_communitybet,
+                    action          =   delete
+                };
+
+
+            %% ==================================================
+            %% ==================================================
+
+            <<"count_cdoclot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   count
+                };
+            <<"get_cdoclot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   'get'
+                };
+            <<"get_all_cdoclots">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   'get'
+                };
+            <<"create_cdoclot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   create
+                };
+            <<"update_cdoclot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   update
+                };
+            <<"delete_cdoclot">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdoclot,
+                    action          =   delete
+                };
+
+            %% ==================================================
+            <<"get_cdocbet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdocbet,
+                    action          =   'get'
+                };
+            <<"get_all_cdocbets">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdocbet,
+                    action          =   'get'
+                };
+            <<"create_cdocbet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdocbet,
+                    action          =   create
+                };
+            <<"update_cdocbet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdocbet,
+                    action          =   update
+                };
+            <<"delete_cdocbet">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_cdocbet,
                     action          =   delete
                 };
 

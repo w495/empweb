@@ -26,7 +26,7 @@
 ]).
 
 
-% 
+%
 % -define\(CREATE_COMMUNITY_PRICE, 1.0).
 %
 
@@ -315,7 +315,7 @@ update(Params)->
             ),
 
         Price = proplists:get_value(price, Servicepl),
-        
+
         Money = proplists:get_value(money, Mbownerpl),
         {ok, [{Readgteauthoritypl}]} =
             empdb_dao_authority:get(Con, [
@@ -342,7 +342,7 @@ update(Params)->
         Candsgteauthority_level =
             proplists:get_value(level, Candsgteauthoritypl),
 
-        case 
+        case
             ((Authority_level >= Readgteauthority_level)
                 and
             (Authority_level >= Candsgteauthority_level))
@@ -429,6 +429,17 @@ count(Params)->
         ])
     end).
 
+
+
+%get(Params)->
+    %empdb_dao:with_transaction(fun(Con)->
+        %empdb_daowp_community:get(Con, Params)
+    %end).
+
+%get(Params, Fields)->
+    %empdb_dao:with_transaction(fun(Con)->
+        %empdb_daowp_community:get(Con, Params, Fields)
+    %end).
 
 
 get(Params)->
