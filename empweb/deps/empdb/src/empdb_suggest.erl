@@ -7,7 +7,8 @@
 -module(empdb_suggest).
 -export([
     string/1,
-    string/2
+    string/2,
+    len/1
 ]).
 
 string(Orgstring) ->
@@ -137,22 +138,37 @@ string(Orgstring, Additions)->
     ]),
 
     Norgstring =
-        binary:part(
+        part(
             Orgstring,
             0,
             erlang:min(
-                erlang:byte_size(Orgstring),
+                len(Orgstring),
                 Maximumnicksize
             )
         ),
 
-    Strparts__ = binary:split(Norgstring, Stoppunkts, [global, trim]),
+    Strparts__ =
+        split(
+            Norgstring,
+            Stoppunkts,
+            [global, trim]
+        ),
 
-    Strparts_ = lists:foldl(fun(Nn, Acc) -> lists:append(binary:split(
-        Nn,
-        Stopwords ,
-        [trim]
-    ), Acc) end, [], Strparts__),
+    Strparts_ =
+        lists:foldl(
+            fun(Nn, Acc) ->
+                lists:append(
+                    split(
+                        Nn,
+                        Stopwords ,
+                        [trim]
+                    ),
+                    Acc
+                )
+            end,
+            [],
+            Strparts__
+        ),
 
     Strparts =
         case lists:filter(fun(<<>>)-> false; (_)-> true end,  Strparts_) of
@@ -182,7 +198,7 @@ string(Orgstring, Additions)->
     Sugs =
         sets:to_list(sets:from_list(lists:map(
             fun(Word) ->
-                binary:part(Word,0,erlang:min(erlang:byte_size(Word), Maximumnicksize))
+                part(Word,0,erlang:min(len(Word), Maximumnicksize))
             end,
             [
                 lgps_new({syllable, 2}),
@@ -197,10 +213,47 @@ string(Orgstring, Additions)->
 
     lists:sort(
         fun(X, Y) ->
-            erlang:byte_size(X) < erlang:byte_size(Y)
+            len(X) < len(Y)
         end,
         Sugs
     ).
+
+
+part(Word, Start, Len) ->
+    Graphemes =
+        ux_string:to_graphemes(
+            unicode:characters_to_list(Word)
+        ),
+    unicode:characters_to_binary(
+        lists:flatten(
+            lists:sublist(Graphemes, Start+1, Len)
+        )
+    ).
+
+
+split(Source, List, _Option) ->
+    Ux_string =
+        ux_string:split(
+            lists:map(
+                fun(Elem) ->
+                    unicode:characters_to_list(Elem)
+                end,
+                List
+            ),
+            unicode:characters_to_list(Source)
+        ),
+    lists:map(
+        fun(Elem) ->
+            unicode:characters_to_binary(Elem)
+        end,
+        Ux_string
+    ).
+
+len(In) ->
+    io:format(" ~n~n~n In  = ~p ~n~n~n", [In]),
+    Out = ux_string:length(unicode:characters_to_list(In)),
+    io:format(" ~n~n~n Out = ~p ~n~n~n", [Out]),
+    Out.
 
 
 string_match(Str, Patterns) ->

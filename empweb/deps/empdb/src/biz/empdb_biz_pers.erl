@@ -282,7 +282,8 @@ register(Params)->
 suggest_nick(Con, Orgnick, Maximumnicksize)->
     lists:sort(
         fun(X, Y) ->
-            erlang:byte_size(X) < erlang:byte_size(Y)
+            empdb_suggest:len(X) < empdb_suggest:len(Y)
+            %% erlang:byte_size(X) < erlang:byte_size(Y)
         end,
         lists:sort(
             lists:filter(
