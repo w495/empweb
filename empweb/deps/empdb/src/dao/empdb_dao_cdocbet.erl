@@ -67,7 +67,6 @@ table({fields, all})->
         isdeleted,
         cdoctype_id,
         cdoctype_alias
-
     ];
 
 %%
