@@ -1721,12 +1721,20 @@ get_lavishget_opt(Params1, Options)->
         Limit = proplists:get_value(limit, Params),
         Offset = proplists:get_value(offset, Params, 0),
 
+
+
         Lavishgetlistcountcur =
-            case Limit of
+            case {Limit} of
                 undefined ->
                     Lavishgetlistcount;
                 _ ->
-                    Limit + Offset
+                    L = Limit + Offset,
+                    case L >  Lavishgetlistcount of
+                        true ->
+                            Lavishgetlistcount;
+                        _ ->
+                            Limit + Offset
+                    end
             end,
 
         {Userpls_, _}=
