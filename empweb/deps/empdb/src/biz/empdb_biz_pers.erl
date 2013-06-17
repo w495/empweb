@@ -554,8 +554,9 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
                 Error ->
                     Error
             end;
-        {true, _} ->
-            {ok, []};
+        {true, tue} ->
+            Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGESTMAXIMUMNICKSIZE),
+            {error,{former_nick,Sugs}};
         {false, _} ->
             {error, {not_enough_money, {[
                 {money, Money},
