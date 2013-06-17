@@ -3124,7 +3124,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                     {error, {unknown, Msg}}
             end;
         Code ->
-            ?empdb_debug("unknown code ~p ~n", [Code, ?MODULE, ?LINE]),
+            ?empdb_debug("unknown code ~p ~p ~p ~n", [Code, ?MODULE, ?LINE]),
             {error, {unknown, Msg}}
     end;
 pgreterr(E) ->
