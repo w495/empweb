@@ -1485,7 +1485,7 @@
 
 --
 
-
+/*
     create table cdoclot(
         doc_id          decimal unique references doc(id),
         cdoc_id         decimal references doc(id)        default null,
@@ -1547,3 +1547,9 @@
     insert into eventtype (alias, isnews) values ('delete_cdocbet_beatrate', false);
     insert into eventtype (alias, isnews) values ('create_cdocbet_win', false);
     insert into eventtype (alias, isnews) values ('delete_cdoclot_win', false);
+
+*/
+
+    alter table pers  alter column nick type varchar(10);
+
+    update pers set nick = 'a' || CAST (id as varchar(1024)) where id  in ( select id from (select id, cl from (select id, char_length(nick) as cl , nick   from pers order by cl desc) as foo where foo.cl > 9) as bar);

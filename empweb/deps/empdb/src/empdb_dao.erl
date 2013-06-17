@@ -3074,6 +3074,16 @@ pgreterr({badmatch, E}) ->
     pgreterr(E);
 pgreterr(#error{code=Error_code_bin, message=Msg}) ->
     case Error_code_bin of
+        <<"22001">> ->
+            try
+                {ok, Re} = re:compile("character varying\\((.+)\\)"),
+                {match, [_, C | _]} = re:run(Msg, Re, [{capture, all, list}]),
+                {error,  {value_too_long_string, empdb_convert:to_integer(C)}}
+            catch
+                E:R ->
+                    ?empdb_debug("pgret ERROR(~p): ~p ~p - ~p~n", [?LINE, Msg, E, R]),
+                    {error,  {value_too_long, Msg}}
+            end;
         <<"23502">> ->
             try
                 {ok, Re} = re:compile("\"(.+)\""),
@@ -3114,7 +3124,7 @@ pgreterr(#error{code=Error_code_bin, message=Msg}) ->
                     {error, {unknown, Msg}}
             end;
         Code ->
-            ?empdb_debug("Code ~p ~n", [Code]),
+            ?empdb_debug("unknown code ~p ~n", [Code, ?MODULE, ?LINE]),
             {error, {unknown, Msg}}
     end;
 pgreterr(E) ->

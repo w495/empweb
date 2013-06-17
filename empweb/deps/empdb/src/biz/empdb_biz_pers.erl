@@ -321,12 +321,12 @@ suggest_nick(Con, Orgnick, Maximumnicksize)->
 
 create__(Pass, Params)->
     empdb_dao:with_connection(emp, fun(Con)->
-        case (erlang:byte_size(proplists:get_value(nick, Params)) > ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE) of
+        case (erlang:byte_size(proplists:get_value(nick, Params)) > ?EMPDB_BIZ_PERS_UNICODEMAXIMUMNICKSIZE) of
             true ->
                 Nick = proplists:get_value(nick, Params),
-                Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
+                Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGESTMAXIMUMNICKSIZE),
                 {error,{nick_length, {[
-                    {more_than, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE},
+                    {more_than, ?EMPDB_BIZ_PERS_DBMAXIMUMNICKSIZE},
                     {suggestions, Sugs}
                 ]}}};
             false ->
@@ -371,9 +371,16 @@ create__(Pass, Params)->
                             |Perspl
                         ]}]};
                     {error,{not_unique,<<"nick">>}}->
-                            Nick = proplists:get_value(nick, Params),
-                            Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE),
+                        Nick = proplists:get_value(nick, Params),
+                        Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGESTMAXIMUMNICKSIZE),
                         {error,{not_unique_nick,Sugs}};
+                    {error,{value_too_long_string,?EMPDB_BIZ_PERS_DBMAXIMUMNICKSIZE}} ->
+                        Nick = proplists:get_value(nick, Params),
+                        Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGESTMAXIMUMNICKSIZE),
+                        {error,{nick_length, {[
+                            {more_than, ?EMPDB_BIZ_PERS_DBMAXIMUMNICKSIZE},
+                            {suggestions, Sugs}
+                        ]}}};
                     {Eclass, Error} ->
                         {Eclass, Error}
                 end
@@ -541,7 +548,7 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
         %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
                     {ok, [{Item}]};
                 {error,{not_unique,<<"nick">>}}->
-                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE),
+                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGESTMAXIMUMNICKSIZE),
                     {error,{not_unique_nick,Sugs}};
                 Error ->
                     Error
