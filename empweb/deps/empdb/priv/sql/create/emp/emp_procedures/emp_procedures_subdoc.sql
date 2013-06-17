@@ -8,27 +8,27 @@ create or replace function on_insert_subdoc_inst() returns "trigger"
 declare
     _doc_parent_id numeric;
 begin
-    update doc set 
+    update doc set
         doctype_id      = (select id from doctype where alias=TG_ARGV[0]),
         doctype_alias   = TG_ARGV[0]
-    where 
-        id=new.doc_id 
-    returning 
-        doc.parent_id 
-    into 
+    where
+        id=new.doc_id
+    returning
+        doc.parent_id
+    into
         _doc_parent_id;
     /*
     if 'post' = TG_ARGV[0] then
         update blog set
-            nposts = 1 + nposts 
-        where 
+            nposts = 1 + nposts
+        where
             blog.doc_id = _doc_parent_id;
     end if;
-    
+
     if 'comment' = TG_ARGV[0] then
         update post set
             ncomments = 1 + ncomments
-        where 
+        where
             post.doc_id = _doc_parent_id;
     end if;
     */
@@ -124,6 +124,11 @@ create trigger t1on_insert_subdoc_inst after insert
 drop trigger if exists t1on_insert_subdoc_inst on claim;
 create trigger t1on_insert_subdoc_inst after insert
    on claim for each row execute procedure on_insert_subdoc_inst('claim');
+
+
+drop trigger if exists t1on_insert_subdoc_inst on cdoclot;
+create trigger t1on_insert_subdoc_inst after insert
+   on cdoclot for each row execute procedure on_insert_subdoc_inst('cdoclot');
 
 
 

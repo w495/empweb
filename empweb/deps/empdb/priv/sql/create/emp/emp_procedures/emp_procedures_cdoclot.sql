@@ -14,6 +14,10 @@ begin
     if not (new.cdoc_id is null) then
         new.cdoc_head =
             (select head from doc where doc.id = new.cdoc_id);
+        new.cdoctype_id =
+            (select doctype_id from doc where doc.id = new.cdoc_id);
+        new.cdoctype_alias =
+            (select doctype_alias from doc where doc.id = new.cdoc_id);
     end if;
     new.betcur = new.betmin;
     return new;

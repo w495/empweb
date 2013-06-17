@@ -64,7 +64,10 @@ table({fields, all})->
         owner_nick,
         price,
         created,
-        isdeleted
+        isdeleted,
+        cdoctype_id,
+        cdoctype_alias
+
     ];
 
 %%

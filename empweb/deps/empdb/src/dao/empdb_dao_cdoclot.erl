@@ -70,7 +70,9 @@ table({fields, all})->
         dtstop,
         betmin,
         betcur,
-        betmax
+        betmax,
+        cdoctype_id,
+        cdoctype_alias
     ];
 
 %%

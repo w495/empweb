@@ -1509,7 +1509,7 @@
         isdeleted       boolean    default false
     );
 
-   alter table cdocbet add column
+    alter table cdocbet add column
         cdoclot_id      decimal         references cdoclot(doc_id)      default null;
 
 
@@ -1550,6 +1550,29 @@
 
 */
 
+    update pers set nick = 'a' || CAST (id as varchar(1024)) where id
+        in ( select id from (select id, cl from (select id, char_length(nick)
+            as cl , nick   from pers order by cl desc) as foo where foo.cl > 9)
+                as bar);
+
     alter table pers  alter column nick type varchar(10);
 
-    update pers set nick = 'a' || CAST (id as varchar(1024)) where id  in ( select id from (select id, cl from (select id, char_length(nick) as cl , nick   from pers order by cl desc) as foo where foo.cl > 9) as bar);
+
+
+    insert into doctype(alias)
+        values  ('cdoclot');
+
+
+
+    alter table cdoclot add column
+        cdoctype_id          decimal         references doctype(id)    default null;
+
+    alter table cdoclot add column
+        cdoctype_alias       varchar(1024)   references doctype(alias) default null;
+
+    alter table cdocbet add column
+        cdoctype_id          decimal         references doctype(id)    default null;
+
+    alter table cdocbet add column
+        cdoctype_alias       varchar(1024)   references doctype(alias) default null;
+

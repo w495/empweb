@@ -15,6 +15,10 @@ begin
             (select cdoc_id from cdoclot where cdoclot.doc_id = new.cdoclot_id);
         new.cdoc_head =
             (select cdoc_head from cdoclot where cdoclot.doc_id = new.cdoclot_id);
+        new.cdoctype_id =
+            (select cdoctype_id from cdoclot where cdoclot.doc_id = new.cdoclot_id);
+        new.cdoctype_alias =
+            (select cdoctype_alias from cdoclot where cdoclot.doc_id = new.cdoclot_id);
     end if;
     /**
         Владелец заявки
