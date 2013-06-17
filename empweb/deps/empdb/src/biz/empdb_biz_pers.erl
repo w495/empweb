@@ -326,7 +326,7 @@ create__(Pass, Params)->
                 Nick = proplists:get_value(nick, Params),
                 Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
                 {error,{nick_length, {[
-                    {more_than, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE},
+                    {more_than, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE},
                     {suggestions, Sugs}
                 ]}}};
             false ->
@@ -372,7 +372,7 @@ create__(Pass, Params)->
                         ]}]};
                     {error,{not_unique,<<"nick">>}}->
                             Nick = proplists:get_value(nick, Params),
-                            Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
+                            Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE),
                         {error,{not_unique_nick,Sugs}};
                     {Eclass, Error} ->
                         {Eclass, Error}
@@ -541,7 +541,7 @@ update(Con, {nick, Nick},  {Function, [Params]}, Mbperspl) ->
         %             update_change_connected(Con, thingwish, owner, Itemid, Nick),
                     {ok, [{Item}]};
                 {error,{not_unique,<<"nick">>}}->
-                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_MAXIMUMNICKSIZE),
+                    Sugs = suggest_nick(Con, Nick, ?EMPDB_BIZ_PERS_SUGGEST_MAXIMUMNICKSIZE),
                     {error,{not_unique_nick,Sugs}};
                 Error ->
                     Error
