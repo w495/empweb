@@ -87,12 +87,13 @@ terminate(_Req, _State) ->
 handle_post(Req, State) ->
     io:format("~n~n~n Req = ~p ~n~n~n", [Req]),
 
-
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     case catch empweb_http:multipart_data(Req) of
         {'EXIT', Reason} ->
             io:format("~n~n~n Reason = ~p ~n~n~n", [Reason]),
             {empweb_jsonapi:not_extended(no_files), Req};
         {Pbody, Req1} ->
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             handle_body(Req1, Pbody, State)
     end.
 
@@ -118,7 +119,10 @@ handle_body(Req, Pbody, State) ->
     end.
 
 handle_part(Req, Acc, State) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {Result, Req2} = empweb_http:multipart_data(Req),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
     acc_part(Req2, Acc, Result, State).
 
 acc_part(Req, Acc, {headers, Headers}, State) ->
