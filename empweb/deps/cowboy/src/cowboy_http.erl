@@ -737,8 +737,8 @@ te_chunked(Data, {0, Streamed}) ->
         fun (Rest, _) when byte_size(Rest) < 4 ->
                 more;
             (<< "\r\n", Rest/binary >>, BinLen) ->
-                %%io:format("~n~n~n ~p in ~p ~n~n", [?MODULE, ?LINE]),
-                %%io:format("BinLen = ~p ~n~n~n", [BinLen]),
+                io:format("~n~n~n ~p in ~p ~n~n", [?MODULE, ?LINE]),
+                io:format("BinLen = ~p ~n~n~n", [BinLen]),
                 %Len = list_to_integer(binary_to_list(BinLen), 16),
                 %te_chunked(Rest, {Len, Streamed});
                 case BinLen of
