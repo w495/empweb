@@ -19,6 +19,11 @@
     multipart_data/1
 ]).
 
+
+-export([
+    test_read_all/0
+]).
+
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
 
 
@@ -33,18 +38,20 @@ multipart_data(Req) ->
     end.
 
 
-read(Req = #http_req{socket=Socket}) ->
-  case gen_tcp:recv(Socket, 0, 10000) of
-        {ok, Bodydata} ->
-            {ok, Bodydata};
-        Else ->
-            io:format("Else = ~p ~n", [Else]),
-            {error, Else}
-    end.
+%read(Req = #http_req{socket=Socket}) ->
+  %case gen_tcp:recv(Socket, 0, 10000) of
+        %{ok, Bodydata} ->
+            %{ok, Bodydata};
+        %Else ->
+            %io:format("Else = ~p ~n", [Else]),
+            %{error, Else}
+    %end.
 
 multipart_data_chunked(Req) ->
     io:format("X~nX~nX~nX ~p in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
-    multipart_data_chunked_x(Req, undefined, 0, [], start).
+    {ok, Tcpstream} = recv(Req),
+    test_parse_chunck(Tcpstream, undef, 0, []).
+
 
     %case read(Req) of
         %{ok, Bodydata} ->
@@ -62,22 +69,60 @@ multipart_data_chunked(Req) ->
     %multipart_data_chunked_(cowboy_http_req:body(Req)).
 
 
-multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
-    io:format("X~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
+%multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
+    %io:format("X~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
+    %Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
+    %file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
+    %Bodydata;
+
+
+%multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
+     %io:format("X~nX~nX~nX ~p in ~p X~nX~nX~n", [?MODULE, ?LINE]),
+    %case read(Req) of
+        %{ok, Bodydata} ->
+            %[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+            %Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
+            %io:format("X~nX~nX~nX~nX~n Chunksize = ~p X~nX~nX~n", [Chunksize]),
+            %multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
+        %Else ->
+            %io:format("X~nX~nX~nX~nX~n Else = ~p X~nX~nX~n", [Else])
+    %end.
+
+
+
+test_read_all() ->
+    {ok, Tcpstream} = file:read_file(<<"priv/tcp-stream.jpg">>),
+    test_parse_chunck(Tcpstream, undef, 0, []).
+
+recv(Req = #http_req{socket=Socket}) ->
+    do_recv(Socket, []).
+
+do_recv(Sock, Bs) ->
+    case gen_tcp:recv(Sock, 0) of
+        {ok, B} ->
+            do_recv(Sock, [Bs, B]);
+        {error, closed} ->
+            {ok, list_to_binary(Bs)}
+    end.
+
+test_parse_chunck(_, 0, Length, Acc) ->
+    io:format("~nX~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
     Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
-    file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
+    file:write_file(<<"priv/image.jpg">>, Bodydata),
     Bodydata;
 
 
-multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
-     io:format("X~nX~nX~nX ~p in ~p X~nX~nX~n", [?MODULE, ?LINE]),
-    case read(Req) of
-        {ok, Bodydata} ->
-            [Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+test_parse_chunck(Bodydata, _, Prevchunksize, Acc) ->
+    io:format("~nX~nX~nX~nX Prevchunksize = ~p ~nX~nX~nX~nX", [Prevchunksize]),
+    case binary:split(Bodydata, [<<"\r\n">>]) of
+        [Chunksizebin, Chunkdata]  ->
+            io:format("~nX~nX~nX~nX Chunksizebin = ~p ~nX~nX~nX~nX", [Chunksizebin]),
             Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
-            multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
-        Else ->
-            io:format("X~nX~nX~nX~nX~n Else = ~p X~nX~nX~n", [Else])
+            <<Data:Chunksize/binary, Prerest/binary>> = Chunkdata,
+            [_, Rest] = binary:split(Prerest, [<<"\r\n">>]),
+            test_parse_chunck(Rest, Chunksize, Chunksize + Prevchunksize, [Data|Acc]);
+        [<<>>] ->
+            test_parse_chunck(Bodydata, 0, Prevchunksize, Acc)
     end.
 
 
