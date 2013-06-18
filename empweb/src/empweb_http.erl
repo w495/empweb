@@ -36,7 +36,7 @@ multipart_data(Req) ->
 
 multipart_data_chunked(Req) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data_chunked_(cowboy_http_req:body(Req)).
+    multipart_data_chunked_(cowboy_http_req:stream_body(Req)).
 
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
