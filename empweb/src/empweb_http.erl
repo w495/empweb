@@ -23,6 +23,10 @@
 
 
 multipart_data(Req) ->
+    cowboy_http_req:multipart_data(Req).
+
+
+multipart_data_c(Req) ->
     case cowboy_http_req:parse_header('Transfer-Encoding', Req) of
         {[<<"chunked">>], Req2} ->
             io:format("~n~n~n chunked ~n~n~n"),

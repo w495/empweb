@@ -102,9 +102,9 @@ handle_post(Req, State) ->
 
 handle_body(Req, Pbody, State) ->
     case acc_part(Req, [], Pbody, State) of
-        {[#partstate{fileinfo=Empweb_resp}], Req1} ->
-            io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
-            {Empweb_resp, Req1};
+        %{[#partstate{fileinfo=Empweb_resp}], Req1} ->
+            %io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
+            %{Empweb_resp, Req1};
         {Partstates, Req1} ->
             io:format("~n~n~n ~p in ~p Partstates = ~p ~n~n~n", [?MODULE, ?LINE, Partstates]),
             {
@@ -159,7 +159,7 @@ acc_part(Req, Acc, {headers, Headers}, State) ->
         filename=Filename,
         fileextension = Fileextension
     },
-
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     handle_part(Req, [Partstate|Acc], State);
 
 acc_part(
