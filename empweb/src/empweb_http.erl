@@ -74,7 +74,7 @@ multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
     case read(Req) of
         {ok, Bodydata} ->
             [Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
-            Chunksize = empdb_convert:to_integer(Chunksizebin),
+            Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
             multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
         Else ->
             io:format("Else = ~p ~n", [Else])
