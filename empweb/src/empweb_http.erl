@@ -1,5 +1,6 @@
 -module(empweb_http).
 -include("empweb.hrl").
+-include_lib("cowboy/include/http.hrl").
 
 
 -export([
@@ -22,14 +23,90 @@
 
 
 multipart_data(Req) ->
-    cowboy_http_req:multipart_data(Req).
+    case cowboy_http_req:parse_header('Transfer-Encoding', Req) of
+        {[<<"chunked">>], Req2} ->
+            multipart_data_chunked(Req2);
+        {[<<"identity">>], Req2} ->
+            cowboy_http_req:multipart_data(Req)
+    end.
+
+multipart_data_chunked(Req) ->
+    multipart_data_chunked_(cowboy_http_req:body(Req)).
+
+
+multipart_data_chunked_({ok, Bodydata, Req}) ->
+    multipart_data(Req#http_req{body_state=waiting}, Bodydata);
+
+multipart_data_chunked_({error, Error}) ->
+    {error, Error}.
+
+multipart_data(Req=#http_req{body_state=waiting}, Bodydata) ->
+    {{<<"multipart">>, _SubType, Params}, Req2} =
+        cowboy_http_req:parse_header('Content-Type', Req),
+    {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
+    {Length, Req3} =
+        case cowboy_http_req:parse_header('Content-Length',Req2) of
+            {undefined, Req2_} ->
+                {undefined, L, Req2__} = cowboy_http_req:parse_header(<<"X-Content-Length">>,Req2_),
+                {erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
+            {Length_, Req2_}->
+                {Length_, Req2_}
+        end,
+    multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)}, Bodydata);
+
+multipart_data(Req=#http_req{body_state={multipart, Length, Cont}}, Bodydata) ->
+    io:format("~n~n 2 ~n~n"),
+    multipart_data(Req, Length, Cont(), Bodydata);
+
+multipart_data(Req=#http_req{body_state=done}, Bodydata) ->
+    io:format("~n~n 3 ~n~n"),
+    {eof, Req}.
+
+multipart_data(Req, Length, {headers, Headers, Cont}, Bodydata) ->
+    io:format("~n~n 4 ~n~n"),
+    {{headers, Headers}, Req#http_req{body_state={multipart, Length, Cont}}};
+
+multipart_data(Req, Length, {body, Data, Cont}, Bodydata) ->
+    io:format("~n~n 5 ~n~n"),
+    {{body, Data}, Req#http_req{body_state={multipart, Length, Cont}}};
+
+multipart_data(Req, Length, {end_of_part, Cont}, Bodydata) ->
+    io:format("~n~n 6 ~n~n"),
+    {end_of_part, Req#http_req{body_state={multipart, Length, Cont}}};
+
+multipart_data(Req, 0, eof, Bodydata) ->
+    io:format("~n~n 7 ~n~n"),
+    {eof, Req#http_req{body_state=done}};
+
+multipart_data(Req=#http_req{socket=Socket, transport=Transport}, _Length, eof, Bodydata) ->
+    io:format("~n~n 8 ~n~n"),
+    {eof, Req#http_req{body_state=done}};
+
+multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata) ->
+    io:format("~n~n 8 ~n~n"),
+    {eof, Req#http_req{body_state=done}};
+
+
+multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
+    io:format("~n~n 9 ~n~n"),
+    case Bodydata of
+        << Data:Length/binary, Buffer/binary >> ->
+            multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
+        Data ->
+            io:format("~n~n 9.1 ~n~n"),
+            io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
+            io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
+            multipart_data(Req, Length - byte_size(Data), Parser(Data), Bodydata)
+    end.
+
+
 
 body_qs(Req) ->
     cowboy_http_req:body_qs(Req).
 
 method(Req) ->
     cowboy_http_req:method(Req).
-    
+
 
 auth(Req)->
     {Res, Req1} = auth_cookie(Req),
@@ -120,11 +197,11 @@ call(Req, #empweb_hap{handler=undefined} = Hao) ->
 call(Req, #empweb_hap{action=undefined} = Hao) ->
     {error, unknown_function};
 
-    
+
 call(Req, Some) ->
     {error, unknown_function}.
 
-    
+
 %%
 %% В старом стиле для классических контроллеров
 %%
@@ -222,7 +299,7 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
     when erlang:is_integer(Status) and erlang:is_list(Icookies) ->
 
     io:format(" ~n~n~n Some = ~p ~n~n~n", [Status]),
-    
+
     Cookies = lists:map(fun
             ({Name, Value})->
                 cowboy_cookies:cookie(Name, Value, []);
@@ -236,10 +313,10 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
         headers=[resp_format(Format)|lists:append(Cookies, Headers)],
         body=Body
     };
-    
+
 resp(Empwebresplist) when erlang:is_list(Empwebresplist) ->
 
-    Resresp_ = 
+    Resresp_ =
         lists:foldl(
             fun
                 (Empwebresp, #http_resp{body=Bodies})->
@@ -247,7 +324,7 @@ resp(Empwebresplist) when erlang:is_list(Empwebresplist) ->
                     Httpresp#http_resp{
                         body    = [Body|Bodies]
                     }
-            end, 
+            end,
             #http_resp{},
             Empwebresplist
         ),
