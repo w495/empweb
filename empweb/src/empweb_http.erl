@@ -29,13 +29,20 @@ multipart_data(Req) ->
             multipart_data_chunked(Req2);
         {[<<"identity">>], Req2} ->
             io:format("~n~n~n chunked ~n~n~n"),
-            cowboy_http_req:multipart_data(Req)
+            cowboy_http_req:multipart_data(Req2)
     end.
 
-multipart_data_chunked(Req) ->
+multipart_data_chunked(Req = #http_req{socket=Socket}) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
-    multipart_data_chunked_(cowboy_http_req:body(Req)).
+    case gen_tcp:recv(Socket, 0, 10000) of
+        {ok, Bodydata} ->
+            file:write_file(<<"priv/static/some1.jpg">>, Bodydata);
+        Else ->
+            io:format("Else = ~p ~n", [Else])
+    end.
+
+    %multipart_data_chunked_(cowboy_http_req:body(Req)).
 
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
