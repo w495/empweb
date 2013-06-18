@@ -93,6 +93,11 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport}, _Length, eof, 
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata) ->
     io:format("~n~n 8 ~n~n"),
+
+    %multipart_data_chunked_(cowboy_http_req:body(Req)).
+
+    %file:write_file(<<"priv/static/some-0.jpg">>, Bodydata),
+
     {eof, Req#http_req{body_state=done}};
 
 
