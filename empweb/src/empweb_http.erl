@@ -43,7 +43,7 @@ read(Req = #http_req{socket=Socket}) ->
     end.
 
 multipart_data_chunked(Req) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("X~nX~nX~nX ~p in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
     multipart_data_chunked_x(Req, undefined, 0, [], start).
 
     %case read(Req) of
@@ -63,21 +63,21 @@ multipart_data_chunked(Req) ->
 
 
 multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
-    io:format("~n~n~nLength = ~p ~n~n~n~n", [Length]),
+    io:format("X~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
     Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
     file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
     Bodydata;
 
 
 multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
-     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+     io:format("X~nX~nX~nX ~p in ~p X~nX~nX~n", [?MODULE, ?LINE]),
     case read(Req) of
         {ok, Bodydata} ->
             [Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
             Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
             multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
         Else ->
-            io:format("Else = ~p ~n", [Else])
+            io:format("X~nX~nX~nX~nX~n Else = ~p X~nX~nX~n", [Else])
     end.
 
 
