@@ -117,6 +117,8 @@ multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
             io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             multipart_data(Req2, Length - byte_size(Data), Parser(Data), Bodydata);
+        {error, timeout} ->
+            {eof, Req#http_req{body_state=done}};
         {done, Req2} ->
             {eof, Req2#http_req{body_state=done}}
     end.
