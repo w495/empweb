@@ -34,11 +34,13 @@ multipart_data(Req) ->
 
 multipart_data_chunked(Req) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     multipart_data_chunked_(cowboy_http_req:body(Req)).
 
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    file:write_file(<<"priv/static/some.jpg">>, Bodydata),
     multipart_data(Req#http_req{body_state=waiting}, Bodydata);
 
 multipart_data_chunked_({error, Error}) ->
