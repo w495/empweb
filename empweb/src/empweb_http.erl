@@ -32,17 +32,56 @@ multipart_data(Req) ->
             cowboy_http_req:multipart_data(Req2)
     end.
 
-multipart_data_chunked(Req = #http_req{socket=Socket}) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
-    case gen_tcp:recv(Socket, 0, 10000) of
+read(Req = #http_req{socket=Socket}) ->
+  case gen_tcp:recv(Socket, 0, 10000) of
         {ok, Bodydata} ->
-            file:write_file(<<"priv/static/some1.jpg">>, Bodydata);
+            {ok, Bodydata};
+        Else ->
+            io:format("Else = ~p ~n", [Else]),
+            {error, Else}
+    end.
+
+multipart_data_chunked(Req) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    multipart_data_chunked_x(Req, undefined, 0, [], start).
+
+    %case read(Req) of
+        %{ok, Bodydata} ->
+            %[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+            %Chunksize = empdb_convert:to_integer(Chunksizebin),
+            %multipart_data_chunked_x(Req, Chunksize, Rest),
+
+
+            %file:write_file(<<"priv/static/some1.jpg">>, Bodydata);
+
+        %Else ->
+            %io:format("Else = ~p ~n", [Else])
+    %end.
+
+    %multipart_data_chunked_(cowboy_http_req:body(Req)).
+
+
+multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
+    io:format("~n~n~nLength = ~p ~n~n~n~n", [Length]),
+    Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
+    file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
+    Bodydata;
+
+
+multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
+     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    case read(Req) of
+        {ok, Bodydata} ->
+            [Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+            Chunksize = empdb_convert:to_integer(Chunksizebin),
+            multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
         Else ->
             io:format("Else = ~p ~n", [Else])
     end.
 
-    %multipart_data_chunked_(cowboy_http_req:body(Req)).
+
+
 
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
@@ -110,6 +149,7 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata
 
 multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
     io:format("~n~n 9 ~n~n"),
+
     case Bodydata of
         << Data:Length/binary, Buffer/binary >> ->
             multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
