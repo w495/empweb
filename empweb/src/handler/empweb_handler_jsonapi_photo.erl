@@ -103,8 +103,10 @@ handle_post(Req, State) ->
 handle_body(Req, Pbody, State) ->
     case acc_part(Req, [], Pbody, State) of
         {[#partstate{fileinfo=Empweb_resp}], Req1} ->
+            io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
             {Empweb_resp, Req1};
         {Partstates, Req1} ->
+            io:format("~n~n~n ~p in ~p Partstates = ~p ~n~n~n", [?MODULE, ?LINE, Partstates]),
             {
                 empweb_jsonapi:fname(empweb_jsonapi:resp(
                     {ok,
@@ -230,6 +232,6 @@ acc_part(
     );
 
 acc_part(Req, Acc, eof, State) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p Acc = ~p ~n~n~n", [?MODULE, ?LINE, Acc]),
     {lists:reverse(Acc), Req}.
 
