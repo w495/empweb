@@ -741,7 +741,7 @@ te_chunked(Data, {0, Streamed}) ->
                 io:format("BinLen = ~p ~n~n~n", [BinLen]),
                 case BinLen of
                     <<>>  ->
-                        more;
+                        {done, Streamed, Rest};
                     _ ->
                         Len = list_to_integer(binary_to_list(BinLen), 16),
                         io:format("Len = ~p ~n~n~n", [Len]),

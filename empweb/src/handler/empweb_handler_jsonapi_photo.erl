@@ -69,6 +69,9 @@ handle(Req, State) ->
                 {empweb_jsonapi:method_not_allowed(), Req1}
         end,
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
+
+    io:format("~n~n~n Empweb_resp = ~p ~n~n~n", [Empweb_resp]),
+
     Http_resp = empweb_http:resp(Empweb_resp),
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
@@ -126,8 +129,11 @@ handle_part(Req, Acc, State) ->
     acc_part(Req2, Acc, Result, State).
 
 acc_part(Req, Acc, {headers, Headers}, State) ->
-    Contentdisposition =   proplists:get_value(<<"Content-Disposition">>, Headers),
-    Contenttype   =   proplists:get_value('Content-Type', Headers),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    Contentdisposition =
+        proplists:get_value(<<"Content-Disposition">>, Headers),
+    Contenttype   =
+        proplists:get_value('Content-Type', Headers),
     Filename =
         case re:run(Contentdisposition, "filename=\"(.+)\"", []) of
             {match,[_,Poslen]} ->
@@ -165,6 +171,7 @@ acc_part(
     {body, Data},
     State
 ) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     %% Здесь можно сразу писать в файл.
     %% Дописывать Data в его конец.
     %% Но это может оказаться не очень эффективно.
@@ -194,6 +201,7 @@ acc_part(
     end_of_part,
     State
 ) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fullbody = list_to_binary(lists:reverse(Body)),
     Hap =  State#state.empweb_hap#empweb_hap{
         handler         = empweb_jsonapi_file,
@@ -222,5 +230,6 @@ acc_part(
     );
 
 acc_part(Req, Acc, eof, State) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {lists:reverse(Acc), Req}.
 
