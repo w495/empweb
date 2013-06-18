@@ -36,12 +36,11 @@ multipart_data(Req) ->
 
 multipart_data_chunked(Req) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data_chunked_(cowboy_http_req:stream_body(Req)).
-
+    multipart_data(Req#http_req{body_state=waiting}, []).
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data(Req#http_req{body_state=waiting}, Bodydata);
+    multipart_data(Req#http_req{body_state=waiting}, []);
 
 multipart_data_chunked_({error, Error}) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
@@ -107,17 +106,19 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata
 multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
     io:format("~n~n 9 ~n~n"),
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    case Bodydata of
-        << Data:Length/binary, Buffer/binary >> ->
+    case cowboy_http_req:stream_body(Req) of
+        {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
-        Data ->
+            multipart_data(Req2#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
+        {ok, Data, Req2} ->
             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             io:format("~n~n 9.1 ~n~n"),
             io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
             io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            multipart_data(Req, Length - byte_size(Data), Parser(Data), Bodydata)
+            multipart_data(Req2, Length - byte_size(Data), Parser(Data), Bodydata);
+        {done, Req2} ->
+            {eof, Req2#http_req{body_state=done}}
     end.
 
 
