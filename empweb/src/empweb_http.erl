@@ -23,35 +23,30 @@
 
 
 multipart_data(Req) ->
-    cowboy_http_req:multipart_data(Req).
-
-
-multipart_data_c(Req) ->
     case cowboy_http_req:parse_header('Transfer-Encoding', Req) of
         {[<<"chunked">>], Req2} ->
-            %% io:format("~n~n~n chunked ~n~n~n"),
-            %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n chunked ~n~n~n"),
             multipart_data_chunked(Req2);
         {[<<"identity">>], Req2} ->
-            %% io:format("~n~n~n chunked ~n~n~n"),
-            %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n chunked ~n~n~n"),
             cowboy_http_req:multipart_data(Req)
     end.
 
 multipart_data_chunked(Req) ->
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data(Req#http_req{body_state=waiting}, []).
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    multipart_data_chunked_(cowboy_http_req:body(Req)).
+
 
 multipart_data_chunked_({ok, Bodydata, Req}) ->
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data(Req#http_req{body_state=waiting}, []);
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    multipart_data(Req#http_req{body_state=waiting}, Bodydata);
 
 multipart_data_chunked_({error, Error}) ->
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {error, Error}.
 
 multipart_data(Req=#http_req{body_state=waiting}, Bodydata) ->
-    %% %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {{<<"multipart">>, _SubType, Params}, Req2} =
         cowboy_http_req:parse_header('Content-Type', Req),
     {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
@@ -63,68 +58,52 @@ multipart_data(Req=#http_req{body_state=waiting}, Bodydata) ->
             {Length_, Req2_}->
                 {Length_, Req2_}
         end,
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)}, Bodydata);
 
 multipart_data(Req=#http_req{body_state={multipart, Length, Cont}}, Bodydata) ->
-    %% io:format("~n~n 2 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 2 ~n~n"),
     multipart_data(Req, Length, Cont(), Bodydata);
 
 multipart_data(Req=#http_req{body_state=done}, Bodydata) ->
-    %% io:format("~n~n 3 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 3 ~n~n"),
     {eof, Req}.
 
 multipart_data(Req, Length, {headers, Headers, Cont}, Bodydata) ->
-    %% io:format("~n~n 4 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 4 ~n~n"),
     {{headers, Headers}, Req#http_req{body_state={multipart, Length, Cont}}};
 
 multipart_data(Req, Length, {body, Data, Cont}, Bodydata) ->
-    %% io:format("~n~n 5 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 5 ~n~n"),
     {{body, Data}, Req#http_req{body_state={multipart, Length, Cont}}};
 
 multipart_data(Req, Length, {end_of_part, Cont}, Bodydata) ->
-    %% io:format("~n~n 6 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 6 ~n~n"),
     {end_of_part, Req#http_req{body_state={multipart, Length, Cont}}};
 
 multipart_data(Req, 0, eof, Bodydata) ->
-    %% io:format("~n~n 7 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 7 ~n~n"),
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, _Length, eof, Bodydata) ->
-    %% io:format("~n~n 8 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 8 ~n~n"),
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata) ->
-    %% io:format("~n~n 8 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n 8 ~n~n"),
     {eof, Req#http_req{body_state=done}};
 
 
 multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
-    %% io:format("~n~n 9 ~n~n"),
-    %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    case cowboy_http_req:stream_body(Req) of
-        {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
-            %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            multipart_data(Req2#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
-        {ok, Data, Req2} ->
-            %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            %% io:format("~n~n 9.1 ~n~n"),
-            %% io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
-            %% io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
-            %% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            multipart_data(Req2, Length - byte_size(Data), Parser(Data), Bodydata);
-        %{error, timeout} ->
-            %{eof, Req#http_req{body_state=done}};
-        {done, Req2} ->
-            {eof, Req2#http_req{body_state=done}}
+    io:format("~n~n 9 ~n~n"),
+    case Bodydata of
+        << Data:Length/binary, Buffer/binary >> ->
+            multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
+        Data ->
+            io:format("~n~n 9.1 ~n~n"),
+            io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
+            io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
+            multipart_data(Req, Length - byte_size(Data), Parser(Data), Bodydata)
     end.
 
 
@@ -326,7 +305,7 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_integer(Status) and erlang:is_list(Icookies) ->
 
-    %% io:format(" ~n~n~n Some = ~p ~n~n~n", [Status]),
+    io:format(" ~n~n~n Some = ~p ~n~n~n", [Status]),
 
     Cookies = lists:map(fun
             ({Name, Value})->
