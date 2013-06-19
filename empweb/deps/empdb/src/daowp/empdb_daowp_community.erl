@@ -17,7 +17,7 @@
 
 
 %
-% -define\(CREATE_ROOM_PRICE, 1.0).
+% -define\(CREATE_Community_PRICE, 1.0).
 %
 
 get(Con, Params)->
@@ -43,37 +43,37 @@ get(Con, Params, Fields)->
     ).
 
 
-get_adds(Con, {ok, Rooms}, Params) ->
+get_adds(Con, {ok, Communitys}, Params) ->
     Fields = proplists:get_value(fields, Params, []),
     {ok,
         lists:map(
-            fun({Roompl})->
+            fun({Communitypl})->
 
 
                 {ok,[{[{count,Nops}]}]} =
                     empdb_dao_pers:count(Con, [
                         {isdeleted, false},
                         {pstatus_alias, online},
-                        {live_community_id, proplists:get_value(id, Roompl)}
+                        {live_community_id, proplists:get_value(id, Communitypl)}
                     ]),
 
                 {ok, Topiclist} =
                     empdb_dao_community:get_community_topic(Con, [
                         {isdeleted, false},
-                        {community_id,proplists:get_value(id, Roompl)}
+                        {community_id,proplists:get_value(id, Communitypl)}
                     ]),
 
 
-                Ncommunitypl = [{nops, Nops}|Roompl],
+                Ncommunitypl = [{nops, Nops}|Communitypl],
 
-                Room_id = proplists:get_value(id, Roompl, null),
+                Community_id = proplists:get_value(id, Communitypl, null),
                 Old_back_file_id =
-                    proplists:get_value(back_file_id, Roompl),
+                    proplists:get_value(back_file_id, Communitypl),
 
                 {Backfileid, Backfilepath} =
                     case empdb_dao_thingbuy:get(Con, [
-                        {community_id, Room_id},
-                        {file_id, proplists:get_value(back_file_id, Roompl)},
+                        {community_id, Community_id},
+                        {file_id, proplists:get_value(back_file_id, Communitypl)},
                         {limit, 1},
                         {fields, [file_id]}
                     ]) of
@@ -131,7 +131,7 @@ get_adds(Con, {ok, Rooms}, Params) ->
                     )
                 }
             end,
-            Rooms
+            Communitys
         )
     };
 
@@ -139,17 +139,17 @@ get_adds(_con, Else, _params) ->
     Else.
 
 
-filepath(Con, Roompl, Idfield) ->
-    filepath(Con, Roompl, Idfield, null).
+filepath(Con, Communitypl, Idfield) ->
+    filepath(Con, Communitypl, Idfield, null).
 
-filepath(Con, Roompl, Idfield, Alias) ->
+filepath(Con, Communitypl, Idfield, Alias) ->
     case empdb_dao:get([
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
     ],Con,[
         {'or', [
             {'and', [
-                {'file.id',     proplists:get_value(Idfield, Roompl, null)},
+                {'file.id',     proplists:get_value(Idfield, Communitypl, null)},
                 {'file.alias',  null}
             ]},
             {'and', [
@@ -157,7 +157,7 @@ filepath(Con, Roompl, Idfield, Alias) ->
                 {'file.alias', Alias}
             ]}
         ]},
-        %{'file.id',     proplists:get_value(Idfield, Roompl, null)},
+        %{'file.id',     proplists:get_value(Idfield, Communitypl, null)},
         {fileinfotype_alias,
             download},
         {image_width,  null},
@@ -170,7 +170,7 @@ filepath(Con, Roompl, Idfield, Alias) ->
         ]}
     ]) of
         {ok, []} ->
-            {   proplists:get_value(file_id, Roompl),
+            {   proplists:get_value(file_id, Communitypl),
                 null
             };
         {ok, [{Filepl}]} ->
