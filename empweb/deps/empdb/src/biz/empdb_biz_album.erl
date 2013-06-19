@@ -28,83 +28,64 @@
 create(Params)->
     empdb_dao:with_connection(fun(Con)->
 
-        %case proplists:get_value(
-            %contype_alias,
-            %Params,
-            %proplists:get_value(
-                %contype_alias,
-                %proplists:get_value(filter, Params, []),
-                %null
-            %)
-        %) of
-            %adult_only ->
-
-                %{ok,[{Servicepl}]} =
-                    %empdb_dao_service:get( Con, [
-                            %{alias, create_adult_only_album_price},
-                            %{fields, [price]},
-                            %{limit, 1}
-                    %]),
-
-                %Price = proplists:get_value(price, Servicepl),
-
-                %{ok, [{Mbownerpl}]} =
-                    %empdb_dao_pers:get(Con, [
-                        %{id,
-                            %proplists:get_value(
-                                %owner_id,
-                                %Params,
-                                %null
-                            %)
-                        %},
-                        %{fields, [
-                            %id,
-                            %money
-                        %]},
-                        %{limit, 1}
-                    %]),
-
-                %Owner_id = proplists:get_value(id,   Mbownerpl),
-                %Money = proplists:get_value(money,   Mbownerpl),
-
-                %case Money >= Price of
-
-                    %false ->
-                        %{error, {not_enough_money, {[
-                            %{money, Money},
-                            %{price, Price}
-                        %]}}};
-                %end;
-            %_ ->
-
-
-        %case empdb_dao_roomlot:get(Con,[
-            %{   filter,
-                %[
-                    %{isdeleted, false}
-                    %|proplists:get_value(filter, Params, [
-                        %{room_id, proplists:get_value(room_id, Params)}
-                    %])
-                %]
-            %}
-        %]) of
-            %{ok, []} ->
-                %empdb_dao_roomlot:create(Con, Params);
-            %{ok, _} ->
-                %{error, {not_uniq_roomlot, {[
-                    %{room_id,
-                        %proplists:get_value(room_id, Params,
-                            %proplists:get_value(room_id,
-                                %proplists:get_value(filter, Params, [])
-                            %)
-                        %)
-                    %}
-                %]}}};
-            %Elseget ->
-                %Elseget
-        %end
-
-        empdb_dao_album:create(Con, Params)
+        case proplists:get_value(
+            contype_alias,
+            Params,
+            proplists:get_value(
+                contype_alias,
+                proplists:get_value(filter, Params, []),
+                null
+            )
+        ) of
+            adult_only ->
+                {ok,[{Servicepl}]} =
+                    empdb_dao_service:get( Con, [
+                        {alias, create_adult_only_album_price},
+                        {fields, [price]},
+                        {limit, 1}
+                    ]),
+                Price = proplists:get_value(price, Servicepl),
+                {ok, [{Mbownerpl}]} =
+                    empdb_dao_pers:get(Con, [
+                        {id,
+                            proplists:get_value(
+                                owner_id,
+                                Params,
+                                null
+                            )
+                        },
+                        {fields, [
+                            id,
+                            money
+                        ]},
+                        {limit, 1}
+                    ]),
+                Owner_id = proplists:get_value(id,   Mbownerpl),
+                Money = proplists:get_value(money,   Mbownerpl),
+                case Money >= Price of
+                    false ->
+                        {error, {not_enough_money, {[
+                            {money, Money},
+                            {price, Price}
+                        ]}}};
+                    true ->
+                        {ok, _} =
+                            empdb_dao_pay:create(Con, [
+                                {pers_id,           Owner_id},
+                                {paytype_alias,     create_adult_only_album},
+                                {isincome,          false},
+                                {price,             Price}
+                            ]),
+                        {ok, _} =
+                            empdb_dao_pers:update(Con,[
+                                {id,    Owner_id},
+                                {money, {decr, Price}}
+                            ]),
+                        empdb_dao_album:create(Con, Params)
+                end;
+            _ ->
+                empdb_dao_album:create(Con, Params)
+        end
     end).
 
 update(Params)->

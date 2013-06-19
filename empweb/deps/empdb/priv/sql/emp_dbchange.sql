@@ -1576,3 +1576,12 @@
     alter table cdocbet add column
         cdoctype_alias       varchar(1024)   references doctype(alias) default null;
 
+
+
+
+    insert into paytype(alias, isincome) values  ('create_adult_only_album',    false);
+
+
+    insert into service(alias, price, isonce)
+        values ('create_adult_only_album_price',  20.0, true);
+
