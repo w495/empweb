@@ -27,6 +27,9 @@
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
 
 
+multipart_data_(Req) ->
+    cowboy_http_req:multipart_data(Req).
+
 multipart_data(Req) ->
     case cowboy_http_req:parse_header('Transfer-Encoding', Req) of
         {[<<"chunked">>], Req2} ->
@@ -49,8 +52,12 @@ multipart_data(Req) ->
 
 multipart_data_chunked(Req) ->
     io:format("X~nX~nX~nX ~p in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
-    {ok, Tcpstream} = recv(Req),
-    test_parse_chunck(Tcpstream, undef, 0, []).
+    %{ok, Tcpstream} = recv(Req),
+    {ok, Tcpstream, Req2} = cowboy_http_req:body(Req),
+    file:write_file(<<"priv/image.jpg.tcpstream">>, Tcpstream),
+    %test_parse_chunck(Tcpstream, undef, 0, []).
+    Bodydata = Tcpstream,
+    multipart_data_chunked_({ok, Bodydata, Req2}).
 
 
     %case read(Req) of
@@ -100,6 +107,12 @@ recv(Req = #http_req{socket=Socket}) ->
 do_recv(Sock, Bs) ->
     case gen_tcp:recv(Sock, 0) of
         {ok, B} ->
+            case Bs of
+                [] ->
+                    file:write_file(<<"priv/image.jpg.tcpstream.0">>, B);
+                _ ->
+                    ok
+            end,
             do_recv(Sock, [Bs, B]);
         {error, closed} ->
             {ok, list_to_binary(Bs)}

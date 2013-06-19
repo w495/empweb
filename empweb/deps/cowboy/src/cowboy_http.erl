@@ -738,15 +738,19 @@ te_chunked(Data, {0, Streamed}) ->
                 more;
             (<< "\r\n", Rest/binary >>, BinLen) ->
                 Len = list_to_integer(binary_to_list(BinLen), 16),
+                io:format("~nX~nX~nX~n BinLen = ~p; Len = ~p ~nX~nX~nX~nX", [BinLen, Len]),
                 te_chunked(Rest, {Len, Streamed});
             (_, _) ->
                 {error, badarg}
         end);
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
+    io:format("~nX~nX~nX~nX ChunkRem = ~p ~nX~nX~nX~nX", [ChunkRem]),
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
+
 te_chunked(Data, {ChunkRem, Streamed}) ->
     Size = byte_size(Data),
+    io:format("~nX~nX~nX~nX ChunkRem = ~p; Size = ~p; ~nX~nX~nX~nX", [ChunkRem, Size]),
     {ok, Data, {ChunkRem - Size, Streamed + Size}}.
 
 %% @doc Decode an identity stream.
