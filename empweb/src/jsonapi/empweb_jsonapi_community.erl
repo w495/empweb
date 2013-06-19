@@ -187,7 +187,7 @@ handle(_req, #empweb_hap{
         end
     );
 
-    
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   get,
@@ -209,7 +209,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-        
+
             #norm_rule{
                 key         = wall_file_id,
                 required    = false,
@@ -240,7 +240,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-            
+
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -285,6 +285,11 @@ handle(_req, #empweb_hap{
                 key         = slogan,
                 required    = false,
                 types       = empweb_norm:filter([string])
+            },
+            #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
             },
             #norm_rule{
                 key         = isclosed,
@@ -362,7 +367,7 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = empweb_norm:filter([nullable, string])
             },
-            
+
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -409,6 +414,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([string])
             },
             #norm_rule{
+                key         = topic_id,
+                required    = false,
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
                 key         = isclosed,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
@@ -430,7 +440,7 @@ handle(_req, #empweb_hap{
         end
     );
 
-    
+
 handle(_req, #empweb_hap{
         is_auth =   true,
         action  =   create,
@@ -483,7 +493,6 @@ handle(_req, #empweb_hap{
                 required    = false,
                 types       = [nullable, string]
             },
-            
             #norm_rule{
                 key         = communitytype_id,
                 required    = false,
@@ -757,7 +766,7 @@ handle(_req, #empweb_hap{
         end
     );
 
-    
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% То что не прошло сопоставления с образцом.
 %% В частности, неавторизованого пользователя

@@ -64,6 +64,8 @@ table({fields, all})->
         owner_nick,
         room_id,
         room_head,
+        community_id,
+        community_head,
         thing_id,
         thing_alias,
         thingtype_id,

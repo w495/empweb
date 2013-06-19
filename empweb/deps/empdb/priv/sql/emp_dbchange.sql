@@ -1396,6 +1396,7 @@
         room_id decimal references doc(id)   default null;
     alter table thingbuy add column
         room_head varchar(1024)  default null;
+
     alter table thingbuy add column
         costs  numeric(1000, 2)  default null;
     insert into paytype(alias, isincome)
@@ -1569,3 +1570,12 @@
 
 
     alter table pers add column phonestr varchar(1024)  default null;
+
+
+
+
+    alter table thingbuy add column
+        community_id decimal references doc(id)   default null;
+    alter table thingbuy add column
+        community_head varchar(1024)  default null;
+
