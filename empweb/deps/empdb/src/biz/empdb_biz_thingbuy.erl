@@ -357,13 +357,13 @@ create_check(
     ) of
         {ok, Ok}->
             Thfile_id = proplists:get_value(file_id, Mbthingpl),
-            community_id = proplists:get_value(id,   Mbcommunity),
+            Community_id = proplists:get_value(id,   Mbcommunity),
 
             {ok, _} =
                 empdb_dao_community:update(
                     Con,
                     [
-                        {id, community_id},
+                        {id, Community_id},
                         {back_file_id, Thfile_id}
                     ]
                 ),
