@@ -97,53 +97,92 @@ create(Params)->
                     {limit, 1}
                 ]),
                 {
-                    %% Берем получателя, и смотрим
-                    empdb_dao_pers:get(Con, [
-                        {'or', [
-                            {id,
-                                proplists:get_value(
-                                    owner_id,
-                                    Params,
-                                    null
-                                )
-                            },
-                            {nick,
-                                proplists:get_value(
-                                    owner_nick,
-                                    Params,
-                                    null
-                                )
-                            }
-                        ]},
-                        {fields, [
-                            id
-                        ]},
-                        {limit, 1}
-                    ]),
-                    %% Берем получателя (страну), и смотрим
-                    empdb_dao_room:get(Con, [
-                        {'or', [
-                            {id,
-                                proplists:get_value(
-                                    room_id,
-                                    Params,
-                                    null
-                                )
-                            },
-                            {head,
-                                proplists:get_value(
-                                    room_head,
-                                    Params,
-                                    ?UNIQ_UNDEFINED
-                                )
-                            }
-                        ]},
-                        {fields, [
-                            id,
-                            owner_id
-                        ]},
-                        {limit, 1}
-                    ])
+                    case proplists:get_value(owner_id, Params, proplists:get_value(owner_nick,Params,?UNIQ_UNDEFINED)) of
+                        ?UNIQ_UNDEFINED ->
+                            {ok, []};
+                        _ ->
+                            %% Берем получателя, и смотрим
+                            empdb_dao_pers:get(Con, [
+                                {'or', [
+                                    {id,
+                                        proplists:get_value(
+                                            owner_id,
+                                            Params,
+                                            null
+                                        )
+                                    },
+                                    {nick,
+                                        proplists:get_value(
+                                            owner_nick,
+                                            Params,
+                                            ?UNIQ_UNDEFINED
+                                        )
+                                    }
+                                ]},
+                                {fields, [
+                                    id
+                                ]},
+                                {limit, 1}
+                            ])
+                    end,
+                    case proplists:get_value(room_id, Params, proplists:get_value(room_head, Params, ?UNIQ_UNDEFINED)) of
+                        ?UNIQ_UNDEFINED ->
+                            {ok, []};
+                        _ ->
+                            %% Берем получателя (страну), и смотрим
+                            empdb_dao_room:get(Con, [
+                                {'or', [
+                                    {id,
+                                        proplists:get_value(
+                                            room_id,
+                                            Params,
+                                            null
+                                        )
+                                    },
+                                    {head,
+                                        proplists:get_value(
+                                            room_head,
+                                            Params,
+                                            ?UNIQ_UNDEFINED
+                                        )
+                                    }
+                                ]},
+                                {fields, [
+                                    id,
+                                    owner_id
+                                ]},
+                                {limit, 1}
+                            ])
+                    end,
+                    case proplists:get_value(community_id, Params, proplists:get_value(community_head, Params, ?UNIQ_UNDEFINED)) of
+                        ?UNIQ_UNDEFINED ->
+                            {ok, []};
+                        _ ->
+                            %% Берем получателя (сообщество), и смотрим
+                            empdb_dao_community:get(Con, [
+                                {'or', [
+                                    {id,
+                                        proplists:get_value(
+                                            community_id,
+                                            Params,
+                                            null
+                                        )
+                                    },
+                                    {head,
+                                        proplists:get_value(
+                                            community_head,
+                                            Params,
+                                            ?UNIQ_UNDEFINED
+                                        )
+                                    }
+                                ]},
+                                {fields, [
+                                    id,
+                                    owner_id
+                                ]},
+                                {limit, 1}
+                            ])
+                    end
                 },
                 Params
             )
@@ -212,6 +251,7 @@ create_check(
     {ok, [{Mbbuyerpl}]},
     {
         {ok, []},
+        {ok, []},
         {ok, []}
     },
     Params
@@ -235,6 +275,7 @@ create_check(
     {ok, [{Mbbuyerpl}]},
     {
         {ok, [{Mbownerpl}]},
+        {ok, []},
         {ok, []}
     },
     Params
@@ -258,7 +299,8 @@ create_check(
     {ok, [{Mbbuyerpl}]},
     {
         _,
-        {ok, [{Mbroom}]}
+        {ok, [{Mbroom}]},
+        _
     },
     Params
 )->
@@ -282,6 +324,46 @@ create_check(
                     Con,
                     [
                         {id, Room_id},
+                        {back_file_id, Thfile_id}
+                    ]
+                ),
+
+            {ok, Ok};
+        Else ->
+            Else
+    end;
+
+create_check(
+    Con,
+    {ok, [{Mbthingpl}]},
+    {ok, [{Mbbuyerpl}]},
+    {
+        _,
+        _,
+        {ok, [{Mbcommunity}]}
+    },
+    Params
+)->
+    case create_do_(
+        Con,
+        {ok, [{Mbthingpl}]},
+        {ok, [{Mbbuyerpl}]},
+        [
+            {community_id, proplists:get_value(id,   Mbcommunity)}
+            |   proplists:delete(community_id,
+                    proplists:delete(community_head, Params)
+                )
+        ]
+    ) of
+        {ok, Ok}->
+            Thfile_id = proplists:get_value(file_id, Mbthingpl),
+            community_id = proplists:get_value(id,   Mbcommunity),
+
+            {ok, _} =
+                empdb_dao_community:update(
+                    Con,
+                    [
+                        {id, community_id},
                         {back_file_id, Thfile_id}
                     ]
                 ),
