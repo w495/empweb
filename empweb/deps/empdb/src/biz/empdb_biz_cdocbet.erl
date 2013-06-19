@@ -222,7 +222,12 @@ create(Params)->
                                         {cdocbet_owner_id,  null},
                                         {cdocbet_owner_nick,null},
                                         {cdocbet_price,     null},
-                                        {owner_id,          Cdocbet_owner_id}
+                                        {owner_id,          Cdocbet_owner_id},
+                                        {fields, [
+                                            id,
+                                            doctype_id,
+                                            doctype_alias
+                                        ]}
                                     ]),
                                 %%
                                 %%  Меняется владельца страны.
@@ -239,8 +244,14 @@ create(Params)->
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
                                     {id,            Cdocbet_owner_id},
-                                    {own_cdoc_id,
-                                        proplists:get_value(id, Cdocpl)},
+                                    case proplists:get_value(doctype_alias, Cdocpl) of
+                                        <<"room">> ->
+                                            {own_room_id,
+                                                proplists:get_value(id, Cdocpl)};
+                                        <<"community">> ->
+                                            {own_community_id,
+                                                proplists:get_value(id, Cdocpl)}
+                                    end,
                                     {citizen_cdoc_id,
                                         proplists:get_value(id, Cdocpl)}
                                 ]),

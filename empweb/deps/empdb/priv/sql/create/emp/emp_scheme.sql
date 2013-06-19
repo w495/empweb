@@ -1979,6 +1979,25 @@ create table experbuy (
 );
 
 
+create sequence seq_experwish_id;
+create table experwish (
+    id                  decimal primary key default nextval('seq_experwish_id'),
+    /**
+        Владелец, тот кто обладает товаром после покупки
+    **/
+    owner_id            decimal         references pers(id)     not null,
+    owner_nick          varchar(1024)   default null   not null,
+    /**
+        Вещь которую приобрели --- опыт.
+        Нужно знать, какой количество
+    **/
+    exper               numeric             default null,
+    price               numeric(1000, 2)    default null,
+    created             timestamp without time zone not null default utcnow(),
+    isdeleted           boolean default false
+);
+
+
 
 create sequence seq_roomexperbuy_id;
 create table roomexperbuy (
