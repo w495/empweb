@@ -63,7 +63,22 @@ begin
             new.read_acctype_alias =
                 (select alias from acctype where id = new.read_acctype_id);
         else
-            new.read_acctype_alias  = 'public';
+            if not (new.parent_id is null) then
+                new.read_acctype_id =
+                    (select read_acctype_id
+                        from
+                            doc
+                        where
+                            doc.id = new.parent_id);
+                new.read_acctype_alias =
+                    (select read_acctype_alias
+                        from
+                            doc
+                        where
+                            doc.id = new.parent_id);
+            else
+                new.read_acctype_alias  = 'public';
+            end if;
         end if;
     end if;
     if (new.read_acctype_id is null) then
@@ -78,7 +93,23 @@ begin
             new.comm_acctype_alias =
                 (select alias from acctype where id = new.comm_acctype_id);
         else
-            new.comm_acctype_alias  = 'private';
+            if not (new.parent_id is null) then
+                new.comm_acctype_id =
+                    (select comm_acctype_id
+                        from
+                            doc
+                        where
+                            doc.id = new.parent_id);
+                new.comm_acctype_alias =
+                    (select comm_acctype_alias
+                        from
+                            doc
+                        where
+                            doc.id = new.parent_id);
+            else
+                new.comm_acctype_alias  = 'private';
+            end if;
+
         end if;
     end if;
     if (new.comm_acctype_id is null) then
@@ -100,6 +131,8 @@ begin
         new.contype_id          =
             (select id from contype   where alias = new.contype_alias);
     end if;
+
+
     return new;
 end;
 $$ language plpgsql;
@@ -215,6 +248,13 @@ begin
                     acctype
                 where
                     acctype.id = new.read_acctype_id);
+        update
+            doc
+        set
+            read_acctype_alias  = new.read_acctype_alias,
+            read_acctype_id     = new.read_acctype_id
+        where
+            parent_id = old.id;
     end if;
     if new.read_acctype_alias != old.read_acctype_alias then
         new.read_acctype_id =
@@ -223,6 +263,13 @@ begin
                     acctype
                 where
                     acctype.alias = new.read_acctype_alias);
+        update
+            doc
+        set
+            read_acctype_alias  = new.read_acctype_alias,
+            read_acctype_id     = new.read_acctype_id
+        where
+            parent_id = old.id;
     end if;
     /**
         Разрешение комментов
@@ -235,6 +282,13 @@ begin
                 where
                     acctype.id = new.comm_acctype_id
             );
+        update
+            doc
+        set
+            comm_acctype_alias  = new.comm_acctype_alias,
+            comm_acctype_id     = new.comm_acctype_id
+        where
+            parent_id = old.id;
     end if;
     if new.comm_acctype_alias != old.comm_acctype_alias then
         new.comm_acctype_id =
@@ -244,7 +298,15 @@ begin
                 where
                     acctype.alias = new.comm_acctype_alias
             );
+        update
+            doc
+        set
+            comm_acctype_alias  = new.comm_acctype_alias,
+            comm_acctype_id     = new.comm_acctype_id
+        where
+            parent_id = old.id;
     end if;
+
     /**
         Типы контента: Обычный, эротический
     **/

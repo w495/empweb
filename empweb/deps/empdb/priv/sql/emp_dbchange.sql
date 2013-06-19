@@ -1482,8 +1482,7 @@
 
 */
 
-
---
+-- 2013.06.19 12:58:52:922344838 ---------------------------------------------
 
 /*
     create table cdoclot(
@@ -1508,24 +1507,18 @@
         created         timestamp without time zone not null    default utcnow(),
         isdeleted       boolean    default false
     );
-
     alter table cdocbet add column
         cdoclot_id      decimal         references cdoclot(doc_id)      default null;
-
-
     alter table doc add column
         cdoclot_id          decimal         references cdoclot(doc_id)  default null;
     alter table doc add column
         cdoclot_betmin      numeric(1000, 2)                            default null;
     alter table doc add column
         cdoclot_betmax      numeric(1000, 2)                            default null;
-
     alter table doc add column
         cdoclot_dtstart     timestamp without time zone not null default utcnow();
     alter table doc add column
         cdoclot_dtstop      timestamp without time zone not null default utcnow() + interval '1 week';
-
-
     alter table doc add column
         cdocbet_id          decimal        references cdocbet(id)       default null;
     alter table doc add column
@@ -1534,9 +1527,6 @@
         cdocbet_owner_nick  varchar(1024)                               default null;
     alter table doc add column
         cdocbet_price       decimal                                     default null;
-
-
-
     insert into paytype(alias, isincome)
         values  ('cdocbet_out',     false),
                 ('cdocbet_in',      true ),
@@ -1547,41 +1537,35 @@
     insert into eventtype (alias, isnews) values ('delete_cdocbet_beatrate', false);
     insert into eventtype (alias, isnews) values ('create_cdocbet_win', false);
     insert into eventtype (alias, isnews) values ('delete_cdoclot_win', false);
-
 */
 
+-- 2013.06.19 12:58:52:922344838 ---------------------------------------------
+
+/*
     update pers set nick = 'a' || CAST (id as varchar(1024)) where id
         in ( select id from (select id, cl from (select id, char_length(nick)
             as cl , nick   from pers order by cl desc) as foo where foo.cl > 9)
                 as bar);
-
     alter table pers  alter column nick type varchar(10);
-
-
-
     insert into doctype(alias)
         values  ('cdoclot');
-
-
-
     alter table cdoclot add column
         cdoctype_id          decimal         references doctype(id)    default null;
-
     alter table cdoclot add column
         cdoctype_alias       varchar(1024)   references doctype(alias) default null;
-
     alter table cdocbet add column
         cdoctype_id          decimal         references doctype(id)    default null;
-
     alter table cdocbet add column
         cdoctype_alias       varchar(1024)   references doctype(alias) default null;
-
-
+*/
 
 
     insert into paytype(alias, isincome) values  ('create_adult_only_album',    false);
 
-
     insert into service(alias, price, isonce)
         values ('create_adult_only_album_price',  20.0, true);
 
+
+
+
+    alter table pers add column phonestr varchar(1024)  default null;

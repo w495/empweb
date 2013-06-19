@@ -117,6 +117,11 @@ handle(_req, #empweb_hap{action='register', params=Params} = Hap) ->
                 types = [integer]
             },
             #norm_rule{
+                key = phonestr,
+                required = false,
+                types = [nullable, string]
+            },
+            #norm_rule{
                 key         = perspicphoto_id,
                 required    = false,
                 types       = [nullable, integer]
@@ -700,6 +705,10 @@ handle(_req, #empweb_hap{
                     #norm_rule{
                         key = phone,
                         types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = phonestr,
+                        types = [nullable, string]
                     },
                 %% ----------------------------------------------------
                 %% Имя

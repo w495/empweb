@@ -81,6 +81,7 @@ create(Params)->
                                 {id,    Owner_id},
                                 {money, {decr, Price}}
                             ]),
+
                         empdb_dao_album:create(Con, Params)
                 end;
             _ ->

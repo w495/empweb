@@ -162,6 +162,7 @@ table({fields, all})->
         phash,
         email,
         phone,
+        phonestr,
 
         %% Информация о пользователе
         fname,
