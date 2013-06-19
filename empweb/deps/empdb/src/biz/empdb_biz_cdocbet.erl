@@ -235,7 +235,12 @@ create(Params)->
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
                                     {id,            Cdoclot_owner_id},
-                                    {own_cdoc_id,   null},
+                                    case proplists:get_value(doctype_alias, Cdocpl) of
+                                        <<"room">> ->
+                                            {own_room_id, null};
+                                        <<"community">> ->
+                                            {own_community_id,null}
+                                    end,
                                     {money,         {incr, Price}}
                                 ]),
                                 %%
