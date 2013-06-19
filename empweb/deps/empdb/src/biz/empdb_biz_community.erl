@@ -431,28 +431,28 @@ count(Params)->
 
 
 
-%get(Params)->
-    %empdb_dao:with_transaction(fun(Con)->
-        %empdb_daowp_community:get(Con, Params)
-    %end).
-
-%get(Params, Fields)->
-    %empdb_dao:with_transaction(fun(Con)->
-        %empdb_daowp_community:get(Con, Params, Fields)
-    %end).
-
-
 get(Params)->
-    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
-        get_con(Con, Params)
+        empdb_daowp_community:get(Con, Params)
     end).
 
 get(Params, Fields)->
-    empdb_biz:nviewsupm(?MODULE, [Params]),
     empdb_dao:with_transaction(fun(Con)->
-        get_con(Con, Params, Fields)
+        empdb_daowp_community:get(Con, Params, Fields)
     end).
+
+
+%get(Params)->
+    %empdb_biz:nviewsupm(?MODULE, [Params]),
+    %empdb_dao:with_transaction(fun(Con)->
+        %get_con(Con, Params)
+    %end).
+
+%get(Params, Fields)->
+    %empdb_biz:nviewsupm(?MODULE, [Params]),
+    %empdb_dao:with_transaction(fun(Con)->
+        %get_con(Con, Params, Fields)
+    %end).
 
 get_con(Con, Params)->
     get_adds(Con,

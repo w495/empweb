@@ -85,7 +85,7 @@ get_adds(Con, {ok, Rooms}, Params) ->
                                     |proplists:delete(back_file_id, Ncommunitypl)
                                 ],
                                 back_file_id,
-                                default_community_background
+                                default_cdoc_background
                             );
                         _ ->
                             filepath(Con, Ncommunitypl, back_file_id, null)
