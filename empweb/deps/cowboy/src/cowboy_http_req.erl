@@ -560,6 +560,7 @@ body(MaxLength, Req) ->
 -spec read_body(non_neg_integer() | infinity, #http_req{}, binary())
     -> {ok, binary(), #http_req{}} | {error, atom()}.
 read_body(MaxLength, Req, Acc) when MaxLength > byte_size(Acc) ->
+    io:format("X~nX~nX~nX ~p:read_body in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
     case stream_body(Req) of
         {ok, Data, Req2} ->
             read_body(MaxLength, Req2, << Acc/binary, Data/binary >>);
