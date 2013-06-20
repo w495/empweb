@@ -76,6 +76,7 @@ table({fields, all})->
         price,
         costs,
         expired,
+        isforwish,
         isdeleted
     ];
 

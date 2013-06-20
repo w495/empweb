@@ -1624,3 +1624,7 @@
     alter table pers add column moneywish numeric(1000, 2)    default 0;
 
 
+    alter table thingbuy add column isforwish boolean default false;
+
+    alter table experbuy add column isforwish boolean default false;
+

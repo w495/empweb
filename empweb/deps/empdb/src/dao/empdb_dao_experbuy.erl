@@ -64,6 +64,7 @@ table({fields, all})->
         exper,
         price,
         created,
+        isforwish,
         isdeleted
     ];
 

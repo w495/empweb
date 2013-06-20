@@ -148,17 +148,6 @@ create(Params)->
                                         erlang:abs(Exper)
                                     }
                                 },
-                                {experwish,
-                                    {
-                                        case Exper > 0 of
-                                            true ->
-                                                decr;
-                                            false ->
-                                                incr
-                                        end,
-                                        erlang:abs(Exper)
-                                    }
-                                },
                                 {fields, [
                                     exper,
                                     experlack,
@@ -166,6 +155,36 @@ create(Params)->
                                     authority_id,
                                     authority_alias
                                 ]}
+                                |
+                                case proplists:get_value(isforwish,   Params) of
+                                    true ->
+                                        {ok, _} =
+                                            empdb_dao_experwish:update(Con, [
+                                                {filter, [
+                                                    {exper,     Exper},
+                                                    {owner_id,  proplists:get_value(id,   Mbownerpl)},
+                                                    {isdeleted, false}
+                                                ]},
+                                                {values, [
+                                                    {isdeleted, true}
+                                                ]}
+                                            ]),
+                                        [
+                                            {experwish,
+                                                {
+                                                    case Exper > 0 of
+                                                        true ->
+                                                            decr;
+                                                        false ->
+                                                            incr
+                                                    end,
+                                                    erlang:abs(Exper)
+                                                }
+                                            }
+                                        ];
+                                    false ->
+                                        []
+                                end
                             ]),
                         %%
                         %% Cоздадим информацию о платежеы

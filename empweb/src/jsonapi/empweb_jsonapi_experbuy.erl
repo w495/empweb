@@ -108,6 +108,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
                 key         = exper,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
@@ -144,6 +149,11 @@ handle(_req, #empweb_hap{
                 key         = owner_nick,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
             },
             #norm_rule{
                 key         = exper,
@@ -183,6 +193,11 @@ handle(_req, #empweb_hap{
                 key         = owner_nick,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
             },
             #norm_rule{
                 key         = exper,

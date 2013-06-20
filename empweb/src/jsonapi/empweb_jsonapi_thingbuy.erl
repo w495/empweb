@@ -186,6 +186,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
                 key         = image_width,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
@@ -300,6 +305,11 @@ handle(_req, #empweb_hap{
                 types       = empweb_norm:filter([nullable, string])
             },
             #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
+            },
+            #norm_rule{
                 key         = image_width,
                 required    = false,
                 types       = empweb_norm:filter([nullable, integer])
@@ -394,6 +404,11 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
                 key         = expired,
                 required    = false,
                 types       = [nullable, unixdatetime]
@@ -460,6 +475,11 @@ handle(_req, #empweb_hap{
                 types       = [nullable, string]
             },
             #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
+            },
+            #norm_rule{
                 key         = expired,
                 required    = false,
                 types       = [nullable, unixdatetime]
@@ -520,6 +540,11 @@ handle(_req, #empweb_hap{
                 key         = thing_alias,
                 required    = false,
                 types       = [nullable, string]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
             },
             #norm_rule{
                 key         = expired,
