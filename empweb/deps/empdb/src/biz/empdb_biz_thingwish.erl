@@ -150,14 +150,14 @@ count_by_thingtype(Params)->
                     {ok, [{Perspl}]} ->
                         {ok, [
                             {[
-                                {all, null},
+                                {all, proplists:get_value(experwish,   Perspl, null)},
                                 {alias, experwish},
                                 {parent_id, null},
                                 {id, null},
                                 {count, proplists:get_value(experwish,   Perspl, null)}
                             ]},
                             {[
-                                {all, null},
+                                {all, proplists:get_value(experwish,   Perspl, null)},
                                 {alias, moneywish},
                                 {parent_id, null},
                                 {id, null},
