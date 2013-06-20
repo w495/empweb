@@ -135,7 +135,41 @@ count_by_thingtype(Params)->
                         end,
                         Results
                     ),
-                {ok, Nresults};
+                case empdb_dao_pers:get(Con, [
+                    {'or', [
+                        {id,    proplists:get_value(owner_id,   Params, null)},
+                        {nick,  proplists:get_value(owner_id,   Params, null)}
+                    ]},
+                    {limit, 1},
+                    {fields, [
+                        experwish,
+                        moneywish
+                    ]}
+
+                ]) of
+                    {ok, [{Perspl}]} ->
+                        {ok, [
+                            {[
+                                {all, null},
+                                {alias, experwish},
+                                {parent_id, null},
+                                {id, null},
+                                {count, proplists:get_value(experwish,   Perspl, null)}
+                            ]},
+                            {[
+                                {all, null},
+                                {alias, moneywish},
+                                {parent_id, null},
+                                {id, null},
+                                {count, proplists:get_value(moneywish,   Perspl, null)}
+                            ]}
+                            |Nresults
+                        ]};
+                    {ok, []} ->
+                        {error, no_such_owner};
+                    Else1 ->
+                        Else1
+                end;
             Else ->
                 Else
         end
