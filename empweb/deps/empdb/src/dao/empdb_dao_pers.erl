@@ -179,6 +179,7 @@ table({fields, all})->
 
         %% Информация о персоонаже
         money,
+        moneywish,
         pstatus_id,
         pstatus_alias,
 
@@ -195,6 +196,7 @@ table({fields, all})->
         exper,
         experlack,
         experlackprice,
+        experwish,
 
         emotion_id,
         emotion_alias,

@@ -38,21 +38,6 @@
 create(Params)->
     empdb_dao:with_transaction(fun(Con)->
         %%
-        %% Берем покупателя, и смотрим сколько у него денег.
-        %%
-        {ok, [{Mbwisherpl}]} =
-            empdb_dao_pers:get(Con, [
-                {'or', [
-                    {id,    proplists:get_value(wisher_id,   Params)},
-                    {nick,  proplists:get_value(wisher_nick, Params)}
-                ]},
-                {fields, [
-                    id,
-                    money
-                ]},
-                {limit, 1}
-            ]),
-        %%
         %% Берем получателя, и смотрим сколько у опыта
         %% и недостатка опыта
         %%
@@ -91,53 +76,30 @@ create(Params)->
                 Val  ->
                     Val
             end,
-        %%
-        %% Смотрим на сколько требуется увеличить опыт.
-        %% Если не указан явно, то используется недостаток опыта
-        %% до следующего уговня.
-        %%
+
         Exper = proplists:get_value(exper,   Params,    Experlack),
 
-        %%
-        %% Вычислем стоймость опыта.
-        %%
         Price = exper2price(Con, Exper),
 
-        %%
-        %% Смотрим сколько денег у плательщика.
-        %%
-        Money = proplists:get_value(money, Mbwisherpl,   0),
-        case {Exper, Price =< Money} of
-            {0, _} ->
+        case Exper of
+            0 ->
                 {error, {wrong_exper, {[
                     {exper, Exper},
-                    {money, Money},
                     {price, Price}
                 ]}}};
-            {_, true} ->
+            _ ->
                 case empdb_dao_experwish:create(Con,[
                     {price, Price}
                     |Params
                 ]) of
                     {ok, [{Respl}]} ->
                         %%
-                        %% Изменим состояние плательшика.
-                        %%
-                        {ok, [{Newwisherpl}]} =
-                            empdb_dao_pers:update(Con,[
-                                {id,    proplists:get_value(id,   Mbwisherpl)},
-                                {money, {decr, Price}},
-                                {fields, [
-                                    money
-                                ]}
-                            ]),
-                        %%
                         %% Изменим состояние получателя.
                         %%
                         {ok, [{Newownerpl}]} =
                             empdb_dao_pers:update(Con,[
                                 {id,    proplists:get_value(id,   Mbownerpl)},
-                                {exper,
+                                {experwish,
                                     {
                                         case Exper > 0 of
                                             true ->
@@ -151,20 +113,11 @@ create(Params)->
                                 {fields, [
                                     exper,
                                     experlack,
+                                    experwish,
                                     experlackprice,
                                     authority_id,
                                     authority_alias
                                 ]}
-                            ]),
-                        %%
-                        %% Cоздадим информацию о платежеы
-                        %%
-                        {ok, _} =
-                            empdb_dao_pay:create(Con, [
-                                {pers_id,           proplists:get_value(id,   Mbwisherpl)},
-                                {paytype_alias,     exper_out},
-                                {isincome,          false},
-                                {price,             Price}
                             ]),
                         {ok, [
                             {[
@@ -192,16 +145,16 @@ create(Params)->
                                         Newownerpl
                                     )
                                 },
+                                {experwish,
+                                    proplists:get_value(
+                                        experwish,
+                                        Newownerpl
+                                    )
+                                },
                                 {exper,
                                     proplists:get_value(
                                         exper,
                                         Newownerpl
-                                    )
-                                },
-                                {money,
-                                    proplists:get_value(
-                                        money,
-                                        Newwisherpl
                                     )
                                 },
                                 {price, Price}
@@ -214,7 +167,6 @@ create(Params)->
             {_, false} ->
                 {error, {not_enough_money, {[
                     {exper, Exper},
-                    {money, Money},
                     {price, Price}
                 ]}}}
         end
@@ -225,7 +177,7 @@ exper2price(Con, Exper) ->
         empdb_dao_service:get(
             Con,
             [
-                {alias, create_experwish_coef},
+                {alias, create_experbuy_coef},
                 {fields, [price]},
                 {limit, 1}
             ]

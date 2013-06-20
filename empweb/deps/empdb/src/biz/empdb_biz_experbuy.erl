@@ -148,6 +148,17 @@ create(Params)->
                                         erlang:abs(Exper)
                                     }
                                 },
+                                {experwish,
+                                    {
+                                        case Exper > 0 of
+                                            true ->
+                                                decr;
+                                            false ->
+                                                incr
+                                        end,
+                                        erlang:abs(Exper)
+                                    }
+                                },
                                 {fields, [
                                     exper,
                                     experlack,

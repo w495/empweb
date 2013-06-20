@@ -1612,6 +1612,41 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+
+            %% ==================================================
+            <<"count_moneywish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   'get'
+                };
+            <<"get_moneywish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   'get'
+                };
+            <<"get_all_moneywishs">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   'get'
+                };
+            <<"create_moneywish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   create
+                };
+            <<"update_moneywish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   update
+                };
+            <<"delete_moneywish">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_moneywish,
+                    action          =   delete
+                };
+
+
             %% ==================================================
 
             <<"count_roomexperbuy">> ->

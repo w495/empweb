@@ -367,7 +367,6 @@ create_check(
                         {back_file_id, Thfile_id}
                     ]
                 ),
-
             {ok, Ok};
         Else ->
             Else
