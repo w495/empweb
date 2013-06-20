@@ -249,16 +249,23 @@ create(Params)->
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
                                     {id,            Cdocbet_owner_id},
-                                    case proplists:get_value(doctype_alias, Cdocpl) of
-                                        <<"room">> ->
-                                            {own_room_id,
-                                                proplists:get_value(id, Cdocpl)};
-                                        <<"community">> ->
-                                            {own_community_id,
-                                                proplists:get_value(id, Cdocpl)}
-                                    end,
                                     {citizen_cdoc_id,
                                         proplists:get_value(id, Cdocpl)}
+                                    |
+                                    case proplists:get_value(doctype_alias, Cdocpl) of
+                                        <<"room">> ->
+                                            [
+                                                {own_room_id,
+                                                    proplists:get_value(id, Cdocpl)}
+                                            ];
+                                        <<"community">> ->
+                                            [
+                                                {own_community_id,
+                                                    proplists:get_value(id, Cdocpl)},
+                                                {live_community_id,
+                                                    proplists:get_value(id, Cdocpl)}
+                                            ]
+                                    end
                                 ]),
                                 %% Победителю шлем сообщение, что он победил
                                 {ok, _} = empdb_dao_event:create(Con, [
