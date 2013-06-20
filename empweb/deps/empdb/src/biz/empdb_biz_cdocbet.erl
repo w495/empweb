@@ -44,6 +44,7 @@ nowsec() ->
     Now.
 
 create(Params)->
+    Cdoc_authority_alias = inhabitant,
     empdb_dao:with_transaction(fun(Con)->
         Cdoclot_id  = proplists:get_value(cdoclot_id, Params),
         Cdocbet_owner_id   = proplists:get_value(owner_id, Params),
@@ -74,7 +75,11 @@ create(Params)->
                 ]},
                 {fields, [
                     id,
-                    money
+                    money,
+                    exper,
+                    authority_id,
+                    authority_level,
+                    authority_alias
                 ]},
                 {limit, 1}
             ])
@@ -90,6 +95,23 @@ create(Params)->
                 Dtstop              = proplists:get_value(dtstop,   Cdoclotpl),
                 Money               = proplists:get_value(money,    Userpl),
                 Newmoney            = Money - Price,
+
+
+                {ok, [{Authority}]} =
+                    empdb_dao_authority:get(Con, [
+                        {alias, Cdoc_authority_alias},
+                        {limit, 1}
+                    ]),
+
+                Cdoc_authority_level =
+                    proplists:get_value(level, Authority),
+
+                Pers_authority_level =
+                    proplists:get_value(authority_level, Userpl),
+
+                Pers_authority_alias =
+                    proplists:get_value(authority_alias, Userpl),
+
                 %%
                 %% Вычисляем, кто до этого, сделал ставку.
                 %%
@@ -115,7 +137,7 @@ create(Params)->
                         _ ->
                             Betmin
                     end,
-                case (
+                case {(
                     (
                         Cdocbet_owner_id =/= Cdoclot_owner_id
                     ) and (
@@ -125,8 +147,8 @@ create(Params)->
                     ) and (
                         (Dtstart    =< Now  ) and (Now      =<  Dtstop)
                     )
-                ) of
-                    true ->
+                ),  Pers_authority_level >= Cdoc_authority_level} of
+                    {true, true} ->
                         case Mbmaxprev of
                             {ok, [{Maxprev}]} ->
                                 Maxprev_owner_id    =
@@ -303,7 +325,7 @@ create(Params)->
                                 %%
                                  {ok, [{Cdocbet}]}
                         end;
-                    _ ->
+                   {_, true} ->
                         {error, {something_wrong, {[
                             {'now',             Now},
                             {cdocbet_owner_id,  Cdocbet_owner_id},
@@ -314,6 +336,13 @@ create(Params)->
                             {betmax,            Betmax},
                             {dtstart,           Dtstart},
                             {dtstop,            Dtstop}
+                        ]}}};
+                    {_, false} ->
+                        {error, {not_enough_authority, {[
+                            {pers_authority_alias, Pers_authority_alias},
+                            {pers_authority_level, Pers_authority_level},
+                            {cdoc_authority_alias, Cdoc_authority_alias},
+                            {cdoc_authority_level, Cdoc_authority_level}
                         ]}}}
                 end;
             {{ok, []}, {ok, _}} ->
