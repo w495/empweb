@@ -139,7 +139,7 @@ begin
     **/
     new.ostatus_alias   = 'citizen';
     new.ostatus_id      = (select id from ostatus   where alias = new.ostatus_alias);
-        
+
     /**
         Семейное положения пользователя
     **/
@@ -174,7 +174,7 @@ begin
     new.invistype_level      =
         (select level from invistype where invistype.alias = new.invistype_alias);
 
-        
+
     /**
         Положение пользователя в стране
     **/
@@ -239,7 +239,7 @@ begin
             (select id from acctype   where alias = new.show_money_acctype_alias);
     end if;
 
-    
+
     return new;
 end;
 $$ language plpgsql;
@@ -262,6 +262,12 @@ begin
             (select doc.head from doc
                 where doc.id = new.own_room_id
                     and doc.doctype_alias = 'room');
+    end if;
+    if new.own_community_id != old.own_community_id then
+        new.own_community_head =
+            (select doc.head from doc
+                where doc.id = new.own_community_id
+                    and doc.doctype_alias = 'community');
     end if;
     if new.live_room_id != old.live_room_id then
         new.live_room_head =
@@ -663,7 +669,7 @@ begin
                     acctype.alias = new.show_money_acctype_alias);
     end if;
 
-    
+
     return new;
 end;
 $$ language plpgsql;
