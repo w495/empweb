@@ -1604,6 +1604,8 @@
     alter table communitytype add column authority_alias
         varchar(1024)     references authority(alias)     default null;
 
+    update community set  communitytype_alias  = 'common'
+        where  communitytype_alias  is null;
 
     update
         communitytype

@@ -44,7 +44,6 @@ nowsec() ->
     Now.
 
 create(Params)->
-    Cdoc_authority_alias = inhabitant,
     empdb_dao:with_transaction(fun(Con)->
         Cdoclot_id  = proplists:get_value(cdoclot_id, Params),
         Cdocbet_owner_id   = proplists:get_value(owner_id, Params),
@@ -95,7 +94,41 @@ create(Params)->
                 Dtstop              = proplists:get_value(dtstop,   Cdoclotpl),
                 Money               = proplists:get_value(money,    Userpl),
                 Newmoney            = Money - Price,
+                Cdoctype_id    = proplists:get_value(cdoctype_id, Cdoclotpl),
+                Cdoctype_alias    = proplists:get_value(cdoctype_alias, Cdoclotpl),
 
+
+
+                Cdoc_authority_alias =
+                    case Cdoctype_alias of
+                        <<"community">> ->
+                            {ok,[{Communitypl}]} =
+                                empdb_dao_community:get(
+                                    Con,
+                                    [
+                                        {id, Cdoc_id},
+                                        {isdeleted, false},
+                                        {limit, 1}
+                                    ]
+                                ),
+                            {ok,[{Communitytypepl}]} =
+                                empdb_dao_communitytype:get(
+                                    Con,
+                                    [
+                                        {id,
+                                            proplists:get_value(
+                                                communitytype_id,
+                                                Communitypl,
+                                                null
+                                            )
+                                        },
+                                        {limit, 1}
+                                    ]
+                                ),
+                            proplists:get_value(authority_alias, Communitytypepl, inhabitant);
+                        _ ->
+                            inhabitant
+                    end,
 
                 {ok, [{Authority}]} =
                     empdb_dao_authority:get(Con, [
