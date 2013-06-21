@@ -1561,70 +1561,88 @@
 */
 
 
+/*
     insert into paytype(alias, isincome) values  ('create_adult_only_album',    false);
-
     insert into service(alias, price, isonce)
         values ('create_adult_only_album_price',  20.0, true);
-
-
-
-
     alter table pers add column phonestr varchar(1024)  default null;
-
-
-
-
     alter table thingbuy add column
         community_id decimal references doc(id)   default null;
     alter table thingbuy add column
         community_head varchar(1024)  default null;
-
-
-
-
     create sequence seq_experwish_id;
     create table experwish (
         id                  decimal primary key default nextval('seq_experwish_id'),
-        /**
-            Владелец, тот кто обладает товаром после покупки
-        **/
         owner_id            decimal         references pers(id)     not null,
         owner_nick          varchar(1024)   default null   not null,
-        /**
-            Вещь которую приобрели --- опыт.
-            Нужно знать, какой количество
-        **/
         exper               numeric             default null,
         price               numeric(1000, 2)    default null,
         created             timestamp without time zone not null default utcnow(),
         isdeleted           boolean default false
     );
-
-
     alter table pers add column experwish numeric  default 0;
-
     create sequence seq_moneywish_id;
     create table moneywish (
         id                  decimal primary key default nextval('seq_moneywish_id'),
-        /**
-            Владелец, тот кто обладает товаром после покупки
-        **/
         owner_id            decimal         references pers(id)     not null,
         owner_nick          varchar(1024)   default null   not null,
-        /**
-            Вещь которую приобрели --- опыт.
-            Нужно знать, какой количество
-        **/
         money               numeric             default null,
         price               numeric(1000, 2)    default null,
         created             timestamp without time zone not null default utcnow(),
         isdeleted           boolean default false
     );
-
     alter table pers add column moneywish numeric(1000, 2)    default 0;
-
-
     alter table thingbuy add column isforwish boolean default false;
-
     alter table experbuy add column isforwish boolean default false;
+*/
 
+
+
+    alter table communitytype add column authority_id
+        decimal     references authority(id)     default null;
+
+    alter table communitytype add column authority_alias
+        varchar(1024)     references authority(alias)     default null;
+
+
+    update
+        communitytype
+    set
+        authority_id =
+            (select id from authority where alias = 'inhabitant' )
+    where
+        alias = 'common';
+    update
+        communitytype
+    set
+        authority_alias = 'inhabitant'
+    where
+        alias = 'common';
+
+    update
+        communitytype
+    set
+        authority_id =
+            (select id from authority where alias = 'citizen' )
+    where
+        alias = 'secret';
+    update
+        communitytype
+    set
+        authority_alias = 'citizen'
+    where
+        alias = 'secret';
+
+    update
+        communitytype
+    set
+        authority_id =
+            (select id from authority where alias = 'elder' )
+    where
+        alias = 'elite';
+    update
+        communitytype
+    set
+        authority_alias = 'elder'
+    where
+        alias = 'elite';

@@ -35,7 +35,6 @@
 %%
 
 create(Params)->
-    Community_authority_alias = inhabitant,
     Owner_id = proplists:get_value(owner_id, Params, []),
     empdb_dao:with_transaction(fun(Con)->
         {ok, [{Mbownerpl}]} =
@@ -49,10 +48,37 @@ create(Params)->
                     nick,
                     money,
                     authority_id,
+                    authority_alias,
                     authority_level
                 ]},
                 {limit, 1}
             ]),
+
+
+        {ok,[{Communitytypepl}]} =
+            empdb_dao_communitytype:get(
+                Con,
+                [
+                    {'or', [
+                        {id,
+                            proplists:get_value(communitytype_id,      Params, null)
+                        },
+                        {alias,
+                            proplists:get_value(communitytype_alias,   Params, common)
+                        }
+                    ]},
+                    {limit, 1}
+                ]
+            ),
+
+        Community_authority_alias =
+            proplists:get_value(authority_alias, Communitytypepl, inhabitant),
+
+
+        io:format("Community_authority_alias = ~p ~n", [Communitytypepl]),
+
+
+        io:format("Community_authority_alias = ~p ~n", [Community_authority_alias]),
 
         %%
         %% Здесь надо вводить, дополнительное ограничение на уровне базы.
@@ -138,7 +164,7 @@ create(Params)->
             proplists:get_value(level, Candsgteauthoritypl, 0),
         case {
             Price =< Money,
-            Mbcommunityobjs,
+            [], %Mbcommunityobjs,
             (Authority_level >= Readgteauthority_level)
                 and
             (Authority_level >= Candsgteauthority_level),
@@ -154,7 +180,7 @@ create(Params)->
                             {price,             Price}
                         ]),
                         Newmoney = Money - Price,
-                        {ok, _} = empdb_dao_pers:update(Con, [
+                        case empdb_dao_pers:update(Con, [
                             {filter, [
                                 {id, Owner_id}
                             ]},
@@ -166,14 +192,20 @@ create(Params)->
                                 {live_community_head,   Head},
                                 {live_community_approved, true}
                             ]}
-                        ]),
-                        {ok, [
-                            {[
-                                {money, Newmoney},
-                                {price, Price}
-                                |Respl
-                            ]}
-                        ]};
+                        ]) of
+                            {ok, _} ->
+                                {ok, [
+                                    {[
+                                        {money, Newmoney},
+                                        {price, Price}
+                                        |Respl
+                                    ]}
+                                ]};
+                            {error,{unknown,<<"exists_live_community">>}} ->
+                                {error, exists_live_community};
+                            Else ->
+                                Else
+                        end;
                     Error ->
                         Error
                 end;
@@ -217,8 +249,8 @@ create(Params)->
                 {error, {not_enough_authority, {[
                     {pers_authority_alias, Pers_authority_alias},
                     {pers_authority_level, Pers_authority_level},
-                    {room_authority_alias, Community_authority_alias},
-                    {room_authority_level, Community_authority_level}
+                    {community_authority_alias, Community_authority_alias},
+                    {community_authority_level, Community_authority_level}
                 ]}}};
             Error ->
                 Error

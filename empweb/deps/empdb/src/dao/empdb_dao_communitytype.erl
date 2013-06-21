@@ -55,6 +55,8 @@ table({fields, all})->
         id,
         name_ti,
         alias,
+        authority_id,
+        authority_alias,
         isdeleted
     ];
 
@@ -74,22 +76,22 @@ table()->
     table(name).
 
 count(Con, Some) ->
-    empdb_dao_doc:count(?MODULE, Con, Some).
+    empdb_dao:count(?MODULE, Con, Some).
 
 get(Con, Some) ->
-    empdb_dao_doc:get(?MODULE, Con, Some).
+    empdb_dao:get(?MODULE, Con, Some).
 
 get(Con, What, Fields)->
-    empdb_dao_doc:get(?MODULE, Con, What, Fields).
+    empdb_dao:get(?MODULE, Con, What, Fields).
 
 create(Con, Proplist)->
-    empdb_dao_doc:create(?MODULE, Con, Proplist).
+    empdb_dao:create(?MODULE, Con, Proplist).
 
 update(Con, Proplist)->
-    empdb_dao_doc:update(?MODULE, Con, Proplist).
+    empdb_dao:update(?MODULE, Con, Proplist).
 
 is_owner(Con, Owner_id, Obj_id) ->
-    empdb_dao_doc:is_owner(Con, Owner_id, Obj_id).
+    empdb_dao:is_owner(Con, Owner_id, Obj_id).
 
 
 
