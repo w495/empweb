@@ -257,13 +257,19 @@ create(Params)->
                                 %%
                                 {ok, _} = empdb_dao_pers:update(Con, [
                                     {id,            Cdoclot_owner_id},
+                                    {money,         {incr, Price}}
+                                    |
                                     case proplists:get_value(doctype_alias, Cdocpl) of
                                         <<"room">> ->
-                                            {own_room_id, null};
+                                            [
+                                                {own_room_id, null}
+                                            ];
                                         <<"community">> ->
-                                            {own_community_id,null}
-                                    end,
-                                    {money,         {incr, Price}}
+                                            [
+                                                {own_community_id,  null},
+                                                {live_community_id, null}
+                                            ]
+                                    end
                                 ]),
                                 %%
                                 %%  Меняется владельца страны.
