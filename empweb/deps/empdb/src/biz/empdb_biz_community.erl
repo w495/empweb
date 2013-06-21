@@ -35,6 +35,7 @@
 %%
 
 create(Params)->
+    Community_authority_alias = inhabitant,
     Owner_id = proplists:get_value(owner_id, Params, []),
     empdb_dao:with_transaction(fun(Con)->
         {ok, [{Mbownerpl}]} =
@@ -110,8 +111,27 @@ create(Params)->
                 ]},
                 {limit, 1}
             ]),
+        {ok, [{Authority}]} =
+            empdb_dao_authority:get(Con, [
+                {alias, Community_authority_alias},
+                {limit, 1}
+            ]),
+
         Authority_level =
             proplists:get_value(authority_level, Mbownerpl),
+
+        Community_authority_level =
+            proplists:get_value(level, Authority),
+
+        Community_authority_level =
+            proplists:get_value(level, Authority),
+
+        Pers_authority_level =
+            proplists:get_value(authority_level, Mbownerpl),
+
+        Pers_authority_alias =
+            proplists:get_value(authority_alias, Mbownerpl),
+
         Readgteauthority_level =
             proplists:get_value(level, Readgteauthoritypl, 0),
         Candsgteauthority_level =
@@ -121,9 +141,10 @@ create(Params)->
             Mbcommunityobjs,
             (Authority_level >= Readgteauthority_level)
                 and
-            (Authority_level >= Candsgteauthority_level)
+            (Authority_level >= Candsgteauthority_level),
+            Pers_authority_level >= Community_authority_level
         } of
-            {true, [], true} ->
+            {true, [], true, true} ->
                 case empdb_dao_community:create(Con, Params) of
                     {ok, [{Respl}]} ->
                         {ok, _} = empdb_dao_pay:create(Con, [
@@ -156,7 +177,7 @@ create(Params)->
                     Error ->
                         Error
                 end;
-            {true, Mbcommunityobjs, true} ->
+            {true, Mbcommunityobjs, true, true} ->
                 case lists:foldl(
                     fun
                         (_, {error,{not_unique_owner,Owner_id}})->
@@ -178,12 +199,12 @@ create(Params)->
                     Not_unique_owner ->
                         Not_unique_owner
                 end;
-            {false, _ ,true}->
+            {false, _ ,true, true}->
                 {error, {not_enough_money, {[
                     {money, Money},
                     {price, Price}
                 ]}}};
-            {_, _, false}->
+            {_, _, false, true}->
                 {error, {not_enough_level, {[
                     {cands_gte_authority_level,
                         Candsgteauthority_level},
@@ -191,6 +212,13 @@ create(Params)->
                         Readgteauthority_level},
                     {authority_level,
                         Authority_level}
+                ]}}};
+            {_, _, _, false}->
+                {error, {not_enough_authority, {[
+                    {pers_authority_alias, Pers_authority_alias},
+                    {pers_authority_level, Pers_authority_level},
+                    {room_authority_alias, Community_authority_alias},
+                    {room_authority_level, Community_authority_level}
                 ]}}};
             Error ->
                 Error
