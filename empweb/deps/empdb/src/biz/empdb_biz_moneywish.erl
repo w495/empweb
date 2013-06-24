@@ -66,10 +66,9 @@ create(Params)->
             ]),
         Money = proplists:get_value(money, Params,   0),
         Price = Money,
-        case money of
+        case Money of
             0 ->
                 {error, {wrong_money, {[
-                    {money, money},
                     {money, Money},
                     {price, Price}
                 ]}}};

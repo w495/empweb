@@ -2142,6 +2142,34 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     action          =   delete
                 };
 
+
+            %% ==================================================
+            <<"get_pptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pptrans,
+                    action          =   'get'
+                };
+            <<"get_all_pptranss">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pptrans,
+                    action          =   'get'
+                };
+            <<"create_pptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pptrans,
+                    action          =   create
+                };
+            <<"update_pptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pptrans,
+                    action          =   update
+                };
+            <<"delete_pptrans">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pptrans,
+                    action          =   delete
+                };
+
             %% ==================================================
             <<"get_communitymemb">> ->
                 Eh#empweb_hap{

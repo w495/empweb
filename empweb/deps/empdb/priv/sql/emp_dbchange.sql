@@ -1596,8 +1596,10 @@
     alter table experbuy add column isforwish boolean default false;
 */
 
+-- 2013.06.24 14:54:07:753472621 ---------------------------------------------
 
 
+/*
     alter table communitytype add column authority_id
         decimal     references authority(id)     default null;
 
@@ -1648,3 +1650,24 @@
         authority_alias = 'elder'
     where
         alias = 'elite';
+*/
+
+
+
+create sequence seq_pptrans_id;
+create table pptrans (
+    id                 decimal primary key default nextval('seq_pptrans_id'),
+    pers_id            decimal         references pers(id)          not null,
+    pers_nick          varchar(1024)   default null   not null,
+    receiver_id        decimal         references pers(id)          not null,
+    transtype_id       decimal         references transtype(id)     default null,
+    transtype_alias    varchar(1024)   references transtype(alias)  default null,
+    price              numeric(1000, 2)    default null,
+    created            timestamp without time zone not null default utcnow(),
+    isdeleted          boolean default false
+);
+
+
+insert into paytype(alias, isincome)
+        values  ('pers_out',     false),
+                ('pers_in',      true );
