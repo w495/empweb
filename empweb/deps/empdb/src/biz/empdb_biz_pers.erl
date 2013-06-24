@@ -873,7 +873,11 @@ update(Con, {live_community_approved, true}, {Function, [Params]}, Mbperspl) ->
             %% то подать заявку на вступление в сообщество он не может.
             Money   = proplists:get_value(money, Mbperspl),
             Price   = proplists:get_value(fee, Communitypl),
-            case  {Candsgteauthoritylevel =< Authoritylevel, Price =< Money} of
+            case  {
+                %Candsgteauthoritylevel =< Authoritylevel,
+                true,
+                Price =< Money
+            } of
                 {true, true} ->
                     case Function(Con, Params) of
                         {ok, Res} ->

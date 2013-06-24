@@ -132,6 +132,11 @@ handle(_req, #empweb_hap{
                 key         = created,
                 required    = false,
                 types       = [float]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm:norm('get')
         ]),
@@ -195,6 +200,11 @@ handle(_req, #empweb_hap{
                 key         = created,
                 required    = false,
                 types       = [float]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
             }
             |empweb_norm:norm('create')
         ]),
@@ -257,6 +267,11 @@ handle(_req, #empweb_hap{
                 key         = created,
                 required    = false,
                 types       = [float]
+            },
+            #norm_rule{
+                key         = isforwish,
+                required    = false,
+                types       = [nullable, boolean]
             }
             |empweb_norm:norm('get')
         ]),
