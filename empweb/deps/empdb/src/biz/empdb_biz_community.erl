@@ -164,10 +164,11 @@ create(Params)->
             proplists:get_value(level, Candsgteauthoritypl, 0),
         case {
             Price =< Money,
-            [], %Mbcommunityobjs,
-            (Authority_level >= Readgteauthority_level)
-                and
-            (Authority_level >= Candsgteauthority_level),
+            Mbcommunityobjs,
+            %(Authority_level >= Readgteauthority_level)
+            %    and
+            %(Authority_level >= Candsgteauthority_level),
+            true,
             Pers_authority_level >= Community_authority_level
         } of
             {true, [], true, true} ->
