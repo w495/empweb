@@ -84,7 +84,8 @@ update(Params)->
                     [
                         {filter, [
                             {parent_id, proplists:get_value(parent_id,Photopl, null)},
-                            {iscover, true}
+                            {iscover, true},
+                            {id, {neq,  proplists:get_value(id,Photopl, null)}}
                         ]},
                         {values, [
                             {iscover, false}
