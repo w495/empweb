@@ -77,7 +77,24 @@ create(Params)->
 
 update(Params)->
     empdb_dao:with_connection(fun(Con)->
-        empdb_dao_photo:update(Con, Params)
+        case {empdb_dao_photo:update(Con, [{fields, [id, parent_id]}|Params]), proplists:get_value(iscover,Params)} of
+            {{ok, [{Photopl}]}, true} ->
+                empdb_dao_photo:update(
+                    Con,
+                    [
+                        {filter, [
+                            {parent_id, proplists:get_value(parent_id,Photopl, null)},
+                            {iscover, true}
+                        ]},
+                        {values, [
+                            {iscover, false}
+                        ]}
+                    ]
+                ),
+                {ok, [{Photopl}]};
+            {Answer, _} ->
+                Answer
+        end
     end).
 
 get(Params)->
