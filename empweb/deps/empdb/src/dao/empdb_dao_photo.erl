@@ -98,6 +98,9 @@ get(Con, What) ->
             ])
         ),
 
+
+    io:format("Fields = ~p ~n", [Fields]),
+
     Req_width     = proplists:get_value(image_width, What, null),
     Req_height    = proplists:get_value(image_height, What, null),
 
