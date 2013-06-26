@@ -183,12 +183,27 @@ count(Params)->
 
 get(Params)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingwish:get(Con, [{isdeleted, false}|Params])
+        empdb_dao_thingwish:get(
+            Con,
+            [
+                {isdeleted, false},
+                {order, {asc, thing_alias}}
+                |Params
+            ]
+        )
     end).
 
 get(Params, Fileds)->
     empdb_dao:with_transaction(fun(Con)->
-        empdb_dao_thingwish:get(Con, [{isdeleted, false}|Params], Fileds)
+        empdb_dao_thingwish:get(
+            Con,
+            [
+                {isdeleted, false},
+                {order, {asc, thing_alias}}
+                |Params
+            ],
+            Fileds
+        )
     end).
 
 is_owner(Uid, Oid)->
