@@ -1652,22 +1652,29 @@
         alias = 'elite';
 */
 
+/*
+
+    create sequence seq_pptrans_id;
+    create table pptrans (
+        id                 decimal primary key default nextval('seq_pptrans_id'),
+        pers_id            decimal         references pers(id)          not null,
+        pers_nick          varchar(1024)   default null   not null,
+        receiver_id        decimal         references pers(id)          not null,
+        transtype_id       decimal         references transtype(id)     default null,
+        transtype_alias    varchar(1024)   references transtype(alias)  default null,
+        price              numeric(1000, 2)    default null,
+        created            timestamp without time zone not null default utcnow(),
+        isdeleted          boolean default false
+    );
 
 
-create sequence seq_pptrans_id;
-create table pptrans (
-    id                 decimal primary key default nextval('seq_pptrans_id'),
-    pers_id            decimal         references pers(id)          not null,
-    pers_nick          varchar(1024)   default null   not null,
-    receiver_id        decimal         references pers(id)          not null,
-    transtype_id       decimal         references transtype(id)     default null,
-    transtype_alias    varchar(1024)   references transtype(alias)  default null,
-    price              numeric(1000, 2)    default null,
-    created            timestamp without time zone not null default utcnow(),
-    isdeleted          boolean default false
-);
+    insert into paytype(alias, isincome)
+            values  ('pers_out',     false),
+                    ('pers_in',      true );
+
+*/
 
 
-insert into paytype(alias, isincome)
-        values  ('pers_out',     false),
-                ('pers_in',      true );
+
+   alter table photo drop column is_cover;
+   alter table photo  add column iscover   boolean default false;

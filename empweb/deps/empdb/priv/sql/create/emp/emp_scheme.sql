@@ -1062,7 +1062,7 @@ create table photo(
     /**
         Разрешение на перепост
     **/
-    is_cover            boolean default false
+    iscover            boolean default false
 );
 
 

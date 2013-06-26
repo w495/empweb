@@ -103,7 +103,7 @@ handle(_req, #empweb_hap{
                 types       = [integer]
             },
             #norm_rule{
-                key         = is_cover,
+                key         = iscover,
                 required    = false,
                 types       = [boolean]
             }
@@ -152,7 +152,7 @@ handle(_req, #empweb_hap{
                 types       = [atom]
             },
             #norm_rule{
-                key         = is_cover,
+                key         = iscover,
                 required    = false,
                 types       = [boolean]
             }
@@ -192,7 +192,7 @@ handle(_req, #empweb_hap{
                 types       = [integer]
             },
             #norm_rule{
-                key         = is_cover,
+                key         = iscover,
                 required    = false,
                 types       = [boolean]
             }
@@ -272,7 +272,7 @@ handle(_req, #empweb_hap{
                 types       = [integer]
             },
             #norm_rule{
-                key         = is_cover,
+                key         = iscover,
                 required    = false,
                 types       = [boolean]
             }
@@ -311,7 +311,7 @@ handle(_req, #empweb_hap{
                 types       = [integer]
             },
             #norm_rule{
-                key         = is_cover,
+                key         = iscover,
                 required    = false,
                 types       = [boolean]
             }

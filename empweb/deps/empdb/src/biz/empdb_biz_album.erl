@@ -135,7 +135,7 @@ get(Params)->
 
                                         case empdb_dao_photo:get(Con, [
                                             {isdeleted, false},
-                                            {order, {desc, 'photo.created'}},
+                                            {order, {desc, iscover}},
                                             {parent_id, Id},
                                             {image_width,
                                                 proplists:get_value(

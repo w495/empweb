@@ -148,15 +148,16 @@ create(Params)->
                 %%
                 %% Вычисляем, кто до этого, сделал ставку.
                 %%
-                Mbmaxprev = empdb_dao_cdocbet:get(Con, [
-                    {isdeleted, false},
-                    {price, {lt, Price + ?EMPDB_BIZ_CDOCBET_EPSILON}},
-                    {cdoclot_id, Cdoclot_id},
-                    {limit, 1},
-                    {order, [
-                        {desc, price}
-                    ]}
-                ]),
+                Mbmaxprev =
+                    empdb_dao_cdocbet:get(Con, [
+                        {isdeleted, false},
+                        {price, {lt, Price + ?EMPDB_BIZ_CDOCBET_EPSILON}},
+                        {cdoclot_id, Cdoclot_id},
+                        {limit, 1},
+                        {order, [
+                            {desc, price}
+                        ]}
+                    ]),
                 %%
                 %% Вычисляем минимально возможную цену ставки.
                 %% Она должна быть больше и равна минимальной ставки за лот,
@@ -232,22 +233,25 @@ create(Params)->
                         %% Если кто-то сделает большую ставку,
                         %% то эти деньги вернем на следующей итерации.
                         %%
-                        {ok, _} = empdb_dao_pers:update(Con,[
-                            {id,    proplists:get_value(id,   Userpl)},
-                            {money, {decr, Price}}
-                        ]),
-                        {ok, _} = empdb_dao_pay:create(Con, [
-                            {pers_id,           proplists:get_value(id,   Userpl)},
-                            {paytype_alias,     cdocbet_out},
-                            {isincome,          false},
-                            {price,             Price}
-                        ]),
-                        {ok, [{Cdocbet}]} = empdb_dao_cdocbet:create(Con,[
-                            {filter, [
-                                id
-                            ]}
-                            |Params
-                        ]),
+                        {ok, _} =
+                            empdb_dao_pers:update(Con,[
+                                {id,    proplists:get_value(id,   Userpl)},
+                                {money, {decr, Price}}
+                            ]),
+                        {ok, _} =
+                            empdb_dao_pay:create(Con, [
+                                {pers_id,           proplists:get_value(id,   Userpl)},
+                                {paytype_alias,     cdocbet_out},
+                                {isincome,          false},
+                                {price,             Price}
+                            ]),
+                        {ok, [{Cdocbet}]} =
+                            empdb_dao_cdocbet:create(Con,[
+                                {filter, [
+                                    id
+                                ]}
+                                |Params
+                            ]),
                         case Price =:= Betmax of
                             true ->
                                 %%
@@ -280,6 +284,7 @@ create(Params)->
                                         {owner_id,          Cdocbet_owner_id},
                                         {fields, [
                                             id,
+                                            head,
                                             doctype_id,
                                             doctype_alias
                                         ]}
@@ -299,9 +304,11 @@ create(Params)->
                                             ];
                                         <<"community">> ->
                                             [
-                                                {own_community_id,  null},
-                                                {live_community_id, null},
-                                                {live_community_approved, null}
+                                                {own_community_id,          null},
+                                                {own_community_head,        null},
+                                                {live_community_id,         null},
+                                                {live_community_head,       null},
+                                                {live_community_approved,   null}
                                             ]
                                     end
                                 ]),
@@ -324,8 +331,12 @@ create(Params)->
                                             [
                                                 {own_community_id,
                                                     proplists:get_value(id, Cdocpl)},
+                                                {own_community_head,
+                                                    proplists:get_value(head, Cdocpl)},
                                                 {live_community_id,
                                                     proplists:get_value(id, Cdocpl)},
+                                                {live_community_head,
+                                                    proplists:get_value(head, Cdocpl)},
                                                 {live_community_approved, true}
                                             ]
                                     end
