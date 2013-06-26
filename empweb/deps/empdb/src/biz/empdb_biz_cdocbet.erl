@@ -300,7 +300,8 @@ create(Params)->
                                         <<"community">> ->
                                             [
                                                 {own_community_id,  null},
-                                                {live_community_id, null}
+                                                {live_community_id, null},
+                                                {live_community_approved, null}
                                             ]
                                     end
                                 ]),
@@ -324,7 +325,8 @@ create(Params)->
                                                 {own_community_id,
                                                     proplists:get_value(id, Cdocpl)},
                                                 {live_community_id,
-                                                    proplists:get_value(id, Cdocpl)}
+                                                    proplists:get_value(id, Cdocpl)},
+                                                {live_community_approved, true}
                                             ]
                                     end
                                 ]),
