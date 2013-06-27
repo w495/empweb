@@ -771,7 +771,7 @@ te_chunked(Data, {0, Streamed}) ->
     io:format("Data = ~w Streamed = ~w ~n", [Data, Streamed]),
 
     token(Data,
-        fun (Rest, _) when byte_size(Rest) < 4 ->
+        fun (Rest, _) when byte_size(Rest) < 6 ->
                 more;
             (<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
 
