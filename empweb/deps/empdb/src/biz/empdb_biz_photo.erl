@@ -64,7 +64,7 @@ create(Params)->
             {ok, [{Postpl}]} ->
                 empdb_daowp_event:feedfriends([
                     {eventobj_alias,    photo},
-                    {eventact_alias,    repost},
+                    {eventact_alias,    create},
                     {pers_id,           proplists:get_value(owner_id, Postpl)},
                     {doc_id,            proplists:get_value(id,     Postpl)},
                     {eventtype_alias,   create_photo}
