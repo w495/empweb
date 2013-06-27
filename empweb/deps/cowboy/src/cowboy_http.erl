@@ -666,6 +666,11 @@ token(<<>>, Fun, _Case, Acc) ->
     io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     Fun(<<>>, Acc);
 
+token(<<"\r\n", Rest/binary >>, Fun, Case, <<>>) ->
+    io:format("~n~n~n ~w in ~w :: ~n~n~n", [?MODULE, ?LINE]),
+    token(Rest, Fun, Case, <<>>);
+
+
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
         when C =:= $(; C =:= $); C =:= $<; C =:= $>; C =:= $@;
              C =:= $,; C =:= $;; C =:= $:; C =:= $\\; C =:= $";
@@ -796,6 +801,10 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
 te_chunked(Data, {ChunkRem, Streamed}) ->
     Size = byte_size(Data),
     io:format("~nX~nX~nX~nX ChunkRem = ~w; Size = ~w; ~nX~nX~nX~nX", [ChunkRem, Size]),
+
+     %<< Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
+
+
     {ok, Data, {ChunkRem - Size, Streamed + Size}}.
 
 %% @doc Decode an identity stream.
