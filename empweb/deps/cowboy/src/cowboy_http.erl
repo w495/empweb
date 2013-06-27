@@ -672,7 +672,7 @@ token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
              C =:= $/; C =:= $[; C =:= $]; C =:= $?; C =:= $=;
              C =:= ${; C =:= $}; C =:= $\s; C =:= $\t;
              C < 32; C =:= 127 ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p :: C = ~p (~w)~n~n~n", [?MODULE, ?LINE, C, C]),
     Fun(Data, Acc);
 
 token(<< C, Rest/binary >>, Fun, Case = ci, Acc) ->
