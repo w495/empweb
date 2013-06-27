@@ -736,9 +736,13 @@ te_chunked(Data, {0, Streamed}) ->
     token(Data,
         fun (Rest, _) when byte_size(Rest) < 4 ->
                 more;
-            (<< "\r\n", Rest/binary >> = Foolpart, BinLen) ->
-                io:format("Foolpart = ~p ~n", [Foolpart]),
-                io:format("binary_to_list(Foolpart) = ~p ~n", [binary_to_list(Foolpart)]),
+            (<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
+
+
+                io:format("BinLen = ~p ~n", [BinLen]),
+
+                %io:format("Foolpart = ~p ~n", [Foolpart]),
+                %io:format("binary_to_list(Foolpart) = ~p ~n", [binary_to_list(Foolpart)]),
 
                 Len = list_to_integer(binary_to_list(BinLen), 16),
                 io:format("~nX~nX~nX~n BinLen = ~p; Len = ~p ~nX~nX~nX~nX", [BinLen, Len]),
