@@ -658,22 +658,30 @@ token_ci(Data, Fun) ->
 %% @doc Parse a token.
 -spec token(binary(), fun()) -> any().
 token(Data, Fun) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     token(Data, Fun, cs, <<>>).
 
 -spec token(binary(), fun(), ci | cs, binary()) -> any().
 token(<<>>, Fun, _Case, Acc) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fun(<<>>, Acc);
+
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
         when C =:= $(; C =:= $); C =:= $<; C =:= $>; C =:= $@;
              C =:= $,; C =:= $;; C =:= $:; C =:= $\\; C =:= $";
              C =:= $/; C =:= $[; C =:= $]; C =:= $?; C =:= $=;
              C =:= ${; C =:= $}; C =:= $\s; C =:= $\t;
              C < 32; C =:= 127 ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fun(Data, Acc);
+
 token(<< C, Rest/binary >>, Fun, Case = ci, Acc) ->
     C2 = cowboy_bstr:char_to_lower(C),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     token(Rest, Fun, Case, << Acc/binary, C2 >>);
+
 token(<< C, Rest/binary >>, Fun, Case, Acc) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     token(Rest, Fun, Case, << Acc/binary, C >>).
 
 %% @doc Parse a quoted string.
