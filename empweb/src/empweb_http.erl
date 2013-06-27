@@ -98,7 +98,7 @@ multipart_data_chunked(Req) ->
 
 
 test_read_all() ->
-    {ok, Tcpstream} = file:read_file(<<"priv/tcp-stream.jpg">>),
+    {ok, Tcpstream} = file:read_file(<<"priv/bada-test-2013-06-27_15-33-10.raw.txt">>),
     test_parse_chunck(Tcpstream, undef, 0, []).
 
 recv(Req = #http_req{socket=Socket}) ->

@@ -45,7 +45,7 @@ create(Params)->
     Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
     Dldir = ?EMPDB_BIZ_FILE_DLDIR,
 
-    io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
+    %io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
 
 
     Doc_id   = proplists:get_value(doc_id,   Params, null),

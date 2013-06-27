@@ -658,12 +658,12 @@ token_ci(Data, Fun) ->
 %% @doc Parse a token.
 -spec token(binary(), fun()) -> any().
 token(Data, Fun) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     token(Data, Fun, cs, <<>>).
 
 -spec token(binary(), fun(), ci | cs, binary()) -> any().
 token(<<>>, Fun, _Case, Acc) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     Fun(<<>>, Acc);
 
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
@@ -672,16 +672,15 @@ token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
              C =:= $/; C =:= $[; C =:= $]; C =:= $?; C =:= $=;
              C =:= ${; C =:= $}; C =:= $\s; C =:= $\t;
              C < 32; C =:= 127 ->
-    io:format("~n~n~n ~p in ~p :: C = ~p (~w)~n~n~n", [?MODULE, ?LINE, C, C]),
+    io:format("~n~n~n ~w in ~w :: C = ~w (~w) Pid = ~w ~n~n~n", [?MODULE, ?LINE, C, C, self()]),
     Fun(Data, Acc);
 
 token(<< C, Rest/binary >>, Fun, Case = ci, Acc) ->
     C2 = cowboy_bstr:char_to_lower(C),
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     token(Rest, Fun, Case, << Acc/binary, C2 >>);
 
 token(<< C, Rest/binary >>, Fun, Case, Acc) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     token(Rest, Fun, Case, << Acc/binary, C >>).
 
 %% @doc Parse a quoted string.
@@ -739,33 +738,64 @@ te_chunked(<<>>, _) ->
     more;
 te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
     {done, Streamed, Rest};
+
+
+%te_chunked(Data, {0, Streamed}) ->
+    %%% @todo We are expecting an hex size, not a general token.
+    %token(
+        %Data,
+        %fun
+            %(<< "\r\n", Rest/binary >>, BinLen) ->
+                %io:format("BinLen = ~w Pid = ~w ~n", [BinLen, self()]),
+
+                %Len = list_to_integer(binary_to_list(BinLen), 16),
+                %io:format("~nX~nX~nX~n BinLen = ~w; Len = ~w ~nX~nX~nX~nX", [BinLen, Len]),
+
+                %te_chunked(Rest, {Len, Streamed});
+            %%% Chunk size shouldn't take too many bytes,
+            %%% don't try to stream forever.
+            %(Rest, _) when byte_size(Rest) < 16 ->
+                %more;
+            %(_, _) ->
+                %{error, badarg}
+        %end
+    %);
+
 te_chunked(Data, {0, Streamed}) ->
     %% @todo We are expecting an hex size, not a general token.
+    io:format("Data = ~w Streamed = ~w ~n", [Data, Streamed]),
+
     token(Data,
         fun (Rest, _) when byte_size(Rest) < 4 ->
                 more;
             (<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
 
 
-                io:format("BinLen = ~p ~n", [BinLen]),
+                io:format("BinLen = ~w Pid = ~w ~n", [BinLen, self()]),
 
-                %io:format("Foolpart = ~p ~n", [Foolpart]),
-                %io:format("binary_to_list(Foolpart) = ~p ~n", [binary_to_list(Foolpart)]),
+                %io:format("Foolpart = ~w ~n", [Foolpart]),
+                %io:format("binary_to_list(Foolpart) = ~w ~n", [binary_to_list(Foolpart)]),
 
                 Len = list_to_integer(binary_to_list(BinLen), 16),
-                io:format("~nX~nX~nX~n BinLen = ~p; Len = ~p ~nX~nX~nX~nX", [BinLen, Len]),
+                io:format("~nX~nX~nX~n BinLen = ~w; Len = ~w ~nX~nX~nX~nX", [BinLen, Len]),
                 te_chunked(Rest, {Len, Streamed});
             (_, _) ->
                 {error, badarg}
         end);
+
+
+
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
-    io:format("~nX~nX~nX~nX ChunkRem = ~p ~nX~nX~nX~nX", [ChunkRem]),
+    io:format("~nX~nX~nX~nX ChunkRem = ~w ~nX~nX~nX~nX", [ChunkRem]),
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
+
+    io:format("!!!!:ChunkRem:~w dataLen:~w Rest:~w ~n", [ChunkRem, byte_size(Data), Rest]),
+
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
 
 te_chunked(Data, {ChunkRem, Streamed}) ->
     Size = byte_size(Data),
-    io:format("~nX~nX~nX~nX ChunkRem = ~p; Size = ~p; ~nX~nX~nX~nX", [ChunkRem, Size]),
+    io:format("~nX~nX~nX~nX ChunkRem = ~w; Size = ~w; ~nX~nX~nX~nX", [ChunkRem, Size]),
     {ok, Data, {ChunkRem - Size, Streamed + Size}}.
 
 %% @doc Decode an identity stream.
@@ -1051,7 +1081,7 @@ connection_to_atom_test_() ->
         {[<<"keep-alive">>], keepalive},
         {[<<"keep-alive">>, <<"upgrade">>], keepalive}
     ],
-    [{lists:flatten(io_lib:format("~p", [T])),
+    [{lists:flatten(io_lib:format("~w", [T])),
         fun() -> R = connection_to_atom(T) end} || {T, R} <- Tests].
 
 content_type_test_() ->
