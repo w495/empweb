@@ -53,6 +53,8 @@
 
 -include("http.hrl").
 
+-opaque req() :: #http_req{}.
+-export_type([req/0]).
 
 -define(COWBOY_RECV_TIMEOUT, 30000).
 
@@ -495,38 +497,77 @@ stream_body_recv(Req=#http_req{
 
 -spec transfer_decode(binary(), #http_req{})
     -> {ok, binary(), #http_req{}} | {error, atom()}.
-transfer_decode(Data, Req=#http_req{
-        body_state={stream, TransferDecode, TransferState, ContentDecode}}) ->
-    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-    io:format("~n~n~n TransferState = ~w  ~n~n~n", [TransferState]),
+
+transfer_decode(Data, Req=#http_req{body_state={stream, _,
+        TransferDecode, TransferState, ContentDecode}}) ->
     case TransferDecode(Data, TransferState) of
-        {ok, Data2, TransferState2} ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-            io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
-            content_decode(ContentDecode, Data2, Req#http_req{body_state=
-                {stream, TransferDecode, TransferState2, ContentDecode}});
         {ok, Data2, Rest, TransferState2} ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-            io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
-            content_decode(ContentDecode, Data2, Req#http_req{
-                buffer=Rest, body_state=
-                {stream, TransferDecode, TransferState2, ContentDecode}});
+            content_decode(ContentDecode, Data2,
+                Req#http_req{buffer=Rest, body_state={stream, 0,
+                TransferDecode, TransferState2, ContentDecode}});
         %% @todo {header(s) for chunked
         more ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-            stream_body_recv(Req#http_req{buffer=Data});
+            stream_body_recv(0, Req#http_req{buffer=Data, body_state={stream,
+                0, TransferDecode, TransferState, ContentDecode}});
+        {more, Length, Data2, TransferState2} ->
+            content_decode(ContentDecode, Data2,
+                Req#http_req{body_state={stream, Length,
+                TransferDecode, TransferState2, ContentDecode}});
         {done, Length, Rest} ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             {done, Req2};
         {done, Data2, Length, Rest} ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             content_decode(ContentDecode, Data2, Req2);
         {error, Reason} ->
-            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             {error, Reason}
     end.
+
+
+-spec stream_body_recv(non_neg_integer(), Req)
+    -> {ok, binary(), Req} | {error, atom()} when Req::req().
+stream_body_recv(MaxLength, Req=#http_req{
+        transport=Transport, socket=Socket, buffer=Buffer,
+        body_state={stream, Length, _, _, _}}) ->
+    %% @todo Allow configuring the timeout.
+    case Transport:recv(Socket, min(Length, MaxLength), 5000) of
+        {ok, Data} -> transfer_decode(<< Buffer/binary, Data/binary >>,
+            Req#http_req{buffer= <<>>});
+        {error, Reason} -> {error, Reason}
+    end.
+
+%transfer_decode(Data, Req=#http_req{
+        %body_state={stream, TransferDecode, TransferState, ContentDecode}}) ->
+    %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+    %io:format("~n~n~n TransferState = ~w  ~n~n~n", [TransferState]),
+    %case TransferDecode(Data, TransferState) of
+        %{ok, Data2, TransferState2} ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
+            %content_decode(ContentDecode, Data2, Req#http_req{body_state=
+                %{stream, TransferDecode, TransferState2, ContentDecode}});
+        %{ok, Data2, Rest, TransferState2} ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
+            %content_decode(ContentDecode, Data2, Req#http_req{
+                %buffer=Rest, body_state=
+                %{stream, TransferDecode, TransferState2, ContentDecode}});
+        %%% @todo {header(s) for chunked
+        %more ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %stream_body_recv(Req#http_req{buffer=Data});
+        %{done, Length, Rest} ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %Req2 = transfer_decode_done(Length, Rest, Req),
+            %{done, Req2};
+        %{done, Data2, Length, Rest} ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %Req2 = transfer_decode_done(Length, Rest, Req),
+            %content_decode(ContentDecode, Data2, Req2);
+        %{error, Reason} ->
+            %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %{error, Reason}
+    %end.
 
 -spec transfer_decode_done(non_neg_integer(), binary(), #http_req{})
     -> #http_req{}.
