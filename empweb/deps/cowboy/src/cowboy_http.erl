@@ -817,6 +817,7 @@ te_chunked(Data, {0, Streamed}) ->
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
     io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     io:format("~nX~nX~nX~nX ChunkRem = ~w ~nX~nX~nX~nX", [ChunkRem]),
+    io:format("~nX~nX~nX~nX Data = ~w ~nX~nX~nX~nX", [Data]),
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
 
     io:format("!!!!:ChunkRem:~w dataLen:~w Rest:~w ~n", [ChunkRem, byte_size(Data), Rest]),

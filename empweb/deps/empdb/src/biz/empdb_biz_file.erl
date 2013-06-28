@@ -670,7 +670,8 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->
-            io:format("Respl = ~p~n~n", [Respl]),
+            io:format("Respl = Respl~n~n", []),
+           io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
 
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
