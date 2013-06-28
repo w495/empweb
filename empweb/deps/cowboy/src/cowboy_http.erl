@@ -666,9 +666,9 @@ token(<<>>, Fun, _Case, Acc) ->
     io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     Fun(<<>>, Acc);
 
-token(<<"\r\n", Rest/binary >>, Fun, Case, <<>>) ->
-    io:format("~n~n~n ~w in ~w :: ~n~n~n", [?MODULE, ?LINE]),
-    token(Rest, Fun, Case, <<>>);
+%token(<<"\r\n", Rest/binary >>, Fun, Case, <<>>) ->
+    %io:format("~n~n~n ~w in ~w :: ~n~n~n", [?MODULE, ?LINE]),
+    %token(Rest, Fun, Case, <<>>);
 
 
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
@@ -744,6 +744,30 @@ te_chunked(<<>>, _) ->
 te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
     {done, Streamed, Rest};
 
+te_chunked(<< "\r\n", Tail/binary >>, {0, _streamed}) when byte_size(Tail) < 4 ->
+    more;
+te_chunked(<< "\r\n", Tail/binary >>, {0, _}=Arg2) ->
+    te_chunked(Tail, Arg2);
+te_chunked(Data, {0, _}) when byte_size(Data) < 4 ->
+    more;
+te_chunked(Data, {0, Streamed}) ->
+    token(Data,
+        fun (Rest, _) when byte_size(Rest) < 4 ->
+                more; % never be
+            (<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
+
+
+                io:format("BinLen = ~w Pid = ~w ~n", [BinLen, self()]),
+
+                %io:format("Foolpart = ~w ~n", [Foolpart]),
+                %io:format("binary_to_list(Foolpart) = ~w ~n", [binary_to_list(Foolpart)]),
+
+                Len = list_to_integer(binary_to_list(BinLen), 16),
+                io:format("~nX~nX~nX~n BinLen = ~w; Len = ~w ~nX~nX~nX~nX", [BinLen, Len]),
+                te_chunked(Rest, {Len, Streamed});
+            (_, _) ->
+                {error, badarg}
+        end);
 
 %te_chunked(Data, {0, Streamed}) ->
     %%% @todo We are expecting an hex size, not a general token.
@@ -766,28 +790,32 @@ te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
         %end
     %);
 
-te_chunked(Data, {0, Streamed}) ->
-    %% @todo We are expecting an hex size, not a general token.
-    io:format("Data = ~w Streamed = ~w ~n", [Data, Streamed]),
-
-    token(Data,
-        fun
-            (<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
-                io:format("BinLen = ~w Pid = ~w ~n", [BinLen, self()]),
-                %io:format("Foolpart = ~w ~n", [Foolpart]),
-                %io:format("binary_to_list(Foolpart) = ~w ~n", [binary_to_list(Foolpart)]),
-                Len = list_to_integer(binary_to_list(BinLen), 16),
-                io:format("~nX~nX~nX~n BinLen = ~w; Len = ~w ~nX~nX~nX~nX", [BinLen, Len]),
-                te_chunked(Rest, {Len, Streamed});
-            (Rest, _) when byte_size(Rest) < 16 ->
-                more;
-            (_, _) ->
-                {error, badarg}
-        end);
+%te_chunked(Data, {0, Streamed}) ->
+    %%% @todo We are expecting an hex size, not a general token.
+    %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+    %io:format("Data = ~w Streamed = ~w ~n", [Data, Streamed]),
+    %token(Data,
+        %fun
+            %(<< "\r\n", Rest/binary >> = _foolpart, BinLen) ->
+                %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+                %io:format("BinLen = ~w Pid = ~w ~n", [BinLen, self()]),
+                %%io:format("Foolpart = ~w ~n", [Foolpart]),
+                %%io:format("binary_to_list(Foolpart) = ~w ~n", [binary_to_list(Foolpart)]),
+                %Len = list_to_integer(binary_to_list(BinLen), 16),
+                %io:format("~nX~nX~nX~n BinLen = ~w; Len = ~w ~nX~nX~nX~nX", [BinLen, Len]),
+                %te_chunked(Rest, {Len, Streamed});
+            %(Rest, _) when byte_size(Rest) < 16 ->
+                %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+                %more;
+            %(_, _) ->
+                %io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+                %{error, badarg}
+        %end);
 
 
 
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     io:format("~nX~nX~nX~nX ChunkRem = ~w ~nX~nX~nX~nX", [ChunkRem]),
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
 
@@ -796,13 +824,13 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
 
 te_chunked(Data, {ChunkRem, Streamed}) ->
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
     Size = byte_size(Data),
     io:format("~nX~nX~nX~nX ChunkRem = ~w; Size = ~w; ~nX~nX~nX~nX", [ChunkRem, Size]),
-
-     %<< Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
-
-
     {ok, Data, {ChunkRem - Size, Streamed + Size}}.
+
+
+
 
 %% @doc Decode an identity stream.
 -spec te_identity(binary(), {non_neg_integer(), non_neg_integer()})

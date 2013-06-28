@@ -497,24 +497,34 @@ stream_body_recv(Req=#http_req{
     -> {ok, binary(), #http_req{}} | {error, atom()}.
 transfer_decode(Data, Req=#http_req{
         body_state={stream, TransferDecode, TransferState, ContentDecode}}) ->
+    io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+    io:format("~n~n~n TransferState = ~w  ~n~n~n", [TransferState]),
     case TransferDecode(Data, TransferState) of
         {ok, Data2, TransferState2} ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
             content_decode(ContentDecode, Data2, Req#http_req{body_state=
                 {stream, TransferDecode, TransferState2, ContentDecode}});
         {ok, Data2, Rest, TransferState2} ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            io:format("~n~n~n TransferState2 = ~w  ~n~n~n", [TransferState2]),
             content_decode(ContentDecode, Data2, Req#http_req{
                 buffer=Rest, body_state=
                 {stream, TransferDecode, TransferState2, ContentDecode}});
         %% @todo {header(s) for chunked
         more ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             stream_body_recv(Req#http_req{buffer=Data});
         {done, Length, Rest} ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             {done, Req2};
         {done, Data2, Length, Rest} ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             content_decode(ContentDecode, Data2, Req2);
         {error, Reason} ->
+            io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             {error, Reason}
     end.
 
