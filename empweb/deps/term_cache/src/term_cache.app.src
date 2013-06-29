@@ -1,0 +1,9 @@
+{application, term_cache, [
+    {description, "term_cache"},
+    {vsn, "0.1"},
+    {applications, [kernel, stdlib]},
+    {modules, [term_cache, term_cache_worker]},
+    {registered, [term_cache]},
+    {mod, {term_cache_app, []}},
+    {env, []}
+]}. 
