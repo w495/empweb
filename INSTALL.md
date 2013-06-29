@@ -43,6 +43,17 @@
 2. Создать базы на новом сервере:
 * `ejabberd`;
 * `emp`.
+
+    $ sudo su postgres
+    >$ createuser  root -s -r -P
+    Enter password for new role: root
+    Enter it again: root
+    $ cd ./empweb/deps/empdb/priv/sql/dumps/
+    $ createdb emp
+    $ psql -d emp < dump-emp-<date>.sql
+    $ createdb ejabberd
+    $ psql -d emp < dump-ejabberd-<date>.sql
+
 3. Применить дампы созданные через `mkdump.sh` к созданным базам.
 
 ## ФАЙЛЫ
