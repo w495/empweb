@@ -801,7 +801,14 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
     {ok, {<<"multipart">>, _SubType, Params}, Req2} =
         parse_header(<<"content-type">>, Req),
     {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
-    {ok, Length, Req3} = parse_header(<<"content-length">>, Req2),
+    {ok, Length, Req3} = %parse_header(<<"content-length">>, Req2),
+        case parse_header(<<"content-length">>,Req2) of
+            {undefined, Req2_} ->
+                {undefined, L, Req2__} = parse_header(<<"x-content-length">>,Req2_),
+                {ok, erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
+            {ok, Length_, Req2_}->
+                {ok, Length_, Req2_}
+        end,
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)});
 multipart_data(Req=#http_req{multipart={Length, Cont}}) ->
     multipart_data(Req, Length, Cont());
