@@ -807,6 +807,9 @@ body_qs(MaxBodyLength, Req) ->
     -> {headers, cowboy:http_headers(), Req} | {body, binary(), Req}
         | {end_of_part | eof, Req} when Req::req().
 multipart_data(Req=#http_req{body_state=waiting}) ->
+    io:format("~n ~p in ~p ~n ~p ~n", [?MODULE, ?LINE, Req]),
+
+
     io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {ok, {<<"multipart">>, _SubType, Params}, Req2} =
         parse_header(<<"content-type">>, Req),
@@ -817,11 +820,14 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
                 {undefined, L, Req2__} = parse_header(<<"x-content-length">>,Req2_),
                 {ok, erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
             {ok, Length_, Req2_}->
+                io:format("~n ~p in ~p ~n Length_ = ~p ~n", [?MODULE, ?LINE, Length_]),
                 {ok, Length_, Req2_}
         end,
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)});
 
 multipart_data(Req=#http_req{multipart={Length, Cont}}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     multipart_data(Req, Length, Cont());
 
 multipart_data(Req=#http_req{body_state=done}) ->
