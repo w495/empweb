@@ -914,10 +914,10 @@ range_digits(Data, Default, Fun) ->
     | {done, non_neg_integer(), Bin} | {error, badarg}
     when Bin::binary(), TransferState::{non_neg_integer(), non_neg_integer()}.
 te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p ~n DONE. ~n", [?MODULE, ?LINE]),
     {done, Streamed, Rest};
 te_chunked(Data, {0, Streamed}) ->
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %% @todo We are expecting an hex size, not a general token.
     token(Data,
         fun (<< "\r\n", Rest/binary >>, BinLen) ->
@@ -945,7 +945,7 @@ te_chunked(Data, {0, Streamed}) ->
     %{ok, <<>>, Rest, {0, Streamed}};
 %% Remainder of chunk (if any) and as much of trailing <<"\r\n">> as possible.
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem - 2 ->
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     ChunkSize = ChunkRem - 2,
     Streamed2 = Streamed + ChunkSize,
     case Data of
@@ -958,7 +958,7 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem - 2 ->
     end;
 %% Incomplete chunk.
 te_chunked(Data, {ChunkRem, Streamed}) ->
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     ChunkRem2 = ChunkRem - byte_size(Data),
     Streamed2 = Streamed + byte_size(Data),
     {more, ChunkRem2, Data, {ChunkRem2, Streamed2}}.

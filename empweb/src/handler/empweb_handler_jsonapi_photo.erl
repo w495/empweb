@@ -100,7 +100,7 @@ handle_post(Req, State) ->
     %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     case catch empweb_http:multipart_data(Req) of
         {'EXIT', Reason} ->
-            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
+            io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
             {empweb_jsonapi:not_extended(no_files), Req};
         {Pbody, Req1} ->
             %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
