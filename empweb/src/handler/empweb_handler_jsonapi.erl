@@ -69,14 +69,14 @@ handle(Req, State) ->
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
     Http_resp = empweb_http:resp(Empweb_resp),
 
-    io:format("~n ~n Http_resp = ~p ~n~n", [Http_resp]),
+    %%% DEGUG: %%% io:format("~n ~n Http_resp = ~p ~n~n", [Http_resp]),
 
 
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
 
-    % io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
+    % %%% DEGUG: %%% io:format("Http_resp_json = ~p ~n~n~n", [Http_resp_json]),
 
     Reply =
         empweb_http:reply(
@@ -85,7 +85,7 @@ handle(Req, State) ->
         ),
 
 
-    io:format("~n ~n Reply = ~p ~n~n", [Reply]),
+    %%% DEGUG: %%% io:format("~n ~n Reply = ~p ~n~n", [Reply]),
 
 
     ?evman_debug({reply, Reply}, <<"server reply">>),
@@ -99,7 +99,7 @@ handle_post(Req, State)->
         {Pbody, Req1} ->
             handle_body(Req1, Pbody, State);
         X ->
-            io:format("empweb_jsonapi = ~p", [X]),
+            %%% DEGUG: %%% io:format("empweb_jsonapi = ~p", [X]),
             {empweb_jsonapi:not_extended(no_post_body), Req}
     end.
 
@@ -2762,7 +2762,7 @@ empweb_jsonapi_map(Req, [{_}|_] = List, State) ->
             {[], Req},
             List
         ),
-    io:format("Res = ~p~n~n~n", [Res]),
+    %%% DEGUG: %%% io:format("Res = ~p~n~n~n", [Res]),
     {lists:reverse(Res), Reqres};
 
 empweb_jsonapi_map(Req, List, State) ->

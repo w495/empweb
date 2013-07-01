@@ -45,7 +45,7 @@ create(Params)->
     Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
     Dldir = ?EMPDB_BIZ_FILE_DLDIR,
 
-    %io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
+    %%%% DEGUG: %%% io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
 
 
     Doc_id   = proplists:get_value(doc_id,   Params, null),
@@ -122,7 +122,7 @@ create(Params)->
 
 
 
-        io:format("~n~nFspath = ~p~n~n", [Fspath_full]),
+        %%% DEGUG: %%% io:format("~n~nFspath = ~p~n~n", [Fspath_full]),
         Whpl =
             case Filetype_mimesuptype of
                 <<"image">> ->
@@ -323,7 +323,7 @@ gm_convert_geometry(
 ) ->
     case gm_convert_geometry(Image_width, Image_height) of
         {error, Reason} ->
-            io:format("~n ~n Reason = ~p ~n ~n", [ Reason ]),
+            %%% DEGUG: %%% io:format("~n ~n Reason = ~p ~n ~n", [ Reason ]),
             Reason;
         {ok, Geometry} ->
             gm:convert(
@@ -387,7 +387,7 @@ convert(Params)->
     Image_width         = proplists:get_value(image_width, Params),
     Image_height         = proplists:get_value(image_height, Params),
 
-    io:format("~n ~n convert(Params) = ~p ~n ~n", [ Params ]),
+    %%% DEGUG: %%% io:format("~n ~n convert(Params) = ~p ~n ~n", [ Params ]),
 
     gm_convert(
         Orig_fs_path_full,
@@ -461,7 +461,7 @@ create_copy_worker(Params)->
     Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
     Dldir = ?EMPDB_BIZ_FILE_DLDIR,
 
-    io:format("~n ~n Params = ~p ~n~n", [ Params ]),
+    %%% DEGUG: %%% io:format("~n ~n Params = ~p ~n~n", [ Params ]),
 
 
     File_id         = proplists:get_value(file_id,          Params, null),
@@ -485,7 +485,7 @@ create_copy_worker(Params)->
 
 
 
-    io:format("~n ~n Image_width = ~p ~p ~n~n", [ Image_width, Image_height ]),
+    %%% DEGUG: %%% io:format("~n ~n Image_width = ~p ~p ~n~n", [ Image_width, Image_height ]),
 
 
     Path_list =
@@ -493,28 +493,28 @@ create_copy_worker(Params)->
 
 
 
-    io:format("~n ~n Ext = ~w ~n~n", [ Ext ]),
+    %%% DEGUG: %%% io:format("~n ~n Ext = ~w ~n~n", [ Ext ]),
 
 
-    io:format("~n ~n Path_list = ~w ~n~n", [ Path_list ]),
+    %%% DEGUG: %%% io:format("~n ~n Path_list = ~w ~n~n", [ Path_list ]),
 
 
     %% Конструируем пути для файла в файловой системе.
     Fspath         = erlang:list_to_binary(filename:join(Path_list)),
 
-    io:format("~n ~n Fspath = ~w ~n ~n", [ Fspath ]),
+    %%% DEGUG: %%% io:format("~n ~n Fspath = ~w ~n ~n", [ Fspath ]),
 
     Fspath_ext     =  << Fspath/binary, $., Ext/binary >>,
 
-    io:format("~n ~n Fspath_ext = ~w ~n ~n", [ Fspath_ext ]),
+    %%% DEGUG: %%% io:format("~n ~n Fspath_ext = ~w ~n ~n", [ Fspath_ext ]),
 
 
     Fspath_full    =  << Fsdir/binary, Fspath_ext/binary >>,
 
-    io:format("~n ~n Fspath_full = ~p ~n ~n", [ Fspath_full ]),
+    %%% DEGUG: %%% io:format("~n ~n Fspath_full = ~p ~n ~n", [ Fspath_full ]),
 
 
-    io:format("~n ~n Orig_fs_path_full = ~p ~n ~n", [ Orig_fs_path_full ]),
+    %%% DEGUG: %%% io:format("~n ~n Orig_fs_path_full = ~p ~n ~n", [ Orig_fs_path_full ]),
 
 
     ok = filelib:ensure_dir(Fspath_full),
@@ -649,7 +649,7 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
         {limit, 1}
     ]) of
         {ok, []} ->
-            io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
+            %%% DEGUG: %%% io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
             Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
             Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
             File_id  = proplists:get_value(file_id,      Phobjpl, null),
@@ -670,8 +670,8 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->
-            io:format("Respl = Respl~n~n", []),
-           io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            %%% DEGUG: %%% io:format("Respl = Respl~n~n", []),
+           %%% DEGUG: %%% io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
 
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
@@ -705,12 +705,12 @@ get_transform(Res, Phobjpl, Fields, Options) ->
 
 
 get_handle_pl(Phpl, Fields, Options) ->
-    io:format("Phpl = ~p ~n~n~n", [Phpl]),
+    %%% DEGUG: %%% io:format("Phpl = ~p ~n~n~n", [Phpl]),
 
     get_handle_path((lists:member(path, Fields) or (Fields =:= [])), Phpl, Options).
 
 get_handle_pathtuple(Phpl, Options) ->
-   %0 io:format("Phpl = ~p ~n~n~n", [Phpl]),
+   %0 %%% DEGUG: %%% io:format("Phpl = ~p ~n~n~n", [Phpl]),
     Outpathname   = proplists:get_value(outpathname, Options, path),
     {Outpathname,
         <<  (proplists:get_value(dir, Phpl))/binary,

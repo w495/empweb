@@ -77,13 +77,13 @@ handle(Req, State) ->
         end,
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
 
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
     Http_resp = empweb_http:resp(Empweb_resp),
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
     Reply =
         empweb_http:reply(
@@ -97,14 +97,14 @@ terminate(_Reason, _Req, _State) ->
     ok.
 
 handle_post(Req, State) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     case catch empweb_http:multipart_data(Req) of
         {'EXIT', Reason} ->
-            io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
             {empweb_jsonapi:not_extended(no_files), Req};
         {Pbody, Req1} ->
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            io:format("~n~n~n ~p  ~n~n~n", [Req1]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p  ~n~n~n", [Req1]),
             handle_body(Req1, Pbody, State)
     end.
 
@@ -119,7 +119,7 @@ handle_body(Req, Pbody, State) ->
             contentdisposition = Contentdisposition,
             contenttype = Contenttype
         }], Req1} ->
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             Fullbody = list_to_binary(lists:reverse(Body)),
             Hap =  State#state.empweb_hap#empweb_hap{
                 handler         = empweb_jsonapi_file,
@@ -133,9 +133,9 @@ handle_body(Req, Pbody, State) ->
                     {fileextension, Fileextension}
                 ]
             },
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {
                 empweb_jsonapi:fname(
                     empweb_jsonapi:resp(
@@ -146,11 +146,11 @@ handle_body(Req, Pbody, State) ->
                 Req2
             };
         {[#partstate{fileinfo=Empweb_resp}], Req1} ->
-            %% io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
+            %% %%% DEGUG: %%% io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
             {Empweb_resp, Req1};
 
         {Partstates, Req1} ->
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {
                 empweb_jsonapi:fname(empweb_jsonapi:resp(
                     {ok,
@@ -168,14 +168,14 @@ handle_body(Req, Pbody, State) ->
     end.
 
 handle_part(Req, Acc, State) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {Result, Req2} = empweb_http:multipart_data(Req),
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    %io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%%% DEGUG: %%% io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
     acc_part(Req2, Acc, Result, State).
 
 acc_part(Req, Acc, {headers, Headers}, State) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Contentdisposition =
         proplists:get_value(<<"content-disposition">>, Headers),
     Contenttype   =
@@ -203,7 +203,7 @@ acc_part(Req, Acc, {headers, Headers}, State) ->
         filename=Filename,
         fileextension = Fileextension
     },
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     handle_part(Req, [Partstate|Acc], State);
 
 acc_part(
@@ -217,7 +217,7 @@ acc_part(
     {body, Data},
     State
 ) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     %% Здесь можно сразу писать в файл.
     %% Дописывать Data в его конец.
     %% Но это может оказаться не очень эффективно.
@@ -247,7 +247,7 @@ acc_part(
     end_of_part,
     State
 ) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fullbody = list_to_binary(lists:reverse(Body)),
     Hap =  State#state.empweb_hap#empweb_hap{
         handler         = empweb_jsonapi_file,
@@ -262,7 +262,7 @@ acc_part(
         ]
     },
     {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-    %% io:format("Fileinfo = ~p~n", [Fileinfo]),
+    %% %%% DEGUG: %%% io:format("Fileinfo = ~p~n", [Fileinfo]),
     handle_part(
         Req1,
         [   Partstate#partstate{
@@ -276,10 +276,10 @@ acc_part(
     );
 
 acc_part(Req, Acc, eof, State) ->
-    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
     {lists:reverse(Acc), Req};
 
 acc_part(Req, Acc, Result, State) ->
-    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
-    io:format("~n~n~n ~p~n~n~n ~p~n~n~n ~p~n~n~n ~p", [Req, Acc, Result, State]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+    %%% DEGUG: %%% io:format("~n~n~n ~p~n~n~n ~p~n~n~n ~p~n~n~n ~p", [Req, Acc, Result, State]),
     {<<>>, Req}.
