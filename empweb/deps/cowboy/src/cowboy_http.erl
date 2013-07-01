@@ -966,7 +966,7 @@ te_chunked(Data, {0, Streamed}) ->
                 Len = list_to_integer(binary_to_list(BinLen), 16),
 
                 io:format("~n~n~n BinLen = ~p ~n~n~n", [BinLen]),
-                io:format("~n~n~n Len = ~p ~n~n~n", [Data]),
+                io:format("~n~n~n Len = ~p ~n~n~n", [Len]),
 
                 te_chunked(Rest, {Len, Streamed});
             %% Chunk size shouldn't take too many bytes,
