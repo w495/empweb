@@ -3,7 +3,84 @@
 -module(empweb_dispatcher).
 -export([dispatch/0]).
 
+
+
 dispatch()->
+    %{ok, App} = application:get_application(),
+    %Options = [{app, App}],
+
+    [
+        {'_', [
+
+            %{   [<<"jsonapi">>, <<"photo">>, <<"upload">>],
+                %empweb_handler_jsonapi_photo,
+                %[   {action, upload},
+                    %{path, <<"priv/files/photo">>}
+                %]
+            %},
+
+            %{   [<<"jsonapi">>, <<"photo">>, <<"upload">>, <<"demo">>],
+                %empweb_handler_jsonapi_photo_demo,
+                %[   {action, upload},
+                    %{path, <<"priv/files/photo">>}
+                %]
+            %},
+
+            %{   [<<"jsonapi">>, <<"res">>, <<"upload">>],
+                %empweb_handler_jsonapi_res,
+                %[   {action, upload},
+                    %{path, <<"priv/files/photo">>}
+                %]
+            %},
+
+            %{   [<<"jsonapi">>, <<"photo">>, '...'],
+                %empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}, {is_auth, true}]
+            %},
+
+            %{   [<<"jsonapi">>, <<"res">>, '...'],
+                %empweb_handler_static, [{path, <<"priv/data/res/">>}, {is_auth, true}]
+            %},
+
+
+            {   <<"/jsonapi/photo/upload">>,
+                empweb_handler_jsonapi_photo,
+                [
+                    {action, upload},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
+            {   <<"/jsonapi/photo/[...]">>,
+                empweb_handler_static,
+                [
+                    {path, <<"deps/empdb/priv/data/">>},
+                    {is_auth, true}
+                ]
+            },
+            {   <<"/jsonapi/res/upload">>,
+                empweb_handler_jsonapi_res,
+                [   {action, upload},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
+            {   <<"/jsonapi">>,
+                empweb_handler_jsonapi,
+                []
+            },
+            {   <<"/static/[...]">>,
+                empweb_handler_static,
+                [
+                    {path, <<"priv/static">>},
+                    {is_auth, true}
+                ]
+            },
+            {   '_',
+                empweb_handler_default,
+                []
+            }
+        ]}
+    ].
+
+dispatch__()->
     {ok, App} = application:get_application(),
     Options = [{app, App}],
 

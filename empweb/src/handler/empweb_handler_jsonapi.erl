@@ -2,7 +2,7 @@
 
 -module(empweb_handler_jsonapi).
 -behaviour(cowboy_http_handler).
--export([init/3, handle/2, terminate/2]).
+-export([init/3, handle/2, terminate/3]).
 
 %%
 %% Определения общие для всего приложения
@@ -61,13 +61,17 @@ handle(Req, State) ->
     ?evman_args([Req, State]),
     {Empweb_resp, Reqres}  =
         case empweb_http:method(Req) of
-            {'POST', Req1} ->
+            {<<"POST">>, Req1} ->
                 handle_post(Req1, State);
             {_, Req1} ->
                 {empweb_jsonapi:method_not_allowed(), Req1}
         end,
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
     Http_resp = empweb_http:resp(Empweb_resp),
+
+    io:format("~n ~n Http_resp = ~p ~n~n", [Http_resp]),
+
+
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
     Http_resp_json = ejson:encode(Http_resp#http_resp.body),
     ?evman_debug({http_resp_json, Http_resp_json}, <<"http json">>),
@@ -79,15 +83,23 @@ handle(Req, State) ->
             Http_resp#http_resp{body = Http_resp_json},
             Reqres
         ),
+
+
+    io:format("~n ~n Reply = ~p ~n~n", [Reply]),
+
+
     ?evman_debug({reply, Reply}, <<"server reply">>),
     {ok,Reply,State}.
 
 handle_post(Req, State)->
     ?evman_args([Req, State]),
     case empweb_http:body_qs(Req) of
+        {ok, Pbody, Req1} ->
+            handle_body(Req1, Pbody, State);
         {Pbody, Req1} ->
             handle_body(Req1, Pbody, State);
-        _ ->
+        X ->
+            io:format("empweb_jsonapi = ~p", [X]),
             {empweb_jsonapi:not_extended(no_post_body), Req}
     end.
 
@@ -128,8 +140,8 @@ handle_data(Req, Bobject, State)->
 %     end
     .
 
-terminate(Req, State) ->
-    ?evman_args([Req, State]),
+terminate(Reason, Req, State) ->
+    ?evman_args([Reason, Req, State]),
     ?evman_warning(Req),
     ok.
 

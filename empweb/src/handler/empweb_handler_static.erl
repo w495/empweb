@@ -6,7 +6,11 @@
 -behaviour(cowboy_http_handler).
 
 %% cowboy_http_handler api
--export([init/3, handle/2, terminate/2]).
+-export([
+    init/3,
+    handle/2,
+    terminate/3
+]).
 
 %%
 %% Определения общие для всего приложения
@@ -54,10 +58,10 @@ init({_Transport, http}, Req, Opts) ->
     end.
 
 handle(Req, State) ->
-    {Method, Req2} = cowboy_http_req:method(Req),
+    {Method, Req2} = cowboy_req:method(Req),
     method_allowed(Req2, State#state{method=Method}).
 
-terminate(Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     ok.
 
 
@@ -82,35 +86,36 @@ filename_join(Tokens) ->
                 <<Path/binary, "/", Token/binary>>
         end, <<>>, Tokens).
 
-method_allowed(Req, State=#state{method='GET'}) ->
+method_allowed(Req, State=#state{method = <<"GET">>}) ->
     resource_exists(Req, State);
-method_allowed(Req, State=#state{method='HEAD'}) ->
+method_allowed(Req, State=#state{method = <<"HEAD">>}) ->
     resource_exists(Req, State);
 
 method_allowed(Req, State=#state{is_auth=true}) ->
-    {ok, Req2} = cowboy_http_req:reply(405, [], <<"405">>, Req),
+    {ok, Req2} = cowboy_req:reply(405, [], <<"405">>, Req),
     {ok, Req2, State};
 
 method_allowed(Req, State=#state{is_auth=false}) ->
-    {ok, Req2} = cowboy_http_req:reply(403, [], <<"403">>, Req),
+    {ok, Req2} = cowboy_req:reply(403, [], <<"403">>, Req),
     {ok, Req2, State}.
 
 resource_exists(Req, State) ->
-    {PathTokens, Req2} = cowboy_http_req:path_info(Req),
+    {PathTokens, Req2} = cowboy_req:path_info(Req),
     FilePath = filename_join([State#state.path | PathTokens]),
+    io:format("~n~n~n FilePath = ~p ~n~n~n", [FilePath]),
     case filelib:is_regular(FilePath) of
         true ->
             valid_request(Req2, State#state{exists=true, filepath=FilePath});
         false ->
-            {ok, Req3} = cowboy_http_req:reply(404, [], <<>>, Req),
+            {ok, Req3} = cowboy_req:reply(404, [], <<>>, Req),
             {ok, Req3, State#state{exists=false, filepath=FilePath}}
     end.
 
-valid_request(Req, State=#state{method='GET'}) ->
+valid_request(Req, State=#state{method = <<"GET">>}) ->
     {ok, Body} = file:read_file(State#state.filepath),
-    {ok, Req2} = cowboy_http_req:reply(200, [], Body, Req),
+    {ok, Req2} = cowboy_req:reply(200, [], Body, Req),
     {ok, Req2, State};
-valid_request(Req, State=#state{method='HEAD'}) ->
+valid_request(Req, State=#state{method = <<"HEAD">>}) ->
     FileSize = filelib:file_size(State#state.filepath),
-    {ok, Req2} = cowboy_http_req:reply(200, [{<<"Content-Length">>, FileSize}], <<>>, Req),
+    {ok, Req2} = cowboy_req:reply(200, [{<<"Content-Length">>, FileSize}], <<>>, Req),
     {ok, Req2, State}.

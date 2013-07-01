@@ -1,6 +1,7 @@
 -module(empweb_http).
 -include("empweb.hrl").
--include_lib("cowboy/include/http.hrl").
+
+%-include_lib("cowboy/include/http.hrl").
 
 
 -export([
@@ -20,211 +21,221 @@
 ]).
 
 
--export([
-    test_read_all/0
-]).
+%-export([
+    %test_read_all/0
+%]).
 
 -define(AUTH_COOKIE_NAME, <<"empire_100829481802076318">>).
 
 
-multipart_data_(Req) ->
-    cowboy_http_req:multipart_data(Req).
-
 multipart_data(Req) ->
-    case cowboy_http_req:parse_header('Transfer-Encoding', Req) of
-        {[<<"chunked">>], Req2} ->
-            io:format("~n~n~n chunked ~n~n~n"),
-            multipart_data_chunked(Req2);
-        {[<<"identity">>], Req2} ->
-            io:format("~n~n~n chunked ~n~n~n"),
-            cowboy_http_req:multipart_data(Req2)
-    end.
+    multipart_data_wrapper(cowboy_req:multipart_data(Req)).
 
 
-%read(Req = #http_req{socket=Socket}) ->
-  %case gen_tcp:recv(Socket, 0, 10000) of
-        %{ok, Bodydata} ->
-            %{ok, Bodydata};
-        %Else ->
-            %io:format("Else = ~p ~n", [Else]),
-            %{error, Else}
+multipart_data_wrapper({Y, Req}) ->
+    {Y, Req};
+
+multipart_data_wrapper({X, Y, Req}) ->
+    {{X, Y}, Req}.
+
+%multipart_data(Req) ->
+    %cowboy_req:multipart_data(Req).
+
+    %case cowboy_req:parse_header(<<"Transfer-Encoding">>, Req) of
+        %{[<<"chunked">>], Req2} ->
+            %io:format("~n~n~n chunked ~n~n~n"),
+            %%multipart_data_chunked(Req2);
+            %cowboy_req:multipart_data(Req2);
+        %{[<<"identity">>], Req2} ->
+            %io:format("~n~n~n chunked ~n~n~n"),
+            %cowboy_req:multipart_data(Req2)
     %end.
 
-multipart_data_chunked(Req) ->
-    io:format("X~nX~nX~nX ~p in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
-    %{ok, Tcpstream} = recv(Req),
-    {ok, Tcpstream, Req2} = cowboy_http_req:body(Req),
-    file:write_file(<<"priv/image.jpg.tcpstream">>, Tcpstream),
+
+%%read(Req = #http_req{socket=Socket}) ->
+  %%case gen_tcp:recv(Socket, 0, 10000) of
+        %%{ok, Bodydata} ->
+            %%{ok, Bodydata};
+        %%Else ->
+            %%io:format("Else = ~p ~n", [Else]),
+            %%{error, Else}
+    %%end.
+
+%multipart_data_chunked(Req) ->
+    %io:format("X~nX~nX~nX ~p in ~p ~nX~nX~nX~nX", [?MODULE, ?LINE]),
+    %%{ok, Tcpstream} = recv(Req),
+    %{ok, Tcpstream, Req2} = cowboy_req:body(Req),
+    %file:write_file(<<"priv/image.jpg.tcpstream">>, Tcpstream),
+    %%test_parse_chunck(Tcpstream, undef, 0, []).
+    %Bodydata = Tcpstream,
+    %multipart_data_chunked_({ok, Bodydata, Req2}).
+
+
+    %%case read(Req) of
+        %%{ok, Bodydata} ->
+            %%[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+            %%Chunksize = empdb_convert:to_integer(Chunksizebin),
+            %%multipart_data_chunked_x(Req, Chunksize, Rest),
+
+
+            %%file:write_file(<<"priv/static/some1.jpg">>, Bodydata);
+
+        %%Else ->
+            %%io:format("Else = ~p ~n", [Else])
+    %%end.
+
+    %%multipart_data_chunked_(cowboy_req:body(Req)).
+
+
+%%multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
+    %%io:format("X~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
+    %%Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
+    %%file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
+    %%Bodydata;
+
+
+%%multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
+     %%io:format("X~nX~nX~nX ~p in ~p X~nX~nX~n", [?MODULE, ?LINE]),
+    %%case read(Req) of
+        %%{ok, Bodydata} ->
+            %%[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+            %%Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
+            %%io:format("X~nX~nX~nX~nX~n Chunksize = ~p X~nX~nX~n", [Chunksize]),
+            %%multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
+        %%Else ->
+            %%io:format("X~nX~nX~nX~nX~n Else = ~p X~nX~nX~n", [Else])
+    %%end.
+
+
+
+%test_read_all() ->
+    %{ok, Tcpstream} = file:read_file(<<"priv/bada-test-2013-06-27_15-33-10.raw.txt">>),
     %test_parse_chunck(Tcpstream, undef, 0, []).
-    Bodydata = Tcpstream,
-    multipart_data_chunked_({ok, Bodydata, Req2}).
 
+%%recv(Req = #http_req{socket=Socket}) ->
+    %%do_recv(Socket, []).
 
-    %case read(Req) of
-        %{ok, Bodydata} ->
-            %[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
-            %Chunksize = empdb_convert:to_integer(Chunksizebin),
-            %multipart_data_chunked_x(Req, Chunksize, Rest),
+%%do_recv(Sock, Bs) ->
+    %%case gen_tcp:recv(Sock, 0) of
+        %%{ok, B} ->
+            %%case Bs of
+                %%[] ->
+                    %%file:write_file(<<"priv/image.jpg.tcpstream.0">>, B);
+                %%_ ->
+                    %%ok
+            %%end,
+            %%do_recv(Sock, [Bs, B]);
+        %%{error, closed} ->
+            %%{ok, list_to_binary(Bs)}
+    %%end.
 
-
-            %file:write_file(<<"priv/static/some1.jpg">>, Bodydata);
-
-        %Else ->
-            %io:format("Else = ~p ~n", [Else])
-    %end.
-
-    %multipart_data_chunked_(cowboy_http_req:body(Req)).
-
-
-%multipart_data_chunked_x(Req, 0, Length, Acc, continue) ->
-    %io:format("X~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
+%test_parse_chunck(_, 0, Length, Acc) ->
+    %io:format("~nX~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
     %Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
-    %file:write_file(<<"priv/static/some1.jpg">>, Bodydata),
+    %file:write_file(<<"priv/image.jpg">>, Bodydata),
     %Bodydata;
 
 
-%multipart_data_chunked_x(Req, _, PrevChunksize, Acc, _) ->
-     %io:format("X~nX~nX~nX ~p in ~p X~nX~nX~n", [?MODULE, ?LINE]),
-    %case read(Req) of
-        %{ok, Bodydata} ->
-            %[Chunksizebin, Rest] = binary:split(Bodydata, [<<"\r\n">>]),
+%test_parse_chunck(Bodydata, _, Prevchunksize, Acc) ->
+    %io:format("~nX~nX~nX~nX Prevchunksize = ~p ~nX~nX~nX~nX", [Prevchunksize]),
+    %case binary:split(Bodydata, [<<"\r\n">>]) of
+        %[Chunksizebin, Chunkdata]  ->
+            %io:format("~nX~nX~nX~nX Chunksizebin = ~p ~nX~nX~nX~nX", [Chunksizebin]),
             %Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
-            %io:format("X~nX~nX~nX~nX~n Chunksize = ~p X~nX~nX~n", [Chunksize]),
-            %multipart_data_chunked_x(Req, Chunksize, Chunksize + PrevChunksize, [Rest|Acc], continue);
-        %Else ->
-            %io:format("X~nX~nX~nX~nX~n Else = ~p X~nX~nX~n", [Else])
+            %<<Data:Chunksize/binary, Prerest/binary>> = Chunkdata,
+            %[_, Rest] = binary:split(Prerest, [<<"\r\n">>]),
+            %test_parse_chunck(Rest, Chunksize, Chunksize + Prevchunksize, [Data|Acc]);
+        %[<<>>] ->
+            %test_parse_chunck(Bodydata, 0, Prevchunksize, Acc)
     %end.
 
 
 
-test_read_all() ->
-    {ok, Tcpstream} = file:read_file(<<"priv/bada-test-2013-06-27_15-33-10.raw.txt">>),
-    test_parse_chunck(Tcpstream, undef, 0, []).
-
-recv(Req = #http_req{socket=Socket}) ->
-    do_recv(Socket, []).
-
-do_recv(Sock, Bs) ->
-    case gen_tcp:recv(Sock, 0) of
-        {ok, B} ->
-            case Bs of
-                [] ->
-                    file:write_file(<<"priv/image.jpg.tcpstream.0">>, B);
-                _ ->
-                    ok
-            end,
-            do_recv(Sock, [Bs, B]);
-        {error, closed} ->
-            {ok, list_to_binary(Bs)}
-    end.
-
-test_parse_chunck(_, 0, Length, Acc) ->
-    io:format("~nX~nX~nX~nXLength = ~p ~nX~nX~nX~nX", [Length]),
-    Bodydata =  erlang:list_to_binary(lists:reverse(Acc)),
-    file:write_file(<<"priv/image.jpg">>, Bodydata),
-    Bodydata;
 
 
-test_parse_chunck(Bodydata, _, Prevchunksize, Acc) ->
-    io:format("~nX~nX~nX~nX Prevchunksize = ~p ~nX~nX~nX~nX", [Prevchunksize]),
-    case binary:split(Bodydata, [<<"\r\n">>]) of
-        [Chunksizebin, Chunkdata]  ->
-            io:format("~nX~nX~nX~nX Chunksizebin = ~p ~nX~nX~nX~nX", [Chunksizebin]),
-            Chunksize = erlang:list_to_integer(erlang:binary_to_list(Chunksizebin), 16),
-            <<Data:Chunksize/binary, Prerest/binary>> = Chunkdata,
-            [_, Rest] = binary:split(Prerest, [<<"\r\n">>]),
-            test_parse_chunck(Rest, Chunksize, Chunksize + Prevchunksize, [Data|Acc]);
-        [<<>>] ->
-            test_parse_chunck(Bodydata, 0, Prevchunksize, Acc)
-    end.
+%multipart_data_chunked_({ok, Bodydata, Req}) ->
+    %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %file:write_file(<<"priv/static/some.jpg">>, Bodydata),
+    %multipart_data(Req#http_req{body_state=waiting}, Bodydata);
+
+%multipart_data_chunked_({error, Error}) ->
+    %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %{error, Error}.
+
+%multipart_data(Req=#http_req{body_state=waiting}, Bodydata) ->
+    %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %{{<<"multipart">>, _SubType, Params}, Req2} =
+        %cowboy_req:parse_header('Content-Type', Req),
+    %{_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
+    %{Length, Req3} =
+        %case cowboy_req:parse_header('Content-Length',Req2) of
+            %{undefined, Req2_} ->
+                %{undefined, L, Req2__} = cowboy_req:parse_header(<<"X-Content-Length">>,Req2_),
+                %{erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
+            %{Length_, Req2_}->
+                %{Length_, Req2_}
+        %end,
+    %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    %multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)}, Bodydata);
+
+%multipart_data(Req=#http_req{body_state={multipart, Length, Cont}}, Bodydata) ->
+    %io:format("~n~n 2 ~n~n"),
+    %multipart_data(Req, Length, Cont(), Bodydata);
+
+%multipart_data(Req=#http_req{body_state=done}, Bodydata) ->
+    %io:format("~n~n 3 ~n~n"),
+    %{eof, Req}.
+
+%multipart_data(Req, Length, {headers, Headers, Cont}, Bodydata) ->
+    %io:format("~n~n 4 ~n~n"),
+    %{{headers, Headers}, Req#http_req{body_state={multipart, Length, Cont}}};
+
+%multipart_data(Req, Length, {body, Data, Cont}, Bodydata) ->
+    %io:format("~n~n 5 ~n~n"),
+    %{{body, Data}, Req#http_req{body_state={multipart, Length, Cont}}};
+
+%multipart_data(Req, Length, {end_of_part, Cont}, Bodydata) ->
+    %io:format("~n~n 6 ~n~n"),
+    %{end_of_part, Req#http_req{body_state={multipart, Length, Cont}}};
+
+%multipart_data(Req, 0, eof, Bodydata) ->
+    %io:format("~n~n 7 ~n~n"),
+    %{eof, Req#http_req{body_state=done}};
+
+%multipart_data(Req=#http_req{socket=Socket, transport=Transport}, _Length, eof, Bodydata) ->
+    %io:format("~n~n 8 ~n~n"),
+    %{eof, Req#http_req{body_state=done}};
+
+%multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata) ->
+    %io:format("~n~n 8 ~n~n"),
+
+    %%multipart_data_chunked_(cowboy_req:body(Req)).
+
+    %%file:write_file(<<"priv/static/some-0.jpg">>, Bodydata),
+
+    %{eof, Req#http_req{body_state=done}};
 
 
+%multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
+    %io:format("~n~n 9 ~n~n"),
 
-
-
-multipart_data_chunked_({ok, Bodydata, Req}) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    file:write_file(<<"priv/static/some.jpg">>, Bodydata),
-    multipart_data(Req#http_req{body_state=waiting}, Bodydata);
-
-multipart_data_chunked_({error, Error}) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    {error, Error}.
-
-multipart_data(Req=#http_req{body_state=waiting}, Bodydata) ->
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    {{<<"multipart">>, _SubType, Params}, Req2} =
-        cowboy_http_req:parse_header('Content-Type', Req),
-    {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
-    {Length, Req3} =
-        case cowboy_http_req:parse_header('Content-Length',Req2) of
-            {undefined, Req2_} ->
-                {undefined, L, Req2__} = cowboy_http_req:parse_header(<<"X-Content-Length">>,Req2_),
-                {erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
-            {Length_, Req2_}->
-                {Length_, Req2_}
-        end,
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)}, Bodydata);
-
-multipart_data(Req=#http_req{body_state={multipart, Length, Cont}}, Bodydata) ->
-    io:format("~n~n 2 ~n~n"),
-    multipart_data(Req, Length, Cont(), Bodydata);
-
-multipart_data(Req=#http_req{body_state=done}, Bodydata) ->
-    io:format("~n~n 3 ~n~n"),
-    {eof, Req}.
-
-multipart_data(Req, Length, {headers, Headers, Cont}, Bodydata) ->
-    io:format("~n~n 4 ~n~n"),
-    {{headers, Headers}, Req#http_req{body_state={multipart, Length, Cont}}};
-
-multipart_data(Req, Length, {body, Data, Cont}, Bodydata) ->
-    io:format("~n~n 5 ~n~n"),
-    {{body, Data}, Req#http_req{body_state={multipart, Length, Cont}}};
-
-multipart_data(Req, Length, {end_of_part, Cont}, Bodydata) ->
-    io:format("~n~n 6 ~n~n"),
-    {end_of_part, Req#http_req{body_state={multipart, Length, Cont}}};
-
-multipart_data(Req, 0, eof, Bodydata) ->
-    io:format("~n~n 7 ~n~n"),
-    {eof, Req#http_req{body_state=done}};
-
-multipart_data(Req=#http_req{socket=Socket, transport=Transport}, _Length, eof, Bodydata) ->
-    io:format("~n~n 8 ~n~n"),
-    {eof, Req#http_req{body_state=done}};
-
-multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _, Bodydata) ->
-    io:format("~n~n 8 ~n~n"),
-
-    %multipart_data_chunked_(cowboy_http_req:body(Req)).
-
-    %file:write_file(<<"priv/static/some-0.jpg">>, Bodydata),
-
-    {eof, Req#http_req{body_state=done}};
-
-
-multipart_data(Req, Length, {more, Parser}, Bodydata) when Length > 0 ->
-    io:format("~n~n 9 ~n~n"),
-
-    case Bodydata of
-        << Data:Length/binary, Buffer/binary >> ->
-            multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
-        Data ->
-            io:format("~n~n 9.1 ~n~n"),
-            io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
-            io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
-            multipart_data(Req, Length - byte_size(Data), Parser(Data), Bodydata)
-    end.
+    %case Bodydata of
+        %<< Data:Length/binary, Buffer/binary >> ->
+            %multipart_data(Req#http_req{buffer=Buffer}, 0, Parser(Data), Bodydata);
+        %Data ->
+            %io:format("~n~n 9.1 ~n~n"),
+            %io:format("~n~n 9.1  Length = ~p ~n~n", [Length]),
+            %io:format("~n~n 9.1  byte_size(Data) = ~p ~n~n", [byte_size(Data)]),
+            %multipart_data(Req, Length - byte_size(Data), Parser(Data), Bodydata)
+    %end.
 
 
 
 body_qs(Req) ->
-    cowboy_http_req:body_qs(Req).
+    cowboy_req:body_qs(Req).
 
 method(Req) ->
-    cowboy_http_req:method(Req).
+    cowboy_req:method(Req).
 
 
 auth(Req)->
@@ -232,7 +243,7 @@ auth(Req)->
     {{session_id, Res}, Req1}.
 
 auth_cookie(Req)->
-    {Res, Req1} = cowboy_http_req:cookie(?AUTH_COOKIE_NAME, Req),
+    {Res, Req1} = cowboy_req:cookie(?AUTH_COOKIE_NAME, Req),
     {Res, Req1}.
 
 make_auth(Body)->
@@ -364,7 +375,7 @@ call_handle(Req, #empweb_hap{handler=Handler,action=Action}=Hap, State) ->
 
 reply(#http_resp{} = Http_resp, Req) ->
     {ok, Reply} =
-        cowboy_http_req:reply(
+        cowboy_req:reply(
             Http_resp#http_resp.status,
             Http_resp#http_resp.headers,
             Http_resp#http_resp.body,
@@ -380,12 +391,18 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
     when erlang:is_list(Icookies) ->
 
 
-    Cookies = lists:map(fun
-            ({Name, Value})->
-                cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Params})->
-                cowboy_cookies:cookie(Name, Value, Params)
-        end, Icookies),
+    Cookies =
+        lists:map(
+            fun
+                ({Name, Value})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, []),
+                    {<<"set-cookie">>, Cookie};
+                ({Name, Value, Params})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, Params),
+                    {<<"set-cookie">>, Cookie}
+            end,
+            Icookies
+        ),
 
 
     #http_resp{
@@ -401,12 +418,19 @@ resp(#empweb_resp{status={redirect, Location},cookies=Icookies,format=Format,bod
 resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers=Headers})
     when erlang:is_atom(Status) and erlang:is_list(Icookies) ->
 
-    Cookies = lists:map(fun
-            ({Name, Value})->
-                cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Params})->
-                cowboy_cookies:cookie(Name, Value, Params)
-        end, Icookies),
+    Cookies =
+        lists:map(
+            fun
+                ({Name, Value})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, []),
+                    {<<"set-cookie">>, Cookie};
+                ({Name, Value, Params})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, Params),
+                    {<<"set-cookie">>, Cookie}
+            end,
+            Icookies
+        ),
+
 
     #http_resp{
         status=status(Status),
@@ -419,13 +443,18 @@ resp(#empweb_resp{status=Status,cookies=Icookies,format=Format,body=Body,headers
 
     io:format(" ~n~n~n Some = ~p ~n~n~n", [Status]),
 
-    Cookies = lists:map(fun
-            ({Name, Value})->
-                cowboy_cookies:cookie(Name, Value, []);
-            ({Name, Value, Params})->
-                cowboy_cookies:cookie(Name, Value, Params)
-        end, Icookies),
-
+    Cookies =
+        lists:map(
+            fun
+                ({Name, Value})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, []),
+                    {<<"set-cookie">>, Cookie};
+                ({Name, Value, Params})->
+                    Cookie = cowboy_http:cookie_to_iodata(Name, Value, Params),
+                    {<<"set-cookie">>, Cookie}
+            end,
+            Icookies
+        ),
 
     #http_resp{
         status=Status,

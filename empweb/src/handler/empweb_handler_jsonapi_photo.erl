@@ -2,7 +2,11 @@
 
 -module(empweb_handler_jsonapi_photo).
 -behaviour(cowboy_http_handler).
--export([init/3, handle/2, terminate/2]).
+-export([
+    init/3,
+    handle/2,
+    terminate/3
+]).
 
 %%
 %% Определения общие для всего приложения
@@ -43,6 +47,9 @@
     body
 }).
 
+ %rr(empweb_handler_jsonapi_photo).%rr(cowboy_req).
+
+
 init(_, Req, _Opts) ->
     ?evman_warning({erlang:time(), Req}),
     {Auth, Req1}    =   empweb_http:auth(Req),
@@ -63,7 +70,7 @@ handle(Req, State) ->
     ?evman_args([Req, State]),
     {Empweb_resp, Reqres}  =
         case empweb_http:method(Req) of
-            {'POST', Req1} ->
+            {<<"POST">>, Req1} ->
                 handle_post(Req1, State);
             {_, Req1} ->
                 {empweb_jsonapi:method_not_allowed(), Req1}
@@ -86,19 +93,18 @@ handle(Req, State) ->
     ?evman_debug({reply, Reply}, <<"server reply">>),
     {ok,Reply,State}.
 
-terminate(_Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     ok.
 
 handle_post(Req, State) ->
-    %% io:format("~n~n~n Req = ~p ~n~n~n", [Req]),
-
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     case catch empweb_http:multipart_data(Req) of
         {'EXIT', Reason} ->
-           io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
+            io:format("~n~n~n ~p in ~p  ~w ~n~n~n", [?MODULE, ?LINE, Reason]),
             {empweb_jsonapi:not_extended(no_files), Req};
         {Pbody, Req1} ->
-           io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n ~p  ~n~n~n", [Req1]),
             handle_body(Req1, Pbody, State)
     end.
 
@@ -165,13 +171,13 @@ handle_part(Req, Acc, State) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {Result, Req2} = empweb_http:multipart_data(Req),
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    %% io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
+    %io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
     acc_part(Req2, Acc, Result, State).
 
 acc_part(Req, Acc, {headers, Headers}, State) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Contentdisposition =
-        proplists:get_value(<<"Content-Disposition">>, Headers),
+        proplists:get_value(<<"content-disposition">>, Headers),
     Contenttype   =
         proplists:get_value('Content-Type', Headers),
     Filename =
@@ -271,5 +277,9 @@ acc_part(
 
 acc_part(Req, Acc, eof, State) ->
     io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
-    {lists:reverse(Acc), Req}.
+    {lists:reverse(Acc), Req};
 
+acc_part(Req, Acc, Result, State) ->
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p~n~n~n ~p~n~n~n ~p~n~n~n ~p", [Req, Acc, Result, State]),
+    {<<>>, Req}.
