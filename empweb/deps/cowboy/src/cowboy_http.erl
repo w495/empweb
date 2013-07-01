@@ -740,10 +740,12 @@ token_ci(Data, Fun) ->
 %% @doc Parse a token.
 -spec token(binary(), fun()) -> any().
 token(Data, Fun) ->
+    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     token(Data, Fun, cs, <<>>).
 
 -spec token(binary(), fun(), ci | cs, binary()) -> any().
 token(<<>>, Fun, _Case, Acc) ->
+    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     Fun(<<>>, Acc);
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
         when C =:= $(; C =:= $); C =:= $<; C =:= $>; C =:= $@;
@@ -751,11 +753,14 @@ token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
              C =:= $/; C =:= $[; C =:= $]; C =:= $?; C =:= $=;
              C =:= ${; C =:= $}; C =:= $\s; C =:= $\t;
              C < 32; C =:= 127 ->
+    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     Fun(Data, Acc);
+
 token(<< C, Rest/binary >>, Fun, Case = ci, Acc) ->
     C2 = cowboy_bstr:char_to_lower(C),
     token(Rest, Fun, Case, << Acc/binary, C2 >>);
 token(<< C, Rest/binary >>, Fun, Case, Acc) ->
+    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     token(Rest, Fun, Case, << Acc/binary, C >>).
 
 %% @doc Parse a quoted string.
@@ -962,7 +967,7 @@ te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
 
     {done, Streamed, Rest};
 te_chunked(Data, {0, Streamed}) ->
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
     io:format("~n te_chunked(~w, {0, ~p}) ~n", [Data, Streamed]),
     %% @todo We are expecting an hex size, not a general token.
     token(Data,
@@ -971,6 +976,7 @@ te_chunked(Data, {0, Streamed}) ->
 
                 io:format("~n BinLen = ~p ~n", [BinLen]),
                 io:format("~n Len = ~p ~n", [Len]),
+                io:format("~n Rest = ~w ~n", [Rest]),
 
                 Ans = te_chunked(Rest, {Len, Streamed}),
                 io:format("~n ~w ~n", [Ans]),
@@ -985,7 +991,7 @@ te_chunked(Data, {0, Streamed}) ->
 
 
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
     io:format("~n te_chunked(~w, {~p, ~p}) ~n", [Data, ChunkRem, Streamed]),
 
     io:format("~n ChunkRem = ~p ~n", [ChunkRem]),
@@ -1005,7 +1011,7 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
 
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
 
     io:format("~n byte_size(Data) = ~p ~n", [byte_size(Data)]),
     io:format("~n ChunkRem = ~p ~n", [ChunkRem]),
@@ -1014,8 +1020,11 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
 
 te_chunked(Data, {ChunkRem, Streamed}) ->
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
     io:format("~n te_chunked(~w, {~p, ~p}) ~n", [Data, ChunkRem, Streamed]),
+
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     io:format("~n {more, ~p, ~p, {~p, ~p}} ~n", [ChunkRem, Data, ChunkRem, Streamed]),
     {more, ChunkRem + 2, Data, {ChunkRem, Streamed}}.
 
