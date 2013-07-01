@@ -22,19 +22,19 @@ start() ->
 
 start(_Type, _Args) ->
     Dispatch = cowboy_router:compile(empweb_dispatcher:dispatch()),
-    %start_listener(http, start_http, fun(Config)->[
-        %% nbacceptors
-        %proplists:get_value(nbacceptors,Config,?EMPWEB_NBACCEPTORS_DEF),
-        %% transopts
-        %[{port,proplists:get_value(port,Config,?EMPWEB_CPORT_HTTP_DEF)}],
-        %% protoopts
+    start_listener(http, start_http, fun(Config)->[
+        % nbacceptors
+        proplists:get_value(nbacceptors,Config,?EMPWEB_NBACCEPTORS_DEF),
+        % transopts
+        [{port,proplists:get_value(port,Config,?EMPWEB_CPORT_HTTP_DEF)}],
+        % protoopts
+        [{env, [{dispatch, Dispatch}]}]
+    ] end),
+
+
+    %{ok, _} = cowboy:start_http(http, 100, [{port, 8001}], [
         %{env, [{dispatch, Dispatch}]}
-    %] end),
-
-
-    {ok, _} = cowboy:start_http(http, 100, [{port, 8001}], [
-        {env, [{dispatch, Dispatch}]}
-    ]),
+    %]),
 
     %start_listener(https, start_https, fun(Config)->[
         %% nbacceptors
@@ -47,7 +47,7 @@ start(_Type, _Args) ->
             %{password,  proplists:get_value(password,Config)}
         %],
         %% protoopts
-        %{env, [{dispatch, Dispatch}]}
+        %[{env, [{dispatch, Dispatch}]}]
     %] end),
 
     ensure_start_link(empweb_sup).
