@@ -673,24 +673,30 @@ transfer_decode(Data, Req=#http_req{body_state={stream, _,
         TransferDecode, TransferState, ContentDecode}}) ->
     case TransferDecode(Data, TransferState) of
         {ok, Data2, Rest, TransferState2} ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             content_decode(ContentDecode, Data2,
                 Req#http_req{buffer=Rest, body_state={stream, 0,
                 TransferDecode, TransferState2, ContentDecode}});
         %% @todo {header(s) for chunked
         more ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             stream_body_recv(0, Req#http_req{buffer=Data, body_state={stream,
                 0, TransferDecode, TransferState, ContentDecode}});
         {more, Length, Data2, TransferState2} ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             content_decode(ContentDecode, Data2,
                 Req#http_req{body_state={stream, Length,
                 TransferDecode, TransferState2, ContentDecode}});
         {done, Length, Rest} ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             {done, Req2};
         {done, Data2, Length, Rest} ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             Req2 = transfer_decode_done(Length, Rest, Req),
             content_decode(ContentDecode, Data2, Req2);
         {error, Reason} ->
+            io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
             {error, Reason}
     end.
 
