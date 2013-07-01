@@ -664,7 +664,7 @@ stream_body_recv(MaxLength, Req=#http_req{
         transport=Transport, socket=Socket, buffer=Buffer,
         body_state={stream, Length, _, _, _}}) ->
     %% @todo Allow configuring the timeout.
-    case Transport:recv(Socket, min(Length, MaxLength), 5000) of
+    case Transport:recv(Socket, min(Length, MaxLength), ?COWBOY_RECV_TIMEOUT) of
         {ok, Data} -> transfer_decode(<< Buffer/binary, Data/binary >>,
             Req#http_req{buffer= <<>>});
         {error, Reason} -> {error, Reason}
@@ -856,7 +856,7 @@ multipart_data(Req, 0, eof) ->
 %multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         %Length, eof) ->
     %%% We just want to skip so no need to stream data here.
-    %{ok, _Data} = Transport:recv(Socket, Length, 5000),
+    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
     %{eof, Req#http_req{body_state=done, multipart=undefined}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
