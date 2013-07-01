@@ -38,7 +38,6 @@
 -export([quoted_string/2]).
 -export([authorization/2]).
 -export([range/1]).
--export([parameterized_tokens/1]).
 
 %% Decoding.
 -export([te_chunked/2]).
@@ -740,12 +739,10 @@ token_ci(Data, Fun) ->
 %% @doc Parse a token.
 -spec token(binary(), fun()) -> any().
 token(Data, Fun) ->
-    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     token(Data, Fun, cs, <<>>).
 
 -spec token(binary(), fun(), ci | cs, binary()) -> any().
 token(<<>>, Fun, _Case, Acc) ->
-    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     Fun(<<>>, Acc);
 token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
         when C =:= $(; C =:= $); C =:= $<; C =:= $>; C =:= $@;
@@ -753,14 +750,11 @@ token(Data = << C, _Rest/binary >>, Fun, _Case, Acc)
              C =:= $/; C =:= $[; C =:= $]; C =:= $?; C =:= $=;
              C =:= ${; C =:= $}; C =:= $\s; C =:= $\t;
              C < 32; C =:= 127 ->
-    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     Fun(Data, Acc);
-
 token(<< C, Rest/binary >>, Fun, Case = ci, Acc) ->
     C2 = cowboy_bstr:char_to_lower(C),
     token(Rest, Fun, Case, << Acc/binary, C2 >>);
 token(<< C, Rest/binary >>, Fun, Case, Acc) ->
-    io:format("~n ~p:token in ~p  ~n", [?MODULE, ?LINE]),
     token(Rest, Fun, Case, << Acc/binary, C >>).
 
 %% @doc Parse a quoted string.
@@ -911,49 +905,6 @@ range_digits(Data, Default, Fun) ->
             Fun(Data, Default)
         end).
 
-%% @doc Parse a non empty list of tokens followed with optional parameters.
--spec parameterized_tokens(binary()) -> any().
-parameterized_tokens(Data) ->
-    nonempty_list(Data,
-        fun (D, Fun) ->
-            token(D,
-                fun (_Rest, <<>>) -> {error, badarg};
-                    (Rest, Token) ->
-                        parameterized_tokens_params(Rest,
-                            fun (Rest2, Params) ->
-                                Fun(Rest2, {Token, Params})
-                            end, [])
-                end)
-        end).
-
--spec parameterized_tokens_params(binary(), fun(), [binary() | {binary(), binary()}]) -> any().
-parameterized_tokens_params(Data, Fun, Acc) ->
-    whitespace(Data,
-        fun (<< $;, Rest/binary >>) ->
-                parameterized_tokens_param(Rest,
-                    fun (Rest2, Param) ->
-                            parameterized_tokens_params(Rest2, Fun, [Param|Acc])
-                    end);
-            (Rest) ->
-                Fun(Rest, lists:reverse(Acc))
-        end).
-
--spec parameterized_tokens_param(binary(), fun()) -> any().
-parameterized_tokens_param(Data, Fun) ->
-    whitespace(Data,
-        fun (Rest) ->
-                token(Rest,
-                    fun (_Rest2, <<>>) -> {error, badarg};
-                        (<< $=, Rest2/binary >>, Attr) ->
-                            word(Rest2,
-                                fun (Rest3, Value) ->
-                                        Fun(Rest3, {Attr, Value})
-                                end);
-                        (Rest2, Attr) ->
-                            Fun(Rest2, Attr)
-                    end)
-        end).
-
 %% Decoding.
 
 %% @doc Decode a stream of chunks.
@@ -963,24 +914,22 @@ parameterized_tokens_param(Data, Fun) ->
     | {done, non_neg_integer(), Bin} | {error, badarg}
     when Bin::binary(), TransferState::{non_neg_integer(), non_neg_integer()}.
 te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
-     io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
-
     {done, Streamed, Rest};
 te_chunked(Data, {0, Streamed}) ->
-    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
-    io:format("~n te_chunked(~w, {0, ~p}) ~n", [Data, Streamed]),
     %% @todo We are expecting an hex size, not a general token.
     token(Data,
         fun (<< "\r\n", Rest/binary >>, BinLen) ->
-                Len = list_to_integer(binary_to_list(BinLen), 16),
-
-                io:format("~n BinLen = ~p ~n", [BinLen]),
-                io:format("~n Len = ~p ~n", [Len]),
-                io:format("~n Rest = ~w ~n", [Rest]),
-
-                Ans = te_chunked(Rest, {Len, Streamed}),
-                io:format("~n ~w ~n", [Ans]),
-                Ans;
+                case list_to_integer(binary_to_list(BinLen), 16) of
+                    %% Final chunk is parsed in one go above. Rest would be
+                    %% <<\r\n">> if complete.
+                    0 when byte_size(Rest) < 2 ->
+                        more;
+                    %% Normal chunk. Add 2 to Len for trailing <<"\r\n">>. Note
+                    %% that repeated <<"-2\r\n">> would be streamed, and
+                    %% accumulated, until out of memory if Len could be -2.
+                    Len when Len > 0 ->
+                        te_chunked(Rest, {Len + 2, Streamed})
+                end;
             %% Chunk size shouldn't take too many bytes,
             %% don't try to stream forever.
             (Rest, _) when byte_size(Rest) < 16 ->
@@ -988,45 +937,26 @@ te_chunked(Data, {0, Streamed}) ->
             (_, _) ->
                 {error, badarg}
         end);
-
-
-te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
-    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
-    io:format("~n te_chunked(~w, {~p, ~p}) ~n", [Data, ChunkRem, Streamed]),
-
-    io:format("~n ChunkRem = ~p ~n", [ChunkRem]),
-    io:format("~n Streamed = ~p ~n", [Streamed]),
-    io:format("~n byte_size(Data) = ~p ~n", [byte_size(Data)]),
-    io:format("~n Data = ~w ~n", [Data]),
-
-    << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
-
-    io:format("~n Chunk = ~w ~n", [Chunk]),
-    io:format("~n Rest = ~w ~n", [Rest]),
-    io:format("~n byte_size(Chunk) = ~w ~n", [byte_size(Chunk)]),
-    io:format("~n Streamed + byte_size(Chunk) = ~w ~n", [Streamed + byte_size(Chunk)]),
-
-
-    io:format("~n {ok, ~p, ~p, {0, ~p}} ~n", [Chunk, Rest, 0, Streamed + byte_size(Chunk)]),
-    {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
-
-te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
-    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
-
-    io:format("~n byte_size(Data) = ~p ~n", [byte_size(Data)]),
-    io:format("~n ChunkRem = ~p ~n", [ChunkRem]),
-
-    << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
-    {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
-
+%% <<"\n">> from trailing <<"\r\n">>.
+te_chunked(<< "\n", Rest/binary>>, {1, Streamed}) ->
+    {ok, <<>>, Rest, {0, Streamed}};
+%% Remainder of chunk (if any) and as much of trailing <<"\r\n">> as possible.
+te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem - 2 ->
+    ChunkSize = ChunkRem - 2,
+    Streamed2 = Streamed + ChunkSize,
+    case Data of
+        << Chunk:ChunkSize/binary, "\r\n", Rest/binary >> ->
+            {ok, Chunk, Rest, {0, Streamed2}};
+        << Chunk:ChunkSize/binary, "\r" >> ->
+            {more, 1, Chunk, {1, Streamed2}};
+        << Chunk:ChunkSize/binary >> ->
+            {more, 2, Chunk, {2, Streamed2}}
+    end;
+%% Incomplete chunk.
 te_chunked(Data, {ChunkRem, Streamed}) ->
-    io:format("~n ~p:te_chunked in ~p  ~n", [?MODULE, ?LINE]),
-    io:format("~n te_chunked(~w, {~p, ~p}) ~n", [Data, ChunkRem, Streamed]),
-
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
-
-    io:format("~n {more, ~p, ~p, {~p, ~p}} ~n", [ChunkRem, Data, ChunkRem, Streamed]),
-    {more, ChunkRem + 2, Data, {ChunkRem, Streamed}}.
+    ChunkRem2 = ChunkRem - byte_size(Data),
+    Streamed2 = Streamed + byte_size(Data),
+    {more, ChunkRem2, Data, {ChunkRem2, Streamed2}}.
 
 %% @doc Decode an identity stream.
 -spec te_identity(Bin, TransferState)
@@ -1383,17 +1313,6 @@ content_type_test_() ->
             ]}}
     ],
     [{V, fun () -> R = content_type(V) end} || {V, R} <- Tests].
-
-parameterized_tokens_test_() ->
-    %% {ParameterizedTokens, Result}
-    Tests = [
-        {<<"foo">>, [{<<"foo">>, []}]},
-        {<<"bar; baz=2">>, [{<<"bar">>, [{<<"baz">>, <<"2">>}]}]},
-        {<<"bar; baz=2;bat">>, [{<<"bar">>, [{<<"baz">>, <<"2">>}, <<"bat">>]}]},
-        {<<"bar; baz=2;bat=\"z=1,2;3\"">>, [{<<"bar">>, [{<<"baz">>, <<"2">>}, {<<"bat">>, <<"z=1,2;3">>}]}]},
-        {<<"foo, bar; baz=2">>, [{<<"foo">>, []}, {<<"bar">>, [{<<"baz">>, <<"2">>}]}]}
-    ],
-    [{V, fun () -> R = parameterized_tokens(V) end} || {V, R} <- Tests].
 
 digits_test_() ->
     %% {Digits, Result}
