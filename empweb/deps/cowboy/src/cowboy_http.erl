@@ -958,8 +958,11 @@ parameterized_tokens_param(Data, Fun) ->
     | {done, non_neg_integer(), Bin} | {error, badarg}
     when Bin::binary(), TransferState::{non_neg_integer(), non_neg_integer()}.
 te_chunked(<< "0\r\n\r\n", Rest/binary >>, {0, Streamed}) ->
+     io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+
     {done, Streamed, Rest};
 te_chunked(Data, {0, Streamed}) ->
+     io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
     %% @todo We are expecting an hex size, not a general token.
     token(Data,
         fun (<< "\r\n", Rest/binary >>, BinLen) ->
@@ -979,6 +982,7 @@ te_chunked(Data, {0, Streamed}) ->
 
 
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
 
     io:format("~n~n~n ChunkRem = ~p ~n~n~n", [ChunkRem]),
     io:format("~n~n~n Streamed = ~p ~n~n~n", [Streamed]),
@@ -988,19 +992,27 @@ te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
 
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
 
+    io:format("~n~n~n Chunk = ~w ~n~n~n", [Chunk]),
+
+    io:format("~n~n~n Rest = ~w ~n~n~n", [Rest]),
+
+
     io:format("~n~n~n byte_size(Chunk) = ~w ~n~n~n", [byte_size(Chunk)]),
     io:format("~n~n~n Streamed + byte_size(Chunk) = ~w ~n~n~n", [Streamed + byte_size(Chunk)]),
 
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
 
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
 
     io:format("~n~n~n byte_size(Data) = ~p ~n~n~n", [byte_size(Data)]),
     io:format("~n~n~n ChunkRem = ~p ~n~n~n", [ChunkRem]),
 
     << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
     {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
+
 te_chunked(Data, {ChunkRem, Streamed}) ->
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
     {more, ChunkRem + 2, Data, {ChunkRem, Streamed}}.
 
 %% @doc Decode an identity stream.
