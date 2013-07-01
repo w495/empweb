@@ -972,6 +972,18 @@ te_chunked(Data, {0, Streamed}) ->
             (_, _) ->
                 {error, badarg}
         end);
+
+
+te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) == ChunkRem + 2 ->
+
+    io:format("~n~n~n byte_size(Data) = ~p ~n~n~n", [byte_size(Data)]),
+    io:format("~n~n~n ChunkRem = ~p ~n~n~n", [ChunkRem]),
+
+    io:format("~n~n~n Data = ~w ~n~n~n", [Data]),
+
+    << Chunk:ChunkRem/binary, "\r\n", Rest/binary >> = Data,
+    {ok, Chunk, Rest, {0, Streamed + byte_size(Chunk)}};
+
 te_chunked(Data, {ChunkRem, Streamed}) when byte_size(Data) >= ChunkRem + 2 ->
 
     io:format("~n~n~n byte_size(Data) = ~p ~n~n~n", [byte_size(Data)]),
