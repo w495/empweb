@@ -134,6 +134,9 @@
 -type send_chunk_fun() :: fun((iodata()) -> ok | {error, atom()}).
 -type resp_chunked_fun() :: fun((send_chunk_fun()) -> ok).
 
+-define(COWBOY_RECV_TIMEOUT, 30000).
+
+
 -record(http_req, {
     %% Transport.
     socket = undefined :: any(),
@@ -804,6 +807,7 @@ body_qs(MaxBodyLength, Req) ->
     -> {headers, cowboy:http_headers(), Req} | {body, binary(), Req}
         | {end_of_part | eof, Req} when Req::req().
 multipart_data(Req=#http_req{body_state=waiting}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {ok, {<<"multipart">>, _SubType, Params}, Req2} =
         parse_header(<<"content-type">>, Req),
     {_, Boundary} = lists:keyfind(<<"boundary">>, 1, Params),
@@ -816,29 +820,62 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
                 {ok, Length_, Req2_}
         end,
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)});
+
 multipart_data(Req=#http_req{multipart={Length, Cont}}) ->
     multipart_data(Req, Length, Cont());
+
 multipart_data(Req=#http_req{body_state=done}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {eof, Req}.
 
 multipart_data(Req, Length, {headers, Headers, Cont}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {headers, Headers, Req#http_req{multipart={Length, Cont}}};
+
 multipart_data(Req, Length, {body, Data, Cont}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {body, Data, Req#http_req{multipart={Length, Cont}}};
+
 multipart_data(Req, Length, {end_of_part, Cont}) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {end_of_part, Req#http_req{multipart={Length, Cont}}};
+
 multipart_data(Req, 0, eof) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {eof, Req#http_req{body_state=done, multipart=undefined}};
+
+%multipart_data(Req=#http_req{socket=Socket, transport=Transport},
+        %Length, eof) ->
+    %%% We just want to skip so no need to stream data here.
+    %{ok, _Data} = Transport:recv(Socket, Length, 5000),
+    %{eof, Req#http_req{body_state=done, multipart=undefined}};
+
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
-        Length, eof) ->
+        _Length, eof) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    %% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
-    {ok, _Data} = Transport:recv(Socket, Length, 5000),
-    {eof, Req#http_req{body_state=done, multipart=undefined}};
+    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
+    Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
+    {eof, Req#http_req{body_state=done}};
+
+multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    %% io:format("~n~n 8 ~n~n"),
+    %% We just want to skip so no need to stream data here.
+    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
+    Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
+    {eof, Req#http_req{body_state=done}};
+
+
 multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
+    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
             multipart_data(Req2#http_req{buffer=Buffer}, 0, Parser(Data));
         {ok, Data, Req2} ->
+            io:format("~n Length = ~p ~n", [Length]),
+            io:format("~n byte_size(Data) = ~p ~n", [byte_size(Data)]),
             multipart_data(Req2, Length - byte_size(Data), Parser(Data))
     end.
 
