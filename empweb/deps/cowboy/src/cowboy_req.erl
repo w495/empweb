@@ -819,6 +819,9 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
             {undefined, Req2_} ->
                 {undefined, L, Req2__} = parse_header(<<"x-content-length">>,Req2_),
                 {ok, erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
+            {ok, undefined, Req2_}->
+                {undefined, L, Req2__} = parse_header(<<"x-content-length">>,Req2_),
+                {ok, erlang:list_to_integer(erlang:binary_to_list(L)), Req2__};
             {ok, Length_, Req2_}->
                 io:format("~n ~p in ~p ~n Length_ = ~p ~n", [?MODULE, ?LINE, Length_]),
                 {ok, Length_, Req2_}
