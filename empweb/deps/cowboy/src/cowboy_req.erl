@@ -134,7 +134,7 @@
 -type send_chunk_fun() :: fun((iodata()) -> ok | {error, atom()}).
 -type resp_chunked_fun() :: fun((send_chunk_fun()) -> ok).
 
--define(COWBOY_RECV_TIMEOUT, 30000).
+-define(COWBOY_RECV_TIMEOUT, 5000000).
 
 
 -record(http_req, {
