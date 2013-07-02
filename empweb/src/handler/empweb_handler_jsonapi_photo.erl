@@ -68,6 +68,8 @@ init(_, Req, _Opts) ->
 
 handle(Req, State) ->
     ?evman_args([Req, State]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     {Empweb_resp, Reqres}  =
         case empweb_http:method(Req) of
             {<<"POST">>, Req1} ->
@@ -77,7 +79,7 @@ handle(Req, State) ->
         end,
     ?evman_debug({empweb_resp, Empweb_resp}, <<"empweb response">>),
 
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
     Http_resp = empweb_http:resp(Empweb_resp),
     ?evman_debug({http_resp, Http_resp}, <<"http response">>),
@@ -91,9 +93,12 @@ handle(Req, State) ->
             Reqres
         ),
     ?evman_debug({reply, Reply}, <<"server reply">>),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     {ok,Reply,State}.
 
 terminate(_Reason, _Req, _State) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     ok.
 
 handle_post(Req, State) ->
