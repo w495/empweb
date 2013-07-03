@@ -735,24 +735,28 @@ body(Req) ->
 -spec body(non_neg_integer() | infinity, Req)
     -> {ok, binary(), Req} | {error, atom()} when Req::req().
 body(infinity, Req) ->
-    case parse_header(<<"transfer-encoding">>, Req) of
-        {ok, [<<"identity">>], Req2} ->
-            read_body(Req2, <<>>);
-        {ok, _, _} ->
-            {error, chunked}
-    end;
+    %case parse_header(<<"transfer-encoding">>, Req) of
+        %{ok, [<<"identity">>], Req2} ->
+            %read_body(Req2, <<>>);
+        %{ok, _, _} ->
+            %{error, chunked}
+    %end;
+    read_body(Req, <<>>);
+
 body(MaxBodyLength, Req) ->
-    case parse_header(<<"transfer-encoding">>, Req) of
-        {ok, [<<"identity">>], Req2} ->
-            {ok, Length, Req3} = parse_header(<<"content-length">>, Req2, 0),
-            if  Length > MaxBodyLength ->
-                    {error, badlength};
-                true ->
-                    read_body(Req3, <<>>)
-            end;
-        {ok, _, _} ->
-            {error, chunked}
-    end.
+    read_body(Req, <<>>).
+
+    %case parse_header(<<"transfer-encoding">>, Req) of
+        %{ok, [<<"identity">>], Req2} ->
+            %{ok, Length, Req3} = parse_header(<<"content-length">>, Req2, 0),
+            %if  Length > MaxBodyLength ->
+                    %{error, badlength};
+                %true ->
+                    %read_body(Req3, <<>>)
+            %end;
+        %{ok, _, _} ->
+            %{error, chunked}
+    %end.
 
 -spec read_body(Req, binary())
     -> {ok, binary(), Req} | {error, atom()} when Req::req().
