@@ -74,6 +74,7 @@ table({fields, all})->
         doc_owner_id,
         doc_owner_nick,
         doc_parent_id,
+        doc_parent_head,
         doctype_id,
         doctype_alias,
         orig_id,

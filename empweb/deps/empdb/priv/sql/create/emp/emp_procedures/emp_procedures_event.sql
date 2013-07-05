@@ -16,6 +16,8 @@ begin
             (select doc.owner_nick from doc where doc.id = new.doc_id);
         new.doc_parent_id =
             (select doc.parent_id from doc where doc.id = new.doc_id);
+        new.doc_parent_head =
+            (select doc.head from doc where doc.id = new.doc_parent_id);
         new.oktype_id =
             (select doc.oktype_id from doc where doc.id = new.doc_id);
         new.oktype_alias =

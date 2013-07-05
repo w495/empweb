@@ -1653,7 +1653,6 @@
 */
 
 /*
-
     create sequence seq_pptrans_id;
     create table pptrans (
         id                 decimal primary key default nextval('seq_pptrans_id'),
@@ -1666,15 +1665,18 @@
         created            timestamp without time zone not null default utcnow(),
         isdeleted          boolean default false
     );
+    insert into paytype (alias,         isincome)
+            values      ('pers_out',    false),
+                        ('pers_in',     true );
 
-
-    insert into paytype(alias, isincome)
-            values  ('pers_out',     false),
-                    ('pers_in',      true );
+   alter table photo drop column is_cover;
+   alter table photo  add column iscover   boolean default false;
 
 */
 
 
+    alter table event add column
+        doc_parent_head         varchar(1024)  default null;
 
-   alter table photo drop column is_cover;
-   alter table photo  add column iscover   boolean default false;
+    update event set doc_parent_head =
+        (select doc.head from doc where doc.id = doc_parent_id);
