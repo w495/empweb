@@ -61,7 +61,8 @@ table({fields, all})->
         ismale,
         x,
         y,
-        file_id
+        file_id,
+        alias
     ];
 
 %%

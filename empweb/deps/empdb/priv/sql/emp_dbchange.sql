@@ -1671,12 +1671,15 @@
 
    alter table photo drop column is_cover;
    alter table photo  add column iscover   boolean default false;
-
-*/
-
-
     alter table event add column
         doc_parent_head         varchar(1024)  default null;
-
     update event set doc_parent_head =
         (select doc.head from doc where doc.id = doc_parent_id);
+*/
+
+    alter table perspichead add column
+        alias         varchar(1024)  default null;
+
+
+    alter table perspicbody add column
+        alias         varchar(1024)  default null;

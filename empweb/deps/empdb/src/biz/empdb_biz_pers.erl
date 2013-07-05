@@ -331,7 +331,11 @@ create__(Pass, Params)->
                     {suggestions, Sugs}
                 ]}}};
             false ->
-                case empdb_dao_pers:create(Con, [{phash, phash(Pass)}, {fields, [id, login, nick]}|Params]) of
+                case empdb_dao_pers:create(Con, [
+                    {phash, phash(Pass)},
+                    {fields, [id, login, nick]}
+                    |create_default(Con, Params)
+                ]) of
                     {ok, Persobj}->
                         [{Perspl}|_] = Persobj,
                         {ok, [{Ownblogpl}]} =
@@ -388,8 +392,50 @@ create__(Pass, Params)->
         end
     end).
 
+create_default(Con, Params)->
+    create_default(
+        perspichead_id,
+        Con,
+        create_default(
+            perspicbody_id,
+            Con,
+            Params
+        )
+    ).
 
-%%
+create_default(Field, Con, Params) ->
+    case proplists:get_value(Field, Params) of
+        undefined ->
+            [
+                {Field, create_default_call(f2m(Field), Con, Params)}
+                |Params
+            ];
+        _ ->
+            Params
+    end.
+
+create_default_call(Module, Con, Params) ->
+    Ismale = proplists:get_value(ismale, Params, true),
+    {ok, [{Objpl}]} =
+        Module:get(
+            Con,
+            [
+                {limit, 1},
+                {ismale, Ismale},
+                {fields, [id]}
+            ]
+        ),
+    proplists:get_value(id, Objpl).
+
+f2m(perspichead_id) ->
+    empdb_dao_perspichead;
+
+f2m(perspicbody_id) ->
+    empdb_dao_perspicbody;
+
+f2m(X) ->
+    X.
+
 %% @doc Обновляет пользователя. Если у пользователя указан пароль,
 %% то обновляется хешь пароля в базе данных сервера приложений,
 %% и обновляется запись пользователя сервера jabberd.
