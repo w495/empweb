@@ -21,6 +21,7 @@
 %% Блоги
 %%
 -export([
+    gcd/2,
     md5/1,
     get/1,
     get/2,
@@ -127,46 +128,65 @@ create(Params)->
             case Filetype_mimesuptype of
                 <<"image">> ->
                     Whpl_ = gm:identify(Fspath_full, [width, height]),
-                    {ok, [{_}]} = empdb_dao_fileinfo:create(Con, [
-                        {fileinfotype_alias,    filesystem},
-                        {doc_id,                Doc_id},
-                        {owner_id,              Owner_id},
-                        {filetype_id,           Filetype_id},
-                        {'size',                Ulsize},
-                        {tokenstring,           Token_string},
-                        {tokenlong,             Token_long},
-                        {md5string,             Md5string},
-                        {md5long,               Md5long},
-                        {dir,                   Fsdir},
-                        {file_id,               File_id},
-                        {path,                  Fspath_ext},
-                        {image_width,           null},
-                        {image_height,          null}
-                    ]),
-                    {ok, [{_}]} = empdb_dao_fileinfo:create(Con, [
-                        {fileinfotype_alias,    download},
-                        {doc_id,                Doc_id},
-                        {owner_id,              Owner_id},
-                        {filetype_id,           Filetype_id},
-                        {'size',                Ulsize},
-                        {tokenstring,           Token_string},
-                        {tokenlong,             Token_long},
-                        {md5string,             Md5string},
-                        {md5long,               Md5long},
-                        {dir,                   Dldir},
-                        {file_id,               File_id},
-                        {path,                  Dlpath_ext},
-                        {image_width,           null},
-                        {image_height,          null}
-                    ]),
+
+                    Whpl_image_width    = proplists:get_value(width, Whpl_),
+                    Whpl_image_height   =  proplists:get_value(height, Whpl_),
+
+                    Whpl_gcd = gcd(Whpl_image_width, Whpl_image_height),
+
+                    Aspect_width  = Whpl_image_width / Whpl_gcd,
+                    Aspect_height =  Whpl_image_height / Whpl_gcd,
+
+                    {ok, [{_}]} =
+                        empdb_dao_fileinfo:create(Con, [
+                            {fileinfotype_alias,    filesystem},
+                            {doc_id,                Doc_id},
+                            {owner_id,              Owner_id},
+                            {filetype_id,           Filetype_id},
+                            {'size',                Ulsize},
+                            {tokenstring,           Token_string},
+                            {tokenlong,             Token_long},
+                            {md5string,             Md5string},
+                            {md5long,               Md5long},
+                            {dir,                   Fsdir},
+                            {file_id,               File_id},
+                            {path,                  Fspath_ext},
+                            {aspect_width,          Aspect_width},
+                            {aspect_height,         Aspect_height},
+                            {image_width,           null},
+                            {image_height,          null}
+                        ]),
+                    {ok, [{_}]} =
+                        empdb_dao_fileinfo:create(Con, [
+                            {fileinfotype_alias,    download},
+                            {doc_id,                Doc_id},
+                            {owner_id,              Owner_id},
+                            {filetype_id,           Filetype_id},
+                            {'size',                Ulsize},
+                            {tokenstring,           Token_string},
+                            {tokenlong,             Token_long},
+                            {md5string,             Md5string},
+                            {md5long,               Md5long},
+                            {dir,                   Dldir},
+                            {file_id,               File_id},
+                            {path,                  Dlpath_ext},
+                            {aspect_width,          Aspect_width},
+                            {aspect_height,         Aspect_height},
+                            {image_width,           null},
+                            {image_height,          null}
+                        ]),
                     [
-                        {image_width,  proplists:get_value(width, Whpl_) },
-                        {image_height, proplists:get_value(height, Whpl_)}
+                        {aspect_width,      Aspect_width},
+                        {aspect_height,     Aspect_height},
+                        {image_width,       Whpl_image_width },
+                        {image_height,      Whpl_image_height }
                     ];
                 _ ->
                     [
-                        {image_width, null},
-                        {image_height, null}
+                        {image_width,       null},
+                        {image_height,      null},
+                        {aspect_width,      null},
+                        {aspect_height,     null}
                     ]
             end,
 
@@ -175,61 +195,64 @@ create(Params)->
         %% Создаем описание файла,
         %% который собираемся хранить в файловой системе
         %% -------------------------------------------------------------------
-        {ok, [{Fsfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
-            {fileinfotype_alias,    filesystem},
-            {doc_id,                Doc_id},
-            {owner_id,              Owner_id},
-            {filetype_id,           Filetype_id},
-            {'size',                Ulsize},
-            {tokenstring,           Token_string},
-            {tokenlong,             Token_long},
-            {md5string,             Md5string},
-            {md5long,               Md5long},
-            {dir,                   Fsdir},
-            {file_id,               File_id},
-            {path,                  Fspath_ext}
-            |Whpl
-        ]),
+        {ok, [{Fsfileinfopl}]} =
+            empdb_dao_fileinfo:create(Con, [
+                {fileinfotype_alias,    filesystem},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Ulsize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {dir,                   Fsdir},
+                {file_id,               File_id},
+                {path,                  Fspath_ext}
+                |Whpl
+            ]),
 
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла,
         %% который собираемся отдавать пользователю
         %% -------------------------------------------------------------------
-        {ok, [{Dlfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
-            {fileinfotype_alias,    download},
-            {doc_id,                Doc_id},
-            {owner_id,              Owner_id},
-            {filetype_id,           Filetype_id},
-            {'size',                Ulsize},
-            {tokenstring,           Token_string},
-            {tokenlong,             Token_long},
-            {md5string,             Md5string},
-            {md5long,               Md5long},
-            {dir,                   Dldir},
-            {file_id,               File_id},
-            {path,                  Dlpath_ext}
-            |Whpl
-        ]),
+        {ok, [{Dlfileinfopl}]} =
+            empdb_dao_fileinfo:create(Con, [
+                {fileinfotype_alias,    download},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Ulsize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {dir,                   Dldir},
+                {file_id,               File_id},
+                {path,                  Dlpath_ext}
+                |Whpl
+            ]),
 
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла, который загрузил пользователь.
         %% -------------------------------------------------------------------
-        {ok, [{Ulfileinfopl}]} = empdb_dao_fileinfo:create(Con, [
-            {fileinfotype_alias,    upload},
-            {doc_id,                Doc_id},
-            {owner_id,              Owner_id},
-            {filetype_id,           Filetype_id},
-            {'size',                Ulsize},
-            {tokenstring,           Token_string},
-            {tokenlong,             Token_long},
-            {md5string,             Md5string},
-            {md5long,               Md5long},
-            {file_id,               File_id},
-            {name,                  Ulname}
-            |Whpl
-        ]),
+        {ok, [{Ulfileinfopl}]} =
+            empdb_dao_fileinfo:create(Con, [
+                {fileinfotype_alias,    upload},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Ulsize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {file_id,               File_id},
+                {name,                  Ulname}
+                |Whpl
+            ]),
 %
 %
 %         spawn_link(fun()->
@@ -632,19 +655,79 @@ get_handle_pictures(Con, Phobjs, What, Fields, _, _) ->
     ).
 
 
-%get_picture_size(_, _, What, Fields) ->
+get_handle_picture_param(Phobjpl, What) ->
 
-    %Req_image_width     = proplists:get_value(window_width, What, null),
-    %Req_image_height    = proplists:get_value(window_height, What, null),
+    Phobjpl_aspect_width =
+        proplists:get_value(aspect_width,    Phobjpl, null),
+    Phobjpl_aspect_height =
+        proplists:get_value(aspect_height,  Phobjpl, null),
 
-    %[
-        %{image_width, }
-    %]
 
-get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
+    Req_window_width    =
+        proplists:get_value(window_width,  What, null),
+    Req_window_height   =
+        proplists:get_value(window_height, What, null),
+    Window_hw =
+         case {
+            (Phobjpl_aspect_width / Phobjpl_aspect_height)
+                >
+            (Req_window_width / Req_window_height),
+            (Req_window_width == null)
+                or
+            (Req_window_height == null)
+        } of
+            {_, null}->
+                undefined;
+            {true, _}->
+                window_width;
+            {_, _ }->
+                window_height
+        end,
+    Res_image_width     =
+        proplists:get_value(
+            image_width,
+            What,
+            begin
+                case Window_hw of
+                    window_width ->
+                        Req_window_width;
+                    window_width ->
+                        Phobjpl_aspect_width * Req_window_height / Phobjpl_aspect_height;
+                    _ ->
+                        null
+                end
+            end
+        ),
+    Res_image_height     =
+        proplists:get_value(
+            image_height,
+            What,
+            begin
+                 case Window_hw of
+                    window_width ->
+                        Req_window_width * Phobjpl_aspect_height / Phobjpl_aspect_width ;
+                    window_width ->
+                        Req_window_height;
+                    _ ->
+                        null
+                end
+            end
+        ),
+
+
+
+
+    [
+        {image_width, Res_image_width},
+        {image_height, Res_image_height}
+    ].
+
+get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
 
     File_id = proplists:get_value(file_id, Phobjpl),
 
+
+    What = get_handle_picture_param(Phobjpl, What1),
 
     Req_image_width     = proplists:get_value(image_width, What, null),
     Req_image_height    = proplists:get_value(image_height, What, null),
@@ -841,3 +924,10 @@ md5(Bin) ->
     C2 = erlang:md5_update(C1, Bin),
     C3 = erlang:md5_final(C2),
     C3.
+
+
+gcd(A, 0) ->
+    A;
+gcd(A, B) ->
+    gcd(B, A rem B).
+

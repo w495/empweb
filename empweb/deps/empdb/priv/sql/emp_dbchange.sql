@@ -1675,7 +1675,7 @@
         doc_parent_head         varchar(1024)  default null;
     update event set doc_parent_head =
         (select doc.head from doc where doc.id = doc_parent_id);
-*/
+
 
     alter table perspichead add column
         alias         varchar(1024)  default null;
@@ -1683,3 +1683,34 @@
 
     alter table perspicbody add column
         alias         varchar(1024)  default null;
+
+*/
+
+    alter table fileinfo add column
+        aspect_width  numeric default null;
+
+
+    alter table fileinfo add column
+        aspect_height  numeric default null;
+
+
+    CREATE OR REPLACE FUNCTION gcd( a numeric,  b numeric)
+    RETURNS numeric
+    IMMUTABLE
+    STRICT
+    LANGUAGE SQL
+    AS $$
+    WITH RECURSIVE t(a,b) AS (
+        VALUES (abs($1)::numeric, abs($2)::numeric)
+    UNION ALL
+        SELECT b, mod(a,b) FROM t
+        WHERE b > 0
+    )
+    SELECT a FROM t WHERE b = 0
+    $$;
+
+
+
+    update fileinfo set aspect_width = image_width / (select gcd(image_width, image_height));
+
+    update fileinfo set aspect_height = image_height / (select gcd(image_width, image_height));

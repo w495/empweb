@@ -78,9 +78,12 @@ table({fields, all})->
         filetype_mimesuptype,
         filetype_ext,
 
-        
+
         image_width,
         image_height,
+        aspect_width,
+        aspect_height,
+
 
         tokenlong,
         tokenstring,
