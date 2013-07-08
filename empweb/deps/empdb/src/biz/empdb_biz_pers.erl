@@ -1304,8 +1304,6 @@ login({Uf, Uv}, Params) ->
                                 comm_acctype_id,
                                 read_acctype_alias,
                                 read_acctype_id,
-                                contype_id,
-                                contype_alias,
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
@@ -1338,8 +1336,6 @@ login({Uf, Uv}, Params) ->
                                         comm_acctype_id,
                                         read_acctype_alias,
                                         read_acctype_id,
-                                        contype_id,
-                                        contype_alias,
                                         id
                                     ])) of
                                         {ok, []} -> {ok, [null]};
@@ -1367,8 +1363,6 @@ login({Uf, Uv}, Params) ->
                                 comm_acctype_id,
                                 read_acctype_alias,
                                 read_acctype_id,
-                                contype_id,
-                                contype_alias,
                                 id
                             ])) of
                                 {ok, []} -> {ok, [null]};
@@ -1401,8 +1395,6 @@ login({Uf, Uv}, Params) ->
                                         comm_acctype_id,
                                         read_acctype_alias,
                                         read_acctype_id,
-                                        contype_id,
-                                        contype_alias,
                                         id
                                     ])) of
                                         {ok, []} -> {ok, [null]};

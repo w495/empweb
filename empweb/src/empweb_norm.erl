@@ -75,7 +75,7 @@ fieldtrigger(Params, {F1, F2}, Options) ->
         {_value1, _      } ->
             proplists:delete(F2, Params)
     end.
-    
+
 filter_self(Params) ->
     case {
         proplists:get_value(id, Params),
@@ -116,6 +116,43 @@ norm('get') ->
             nkey        = fields,
             required    = false,
             types       = [normlist([atom])]
+        },
+        #norm_rule{
+            key         = image_width,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+            %default     = null
+        },
+        #norm_rule{
+            key         = image_scale,
+            required    = false,
+            types       = empweb_norm:filter([nullable, float])
+            %default     = null
+        },
+        #norm_rule{
+            key         = window_width,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+            %default     = null
+        }
+
+        #norm_rule{
+            key         = image_height,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+            %default     = null
+        },
+        #norm_rule{
+            key         = image_scale,
+            required    = false,
+            types       = empweb_norm:filter([nullable, float])
+            %default     = null
+        },
+        #norm_rule{
+            key         = window_width,
+            required    = false,
+            types       = empweb_norm:filter([nullable, integer])
+            %default     = null
         }
     ];
 

@@ -189,18 +189,6 @@ handle(_req, #empweb_hap{
                 key         = isforwish,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
-            },
-            #norm_rule{
-                key         = image_width,
-                required    = false,
-                types       = empweb_norm:filter([nullable, integer])
-                %default     = null
-            },
-            #norm_rule{
-                key         = image_height,
-                required    = false,
-                types       = empweb_norm:filter([nullable, integer])
-                %default     = null
             }
             |empweb_norm:norm('get')
         ],
@@ -308,18 +296,6 @@ handle(_req, #empweb_hap{
                 key         = isforwish,
                 required    = false,
                 types       = empweb_norm:filter([nullable, boolean])
-            },
-            #norm_rule{
-                key         = image_width,
-                required    = false,
-                types       = empweb_norm:filter([nullable, integer])
-                %default     = null
-            },
-            #norm_rule{
-                key         = image_height,
-                required    = false,
-                types       = empweb_norm:filter([nullable, integer])
-                %default     = null
             }
             |empweb_norm:norm('get')
         ]),

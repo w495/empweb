@@ -54,18 +54,6 @@ norm('get') ->
             types       = [nullable, integer]
         },
         #norm_rule{
-            key         = image_width,
-            required    = false,
-            types       = empweb_norm:filter([nullable, integer])
-            %default     = null
-        },
-        #norm_rule{
-            key         = image_height,
-            required    = false,
-            types       = empweb_norm:filter([nullable, integer])
-            %default     = null
-        },
-        #norm_rule{
             key         = costume_thingbuy_id,
             required    = false,
             types       = empweb_norm:filter([nullable, integer])

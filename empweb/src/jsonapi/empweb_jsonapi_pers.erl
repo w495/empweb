@@ -309,22 +309,13 @@ handle(Req, #empweb_hap{action=login,  params=Params} = Hap) ->
                 #norm_rule{
                     key = nick,
                     types = [string]
-                },
-                #norm_rule{
-                    key         = image_width,
-                    required    = false,
-                    types       = empweb_norm:filter([nullable, integer])
-                },
-                #norm_rule{
-                    key         = image_height,
-                    required    = false,
-                    types       = empweb_norm:filter([nullable, integer])
                 }
             ]},
             #norm_rule{
                 key = pass,
                 types = [string]
             }
+            |empweb_norm:norm('get')
         ]),
         fun(Data)->
             %% Если login выполнился успешно,

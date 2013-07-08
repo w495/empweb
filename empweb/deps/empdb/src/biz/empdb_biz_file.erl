@@ -631,11 +631,25 @@ get_handle_pictures(Con, Phobjs, What, Fields, _, _) ->
         Phobjs
     ).
 
+
+%get_picture_size(_, _, What, Fields) ->
+
+    %Req_image_width     = proplists:get_value(window_width, What, null),
+    %Req_image_height    = proplists:get_value(window_height, What, null),
+
+    %[
+        %{image_width, }
+    %]
+
 get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
 
     File_id = proplists:get_value(file_id, Phobjpl),
-    Req_width     = proplists:get_value(image_width, What, null),
-    Req_height    = proplists:get_value(image_height, What, null),
+
+
+    Req_image_width     = proplists:get_value(image_width, What, null),
+    Req_image_height    = proplists:get_value(image_height, What, null),
+
+
 
     Options    = proplists:get_value(options, What, []),
 
@@ -644,8 +658,8 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
     case empdb_dao_fileinfo:get(Con, [
         {file_id, File_id},
         {fileinfotype_alias, download},
-        {image_width, Req_width},
-        {image_height, Req_height},
+        {image_width, Req_image_width},
+        {image_height, Req_image_height},
         {limit, 1}
     ]) of
         {ok, []} ->
@@ -665,8 +679,8 @@ get_handle_picture(Con, {Phobjpl}, What, Fields, _, _) ->
                     {doc_id,        Doc_id},
                     {owner_id,      Owner_id},
                     {fileextension, Ext},
-                    {image_width,   Req_width},
-                    {image_height,  Req_height}
+                    {image_width,   Req_image_width},
+                    {image_height,  Req_image_height}
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->
@@ -756,8 +770,8 @@ get_system_picture(Con, What) ->
             [image_width, image_height, file_id, path]
         ),
 
-    Req_width     = proplists:get_value(image_width, What, null),
-    Req_height    = proplists:get_value(image_height, What, null),
+    Req_image_width     = proplists:get_value(image_width, What, null),
+    Req_image_height    = proplists:get_value(image_height, What, null),
 
     case empdb_dao:get([
         {empdb_dao_file, id},
@@ -775,11 +789,11 @@ get_system_picture(Con, What) ->
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %         {'or', [
-            %             {image_width, Req_width},
+            %             {image_width, Req_image_width},
             %             {image_width, null}
             %         ]},
             %         {'or', [
-            %             {image_height, Req_height},
+            %             {image_height, Req_image_height},
             %             {image_height, null}
             %         ]}
             % {image_width, proplists:get_value(image_width,      What, null)},
@@ -793,7 +807,7 @@ get_system_picture(Con, What) ->
 
     ]) of
         {ok,Phobjs} ->
-            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, Req_width, Req_height)};
+            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, Req_image_width, Req_image_height)};
         Error ->
             Error
     end.
