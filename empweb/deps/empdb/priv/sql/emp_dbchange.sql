@@ -1716,12 +1716,7 @@
     update fileinfo set aspect_height = image_height / (select gcd(image_width, image_height));
 
 
+    update fileinfo set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
 
-    select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id where fileinfo.image_width is not null;
-
-    select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id where fileinfo.image_height is not null;
-
-    update fileinfo set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfo.image_width is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfo.image_height is not null limit 1))) where image_width is null;
-
-    update fileinfo set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfo.image_height is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfo.image_height is not null limit 1))) where image_width is null;
+    update fileinfo set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
 

@@ -1,6 +1,9 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add description to biz_user
+%% @copyright 2013 Empire
+%% @author Илья w-495 Никитин
+%% @doc Функции работы с файлами, их загрузки
+%%      и конвертации (для картинок).
+%%
+%%
 -module(empdb_biz_file).
 
 %% ===========================================================================
@@ -8,7 +11,7 @@
 %% ===========================================================================
 
 %%
-%% Структры для работы с запросами к базе данных
+%% Структуры для работы с запросами к базе данных,
 %%
 -include("empdb.hrl").
 
@@ -121,6 +124,23 @@ create(Params)->
 
         File_id = proplists:get_value(id, File),
 
+
+        io:format("~n~n~n ~p ~n~n~n", [
+            [
+                {fileinfotype_alias,    filesystem},
+                {doc_id,                Doc_id},
+                {owner_id,              Owner_id},
+                {filetype_id,           Filetype_id},
+                {'size',                Ulsize},
+                {tokenstring,           Token_string},
+                {tokenlong,             Token_long},
+                {md5string,             Md5string},
+                {md5long,               Md5long},
+                {dir,                   Fsdir},
+                {file_id,               File_id},
+                {path,                  Fspath_ext}
+            ]
+        ]),
 
         Whpl =
             case Filetype_mimesuptype of

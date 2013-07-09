@@ -1,12 +1,7 @@
-%% Author: w-495
-%% Created: 25.07.2012
-%% Description: TODO: Add descr to biz_user
+
+
 -module(empdb_dao_fileinfo).
 -behaviour(empdb_dao).
-
-%%
-%% Include files
-%%
 
 
 -export([
@@ -63,7 +58,6 @@ table({fields, all})->
         path,
         name,
         dir,
-
         owner_id,
         owner_nick,
         doc_id,
