@@ -124,7 +124,7 @@ norm('get') ->
             %default     = null
         },
         #norm_rule{
-            key         = image_scale,
+            key         = image_scale_width,
             required    = false,
             types       = empweb_norm:filter([nullable, float])
             %default     = null
@@ -134,8 +134,7 @@ norm('get') ->
             required    = false,
             types       = empweb_norm:filter([nullable, integer])
             %default     = null
-        }
-
+        },
         #norm_rule{
             key         = image_height,
             required    = false,
@@ -143,15 +142,21 @@ norm('get') ->
             %default     = null
         },
         #norm_rule{
-            key         = image_scale,
+            key         = image_scale_height,
             required    = false,
             types       = empweb_norm:filter([nullable, float])
             %default     = null
         },
         #norm_rule{
-            key         = window_width,
+            key         = window_height,
             required    = false,
             types       = empweb_norm:filter([nullable, integer])
+            %default     = null
+        },
+        #norm_rule{
+            key         = image_scale,
+            required    = false,
+            types       = empweb_norm:filter([nullable, float])
             %default     = null
         }
     ];

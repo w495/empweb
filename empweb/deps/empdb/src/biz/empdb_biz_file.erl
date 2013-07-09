@@ -122,21 +122,27 @@ create(Params)->
         File_id = proplists:get_value(id, File),
 
 
-
-        %%% DEGUG: %%% io:format("~n~nFspath = ~p~n~n", [Fspath_full]),
         Whpl =
             case Filetype_mimesuptype of
                 <<"image">> ->
+                    %%
+                    %% Только для изображений
+                    %%
                     Whpl_ = gm:identify(Fspath_full, [width, height]),
 
-                    Whpl_image_width    = proplists:get_value(width, Whpl_),
-                    Whpl_image_height   =  proplists:get_value(height, Whpl_),
+                    Whpl_image_width    =
+                        proplists:get_value(width, Whpl_),
+                    Whpl_image_height   =
+                        proplists:get_value(height, Whpl_),
+                    Whpl_gcd =
+                        gcd(Whpl_image_width, Whpl_image_height),
+                    Aspect_width  = Whpl_image_width  / Whpl_gcd,
+                    Aspect_height = Whpl_image_height / Whpl_gcd,
 
-                    Whpl_gcd = gcd(Whpl_image_width, Whpl_image_height),
-
-                    Aspect_width  = Whpl_image_width / Whpl_gcd,
-                    Aspect_height =  Whpl_image_height / Whpl_gcd,
-
+                    %%
+                    %% Создаем запись для запроса
+                    %% на оригинальное изображение.
+                    %%
                     {ok, [{_}]} =
                         empdb_dao_fileinfo:create(Con, [
                             {fileinfotype_alias,    filesystem},
@@ -156,6 +162,10 @@ create(Params)->
                             {image_width,           null},
                             {image_height,          null}
                         ]),
+                    %%
+                    %% Создаем запись для запроса
+                    %% на оригинальное изображение.
+                    %%
                     {ok, [{_}]} =
                         empdb_dao_fileinfo:create(Con, [
                             {fileinfotype_alias,    download},
@@ -253,44 +263,6 @@ create(Params)->
                 {name,                  Ulname}
                 |Whpl
             ]),
-%
-%
-%         spawn_link(fun()->
-%             lists:map(
-%                 fun({W, H})->
-%                     spawn_link(fun()->
-%                         create_copy([
-%                             {fs_path_full,  Fspath_full},
-%                             {file_id,       File_id},
-%                             {doc_id,        Doc_id},
-%                             {owner_id,      Owner_id},
-%                             {fileextension, Ulext},
-%                             {image_width,   W},
-%                             {image_height,  H},
-%                             {ul_name,       Ulname}
-%                         ])
-%                     end),
-%                     spawn_link(fun()->
-%                         create_copy([
-%                             {fs_path_full,  Fspath_full},
-%                             {file_id,       File_id},
-%                             {doc_id,        Doc_id},
-%                             {owner_id,      Owner_id},
-%                             {fileextension, Ulext},
-%                             {image_width,   erlang:trunc(W*0.98)},
-%                             {image_height,  erlang:trunc(H*0.98)},
-%                             {ul_name,       Ulname}
-%                         ])
-%                     end)
-%                 end,
-%                 [
-%                     {320, 240},
-%                     {480, 320},
-%                     {220, 176},
-%                     {128, 128}
-%                 ]
-%             )
-%         end),
 
         case proplists:get_value(isres,   Params, null) of
             true ->
@@ -338,6 +310,10 @@ gm_convert_geometry(W, H) ->
         ])
     }.
 
+
+%%%
+%%% @doc Приводит к нужным размерам, растягивая или сжимая картинку
+%%%
 gm_convert_geometry(
     Orig_fs_path_full,
     Fspath_full,
@@ -361,6 +337,9 @@ gm_convert_geometry(
             )
     end.
 
+%%%
+%%% @doc Обрезает лишнее, и приводит к нужным размерам,
+%%%
 gm_convert_tge(
     Orig_fs_path_full,
     Fspath_full,
@@ -658,7 +637,7 @@ get_handle_pictures(Con, Phobjs, What, Fields, _, _) ->
 get_handle_picture_param(Phobjpl, What) ->
 
     Phobjpl_aspect_width =
-        proplists:get_value(aspect_width,    Phobjpl, null),
+        proplists:get_value(aspect_width,   Phobjpl, null),
     Phobjpl_aspect_height =
         proplists:get_value(aspect_height,  Phobjpl, null),
 
@@ -667,22 +646,29 @@ get_handle_picture_param(Phobjpl, What) ->
         proplists:get_value(window_width,  What, null),
     Req_window_height   =
         proplists:get_value(window_height, What, null),
+
     Window_hw =
-         case {
-            (Phobjpl_aspect_width / Phobjpl_aspect_height)
-                >
-            (Req_window_width / Req_window_height),
-            (Req_window_width == null)
-                or
-            (Req_window_height == null)
-        } of
-            {_, null}->
-                undefined;
-            {true, _}->
-                window_width;
-            {_, _ }->
-                window_height
+        case
+            (Req_window_width       == null) or
+            (Req_window_height      == null) or
+            (Phobjpl_aspect_width   == null) or
+            (Phobjpl_aspect_height  == null)
+        of
+            false ->
+                case
+                    (Phobjpl_aspect_width / Phobjpl_aspect_height)
+                        >
+                    (Req_window_width / Req_window_height)
+                of
+                    true->
+                        window_width;
+                    _->
+                        window_height
+                end;
+            _ ->
+                undefined
         end,
+
     Res_image_width     =
         proplists:get_value(
             image_width,
@@ -691,8 +677,12 @@ get_handle_picture_param(Phobjpl, What) ->
                 case Window_hw of
                     window_width ->
                         Req_window_width;
-                    window_width ->
-                        Phobjpl_aspect_width * Req_window_height / Phobjpl_aspect_height;
+                    window_height ->
+                        erlang:trunc(
+                            Phobjpl_aspect_width *
+                            Req_window_height /
+                            Phobjpl_aspect_height
+                        );
                     _ ->
                         null
                 end
@@ -705,17 +695,18 @@ get_handle_picture_param(Phobjpl, What) ->
             begin
                  case Window_hw of
                     window_width ->
-                        Req_window_width * Phobjpl_aspect_height / Phobjpl_aspect_width ;
-                    window_width ->
+                        erlang:trunc(
+                            Req_window_width *
+                            Phobjpl_aspect_height /
+                            Phobjpl_aspect_width
+                        );
+                    window_height ->
                         Req_window_height;
                     _ ->
                         null
                 end
             end
         ),
-
-
-
 
     [
         {image_width, Res_image_width},
@@ -753,6 +744,9 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
             Doc_id   = proplists:get_value(doc_id,       Phobjpl, null),
             Owner_id = proplists:get_value(owner_id,     Phobjpl, null),
             Ext      = proplists:get_value(filetype_ext, Phobjpl, <<>>),
+            Req_gcd         = gcd(Req_image_width, Req_image_height),
+            Aspect_width    = erlang:trunc(Req_image_width / Req_gcd),
+            Aspect_height   = erlang:trunc(Req_image_height / Req_gcd),
             {ok, [{Copypl}]} =
                 empdb_biz_file:create_copy_worker([
                     {connection,    Con},
@@ -763,7 +757,9 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
                     {owner_id,      Owner_id},
                     {fileextension, Ext},
                     {image_width,   Req_image_width},
-                    {image_height,  Req_image_height}
+                    {image_height,  Req_image_height},
+                    {aspect_width,  Aspect_width},
+                    {aspect_height, Aspect_height}
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->

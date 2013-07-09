@@ -1518,7 +1518,14 @@ login({Uf, Uv}, Params) ->
                                 Perspicphotofields =
                                     lists:append([
                                         empdb_dao_doc:table({fields, select}),
-                                        [image_width, image_height, file_id, path]
+                                        [
+                                            image_width,
+                                            image_height,
+                                            aspect_width,
+                                            aspect_height,
+                                            file_id,
+                                            path
+                                        ]
                                     ]),
                                 Req_width     = proplists:get_value(image_width, Params, null),
                                 Req_height    = proplists:get_value(image_height, Params, null),
@@ -1540,10 +1547,7 @@ login({Uf, Uv}, Params) ->
                                         {'file.id',             Perspicphoto_id}
                                     ]) of
                                         {ok,Phobjs} ->
-                                            What = [
-                                                {image_width,   Req_width},
-                                                {image_height,  Req_height}
-                                            ],
+                                            What = Params,
                                             {ok, empdb_biz_file:get_handle_pictures(
                                                 Con,
                                                 Phobjs,
