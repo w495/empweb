@@ -11,7 +11,7 @@
        ]).
 
 %% =====================================================
-%% API
+%% APIpart_to_tuple
 %% =====================================================
 
 %% Explicit Identify
@@ -41,7 +41,7 @@ identify(File, Options) ->
     {error, Msg}  -> {error, Msg};
     no_error      -> parse_identify_explicit(Result)
   end.
-  
+
 %% Convert
 convert(File, Converted, Options) ->
   Template = "convert {{options}} :input_file :output_file",
@@ -87,9 +87,14 @@ kv_string(Option) ->
 
 %% Convert an identify -format response to a list of k/v pairs
 part_to_tuple(X) ->
-  [K,V] = re:split(X, ": ", [{return, list}]),
+    part_to_tuple_x(re:split(X, ": ", [{return, list}])).
+
+part_to_tuple_x([K,V]) ->
   K1 = list_to_atom(K),
-  {K1, converted_value(K1, V)}.
+  {K1, converted_value(K1, V)};
+
+part_to_tuple_x(_) ->
+  {type, noimage}.
 
 %% Conversions for passed options
 
@@ -140,7 +145,7 @@ bind_data(Template, [{Key, Value}|Rest], Options) ->
   end,
   NewTemplate = re:replace(Template, Search, Replace, [{return, list}]),
   bind_data(NewTemplate, Rest, Options);
-  
+
 bind_data(Template, [], _Options) ->
   Template.
 
@@ -165,7 +170,7 @@ parse_error(Cmd, [{ErrorDescription, Error}|Errors]) ->
     _ ->
       parse_error(Cmd, Errors)
   end.
-    
+
 %% Return ok if successful, otherwise return a useful error
 parse_result(Result) ->
   case cmd_error(Result) of

@@ -148,7 +148,9 @@ create(Params)->
                     %%
                     %% Только для изображений
                     %%
-                    Whpl_ = gm:identify(Fspath_full, [width, height]),
+                    Whpl_ = gm:identify(Fspath_full, [width, height, type]),
+
+                    io:format("~n~n~n Whpl_ = ~p ~n~n~n", [Whpl_]),
 
                     Whpl_image_width    =
                         proplists:get_value(width, Whpl_),
