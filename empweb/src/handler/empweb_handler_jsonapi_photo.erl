@@ -72,6 +72,7 @@ handle(Req, State) ->
 
     {Empweb_resp, Reqres}  =
         case empweb_http:method(Req) of
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {<<"POST">>, Req1} ->
                 handle_post(Req1, State);
             {_, Req1} ->
@@ -110,6 +111,7 @@ handle_post(Req, State) ->
         {Pbody, Req1} ->
             %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             %%% DEGUG: %%% io:format("~n~n~n ~p  ~n~n~n", [Req1]),
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             handle_body(Req1, Pbody, State)
     end.
 
@@ -138,9 +140,9 @@ handle_body(Req, Pbody, State) ->
                     {fileextension, Fileextension}
                 ]
             },
-            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {
                 empweb_jsonapi:fname(
                     empweb_jsonapi:resp(

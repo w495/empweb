@@ -26,8 +26,11 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 create(Params)->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     %io:format("------------------------------------ = ~p = --------------------", [Params]),
-    empdb_biz_file:create(Params).
+    Res = empdb_biz_file:create(Params),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    Res.
 
 update(Params)->
     empdb_biz_file:update(Params).

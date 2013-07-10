@@ -49,6 +49,8 @@ create(Params)->
     Fsdir = ?EMPDB_BIZ_FILE_FSDIR,
     Dldir = ?EMPDB_BIZ_FILE_DLDIR,
 
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     %%%% DEGUG: %%% io:format("~n~n~nParams = ~p ~n~n~n", [proplists:delete(filebody, Params)]),
 
 
@@ -97,6 +99,8 @@ create(Params)->
     Md5long =
         erlang:list_to_integer(erlang:binary_to_list(Md5string), 16),
 
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     empdb_dao:with_transaction(fun(Con)->
         %% -------------------------------------------------------------------
         %% Выбираем тип файла.
@@ -141,6 +145,8 @@ create(Params)->
                 {path,                  Fspath_ext}
             ]
         ]),
+
+        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         Whpl =
             case Filetype_mimesuptype of
@@ -222,6 +228,8 @@ create(Params)->
                     ]
             end,
 
+        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла,
@@ -244,6 +252,7 @@ create(Params)->
                 |Whpl
             ]),
 
+        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла,
@@ -266,6 +275,7 @@ create(Params)->
                 |Whpl
             ]),
 
+        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла, который загрузил пользователь.
@@ -285,6 +295,9 @@ create(Params)->
                 {name,                  Ulname}
                 |Whpl
             ]),
+
+
+        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         case proplists:get_value(isres,   Params, null) of
             true ->

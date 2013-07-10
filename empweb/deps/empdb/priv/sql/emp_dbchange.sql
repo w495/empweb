@@ -1711,12 +1711,515 @@
 
 
 
-    update fileinfo set aspect_width = image_width / (select gcd(image_width, image_height));
-
-    update fileinfo set aspect_height = image_height / (select gcd(image_width, image_height));
-
 
     update fileinfo set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
 
     update fileinfo set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
 
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+create sequence seq_static_ti;
+
+select setval('seq_static_ti',  1000000);
+select setval('seq_tr_id',      1000000);
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'enter',  'enter',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'вход','enter',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+----
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'registration',  'registration',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'регистрация','registration',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'recover personage',  'recover_personage',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'восстановление персонажа','recover_personage',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'language',  'language',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'язык','language',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'help',  'help',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'помощь','help',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'invite friend',  'invite_friend',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'пригласить друга','invite_friend',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'official site',  'official_site',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'официальный сайт','official_site',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'exit',  'exit',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'выход','exit',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'nick',  'nick',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'имя','nick',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'password',  'password',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'пароль','password',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'remember me',  'remember_me',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'запомнить','remember_me',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'remember me',  'remember_me',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'запомнить','remember_me',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'ok',  'ok',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'ok','ok',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'back',  'back',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'назад','back',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'confirm',  'confirm',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'повтор',   'confirm',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'male',  'male',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'мужской',   'male',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'female',  'female',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'женский',   'female',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'email',  'email',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'электропочта',   'email',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'phone',  'phone',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'телефон',   'phone',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'english',  'english',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'английский',   'english',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'russian',  'russian',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'русский',   'russian',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'has joined country',  'has_joined_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'присоединился к стране',   'has_joined_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'say',  'say',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'сказать',   'say',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'chat menu',  'chat_menu',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'меню чата',   'chat_menu',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'has joined country',  'has_joined_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'присоединился к стране',   'has_joined_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'say',  'say',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'сказать',   'say',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'chat menu',  'chat_menu',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'меню чата',   'chat_menu',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+
+/*
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'profile',  'profile',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'профиль',   'profile',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+SELECT nextval('seq_static_ti');
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'my info',  'my_info',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'мое инфо',   'my_info',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'go to country',  'goto_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'перейти в страну',   'goto_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+
+insert into tr (text, ta, ti, lang_id, trtype_id)
+    values
+        (   'go to country',  'goto_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='en_gb'),
+            (select id from trtype where alias='static')
+        ),
+        (   'перейти в страну',   'goto_country',
+            (select currval('seq_static_ti')),
+            (select id from lang where alias='ru_ru'),
+            (select id from trtype where alias='static')
+        );
+
+*/
