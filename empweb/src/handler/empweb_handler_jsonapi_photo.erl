@@ -130,7 +130,7 @@ handle_body(Req, Pbody, State) ->
                 contentdisposition = Contentdisposition,
                 contenttype = Contenttype
             }], Req1} ->
-                %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
                 Fullbody = list_to_binary(lists:reverse(Body)),
                 Hap =  State#state.empweb_hap#empweb_hap{
                     handler         = empweb_jsonapi_file,
@@ -192,7 +192,8 @@ handle_part(Req, Acc, State) ->
     acc_part(Req2, Acc, Result, State).
 
 acc_part(Req, Acc, {headers, Headers}, State) ->
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     Contentdisposition =
         proplists:get_value(<<"content-disposition">>, Headers),
     Contenttype   =
@@ -220,7 +221,7 @@ acc_part(Req, Acc, {headers, Headers}, State) ->
         filename=Filename,
         fileextension = Fileextension
     },
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     handle_part(Req, [Partstate|Acc], State);
 
 acc_part(
@@ -234,7 +235,7 @@ acc_part(
     {body, Data},
     State
 ) ->
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     %% Здесь можно сразу писать в файл.
     %% Дописывать Data в его конец.
     %% Но это может оказаться не очень эффективно.
@@ -264,7 +265,7 @@ acc_part(
     end_of_part,
     State
 ) ->
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fullbody = list_to_binary(lists:reverse(Body)),
     Hap =  State#state.empweb_hap#empweb_hap{
         handler         = empweb_jsonapi_file,
@@ -279,7 +280,7 @@ acc_part(
         ]
     },
     {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-    %% %%% DEGUG: %%% io:format("Fileinfo = ~p~n", [Fileinfo]),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     handle_part(
         Req1,
         [   Partstate#partstate{
@@ -293,10 +294,9 @@ acc_part(
     );
 
 acc_part(Req, Acc, eof, State) ->
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
     {lists:reverse(Acc), Req};
 
 acc_part(Req, Acc, Result, State) ->
-    %%% DEGUG: %%% io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
-    %%% DEGUG: %%% io:format("~n~n~n ~p~n~n~n ~p~n~n~n ~p~n~n~n ~p", [Req, Acc, Result, State]),
+    io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
     {<<>>, Req}.
