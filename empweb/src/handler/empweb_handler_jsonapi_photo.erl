@@ -145,7 +145,7 @@ handle_body(Req, Pbody, State) ->
                     ]
                 },
                 io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-                {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
+                {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req1, Hap, <<"upload_file">>),
                 io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
                 {
                     empweb_jsonapi:fname(
@@ -268,32 +268,7 @@ acc_part(
     State
 ) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    Fullbody = list_to_binary(lists:reverse(Body)),
-    Hap =  State#state.empweb_hap#empweb_hap{
-        handler         = empweb_jsonapi_file,
-        action          = create,
-        params          = [
-            {isres,         false},
-            {filebody,      Fullbody},
-            {filename,      Filename},
-            {nchanks,       Nchanks},
-            {contenttype,   Contenttype},
-            {fileextension, Fileextension}
-        ]
-    },
-    {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    handle_part(
-        Req1,
-        [   Partstate#partstate{
-                fileinfo    =   Fileinfo,
-                body        =   [],
-                nchanks     =   Nchanks + 1
-            }
-            |Acc
-        ],
-        State
-    );
+    {lists:reverse(Acc), Req};
 
 acc_part(Req, Acc, eof, State) ->
     io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
