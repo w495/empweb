@@ -186,9 +186,10 @@ handle_body(Req, Pbody, State) ->
 
 handle_part(Req, Acc, State) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-
     %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     {Result, Req2} = empweb_http:multipart_data(Req),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     %%%% DEGUG: %%% io:format("~n~n~n ~p in ~p {Acc, Result, State} = ~p ~n~n~n", [?MODULE, ?LINE, {Acc, Result, State}]),
     acc_part(Req2, Acc, Result, State).
