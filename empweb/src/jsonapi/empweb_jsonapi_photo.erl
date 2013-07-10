@@ -67,6 +67,7 @@ init(_, Req, #empweb_hap{
         {pers_id,           Pid},
         {pers_perm_names,   Pns}
     ]}, <<" = Hap">>),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
     {ok,
         Req,

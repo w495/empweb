@@ -68,6 +68,8 @@ init(_, Req, #empweb_hap{
         {pers_perm_names,   Pns}
     ]}, <<" = Hap">>),
 
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     {ok,
         Req,
         #empweb_hap{
@@ -83,22 +85,26 @@ handle(_req, #empweb_hap{
         action=create, params=Params, pers_id=Pers_id
     } = Hap) ->
     ?evman_args([Hap], <<" = create file">>),
-    {ok,
-        empweb_jsonapi:resp(
-            empweb_biz_file:create([
-                {owner_id,
-                    case Pers_id of
-                        undefined ->
-                            -100500;
-                        _ ->
-                            Pers_id
-                    end
-                }
-                |Params
-            ])
-        ),
-        Hap
-    };
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    Res =
+        {ok,
+            empweb_jsonapi:resp(
+                empweb_biz_file:create([
+                    {owner_id,
+                        case Pers_id of
+                            undefined ->
+                                -100500;
+                            _ ->
+                                Pers_id
+                        end
+                    }
+                    |Params
+                ])
+            ),
+            Hap
+        },
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    Res;
 
 handle(_req, #empweb_hap{
         action=Action, params=Params, is_auth=Is_auth, pers_id=Pers_id
