@@ -134,7 +134,7 @@
 -type send_chunk_fun() :: fun((iodata()) -> ok | {error, atom()}).
 -type resp_chunked_fun() :: fun((send_chunk_fun()) -> ok).
 
--define(COWBOY_RECV_TIMEOUT, 5000000).
+-define(COWBOY_RECV_TIMEOUT, 30000).
 
 
 -record(http_req, {
@@ -865,11 +865,11 @@ multipart_data(Req, 0, eof) ->
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         _Length, eof) ->
-    io:format("~n eof ~p in ~p  _Length = ~p ~n", [?MODULE, ?LINE, _Length]),
+    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
     %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-    Transport:recv(Socket, 0, 5000),
+    Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
