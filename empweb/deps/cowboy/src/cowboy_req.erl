@@ -811,6 +811,8 @@ body_qs(MaxBodyLength, Req) ->
     -> {headers, cowboy:http_headers(), Req} | {body, binary(), Req}
         | {end_of_part | eof, Req} when Req::req().
 multipart_data(Req=#http_req{body_state=waiting}) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     %%% DEGUG: %%% io:format("~n ~p in ~p ~n ~p ~n", [?MODULE, ?LINE, Req]),
 
 
@@ -833,15 +835,21 @@ multipart_data(Req=#http_req{body_state=waiting}) ->
     multipart_data(Req3, Length, {more, cowboy_multipart:parser(Boundary)});
 
 multipart_data(Req=#http_req{multipart={Length, Cont}}) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
 
     multipart_data(Req, Length, Cont());
 
 multipart_data(Req=#http_req{body_state=done}) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {eof, Req}.
 
 multipart_data(Req, Length, {headers, Headers, Cont}) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {headers, Headers, Req#http_req{multipart={Length, Cont}}};
 
@@ -850,10 +858,12 @@ multipart_data(Req, Length, {body, Data, Cont}) ->
     {body, Data, Req#http_req{multipart={Length, Cont}}};
 
 multipart_data(Req, Length, {end_of_part, Cont}) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {end_of_part, Req#http_req{multipart={Length, Cont}}};
 
 multipart_data(Req, 0, eof) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {eof, Req#http_req{body_state=done, multipart=undefined}};
 
@@ -865,6 +875,7 @@ multipart_data(Req, 0, eof) ->
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         _Length, eof) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     io:format("~n ~p in ~p _Length = ~w ~n", [?MODULE, ?LINE, _Length]),
     %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
@@ -877,12 +888,11 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport},
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
     %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-
-    io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
 
     %Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
 
@@ -891,6 +901,8 @@ multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
 
 multipart_data(Req, Length, {more, Parser}) when Length > 0 ->
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+
     case stream_body(Req) of
         {ok, << Data:Length/binary, Buffer/binary >>, Req2} ->
             multipart_data(Req2#http_req{buffer=Buffer}, 0, Parser(Data));
