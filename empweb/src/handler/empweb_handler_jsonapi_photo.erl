@@ -72,8 +72,9 @@ handle(Req, State) ->
 
     {Empweb_resp, Reqres}  =
         case empweb_http:method(Req) of
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {<<"POST">>, Req1} ->
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
                 handle_post(Req1, State);
             {_, Req1} ->
                 {empweb_jsonapi:method_not_allowed(), Req1}
