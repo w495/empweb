@@ -299,6 +299,8 @@ acc_part(
         %Req2
     %};
 
+    io:format("~n~n~n end_of_part ~n~n~n", []),
+
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     Fullbody = list_to_binary(lists:reverse(Body)),
     Hap =  State#state.empweb_hap#empweb_hap{
@@ -314,10 +316,8 @@ acc_part(
         ]
     },
     {Fileinfo, Req1} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-
-
-    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-    {
+    handle_part(
+        Req1,
         [   Partstate#partstate{
                 fileinfo    =   Fileinfo,
                 body        =   [],
@@ -325,23 +325,15 @@ acc_part(
             }
             |Acc
         ],
-        Req1
-    };
-
-    %handle_part(
-        %Req1,
-        %[   Partstate#partstate{
-                %fileinfo    =   Fileinfo,
-                %body        =   [],
-                %nchanks     =   Nchanks + 1
-            %}
-            %|Acc
-        %],
-        %State
-    %);
+        State
+    );
 
 acc_part(Req, Acc, eof, State) ->
     io:format("~n~n~n ~p in ~p  ~n~n~n", [?MODULE, ?LINE]),
+
+    io:format("~n~n~n eof ~n~n~n", []),
+
+
     {lists:reverse(Acc), Req};
 
 acc_part(Req, Acc, Result, State) ->
