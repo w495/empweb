@@ -122,5 +122,5 @@ handle(_req, #empweb_hap{
 
 
 terminate(_req, Hap)->
-    ?evman_args([Hap], <<" = terminate">>),
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
     ok.

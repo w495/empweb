@@ -117,6 +117,8 @@ handle_post(Req, State) ->
     end.
 
 handle_body(Req, Pbody, State) ->
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
     case acc_part(Req, [], Pbody, State) of
         {[#partstate{
             fileinfo    =   undefined,
@@ -155,24 +157,30 @@ handle_body(Req, Pbody, State) ->
             };
         {[#partstate{fileinfo=Empweb_resp}], Req1} ->
             %% %%% DEGUG: %%% io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
+             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
             {Empweb_resp, Req1};
 
         {Partstates, Req1} ->
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+
             %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            {
-                empweb_jsonapi:fname(empweb_jsonapi:resp(
-                    {ok,
-                        lists:foldl(
-                            fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
-                                [{proplists:delete(fname, Bpl)}|Acc]
-                            end,
-                            [],
-                            Partstates
-                        )
-                    }
-                ), <<"upload_file">>),
-                Req1
-            }
+            Res =
+                {
+                    empweb_jsonapi:fname(empweb_jsonapi:resp(
+                        {ok,
+                            lists:foldl(
+                                fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
+                                    [{proplists:delete(fname, Bpl)}|Acc]
+                                end,
+                                [],
+                                Partstates
+                            )
+                        }
+                    ), <<"upload_file">>),
+                    Req1
+                },
+            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+            Res
     end.
 
 handle_part(Req, Acc, State) ->
