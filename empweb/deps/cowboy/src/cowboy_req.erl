@@ -867,35 +867,17 @@ multipart_data(Req, 0, eof) ->
     %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
     {eof, Req#http_req{body_state=done, multipart=undefined}};
 
-%multipart_data(Req=#http_req{socket=Socket, transport=Transport},
-        %Length, eof) ->
-    %%% We just want to skip so no need to stream data here.
-    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-    %{eof, Req#http_req{body_state=done, multipart=undefined}};
-
-multipart_data(Req=#http_req{socket=Socket, transport=Transport},
-        _Length, eof) ->
-    io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
-    io:format("~n ~p in ~p _Length = ~w ~n", [?MODULE, ?LINE, _Length]),
-    %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
-    %% We just want to skip so no need to stream data here.
-    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-
-    %spawn(fun()->
-        %Transport:recv(Socket, _Length, ?COWBOY_RECV_TIMEOUT),
-    %end)
-
+multipart_data(Req, 0, Some) ->
+    io:format("multipart_data: ~n ~p in ~p Some = ~p ~n", [?MODULE, ?LINE, Some]),
     {eof, Req#http_req{body_state=done}};
 
-multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
+multipart_data(Req=#http_req{socket=Socket, transport=Transport},
+        Length, eof) ->
     io:format("multipart_data: ~n ~p in ~p  ~n", [?MODULE, ?LINE]),
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p Length = ~w ~n", [?MODULE, ?LINE, Length]),
     %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
-    %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-
-    %Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
-
+    {ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
     {eof, Req#http_req{body_state=done}};
 
 
