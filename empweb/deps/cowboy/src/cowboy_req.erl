@@ -865,11 +865,15 @@ multipart_data(Req, 0, eof) ->
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport},
         _Length, eof) ->
-    %%% DEGUG: %%% io:format("~n ~p in ~p  ~n", [?MODULE, ?LINE]),
+    io:format("~n ~p in ~p _Length = ~w ~n", [?MODULE, ?LINE, _Length]),
     %% %%% DEGUG: %%% io:format("~n~n 8 ~n~n"),
     %% We just want to skip so no need to stream data here.
     %{ok, _Data} = Transport:recv(Socket, Length, ?COWBOY_RECV_TIMEOUT),
-    Transport:recv(Socket, 0, ?COWBOY_RECV_TIMEOUT),
+
+    %spawn(fun()->
+        %Transport:recv(Socket, _Length, ?COWBOY_RECV_TIMEOUT),
+    %end)
+
     {eof, Req#http_req{body_state=done}};
 
 multipart_data(Req=#http_req{socket=Socket, transport=Transport}, 0, _) ->
