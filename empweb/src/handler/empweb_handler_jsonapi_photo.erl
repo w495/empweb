@@ -119,69 +119,70 @@ handle_post(Req, State) ->
 handle_body(Req, Pbody, State) ->
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
-    case acc_part(Req, [], Pbody, State) of
-        {[#partstate{
-            fileinfo    =   undefined,
-            body        =   Body,
-            nchanks     =   Nchanks,
-            filename    =   Filename,
-            fileextension = Fileextension,
-            contentdisposition = Contentdisposition,
-            contenttype = Contenttype
-        }], Req1} ->
-            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            Fullbody = list_to_binary(lists:reverse(Body)),
-            Hap =  State#state.empweb_hap#empweb_hap{
-                handler         = empweb_jsonapi_file,
-                action          = create,
-                params          = [
-                    {isres,         false},
-                    {filebody,      Fullbody},
-                    {filename,      Filename},
-                    {nchanks,       Nchanks},
-                    {contenttype,   Contenttype},
-                    {fileextension, Fileextension}
-                ]
-            },
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            {
-                empweb_jsonapi:fname(
-                    empweb_jsonapi:resp(
-                        {ok,Bpl}
-                    ),
-                    <<"upload_file">>
-                ),
-                Req2
-            };
-        {[#partstate{fileinfo=Empweb_resp}], Req1} ->
-            %% %%% DEGUG: %%% io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
-             io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            {Empweb_resp, Req1};
-
-        {Partstates, Req1} ->
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-
-            %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            Res =
-                {
-                    empweb_jsonapi:fname(empweb_jsonapi:resp(
-                        {ok,
-                            lists:foldl(
-                                fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
-                                    [{proplists:delete(fname, Bpl)}|Acc]
-                                end,
-                                [],
-                                Partstates
-                            )
-                        }
-                    ), <<"upload_file">>),
-                    Req1
+    XXX =
+        case acc_part(Req, [], Pbody, State) of
+            {[#partstate{
+                fileinfo    =   undefined,
+                body        =   Body,
+                nchanks     =   Nchanks,
+                filename    =   Filename,
+                fileextension = Fileextension,
+                contentdisposition = Contentdisposition,
+                contenttype = Contenttype
+            }], Req1} ->
+                %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                Fullbody = list_to_binary(lists:reverse(Body)),
+                Hap =  State#state.empweb_hap#empweb_hap{
+                    handler         = empweb_jsonapi_file,
+                    action          = create,
+                    params          = [
+                        {isres,         false},
+                        {filebody,      Fullbody},
+                        {filename,      Filename},
+                        {nchanks,       Nchanks},
+                        {contenttype,   Contenttype},
+                        {fileextension, Fileextension}
+                    ]
                 },
-            io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
-            Res
-    end.
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                {#empweb_resp{body = {Bpl}}, Req2} = empweb_jsonapi:call(Req, Hap, <<"upload_file">>),
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                {
+                    empweb_jsonapi:fname(
+                        empweb_jsonapi:resp(
+                            {ok,Bpl}
+                        ),
+                        <<"upload_file">>
+                    ),
+                    Req2
+                };
+            {[#partstate{fileinfo=Empweb_resp}], Req1} ->
+                %% %%% DEGUG: %%% io:format("~n~n~n ~p in ~p Empweb_resp = ~p ~n~n~n", [?MODULE, ?LINE, Empweb_resp]),
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                {Empweb_resp, Req1};
+            {Partstates, Req1} ->
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                Res =
+                    {
+                        empweb_jsonapi:fname(empweb_jsonapi:resp(
+                            {ok,
+                                lists:foldl(
+                                    fun(#partstate{fileinfo=#empweb_resp{body = {Bpl}}}, Acc)->
+                                        [{proplists:delete(fname, Bpl)}|Acc]
+                                    end,
+                                    [],
+                                    Partstates
+                                )
+                            }
+                        ), <<"upload_file">>),
+                        Req1
+                    },
+                io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+                Res
+        end,
+    io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+    XXX.
 
 handle_part(Req, Acc, State) ->
     %%% DEGUG: %%% io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
