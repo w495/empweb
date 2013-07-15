@@ -12,34 +12,6 @@ dispatch()->
     [
         {'_', [
 
-            %{   [<<"jsonapi">>, <<"photo">>, <<"upload">>],
-                %empweb_handler_jsonapi_photo,
-                %[   {action, upload},
-                    %{path, <<"priv/files/photo">>}
-                %]
-            %},
-
-            %{   [<<"jsonapi">>, <<"photo">>, <<"upload">>, <<"demo">>],
-                %empweb_handler_jsonapi_photo_demo,
-                %[   {action, upload},
-                    %{path, <<"priv/files/photo">>}
-                %]
-            %},
-
-            %{   [<<"jsonapi">>, <<"res">>, <<"upload">>],
-                %empweb_handler_jsonapi_res,
-                %[   {action, upload},
-                    %{path, <<"priv/files/photo">>}
-                %]
-            %},
-
-            %{   [<<"jsonapi">>, <<"photo">>, '...'],
-                %empweb_handler_static, [{path, <<"deps/empdb/priv/data/">>}, {is_auth, true}]
-            %},
-
-            %{   [<<"jsonapi">>, <<"res">>, '...'],
-                %empweb_handler_static, [{path, <<"priv/data/res/">>}, {is_auth, true}]
-            %},
 
 
             {   <<"/jsonapi/photo/upload">>,
@@ -60,6 +32,13 @@ dispatch()->
                 empweb_handler_jsonapi_res,
                 [   {action, upload},
                     {path, <<"priv/files/photo">>}
+                ]
+            },
+            {   <<"/jsonapi/res/[...]">>,
+                empweb_handler_static,
+                [
+                    {path, <<"priv/data/res/">>},
+                    {is_auth, true}
                 ]
             },
             {   <<"/jsonapi">>,
