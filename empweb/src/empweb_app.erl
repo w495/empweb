@@ -31,24 +31,25 @@ start(_Type, _Args) ->
         [{env, [{dispatch, Dispatch}]}]
     ] end),
 
+    start_listener(https, start_https, fun(Config)->[
+        % nbacceptors
+        proplists:get_value(nbacceptors,Config,?EMPWEB_NBACCEPTORS_DEF),
+        % transopts
+        [
+            {port,      proplists:get_value(port,Config)},
+            {certfile,  proplists:get_value(certfile,Config)},
+            {keyfile,   proplists:get_value(keyfile,Config)},
+            {password,  proplists:get_value(password,Config)}
+        ],
+        % protoopts
+        [{env, [{dispatch, Dispatch}]}]
+    ] end),
 
     %{ok, _} = cowboy:start_http(http, 100, [{port, 8001}], [
         %{env, [{dispatch, Dispatch}]}
     %]),
 
-    %start_listener(https, start_https, fun(Config)->[
-        %% nbacceptors
-        %proplists:get_value(nbacceptors,Config,?EMPWEB_NBACCEPTORS_DEF),
-        %% transopts
-        %[
-            %{port,      proplists:get_value(port,Config)},
-            %{certfile,  proplists:get_value(certfile,Config)},
-            %{keyfile,   proplists:get_value(keyfile,Config)},
-            %{password,  proplists:get_value(password,Config)}
-        %],
-        %% protoopts
-        %[{env, [{dispatch, Dispatch}]}]
-    %] end),
+
 
     ensure_start_link(empweb_sup).
 
