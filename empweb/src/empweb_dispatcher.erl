@@ -12,8 +12,6 @@ dispatch()->
     [
         {'_', [
 
-
-
             {   <<"/jsonapi/photo/upload">>,
                 empweb_handler_jsonapi_photo,
                 [
