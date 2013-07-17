@@ -251,7 +251,12 @@ call_extention(
         extention = 1
     }
 ) ->
-    {error, Error}.
+    case Error of
+        {[{Type, Details}]} ->
+            {error, {[{type, Type}, {details, Details}]}};
+        Details ->
+            {error, {[{type, unknown}, {details, Details}]}}
+    end.
 
 
 fname(Res, Fname) ->
