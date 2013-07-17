@@ -1,0 +1,188 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru"><head xml:lang="ru"><meta xmlns="" http-equiv="Content-Type" content="text/html;charset=UTF-8" charset="UTF-8"/><meta xmlns="" http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><meta xmlns="" data-name="author" content="ζAVρ λαβ"/><meta xmlns="" data-name="description" content="adv com system"/><meta xmlns="" data-name="viewport" content="width=device-width, initial-scale=1.0"/><title xmlns="">Ручной тест</title>
+    <head>
+        <style>
+            *{
+                margin:0;
+                padding:0;
+            }
+            body{
+                padding-left: 30px;
+            }
+            .about{
+                font-size: 80%;
+                margin: 20px 20px 30px 200px;
+                padding:5px 5px 5px 5px;
+                width: 900px;
+                word-wrap: break-word;
+                border: 1px solid black;
+            }
+            .as{
+                margin: 10px 0px 0px 20px;
+                padding:5px 5px 5px 5px;
+            }
+            .asd{
+                margin: 5px 0px 5px 20px;
+            }
+            .test-set{
+                padding-left: 30px;
+            }
+            .test-set h2{
+                margin: 20px 0 20px 0;
+            }
+            .input-w, .output-w{
+                margin: 10px 10px 10px 10px;
+                padding: 10px 10px 10px 10px;
+                width:  800px;
+                height: 400px;
+            }
+            .input, .output{
+                margin: 10px 10px 10px 10px;
+                width:  780px;
+                height: 380px;
+                word-wrap: break-word;
+                margin: 10px 0 10px 20px;
+                font-family:monospace;
+            }
+            .submit{
+                width:  820px;
+                height: 60px;
+            }
+            dl{
+                margin: 10px 10px 10px 10px;
+            }
+            dt{
+                display: inline;
+            }
+            dd{
+                margin: 0px 0px 0px 10px;
+            }
+        </style>
+    </head>
+<body>
+    <h1 class="gh">Ручное тестирование</h1>
+    <nav><a href="test-plain.html">plain</a>&nbsp;<a href="test-ajax.html">ajax</a>&nbsp;<a href="test-auto.html">auto</a>&nbsp;<a href="test-hl.html">hl</a></nav>
+    <article class="about"><h2>Описание</h2><section class="as"><h3>Что это</h3><div class="asd">Модуль ручного тестирования. По сути просто одна html-страница. С помощью javascript со страницы вополняется запрос к серверу. Запрос и ответы сервера вместе с статус-кодом выводятся на страницу. </div></section><section class="as"><h3>Использование</h3><div class="asd"><div class="asd-url">http://{host}/static/test-ajax.html?url={url}&amp;с={number}</div><dl><dt>c</dt><dd>количество одновременных запросов</dd><dt>url</dt><dd>адрес тестируемого сервиса</dd></dt></dl><p><div>Например:</div><div class="asd-url">http://127.0.0.1:8000/static/tests.html?url=http://127.0.0.1:8000/jsonapi/</div></p><p>В текущей реализации тестов, если параметр <em>{url}</em> не указан,<br/>то используется <em>{host} + "/jsonapi/"</em>. Если не указан <em>{с}</em>, то используется <em>с=1</em></p></div></section></article>
+    <section class="test-set">
+        <h2>ajax вариант</h2>
+        <table class="test">
+            <tr>
+                <td valign="top" class="input-w">
+                    <form class="form" action="http://127.0.0.1:8001/jsonapi/ext/1" method="post">
+                        <p><input class="submit" type="submit" ></p>
+                        <p><textarea  class="input"  name="datas">{"fname": "login", "params":{"nick":"n1", "pass":"q"}}</textarea></p>
+                    </form>
+                </td>
+                <td valign="top" class="output-w">
+                    <div>
+                        <span>Конкуренция : </span>
+                        <span class="cnum"></span>
+                    </div>
+                    <div>
+                        <span>Текущее время: </span>
+                        <span class="cdate"></span>
+                    </div>
+                    <div>
+                        <span>Время ответа [мс]: </span>
+                        <span class="rtime"></span>
+                    </div>
+                    <div>
+                        <span>Статус код: </span>
+                        <span class="ostatus"></span>
+                    </div>
+                    <div class="output"></div>
+                </td>
+            </tr>
+        </table>
+    </section>
+        <!-- ============================================================== -->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript">
+// ------------------------------------------------------------------------------------
+
+var default_url  =  "" + window.location.protocol + "//"+ window.location.host +"/jsonapi/ext/1";
+var default_c = 1;
+
+mark_err = function(test){
+    $(".output", test).css("color", "red");
+    $("h3", test)
+        .css("color", "red")
+        .html($("h3", test).html()+ " [OШИБКА]");
+}
+mark_suc = function(test){
+    $(".output", test).css("color", "green")
+}
+ups = function(){
+    var urlParams = {};
+    (function () {
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+    })();
+    return urlParams;
+};
+jQuery(document).ready(function($) {
+    var url = ups().url;
+    var c = ups().c;
+    if(!url)
+        url = default_url;
+    if(!c)
+        c = default_c;
+
+    $(".form").attr("action", url);
+    $(".cnum").html("" + c);
+
+    var test = $(".test");
+    var input = $(".input", test).html();
+
+    $(".submit").click(function(){
+        var input = $(".input").val();
+        var cdate = new Date();
+        var sms = cdate.getTime();
+        $(".cdate").html("" + cdate);
+        for(var cc = 0; cc != c; ++cc){
+            $.post(url, {data: input})
+                .success(function() {
+                    $(".ostatus", test).css("color", "blue");
+                    if($(test).data("anti") == "anti"){
+                        mark_err(test)
+                    }else{
+                        mark_suc(test)
+                    }
+                })
+                .error(function() {
+                    $(".ostatus", test).css("color", "maroon");
+                    if($(test).data("anti") == "anti"){
+                        mark_suc(test)
+                    }else{
+                        mark_err(test)
+                    }
+                })
+                .complete(function(response) {
+                    if(response){
+                        cc = cc - 1;
+                        if(0 == cc){
+                            var rms = (new Date()).getTime();
+                            var rtime = "" + (rms - sms);
+                            $(".rtime").html(rtime);
+                            if(response.responseText){
+                                $(".output", test).html(response.responseText)
+                            }
+                            if(response.status)
+                                $(".ostatus", test).html(response.status)
+                        }
+                    }
+                });
+        }
+        return false;
+    });
+});
+// ------------------------------------------------------------------------------------
+        </script>
+</body>
+</html>
