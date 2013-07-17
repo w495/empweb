@@ -94,6 +94,12 @@ filter_self(Params) ->
 norm('get') ->
     [
         #norm_rule{
+            key         = extention,
+            nkey        = extention,
+            required    = false,
+            types       = [nullable, integer]
+        },
+        #norm_rule{
             key         = order,
             nkey        = order,
             required    = false,

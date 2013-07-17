@@ -914,12 +914,14 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
     order    =   Order,
     limit    =   Limit,
     distinct =   Distinct,
-    offset   =   Offset
+    offset   =   Offset,
+    extention =  Extention
 } = Qo ) when
     erlang:is_list(Afilter1),
         erlang:is_tuple(Aparent)
         orelse erlang:is_list(Aparent)
         orelse erlang:is_atom(Aparent)->
+
     %Fields = lists:reverse(Input_fields1),
     {Query, Querycnt, Pfields} = empdb_memocashe({Aop, Qo}, fun() ->
         {Op1, {Afilter, Input_fields}} = lists:foldl(
@@ -1383,7 +1385,13 @@ get([{Aparent, _}|Arest] = Aop, Con, #queryobj{
                                             Number + 1,
                                             [
                                                 {[
-                                                    {'#', Number + Offsetnum},
+                                                    {
+                                                        case Extention of
+                                                            1 -> '#+';
+                                                            _ -> '#'
+                                                        end,
+                                                        Number + Offsetnum
+                                                    },
                                                     {'@', Count}
                                                     |lists:reverse(Itempl)
                                                 ]}
@@ -1442,7 +1450,8 @@ get(Current, Con, Opts) when erlang:is_list(Opts) ->
                     ),
                 order   =   proplists:get_value(order,   Opts, []),
                 limit   =   proplists:get_value(limit,   Opts),
-                offset  =   proplists:get_value(offset,  Opts)
+                offset  =   proplists:get_value(offset,  Opts),
+                extention = proplists:get_value(offset,  Opts)
         }
     ).
 
@@ -1458,7 +1467,8 @@ get(Current,Con,Opts,Fields) when erlang:is_list(Opts) ->
                 fields  =   Fields,
                 order   =   proplists:get_value(order,   Opts, []),
                 limit   =   proplists:get_value(limit,   Opts),
-                offset  =   proplists:get_value(offset,  Opts)
+                offset  =   proplists:get_value(offset,  Opts),
+                extention = proplists:get_value(offset,  Opts)
         }
     ).
 

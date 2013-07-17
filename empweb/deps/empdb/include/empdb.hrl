@@ -17,7 +17,8 @@
     %% Для select
         limit       = undefined :: undefined | integer(),
     %% Для select
-        offset      = undefined :: undefined | integer()
+        offset      = undefined :: undefined | integer(),
+        extention   = undefined
 }).
 
 

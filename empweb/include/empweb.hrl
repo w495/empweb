@@ -23,7 +23,8 @@
     auth,
     pers_id,
     pers_nick,
-    pers_perm_names =[]
+    pers_perm_names =[],
+    extention = undefinned
 }).
 
 

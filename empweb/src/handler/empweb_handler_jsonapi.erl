@@ -36,24 +36,28 @@
 %
 
 
-init(_, Req, _Opts) ->
+init(_, Req, Opts) ->
     ?evman_warning({erlang:time(), Req}),
     {Auth, Req1}    =   empweb_http:auth(Req),
     Is_auth         =   empweb_biz_pers:is_auth(Auth),
     Pid             =   empweb_biz_pers:get_pers_id(Auth),
     Pnick           =   empweb_biz_pers:get_pers_nick(Auth),
+
     Pperm_names     =   empweb_biz_pers:get_perm_names(Auth),
+    Extention       =   proplists:get_value(extention, Opts, undefined),
+
 
     spawn_link(empweb_biz_pers, make_online, [[{id, Pid}]]),
 
     {ok, Req1, #state{
         empweb_hap  =
-            #empweb_hap {
+            #empweb_hap{
                 auth            =   Auth,
                 is_auth         =   Is_auth,
                 pers_id         =   Pid,
                 pers_nick       =   Pnick,
-                pers_perm_names =   Pperm_names
+                pers_perm_names =   Pperm_names,
+                extention       =   Extention
             }
     }}.
 
@@ -150,17 +154,23 @@ empweb_jsonapi_map(Req, {List}, State) ->
 
     Fname   =  proplists:get_value(<<"fname">>, List),
     Params  =
-        case proplists:get_value(<<"params">>, List, []) of
+        case proplists:get_value(<<"params">>, List, {[]}) of
             null ->
-                [];
+                {[]};
             Res ->
                 Res
         end,
     ?evman_debug({empweb_jsonapi_params, Params},  <<"empweb_jsonapi params">>),
 
 
+    Extention = State#state.empweb_hap#empweb_hap.extention,
+
+    io:format("~n~n~n Params = ~p ~n~n~n ", [Params]),
+
+    {Paramspl} = Params,
+
     Eh =  State#state.empweb_hap#empweb_hap{
-        params          =   Params
+        params          =   {[{extention,1}|Paramspl]}
     },
 
     Hap =

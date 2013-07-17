@@ -43,6 +43,14 @@ dispatch()->
                 empweb_handler_jsonapi,
                 []
             },
+
+            {   <<"/jsonapi/ext/1">>,
+                empweb_handler_jsonapi,
+                [
+                    {extention, 1}
+                ]
+            },
+
             {   <<"/static/[...]">>,
                 empweb_handler_static,
                 [

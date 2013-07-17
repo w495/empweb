@@ -115,21 +115,144 @@
 ]).
 
 
-call(Req1, Hap) ->
-    {Res, Req} = case empweb_http:call(Req1, Hap) of
-        {ok, Reply} ->
-            {Reply, Req1};
-        {error, unknown_function} ->
-            {empweb_jsonapi:not_extended(unknown_function), Req1};
-        {error, Error} ->
-            {empweb_jsonapi:internal_server_error(
-                {[{unknown_error1, empweb_jsonapi:format(Error)}]}
-            ), Req1}
-    end.
 
 call(Req1, Hap, Fname) ->
     {Res, Req} = call(Req1, Hap),
     {fname(Res, Fname), Req}.
+
+call(Req, Hap) ->
+    io:format(" ~n~n~n Hap = ~p ~n~n~n", [Hap]),
+
+    Call = empweb_http:call(Req, Hap),
+
+    io:format(" ~n~n~n Call = ~p ~n~n~n", [Call]),
+
+    call_extention(
+        Call,
+        Hap,
+        Req
+    ).
+
+
+    %{Res, Req} =
+        %case empweb_http:call(Req1, Hap) of
+            %{ok, Reply} ->
+                %{Reply, Req1};
+            %{error, unknown_function} ->
+                %{empweb_jsonapi:not_extended(unknown_function), Req1};
+            %{error, Error} ->
+                %{empweb_jsonapi:internal_server_error(
+                    %{[{unknown_error1, empweb_jsonapi:format(Error)}]}
+                %), Req1}
+        %end.
+
+
+-record(
+    extention,
+    {
+        ok,
+        error
+    }
+).
+
+
+call_extention({ok, Reply = #empweb_resp{body={Bodypl}}}, Hap = #empweb_hap{extention = 1}, Req) ->
+    {
+        #empweb_resp{
+            body =
+                {   %Bodypl
+                    [
+                        call_extention(
+                            #extention{
+                                ok      =   proplists:get_value(ok, Bodypl),
+                                error   =   proplists:get_value(error, Bodypl)
+                            },
+                            Hap
+                        )
+                        |proplists:delete(ok, proplists:delete(error, Bodypl))
+                    ]
+                }
+        },
+        Req
+    };
+
+call_extention({ok, Reply}, _, Req) ->
+    {
+        Reply,
+        Req
+    };
+
+call_extention({error, unknown_function}, _, Req) ->
+    {
+        not_extended(unknown_function),
+        Req
+    };
+
+call_extention({error, Error}, _, Req) ->
+    {
+        internal_server_error(
+            {
+                [
+                    {
+                        unknown_error1,
+                        empweb_jsonapi:format(Error)
+                    }
+                ]
+            }
+        ),
+        Req
+    }.
+
+
+call_extention_list(List) ->
+    lists:map(
+        fun({Objpl}) ->
+            call_extention_obj({Objpl})
+        end,
+        List
+    ).
+
+call_extention_obj({Objpl}) ->
+    {
+        lists:map(
+            fun
+                ({Key, List}) when erlang:is_list(List)->
+                    {Key, call_extention_list(List)};
+                ({Key, {Objpl}}) when erlang:is_list(Objpl)->
+                    {Key, call_extention_obj({Objpl})};
+                ({'@', All})->
+                    {'__all__', All};
+                ({'#', Number})->
+                    {'__number__', Number};
+                ({Key, Value})->
+                    {Key, Value}
+            end,
+            Objpl
+        )
+    }.
+
+call_extention(
+    #extention{
+        ok      =   Reply,
+        error   =   undefined
+    },
+    #empweb_hap{
+        extention = 1
+    }
+) ->
+    {ok, call_extention_list(Reply)};
+
+call_extention(
+    #extention{
+        ok      =   undefined,
+        error   =   Error
+    },
+    #empweb_hap{
+        extention = 1
+    }
+) ->
+    {error, Error}.
+
 
 fname(Res, Fname) ->
     {Rpl} = Res#empweb_resp.body,
@@ -429,7 +552,7 @@ error(Code, {error, Error}) ->
         format  = json,
         body    = {[
             {'utc',     nowsec()},
-            {error, Error}
+            {error,     Error}
         ]}
     };
 error(Code, Error) ->
