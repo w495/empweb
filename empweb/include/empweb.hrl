@@ -2,6 +2,18 @@
 -define(__EMPWEB_474797140__, true).
 
 
+
+
+%% @doc  Заголовоки Content-Type для JSON
+%%
+-define(OUTPUT_CONTROL_ALLOW_HEADERS, [
+    {<<"Access-Control-Allow-Origin">>, <<"*">>},
+    {<<"Access-Control-Allow-Headers">>, <<"origin, x-requested-with, content-type">>},
+    {<<"Access-Control-Allow-Methods">>, <<"PUT, GET, POST, DELETE, OPTIONS">>}
+]).
+
+
+
 %%
 %%
 %%
@@ -36,7 +48,7 @@
     status = 200,
     format  = json,
     cookies = [],
-    headers = [],
+    headers = ?OUTPUT_CONTROL_ALLOW_HEADERS,
     body = []
 }).
 
@@ -97,6 +109,7 @@
 %% =========================================================================
 %%
 
+%%
 %%
 %% @doc  Заголовок Content-Type для JSON
 %%
