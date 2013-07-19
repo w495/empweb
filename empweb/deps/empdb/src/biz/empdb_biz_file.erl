@@ -682,6 +682,14 @@ get_handle_picture_param(Phobjpl, What) ->
     Req_window_height   =
         proplists:get_value(window_height, What, null),
 
+
+
+    Req_image_scale_width   =
+        proplists:get_value(image_scale_width,  What, null),
+    Req_image_scale_height   =
+        proplists:get_value(image_scale_height, What, null),
+
+
     Window_hw =
         case
             (Req_window_width       == null) or
@@ -745,7 +753,9 @@ get_handle_picture_param(Phobjpl, What) ->
 
     [
         {image_width, Res_image_width},
-        {image_height, Res_image_height}
+        {image_height, Res_image_height},
+        {req_image_scale_width, Req_image_scale_width},
+        {req_image_scale_height, Req_image_scale_height}
     ].
 
 get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
@@ -759,19 +769,25 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
     Req_image_height    = proplists:get_value(image_height, What, null),
 
 
+    %io:format("What = ~p ", [What]),
+    %1/0,
 
     Options    = proplists:get_value(options, What, []),
 
 
-
     case empdb_dao_fileinfo:get(Con, [
         {file_id, File_id},
-        {fileinfotype_alias, download},
-        {image_width, Req_image_width},
-        {image_height, Req_image_height},
-        {limit, 1}
+        {'or', [
+            {'and', [
+                {fileinfotype_alias,    download},
+                {image_width,           Req_image_width},
+                {image_height,          Req_image_height}
+            ]},
+            {fileinfotype_alias,    upload}
+        ]},
+        {limit, 2}
     ]) of
-        {ok, []} ->
+        {ok, [{_Uploadpl}]} ->
             %%% DEGUG: %%% io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
             Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
             Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
@@ -797,10 +813,19 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
                     {aspect_height, Aspect_height}
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
-        {ok, [{Respl}]} ->
+        {ok, [{Mbrespl1}, {Mbrespl2}]} ->
             %%% DEGUG: %%% io:format("Respl = Respl~n~n", []),
-           %%% DEGUG: %%% io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-
+            %%% DEGUG: %%% io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
+            Respl =
+                case {
+                    proplists:get_value(fileinfotype_alias, Mbrespl1),
+                    proplists:get_value(fileinfotype_alias, Mbrespl2)
+                } of
+                    {download, _} ->
+                        Mbrespl1;
+                    _ ->
+                        Mbrespl2
+                end,
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
             Error
