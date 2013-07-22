@@ -815,18 +815,19 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Mbrespl1}, {Mbrespl2}]} ->
-            %%% DEGUG: %%% io:format("Respl = Respl~n~n", []),
+            io:format("Respl = ~p~n~n", [[{Mbrespl1}, {Mbrespl2}]]),
             %%% DEGUG: %%% io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
             Respl =
                 case {
                     proplists:get_value(fileinfotype_alias, Mbrespl1),
                     proplists:get_value(fileinfotype_alias, Mbrespl2)
                 } of
-                    {download, _} ->
+                    {<<"download">>, _} ->
                         Mbrespl1;
                     _ ->
                         Mbrespl2
                 end,
+            io:format("Respl = ~p ~n~n", [Respl]),
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
             Error

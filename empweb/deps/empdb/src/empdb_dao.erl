@@ -458,10 +458,11 @@ sql_cond({Ff, {eq, null}})  ->
     ]};
 
 sql_cond({Ff, {eq, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" = $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -475,10 +476,11 @@ sql_cond({Ff, {neq, null}})  ->
     ]};
 
 sql_cond({Ff, {neq, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" != $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -493,10 +495,11 @@ sql_cond({Ff, {ne, null}})  ->
     ]};
 
 sql_cond({Ff, {ne, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" != $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -504,10 +507,11 @@ sql_cond({Ff, {lt, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {lt, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" < $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -515,10 +519,11 @@ sql_cond({Ff, {lte, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {lte, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" <= $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -526,10 +531,11 @@ sql_cond({Ff, {gt, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {gt, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
         [   empdb_convert:to_binary(Ff),
             <<" > $">>,
-            empdb_convert:to_binary(cond_atom(Ff))
+            empdb_convert:to_binary(Ca)
         ]
     };
 
@@ -537,8 +543,9 @@ sql_cond({Ff, {gte, undefined}}) ->
     {[], []};
 
 sql_cond({Ff, {gte, Val}}) ->
-    {   [{cond_atom(Ff), Val}],
-        [empdb_convert:to_binary(Ff),<<" >= $">>,empdb_convert:to_binary(cond_atom(Ff))]
+    Ca = cond_atom(Ff),
+    {   [{Ca, Val}],
+        [empdb_convert:to_binary(Ff),<<" >= $">>,empdb_convert:to_binary(Ca)]
     };
 
 sql_cond({Ff, {in, []}}) ->
@@ -568,17 +575,18 @@ sql_cond({Ff, null} = Tuple) ->
 
 sql_cond({Ff, Val} = Tuple) ->
     ?empdb_debug("Tuple = ~p~n~n", [Tuple]),
-    {[{cond_atom(Ff), Val}], [
+    Ca = cond_atom(Ff),
+    {[{Ca, Val}], [
         empdb_convert:to_binary(Ff),
         <<" = $">>,
-        empdb_convert:to_binary(cond_atom(Ff))
+        empdb_convert:to_binary(Ca)
     ]}.
 
 cond_atom(Ff)->
     erlang:binary_to_atom(
         erlang:list_to_binary([
             <<"`">>,
-            erlang:atom_to_binary(a, utf8),
+            erlang:atom_to_binary(Ff, utf8),
             <<"@filter#">>,
             empdb_convert:to_binary(crypto:rand_uniform(1, 1000)),
             <<"`">>

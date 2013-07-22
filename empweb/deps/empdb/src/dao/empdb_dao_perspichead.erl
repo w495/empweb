@@ -125,6 +125,9 @@ get(Con, What) ->
         {fileinfotype_alias, filesystem},
         {image_height, null},
         {image_width, null}
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
     ]) of
         {ok,Phobjs} ->
             {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], [])};
