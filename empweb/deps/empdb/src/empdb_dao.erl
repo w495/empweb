@@ -575,8 +575,16 @@ sql_cond({Ff, Val} = Tuple) ->
     ]}.
 
 cond_atom(Ff)->
-    erlang:list_to_atom("`" ++ erlang:atom_to_list(Ff) ++ "@filter`").
-
+    erlang:binary_to_atom(
+        erlang:list_to_binary([
+            <<"`">>,
+            erlang:atom_to_binary(a, utf8),
+            <<"@filter#">>,
+            empdb_convert:to_binary(crypto:rand_uniform(1, 1000)),
+            <<"`">>
+        ]),
+        utf8
+    ).
 
 sql_where(<<>>)->
     {[], []};

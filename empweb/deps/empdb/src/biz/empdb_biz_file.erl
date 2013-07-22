@@ -754,8 +754,8 @@ get_handle_picture_param(Phobjpl, What) ->
     [
         {image_width, Res_image_width},
         {image_height, Res_image_height},
-        {req_image_scale_width, Req_image_scale_width},
-        {req_image_scale_height, Req_image_scale_height}
+        {image_scale_width, Req_image_scale_width},
+        {image_scale_height, Req_image_scale_height}
     ].
 
 get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
@@ -769,8 +769,7 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
     Req_image_height    = proplists:get_value(image_height, What, null),
 
 
-    %io:format("What = ~p ", [What]),
-    %1/0,
+    io:format("What = ~p ", [What]),
 
     Options    = proplists:get_value(options, What, []),
 
@@ -788,6 +787,8 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
         {limit, 2}
     ]) of
         {ok, [{_Uploadpl}]} ->
+            io:format("_Uploadpl = ~p ~n~n", [_Uploadpl]),
+                1/0,
             %%% DEGUG: %%% io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
             Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
             Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
@@ -985,5 +986,7 @@ md5(Bin) ->
 gcd(A, 0) ->
     A;
 gcd(A, B) ->
+    io:format("A = ~p ~n", [A]),
+    io:format("B = ~p ~n", [B]),
     gcd(B, A rem B).
 
