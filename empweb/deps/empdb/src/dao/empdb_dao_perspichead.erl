@@ -133,8 +133,8 @@ get(Con, What) ->
                 lists:map(
                     fun({Pl})->
                         {[
-                            {x, erlang:trunc(proplists:get_value(x, Pl) * Image_scale_width)},
-                            {y, erlang:trunc(proplists:get_value(y, Pl) * Image_scale_height)}
+                            {x, leftmult(erlang:trunc(proplists:get_value(x, Pl),Image_scale_width))},
+                            {y, leftmult(erlang:trunc(proplists:get_value(y, Pl),Image_scale_height))}
                             |proplists:delete(x, proplists:delete(y, Pl))
                         ]}
                     end,
@@ -151,6 +151,12 @@ get(Con, What) ->
 get(Con, What, Afields)->
     get(Con, [{fields, Afields}|What]).
 
+
+leftmult(X, null) ->
+    X ;
+
+leftmult(X, Y) ->
+    X * Y.
 
     %empdb_dao_doc:get(?MODULE, Con, What).
 

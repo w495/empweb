@@ -121,7 +121,7 @@ get(Con, What) ->
         |proplists:delete(fields,
             proplists:delete(image_height,
                 proplists:delete(image_width, What)))
-    ]) of
+     ]) of
         {ok,Phobjs} ->
             List =
                 empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], []),
@@ -133,8 +133,8 @@ get(Con, What) ->
                 lists:map(
                     fun({Pl})->
                         {[
-                            {x, erlang:trunc(proplists:get_value(x, Pl) * Image_scale_width)},
-                            {y, erlang:trunc(proplists:get_value(y, Pl) * Image_scale_height)}
+                            {x, leftmult(erlang:trunc(proplists:get_value(x, Pl),Image_scale_width))},
+                            {y, leftmult(erlang:trunc(proplists:get_value(y, Pl),Image_scale_height))}
                             |proplists:delete(x, proplists:delete(y, Pl))
                         ]}
                     end,
@@ -145,13 +145,18 @@ get(Con, What) ->
             Error
     end.
 
-
     %empdb_dao_doc:get(?MODULE, Con, What).
+
 
 get(Con, What, Afields)->
     get(Con, [{fields, Afields}|What]).
 
-    %empdb_dao_doc:get(?MODULE, Con, What).
+
+leftmult(X, null) ->
+    X ;
+
+leftmult(X, Y) ->
+    X * Y.
 
 create(Con, Proplist)->
     empdb_dao_doc:create(?MODULE, Con, Proplist).
