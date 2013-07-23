@@ -96,14 +96,7 @@ get(Con, What) ->
                 lists:append([
                     empdb_dao_perspichead:table({fields, select}),
                     empdb_dao_doc:table({fields, select}),
-                    [
-                        aspect_width,
-                        aspect_height,
-                        image_width,
-                        image_height,
-                        file_id,
-                        path
-                    ]
+                    empdb_dao_fileinfo:table({fields, additional})
                 ]);
             _ ->
                 Truefields
@@ -130,7 +123,24 @@ get(Con, What) ->
                 proplists:delete(image_width, What)))
     ]) of
         {ok,Phobjs} ->
-            {ok, empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], [])};
+            List =
+                empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], []),
+            Image_scale_width   =
+                proplists:get_value(image_scale_width,  What, null),
+            Image_scale_height   =
+                proplists:get_value(image_scale_height, What, null),
+            Res =
+                lists:map(
+                    fun({Pl})->
+                        {[
+                            {x, erlang:trunc(proplists:get_value(x, Pl) * Image_scale_width)},
+                            {y, erlang:trunc(proplists:get_value(y, Pl) * Image_scale_height)}
+                            |proplists:delete(x, proplists:delete(y, Pl))
+                        ]}
+                    end,
+                    List
+                ),
+            {ok, Res};
         Error ->
             Error
     end.

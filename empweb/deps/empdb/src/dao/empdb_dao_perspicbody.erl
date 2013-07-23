@@ -95,7 +95,8 @@ get(Con, What) ->
             [] ->
                 lists:append([
                     empdb_dao_perspicbody:table({fields, select}),
-                    empdb_dao_doc:table({fields, select})
+                    empdb_dao_doc:table({fields, select}),
+                    empdb_dao_fileinfo:table({fields, additional})
                 ]);
             _ ->
                 Truefields
@@ -106,92 +107,49 @@ get(Con, What) ->
         {empdb_dao_perspicbody, {doc_id, file_id}},
         {empdb_dao_file, id},
         {empdb_dao_fileinfo, file_id}
-    ],Con,[
-        {fileinfotype_alias, download},
+      ],Con,[
         {fields, [
-            {as, {'fileinfo.path', fileinfopath}},
-            {as, {'fileinfo.dir',  fileinfodir}}
+            fileinfotype_alias,
+            'fileinfo.filetype_ext',
+            {as, {'fileinfo.path', path}},
+            {as, {'fileinfo.dir',  dir}}
             | proplists:delete(path, Fields)
         ]},
-        {image_width,  null},
-        {image_height, null}
-        |proplists:delete(fields, What)
+        {fileinfotype_alias, filesystem},
+        {image_height, null},
+        {image_width, null}
+        |proplists:delete(fields,
+            proplists:delete(image_height,
+                proplists:delete(image_width, What)))
     ]) of
         {ok,Phobjs} ->
-            {ok,
-                lists:map(fun({Phpl})->
-                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
-                        true ->
-                            {[
-                                {path,
-                                    <<  (proplists:get_value(fileinfodir, Phpl))/binary,
-                                        (proplists:get_value(fileinfopath, Phpl))/binary
-                                    >>
-                                }
-                                | proplists:delete(fileinfodir,
-                                    proplists:delete(fileinfopath,
-                                        proplists:delete(path, Phpl)))
-                            ]};
-                        _ ->
-                            {proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))}
-                    end
-                end, Phobjs)
-            };
+            List =
+                empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], []),
+            Image_scale_width   =
+                proplists:get_value(image_scale_width,  What, null),
+            Image_scale_height   =
+                proplists:get_value(image_scale_height, What, null),
+            Res =
+                lists:map(
+                    fun({Pl})->
+                        {[
+                            {x, erlang:trunc(proplists:get_value(x, Pl) * Image_scale_width)},
+                            {y, erlang:trunc(proplists:get_value(y, Pl) * Image_scale_height)}
+                            |proplists:delete(x, proplists:delete(y, Pl))
+                        ]}
+                    end,
+                    List
+                ),
+            {ok, Res};
         Error ->
             Error
     end.
+
 
     %empdb_dao_doc:get(?MODULE, Con, What).
 
-get(Con, What, Truefields)->
-
-    Fields =
-        case Truefields of
-            [] ->
-                lists:append([
-                    empdb_dao_perspicbody:table({fields, select}),
-                    empdb_dao_doc:table({fields, select})
-                ]);
-            _ ->
-                Truefields
-        end,
-
-    case empdb_dao:get([
-        {empdb_dao_doc, id},
-        {empdb_dao_perspicbody, {doc_id, file_id}},
-        {empdb_dao_file, id},
-        {empdb_dao_fileinfo, file_id}
-    ],Con,[
-        {fileinfotype_alias, download}
-        |What
-    ], [
-        {as, {'fileinfo.path', fileinfopath}},
-        {as, {'fileinfo.dir',  fileinfodir}}
-        | proplists:delete(path, Fields)
-    ]) of
-        {ok,Phobjs} ->
-            {ok,
-                lists:map(fun({Phpl})->
-                    case (lists:member(path, Truefields) or (Truefields =:= [])) of
-                        true ->
-                            {[
-                                {path,
-                                    <<  (proplists:get_value(fileinfodir, Phpl))/binary,
-                                        (proplists:get_value(fileinfopath, Phpl))/binary
-                                    >>
-                                }
-                                | proplists:delete(fileinfodir,
-                                    proplists:delete(fileinfopath,
-                                        proplists:delete(path, Phpl)))
-                            ]};
-                        _ ->
-                            {proplists:delete(fileinfodir, proplists:delete(fileinfopath, Phpl))}
-                    end
-                end, Phobjs)
-            };
-        Error ->
-            Error
-    end.
+get(Con, What, Afields)->
+    get(Con, [{fields, Afields}|What]).
 
     %empdb_dao_doc:get(?MODULE, Con, What).
 

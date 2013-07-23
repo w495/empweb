@@ -1712,13 +1712,23 @@
 
 
 
-    update fileinfo set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
+    update fileinfo as f set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload' )));
 
-    update fileinfo set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1) / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_width is not null limit 1), (select fileinfo.image_height from fileinfo where fileinfo.file_id = file_id and fileinfotype_alias  = 'upload' and fileinfo.image_height is not null limit 1))) where image_width is null;
+    update fileinfo as f set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload')));
+
+
+
+
+    update fileinfo set aspect_width = orig_image_width / (select gcd(orig_image_width, orig_image_height));
+
+
+    update fileinfo set aspect_height = orig_image_height / (select gcd(orig_image_width, orig_image_height));
+
 
 --------------------------------------------------------------------
 --------------------------------------------------------------------
 --------------------------------------------------------------------
+
 
 create sequence seq_static_ti;
 
@@ -3594,3 +3604,30 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
             --(select id from trtype where alias='static')
         --);
 
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+
+    alter table fileinfo add column
+        orig_image_width  numeric default null;
+
+
+    alter table fileinfo add column
+        orig_image_height  numeric default null;
+
+
+
+    update fileinfo as f set orig_image_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload');
+
+    update fileinfo as f set orig_image_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload');
+
+
+
+
+    update fileinfo as f set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload' )));
+
+    update fileinfo as f set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload')));

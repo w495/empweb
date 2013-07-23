@@ -35,6 +35,18 @@ table({fields, insert, required})-> [];
 table({fields, select})->
     table({fields, all}) -- [isdeleted];
 
+table({fields, additional})->
+    [
+        aspect_width,
+        aspect_height,
+        image_width,
+        image_height,
+        orig_image_width,
+        orig_image_height,
+        file_id,
+        path
+    ];
+
 %%
 %% @doc Возвращает список полей таблицы для обновления
 %%
@@ -75,6 +87,12 @@ table({fields, all})->
 
         image_width,
         image_height,
+
+
+
+        orig_image_width,
+        orig_image_height,
+
         aspect_width,
         aspect_height,
 

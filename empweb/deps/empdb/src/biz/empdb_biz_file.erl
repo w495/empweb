@@ -187,6 +187,8 @@ create(Params)->
                             {path,                  Fspath_ext},
                             {aspect_width,          Aspect_width},
                             {aspect_height,         Aspect_height},
+                            {orig_image_width,      Whpl_image_width},
+                            {orig_image_height,     Whpl_image_height},
                             {image_width,           null},
                             {image_height,          null}
                         ]),
@@ -210,12 +212,16 @@ create(Params)->
                             {path,                  Dlpath_ext},
                             {aspect_width,          Aspect_width},
                             {aspect_height,         Aspect_height},
+                            {orig_image_width,      Whpl_image_width},
+                            {orig_image_height,     Whpl_image_height},
                             {image_width,           null},
                             {image_height,          null}
                         ]),
                     [
                         {aspect_width,      Aspect_width},
                         {aspect_height,     Aspect_height},
+                        {orig_image_width,      Whpl_image_width},
+                        {orig_image_height,     Whpl_image_height},
                         {image_width,       Whpl_image_width },
                         {image_height,      Whpl_image_height }
                     ];
@@ -223,6 +229,8 @@ create(Params)->
                     [
                         {image_width,       null},
                         {image_height,      null},
+                        {orig_image_width,  null},
+                        {orig_image_height, null},
                         {aspect_width,      null},
                         {aspect_height,     null}
                     ]
@@ -385,7 +393,7 @@ gm_convert_tge(
         Orig_fs_path_full,
         Fspath_full,
         [
-            {thumbnail, Image_width, Image_height},
+            {resize, Image_width, Image_height},
             {gravity, <<"center">>},
             {extent, Image_width, Image_height},
             {background, <<"transparent">>}
@@ -669,6 +677,15 @@ get_handle_pictures(Con, Phobjs, What, Fields, _, _) ->
     ).
 
 
+mullnull(_, null) ->
+    null;
+
+mullnull(null, _) ->
+    null;
+
+mullnull(X, Y) ->
+    erlang:trunc(X * Y).
+
 get_handle_picture_param(Phobjpl, What) ->
 
     Phobjpl_aspect_width =
@@ -677,18 +694,21 @@ get_handle_picture_param(Phobjpl, What) ->
         proplists:get_value(aspect_height,  Phobjpl, null),
 
 
+    Phobjpl_orig_image_width =
+        proplists:get_value(orig_image_width,   Phobjpl, null),
+    Phobjpl_orig_image_height =
+        proplists:get_value(orig_image_height,  Phobjpl, null),
+
+
     Req_window_width    =
         proplists:get_value(window_width,  What, null),
     Req_window_height   =
         proplists:get_value(window_height, What, null),
 
-
-
     Req_image_scale_width   =
         proplists:get_value(image_scale_width,  What, null),
     Req_image_scale_height   =
         proplists:get_value(image_scale_height, What, null),
-
 
     Window_hw =
         case
@@ -727,7 +747,10 @@ get_handle_picture_param(Phobjpl, What) ->
                             Phobjpl_aspect_height
                         );
                     _ ->
-                        null
+                        mullnull(
+                            Phobjpl_orig_image_width,
+                            Req_image_scale_width
+                        )
                 end
             end
         ),
@@ -746,16 +769,17 @@ get_handle_picture_param(Phobjpl, What) ->
                     window_height ->
                         Req_window_height;
                     _ ->
-                        null
+                        mullnull(
+                            Phobjpl_orig_image_height,
+                            Req_image_scale_height
+                        )
                 end
             end
         ),
 
     [
         {image_width, Res_image_width},
-        {image_height, Res_image_height},
-        {image_scale_width, Req_image_scale_width},
-        {image_scale_height, Req_image_scale_height}
+        {image_height, Res_image_height}
     ].
 
 get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
@@ -768,6 +792,9 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
     Req_image_width     = proplists:get_value(image_width, What, null),
     Req_image_height    = proplists:get_value(image_height, What, null),
 
+    %Req_image_scale_width     = proplists:get_value(req_image_scale_width, What, null),
+    %Req_image_scale_height    = proplists:get_value(req_image_scale_height, What, null),
+
 
     io:format("What = ~p ", [What]),
 
@@ -776,19 +803,12 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
 
     case empdb_dao_fileinfo:get(Con, [
         {file_id, File_id},
-        {'or', [
-            {'and', [
-                {fileinfotype_alias,    download},
-                {image_width,           Req_image_width},
-                {image_height,          Req_image_height}
-            ]},
-            {fileinfotype_alias,    upload}
-        ]},
-        {limit, 2}
+        {fileinfotype_alias,    download},
+        {image_width,           Req_image_width},
+        {image_height,          Req_image_height},
+        {limit, 1}
     ]) of
-        {ok, [{_Uploadpl}]} ->
-            io:format("_Uploadpl = ~p ~n~n", [_Uploadpl]),
-                1/0,
+        {ok, []} ->
             %%% DEGUG: %%% io:format("~n~n~n !!!!!!!   !!!!!!!! ~n~n~n"),
             Fs_dir   = proplists:get_value(dir,          Phobjpl, <<>>),
             Fs_path  = proplists:get_value(path,         Phobjpl, <<>>),
@@ -814,19 +834,7 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
                     {aspect_height, Aspect_height}
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
-        {ok, [{Mbrespl1}, {Mbrespl2}]} ->
-            io:format("Respl = ~p~n~n", [[{Mbrespl1}, {Mbrespl2}]]),
-            %%% DEGUG: %%% io:format("~n~n~n ~w in ~w Pid = ~w  ~n~n~n", [?MODULE, ?LINE, self()]),
-            Respl =
-                case {
-                    proplists:get_value(fileinfotype_alias, Mbrespl1),
-                    proplists:get_value(fileinfotype_alias, Mbrespl2)
-                } of
-                    {<<"download">>, _} ->
-                        Mbrespl1;
-                    _ ->
-                        Mbrespl2
-                end,
+        {ok, [{Respl}]} ->
             io:format("Respl = ~p ~n~n", [Respl]),
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
@@ -987,7 +995,7 @@ md5(Bin) ->
 gcd(A, 0) ->
     A;
 gcd(A, B) ->
-    io:format("A = ~p ~n", [A]),
-    io:format("B = ~p ~n", [B]),
+    io:format("~n~n A = ~p ~n~n", [A]),
+    io:format("~n~n B = ~p ~n~n", [B]),
     gcd(B, A rem B).
 

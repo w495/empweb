@@ -171,14 +171,7 @@ get_top(Con, What) ->
             lists:append([
                 empdb_dao_photo:table({fields, select}),
                 empdb_dao_doc:table({fields, select}),
-                [
-                    aspect_width,
-                    aspect_height,
-                    image_width,
-                    image_height,
-                    file_id,
-                    path
-                ]
+                empdb_dao_fileinfo:table({fields, additional})
             ])
         ),
 
