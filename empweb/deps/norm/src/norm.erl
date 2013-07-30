@@ -134,14 +134,14 @@ norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, required=true, key=?UNIQ
 
 norm(Data, [#norm_rule{rules=[Crule|Crestrules]=Crules, key=?UNIQ_UNDEFINED, keys=[]}=Rule|Restrules], Norm) ->
     norm(Data, Restrules, norm(Data, Crules, Norm));
-    
+
 %%
 %% Для обработки множественных ключей
 %%
 norm(Data, [#norm_rule{keys=[Rkey|Restrkeys]=Rkeys, key=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
     norm(Data, [Rule|Restrules], Norm, Rkeys);
 
-% 
+%
 norm(Data, [#norm_rule{key=Key, nkey=?UNIQ_UNDEFINED}=Rule|Restrules], Norm) ->
     norm(Data, [Rule#norm_rule{nkey=Key}|Restrules], Norm);
 
@@ -192,7 +192,7 @@ norm(Data, [#norm_rule{key=Rkey, nkey=Nkey, types=Types, required=Required, defa
                         Norm#norm{errors=[
                             #norm_error{
                                 reason  =   types,
-                                value   =   Value, 
+                                value   =   Value,
                                 rule    =   Rule
                             } |Norm#norm.errors
                         ]}
@@ -253,7 +253,7 @@ rule_type_done(_converter, _value, Type)
         when erlang:is_function(Type, 0) ->
     io:format("1.1)  = ~p ~n", [{_converter, Type, _value}]),
     {ok, Type()};
-    
+
 rule_type_done(_converter, Value, Type)
         when erlang:is_function(Type, 1) ->
     io:format("1.1)  = ~p ~n", [{_converter, Type, Value}]),
@@ -271,7 +271,7 @@ to_rule_type(_converter, Value, predefined) ->
 
 to_rule_type(_converter, Value, any) ->
     {ok, Value};
-    
+
 to_rule_type(_converter, Value, []) ->
     {error, Value};
 
@@ -286,10 +286,15 @@ to_rule_type(Converter, Value, [Type|Restrules]) ->
         X
     catch
         throw : {type_error, Error} ->
-            throw({type_error, Error});
+            %throw({type_error, Error});
+            %%
+            %% Вызывает исключение, которое требуется
+            %% перехватывать выше. А для этого нужно учитывать формат.
+            %%
+            {error, {type_error, Error}};
         _t : _e ->
             io:format("2) _t : _e = ~p ~n~n", [{_t,  _e, Type, Value, Restrules}]),
-            
+
             to_rule_type(Converter, Value, Restrules)
     end.
 

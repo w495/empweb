@@ -620,14 +620,21 @@ handle_params(Data, Function, Pstate) ->
         <<" = data & function">>
     ),
 
+    io:format("LINE =  ~p  ", [?LINE]),
+
     case Data#norm.errors of
         [] ->
-            case erlang:apply(Function, [Data]) of
+            io:format("LINE =  ~p  ", [?LINE]),
+            V = erlang:apply(Function, [Data]),
+            io:format("LINE =  ~p  ", [?LINE]),
+            case V of
                 {ok, Reply, State} ->
                     ?evman_debug(
                         Reply,
                         <<" = reply">>
                     ),
+                    io:format("LINE =  ~p  ", [?LINE]),
+                    io:format("Reply =  ~p ", [Reply]),
                     {ok, Reply, State};
                 {error, {Reason, Object}} ->
                     ?evman_error(
@@ -637,21 +644,42 @@ handle_params(Data, Function, Pstate) ->
                         ]},
                         <<" = error">>
                     ),
+                    io:format("LINE =  ~p  ", [?LINE]),
                     {ok, not_extended({[{Reason, Object}]}), Pstate};
                 {error, Error} ->
                     ?evman_error(
                         {error, Error},
                         <<" = error">>
                     ),
+                    io:format("LINE =  ~p  ", [?LINE]),
+                    io:format("Error =  ~p ", [Error]),
                     {ok, ?MODULE:error(), Pstate};
                 Some ->
                     ?evman_error(
                         {error, Some},
                         <<" = error">>
                     ),
+                    io:format("LINE =  ~p  ", [?LINE]),
+                    io:format("Some =  ~p ", [Some]),
                     {ok, ?MODULE:error(), Pstate}
             end;
+        [#norm_error{reason=types,value={type_error, Value}}|Errors] ->
+            io:format("LINE =  ~p ~n", [?LINE]),
+
+            io:format("~nErrors =  ~p ", [Errors]),
+            io:format("~nValue =  ~p ", [Value]),
+
+
+            io:format("LINE =  ~p  ", [?LINE]),
+            Res__ = not_extended({[{type_error, Value}]}),
+
+            io:format("LINE =  ~p  ", [?LINE]),
+            io:format("~n~n Res__ = ~p ~n~n", [Res__]),
+
+            {ok, Res__, Pstate};
         Errors ->
+            io:format("LINE =  ~p  ", [?LINE]),
+            io:format("Errors =  ~p ", [Errors]),
             ?evman_error(
                 {wrong_format, Errors},
                 <<" = wrong format">>

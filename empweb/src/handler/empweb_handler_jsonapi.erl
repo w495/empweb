@@ -119,30 +119,31 @@ handle_body(Req, Pbody, State)->
 
 handle_data(Req, Bobject, State)->
     ?evman_args([Req, Bobject, State]),
-%     try
+    try
         ?evman_debug({bobject, Bobject},        <<"binary object">>),
         Object  =  ejson:decode(Bobject),
         ?evman_debug({object, Object},          <<"native object">>),
         {Res, Reqres}  =  empweb_jsonapi_map(Req, Object, State),
         ?evman_debug({empweb_jsonapi_result, Res},  <<"empweb_jsonapi result">>),
         {Res, Reqres}
-%     catch
-%         throw:{invalid_json, _} ->
-%             {empweb_jsonapi:not_extended(invalid_json), Req};
-%         Eclass:Ereason ->
-%             ?evman_error(#event{error={Eclass,Ereason}}),
-%             {empweb_jsonapi:internal_server_error(
-%                 {[
-%                     {unknown_error,
-%                         {[
-%                             {class, empweb_jsonapi:format(Eclass)},
-%                             {reason, empweb_jsonapi:format(Ereason)}
-%                         ]}
-%                     }
-%                 ]}
-%             ), Req}
-%     end
-    .
+    catch
+        throw:{invalid_json, _} ->
+            {empweb_jsonapi:not_extended(invalid_json), Req};
+        throw:{invalid_json, _} ->
+            {empweb_jsonapi:not_extended(invalid_json), Req};
+        Eclass:Ereason ->
+            ?evman_error(#event{error={Eclass,Ereason}}),
+            {empweb_jsonapi:internal_server_error(
+                {[
+                    {unknown_error,
+                        {[
+                            {class, empweb_jsonapi:format(Eclass)},
+                            {reason, empweb_jsonapi:format(Ereason)}
+                        ]}
+                    }
+                ]}
+            ), Req}
+    end.
 
 terminate(Reason, Req, State) ->
     ?evman_args([Reason, Req, State]),

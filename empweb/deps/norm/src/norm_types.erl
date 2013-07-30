@@ -110,20 +110,21 @@ email(Value) ->
         nomatch ->
             throw({
                 type_error,
-                {
+                {[{
                     email,
-                    [
+                    {[
                         {value, Value}
-                    ]
-                }
+                    ]}
+                }]}
             })
     end.
 
 string(Value) ->
-    Value.
+    % when is_binary(Value); is_list(Value)
+    norm_convert:to_binary(Value).
 
 text(Value) ->
-    Value.
+    norm_convert:to_binary(Value).
 
 list(Value) ->
     norm_convert:to_list(Value).
