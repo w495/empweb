@@ -58,11 +58,16 @@ table({fields, insert})->
 table({fields, all})->
     [
         doc_id,
+        number,
+        'size',
         ismale,
         x,
         y,
         file_id,
-        alias
+        alias,
+        size_242_id,
+        size_140_id,
+        isforsupport
     ];
 
 %%

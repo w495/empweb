@@ -95,22 +95,43 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = ismale,
                 required    = false,
-                types       = [nullable, boolean]
+                types       = empweb_norm:filter([nullable, boolean])
             },
             #norm_rule{
                 key         = x,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = y,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = file_id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
+            },
+            #norm_rule{
+                key         = 'size',
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer]),
+                default     = 140
+            },
+            #norm_rule{
+                key         = size_242_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = size_140_id,
+                required    = false,
+                types       = empweb_norm:filter([nullable, integer])
+            },
+            #norm_rule{
+                key         = isforsupport,
+                required    = false,
+                types       = empweb_norm:filter([nullable, boolean])
             }
             |empweb_norm_doc:norm('get')
         ]),
@@ -260,22 +281,22 @@ handle(_req, #empweb_hap{
             #norm_rule{
                 key         = ismale,
                 required    = false,
-                types       = [nullable, boolean]
+                types       = empweb_norm:filter([nullable, boolean])
             },
             #norm_rule{
                 key         = x,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = y,
                 required    = false,
-                types       = [nullable, integer]
+                types       = empweb_norm:filter([nullable, integer])
             },
             #norm_rule{
                 key         = file_id,
                 required    = false,
-                types       = [integer]
+                types       = empweb_norm:filter([integer])
             }
             |empweb_norm_doc:norm('delete')
         ]),

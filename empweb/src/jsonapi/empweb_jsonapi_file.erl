@@ -100,6 +100,9 @@ handle(_req, #empweb_hap{
             |Params
         ]),
 
+    io:format("~n~n~n FILE PARAMS ~p ~n~n~n", [Params]),
+
+
     io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
     Res =

@@ -57,12 +57,17 @@ table({fields, insert})->
 %%
 table({fields, all})->
     [
+        number,
+        'size',
         doc_id,
         ismale,
         x,
         y,
         file_id,
-        alias
+        alias,
+        size_242_id,
+        size_140_id,
+        isforsupport
     ];
 
 %%

@@ -207,9 +207,9 @@
     alter table pers add column own_community_id
         decimal references community(doc_id) default null;
     alter table pers add column
-        live_community_head varchar(1024) default null;
+        live_community_body varchar(1024) default null;
     alter table pers add column
-        own_community_head  varchar(1024) default null;
+        own_community_body  varchar(1024) default null;
     alter table pers add column live_community_approved
         boolean  default null;
     alter table community add
@@ -478,7 +478,7 @@
             decimal primary key default nextval('seq_roomexperbuy_id'),
         room_id
             decimal         references room(doc_id)      default null,
-        room_head
+        room_body
             varchar(1024)                            default null,
         exper
             numeric             default null,
@@ -557,7 +557,7 @@
                 ('community_in',      true );
     alter table pers add  column citizen_room_id
         decimal references room(doc_id) default null;
-    alter table pers add column citizen_room_head
+    alter table pers add column citizen_room_body
         varchar(1024) default null;
     alter table pers add column citizen_room_fromdatetime
         timestamp without time zone default null;
@@ -855,7 +855,7 @@
         pers_nick   varchar(1024)                            default null,
 
         room_id     decimal         references room(doc_id)  default null,
-        room_head   varchar(1024)                            default null,
+        room_body   varchar(1024)                            default null,
 
         roomlisttype_id        decimal
             references roomlisttype(id)        default null,
@@ -906,7 +906,7 @@
         sender_nick     varchar(1024)       default null,
         room_id         decimal
             references room(doc_id)         default null,
-        room_head       varchar(1024)       default null,
+        room_body       varchar(1024)       default null,
         roomtype_id     decimal
             references roomtype(id)         default null,
         roomtype_alias  varchar(1024)
@@ -1088,7 +1088,7 @@
     create sequence seq_event_id;
     create table event(
         id                  decimal primary key default     nextval('seq_event_id'),
-        head                text,
+        body                text,
         body                text default null,
         owner_id            decimal references pers(id) default null,
         owner_nick          varchar(1024)               default null,
@@ -1106,7 +1106,7 @@
         eventspc_alias     varchar(1024)   references eventspc(alias) default null,
         target_id       decimal                                     default null,
         doc_id          decimal         references doc(id)          default null,
-        doc_head        varchar(1024)                               default null,
+        doc_body        varchar(1024)                               default null,
         doc_owner_id    decimal         references pers(id)         default null,
         doc_owner_nick  varchar(1024)                               default null,
         doc_parent_id   decimal         references doc(id)          default null,
@@ -1198,7 +1198,7 @@
     alter table pers add column
         isostatusable       boolean         default true;
     alter table doc add column
-        head_ti     decimal unique default nextval('seq_any_ti');
+        body_ti     decimal unique default nextval('seq_any_ti');
     alter table doc add column
         body_ti     decimal unique default nextval('seq_any_ti');
 */
@@ -1207,11 +1207,11 @@
 -- 2013.02.27 10:08:19:307711396 ---------------------------------------------
 
 /*
-    alter table pers drop column perspichead_id ;
+    alter table pers drop column perspicbody_id ;
     alter table pers drop column perspicbody_id ;
     drop table perspicbody ;
-    drop table perspichead ;
-    create table perspichead(
+    drop table perspicbody ;
+    create table perspicbody(
         doc_id      decimal unique references doc(id),
         x           decimal default null,
         y           decimal default null,
@@ -1224,7 +1224,7 @@
         file_id     decimal references file(id)     default null
     );
     alter table pers add column
-        perspichead_id     decimal references perspichead(doc_id);
+        perspicbody_id     decimal references perspicbody(doc_id);
     alter table pers add column
         perspicbody_id     decimal references perspicbody(doc_id);
 */
@@ -1265,23 +1265,23 @@
     alter table claim add column
         room_id decimal references doc(id) default null;
     alter table claim add column
-        room_head varchar(1024)            default null;
+        room_body varchar(1024)            default null;
     alter table claim add column
         ss_owner_citizen_room_id decimal references doc(id) default null;
     alter table claim add column
-        ss_owner_citizen_room_head varchar(1024)            default null;
+        ss_owner_citizen_room_body varchar(1024)            default null;
     alter table claim add column
         ss_owner_live_room_id decimal references doc(id) default null;
     alter table claim add column
-        ss_owner_live_room_head varchar(1024)            default null;
+        ss_owner_live_room_body varchar(1024)            default null;
     alter table claim add column
         ss_pers_citizen_room_id decimal references doc(id) default null;
     alter table claim add column
-        ss_pers_citizen_room_head varchar(1024)            default null;
+        ss_pers_citizen_room_body varchar(1024)            default null;
     alter table claim add column
         ss_pers_live_room_id decimal references doc(id) default null;
     alter table claim add column
-        ss_pers_live_room_head varchar(1024)            default null;
+        ss_pers_live_room_body varchar(1024)            default null;
 */
 
 
@@ -1365,7 +1365,7 @@
     alter table file add column alias varchar(1024) default null;
     alter table bitrate add created timestamp without time zone not null default utcnow(),
     alter table perspicbody add column ismale boolean default null;
-    alter table perspichead add column ismale boolean default null;
+    alter table perspicbody add column ismale boolean default null;
     insert into actiontype(alias, ispaid, price, istoall, isforme, isfake)
         values),
             ('fly',        false, null, false, true,  true);
@@ -1379,11 +1379,11 @@
     insert into service(alias, price, isonce)
         values ('change_nick_price', 1.0,       true);
     insert into service(alias, price, isonce)
-        values ('change_perspichead_price', 1.0,       true);
+        values ('change_perspicbody_price', 1.0,       true);
     insert into service(alias, price, isonce)
         values ('change_perspicbody_price', 1.0,       true);
     insert into paytype(alias, isincome)
-        values  ('change_perspichead',     false),
+        values  ('change_perspicbody',     false),
                 ('change_perspicbody',     false);
     alter table claim add column  isoffer  boolean default null;
 */
@@ -1395,7 +1395,7 @@
     alter table thingbuy add column
         room_id decimal references doc(id)   default null;
     alter table thingbuy add column
-        room_head varchar(1024)  default null;
+        room_body varchar(1024)  default null;
 
     alter table thingbuy add column
         costs  numeric(1000, 2)  default null;
@@ -1431,7 +1431,7 @@
     create table communitylot(
         doc_id          decimal unique references doc(id),
         community_id         decimal references community(doc_id)        default null,
-        community_head       varchar(1024)  default null,
+        community_body       varchar(1024)  default null,
         dtstart         timestamp without time zone not null default utcnow(),
         dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
         betmin          numeric(1000, 2) default 0,
@@ -1439,13 +1439,13 @@
         betmax          numeric(1000, 2) default 100
     );
     alter table communitylot add column community_id          decimal         references community(doc_id)   default null;
-    alter table communitylot add column community_head       varchar(1024)  default null;
+    alter table communitylot add column community_body       varchar(1024)  default null;
     create sequence seq_communitybet_id;
     create table communitybet(
         id              decimal primary key default nextval('seq_communitybet_id'),
         communitylot_id      decimal         references communitylot(doc_id)      default null,
         community_id         decimal             default null,
-        community_head       varchar(1024)  default null,
+        community_body       varchar(1024)  default null,
         owner_id        decimal             references pers(id)     not null,
         owner_nick      varchar(1024)       default null   not null,
         price           numeric(1000, 2)    default 0,
@@ -1489,7 +1489,7 @@
     create table cdoclot(
         doc_id          decimal unique references doc(id),
         cdoc_id         decimal references doc(id)        default null,
-        cdoc_head       varchar(1024)  default null,
+        cdoc_body       varchar(1024)  default null,
         dtstart         timestamp without time zone not null default utcnow(),
         dtstop          timestamp without time zone not null default utcnow() + interval '1 week',
         betmin          numeric(1000, 2) default 0,
@@ -1501,7 +1501,7 @@
         id              decimal primary key default nextval('seq_cdocbet_id'),
         cdoclot_id      decimal         references cdoclot(doc_id)      default null,
         cdoc_id         decimal             default null,
-        cdoc_head       varchar(1024)  default null,
+        cdoc_body       varchar(1024)  default null,
         owner_id        decimal             references pers(id)     not null,
         owner_nick      varchar(1024)       default null   not null,
         price           numeric(1000, 2)    default 0,
@@ -1569,7 +1569,7 @@
     alter table thingbuy add column
         community_id decimal references doc(id)   default null;
     alter table thingbuy add column
-        community_head varchar(1024)  default null;
+        community_body varchar(1024)  default null;
     create sequence seq_experwish_id;
     create table experwish (
         id                  decimal primary key default nextval('seq_experwish_id'),
@@ -1672,12 +1672,12 @@
    alter table photo drop column is_cover;
    alter table photo  add column iscover   boolean default false;
     alter table event add column
-        doc_parent_head         varchar(1024)  default null;
-    update event set doc_parent_head =
-        (select doc.head from doc where doc.id = doc_parent_id);
+        doc_parent_body         varchar(1024)  default null;
+    update event set doc_parent_body =
+        (select doc.body from doc where doc.id = doc_parent_id);
 
 
-    alter table perspichead add column
+    alter table perspicbody add column
         alias         varchar(1024)  default null;
 
 
@@ -3626,8 +3626,105 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
     update fileinfo as f set orig_image_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload');
 
 
-
-
     update fileinfo as f set aspect_width = (select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload' )));
 
     update fileinfo as f set aspect_height = (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload') / (select gcd((select fileinfo.image_width from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload'), (select fileinfo.image_height from fileinfo where fileinfo.file_id = f.file_id and fileinfotype_alias  = 'upload')));
+
+
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+
+    create sequence seq_perspicparttype_id;
+    create table perspicparttype(
+        id          decimal primary key default nextval('seq_perspicparttype_id'),
+        name_ti     decimal unique default nextval('seq_any_ti'),
+        alias       varchar(1024)   unique,
+        created     timestamp without time zone not null default utcnow(),
+        isdeleted   boolean default false
+    );
+
+
+    alter table perspichead add column perspicparttype_id
+        decimal references perspicparttype(id) default null;
+
+    alter table perspicbody add column perspicparttype_id
+        decimal references perspicparttype(id) default null;
+
+
+    alter table perspichead add column perspicparttype_alias
+        varchar(1024) references perspicparttype(alias) default null;
+
+    alter table perspicbody add column perspicparttype_alias
+        varchar(1024) references perspicparttype(alias) default null;
+
+
+    --alter table perspicparttype add column picsize decimal default null;
+
+
+    --insert into perspicparttype(alias, picsize) value
+        --('242', 242),
+        --();
+
+
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+
+    alter table perspichead drop column  perspicparttype_id;
+    alter table perspichead drop column  perspicparttype_alias;
+
+
+    alter table perspichead drop column  perspicphoto_id;
+    alter table perspicbody drop column  perspicparttype_id;
+    alter table perspicbody drop column  perspicparttype_alias;
+
+
+    alter table perspichead drop column  perspichead_242_id;
+    alter table perspichead drop column  perspichead_140_id;
+    alter table perspicbody drop column  perspicbody_242_id;
+    alter table perspicbody drop column  perspicbody_140_id;
+
+
+    alter table perspicbody add column size_242_id
+        decimal references perspicbody(doc_id) default null;
+
+    alter table perspicbody add column size_140_id
+        decimal references perspicbody(doc_id) default null;
+
+
+    alter table perspichead add column size_242_id
+        decimal references perspichead(doc_id) default null;
+
+    alter table perspichead add column size_140_id
+        decimal references perspichead(doc_id) default null;
+
+    alter table perspichead add column isforsupport
+        boolean default false;
+
+    alter table perspicbody add column isforsupport
+        boolean default false;
+
+-------------------------------------------------------------------------
+
+    update doc set isdeleted = true
+        where id in (select doc_id from perspichead );
+
+    update doc set isdeleted = true
+        where id in (select doc_id from perspicbody );
+
+
+
+    alter table perspichead add column number
+        decimal default null;
+
+    alter table perspicbody add column number
+        decimal default null;
+
+    alter table perspichead add column size
+        decimal default null;
+
+    alter table perspicbody add column size
+        decimal default null;
+
+
