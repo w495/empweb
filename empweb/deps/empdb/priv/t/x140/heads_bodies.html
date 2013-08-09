@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script type="text/javascript">
+ 
+            var bodies = {
+				'231_95.png': 15,
+				'232_95.png': 25,
+				'233_95.png': 18,
+				'234_95.png': 22,
+				'235_95.png': 18,
+				'236_95.png': 23,
+				'237_95.png': 36,
+				'238_95.png': 20,
+				'239_95.png': 24,
+				'240_95.png': 18,
+			    '251_95.png': 27,
+				'252_95.png': 17,
+				'253_95.png': 23,
+				'254_95.png': 26,
+				'255_95.png': 23,
+				'256_95.png': 14,
+				'257_95.png': 28,
+				'259_95.png': 28,
+				'260_95.png': 31,
+				'261_95.png': 13,
+				'262_95.png': 28,
+				'278_95.png': 20,
+				'279_95.png': 29,
+				'281_95.png': 18,
+				'282_95.png': 32,
+				'283_95.png': 52,
+				'284_95.png': 32,
+				'285_95.png': 40,
+				'286_95.png': 25,
+				'287_95.png': 25,
+				'288_95.png': 36,
+				'289_95.png': 19,
+				'290_95.png': 35,
+				'291_95.png': 34,
+				'292_95.png': 32,
+				'293_95.png': 32,
+				'294_95.png': 24,
+            };
+            var heads = {
+				'261.png': 16,
+				'262.png': 17,
+				'263.png': 19,
+				'264.png': 18,
+				'266.png': 23,
+				'267.png': 17,
+				'268.png': 18,
+				'269.png': 25,
+				'271.png': 28,
+				'272.png': 18,
+				'273.png': 20,
+				'274.png': 22,
+				'275.png': 20,
+				'276.png': 28,
+				'277.png': 15,
+				'279.png': 19,
+				'280.png': 18,
+				'281.png': 14,
+				'282.png': 19,
+				'283.png': 17,
+				'284.png': 33,
+				'285.png': 16,
+				'286.png': 16,
+				'287.png': 29,
+				'288.png': 18,
+				'289.png': 26,
+				'290.png': 15,
+				'291.png': 31,
+				'292.png': 32,
+				'293.png': 18,
+				'294.png': 29,
+				'295.png': 21,
+				'296.png': 22,
+				'297.png': 21,
+				'298.png': 15,
+				'299.png': 38,
+				'300.png': 19,
+				'301.png': 23,
+				'302.png': 22,
+				'303.png': 26,
+				'304.png': 16,
+				'305.png': 20,
+				'306.png': 27,
+				'307.png': 17,
+				'308.png': 19,
+				'309.png': 56,
+				'310.png': 16,
+				'311.png': 20,
+				'312.png': 21,
+				'313.png': 16,
+				'314.png': 33,
+				'315.png': 15,
+				'316.png': 22,
+				'317.png': 17,
+				'318.png': 31,
+				'319.png': 18,
+				'320.png': 28,
+				'321.png': 28,
+				'322.png': 19,
+				'323.png': 36,
+				'324.png': 21,
+				'325.png': 27,
+				'326.png': 20,
+				'327.png': 16,
+				'328.png': 39,
+				'329.png': 18,
+            };
+
+            function updatePreview(nodeSelector, radioBtn) {
+                var previewNode = $('#preview');
+                var headNode = $(nodeSelector);
+                var input = $(radioBtn.data('input'));
+                var offset = input.val();
+                var file = radioBtn.attr('data-file');
+                headNode.contents().remove();
+                console.log('offset', offset, 'file', file, 'headNode', headNode);
+                headNode.append($('<img>').attr('src', file));
+
+                var previewCentralAxe = previewNode.width() / 2;
+                var headNodeLeft = previewCentralAxe - offset;
+                console.log('left', headNodeLeft + 'px');
+                headNode.css('left', headNodeLeft + 'px');
+            }
+
+            function putHead() {
+                updatePreview('#preview_head', $(this));
+            }
+
+            function putBody() {
+                updatePreview('#preview_body', $(this));
+            }
+
+            function addItem(node, template, group, file, offset, putBody) {
+                var item = template.clone();
+                item.find('img').attr('src', file);
+                item.find('.offset').text(offset + 'px');
+                var offsetInput = item.find('input[type=text]').val(offset);
+                var radio = item.find('input[type=radio]')
+                                .change(function () {
+
+                                });
+                offsetInput.change(function () {
+                    if (radio.is(':checked')) {
+                        radio.click();
+                    }
+                });
+                radio.attr('name', 'head')
+                      .attr('data-file', file)
+                      .attr('name', group)
+                      .data('input', offsetInput)
+                      .click(putBody);
+                item.find('.file').text(file);
+                node.append(item);
+            }
+            $(document).ready(function() {
+                var template = $('#template');
+                template.removeAttr('id');
+                $.each(heads, function (file, offset) {
+                    addItem($("#heads"), template, 'head', 'head/' + file, offset, putHead);
+                });
+                $.each(bodies, function (file, offset) {
+                    addItem($("#bodies"), template, 'body', 'body/' + file, offset, putBody);
+                });
+            });
+        </script>
+        <style>
+            #left { position:absolute; left: 0px; top: 0px; bottom: 0px; overflow-y: scroll; overflow-x: hidden; }
+            #right { position: absolute; width: 50%; top: 0px; bottom: 0px; right: 0px; padding: 5px; }
+
+            .heads, .bodies { float: left; width: 200px; }
+            .offset { width: 30px; }
+            .item { margin: 5px; padding: 5px; border: 1px solid #e0e0e0;}
+            #preview { height: 140px; width: 100px; position: relative; }
+            #preview_wrap { float: left; padding: 0px; margin: 5px; border: 1px solid green; }
+            #preview_head { position: absolute; top: 0px; overflow: hidden;}
+            #preview_body { position: absolute; bottom: 0px; overflow: hidden; }
+            #preview_axe { position: absolute; top: 0px; bottom: 0px; left: 50%; width: 1px; background-color: red; }
+            img { display: block; }
+            body { font-size: 12px; }
+            .file { color: green; }
+        </style>
+    </head>
+    <body>
+        <div id="left">
+            <table>
+                <tr>
+                    <td valign="top">
+                        <div id="heads"></div> 
+                    </td>
+                    <td valign="top">s
+                        <div id="bodies"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="right">
+            <p>Preview:</p>
+            <div id="preview_wrap">
+                <div id="preview">
+                    <div id="preview_body"></div>
+                    <div id="preview_head"></div>
+                    <div id="preview_axe"></div>
+                </div>
+            </div>
+        </div>
+        <div style="display: none;">
+            <div id="template" class="item">
+                <div>
+                    <input type="radio">
+                </div>
+                <div>
+                    <img src=""><br>
+                    <div class="file"></div>
+                    Offset: <input class="offset" type="text">
+                </div>
+            <div>
+        </div>
+        <script>
+
+        </script>
+    </body>
+</html>

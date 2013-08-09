@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script type="text/javascript">
+ 
+var clothes = {
+    '0001.png': { hOffset: 36, vOffset: -3 },
+    '0002.png': { hOffset: 40, vOffset: -2 },
+    '0003.png': { hOffset: 23, vOffset: -7 },
+    '0004.png': { hOffset: 56, vOffset: -2 },
+    '0005.png': { hOffset: 24, vOffset: -3 },
+    '0007.png': { hOffset: 34, vOffset: 5 },
+    '0008.png': { hOffset: 28, vOffset: 6 },
+    '0009.png': { hOffset: 48, vOffset: -2 },
+    '0010.png': { hOffset: 35, vOffset: 1 },
+    '0011.png': { hOffset: 66, vOffset: 0 },
+    '0012.png': { hOffset: 28, vOffset: 2 },
+    '0013.png': { hOffset: 24, vOffset: -5 },
+    '0014.png': { hOffset: 55, vOffset: 3 },
+    '0015.png': { hOffset: 31, vOffset: 0 },
+    '0016.png': { hOffset: 40, vOffset: 11 },
+    '0018.png': { hOffset: 50, vOffset: 0 },
+    '0019.png': { hOffset: 22, vOffset: 0 },
+    '0020.png': { hOffset: 23, vOffset: 0 },
+    '262.png': { hOffset: 23, vOffset: 1 },
+    '263.png': { hOffset: 26, vOffset: -2 },
+    '266.png': { hOffset: 36, vOffset: 3 },
+    '268.png': { hOffset: 24, vOffset: 2 },
+    '269.png': { hOffset: 35, vOffset: 0 },
+    '271.png': { hOffset: 41, vOffset: -3 },
+    '272.png': { hOffset: 26, vOffset: 1 },
+    '273.png': { hOffset: 29, vOffset: 0 },
+    '277.png': { hOffset: 21, vOffset: -3 },
+    '280.png': { hOffset: 27, vOffset: 4 },
+    '281.png': { hOffset: 24, vOffset: 5 },
+    '282.png': { hOffset: 31, vOffset: -24 },
+    '283.png': { hOffset: 40, vOffset: -30 },
+    '286.png': { hOffset: 25, vOffset: 5 },
+    '287.png': { hOffset: 68, vOffset: -2 },
+    '288.png': { hOffset: 32, vOffset: -16 },
+    '289.png': { hOffset: 41, vOffset: -3 },
+    '290.png': { hOffset: 23, vOffset: 0 },
+    '293.png': { hOffset: 28, vOffset: 5 },
+    '294.png': { hOffset: 47, vOffset: 0 },
+    '295.png': { hOffset: 37, vOffset: 3 },
+    '297.png': { hOffset: 32, vOffset: 0 },
+    '298.png': { hOffset: 23, vOffset: 3 },
+    '300.png': { hOffset: 28, vOffset: 2 },
+    '301.png': { hOffset: 32, vOffset: -3 },
+    '302.png': { hOffset: 35, vOffset: 0 },
+    '303.png': { hOffset: 42, vOffset: -15 },
+    '304.png': { hOffset: 22, vOffset: 8 },
+    '307.png': { hOffset: 26, vOffset: -1 },
+    '308.png': { hOffset: 24, vOffset: -4 },
+    '309.png': { hOffset: 73, vOffset: 0 },
+    '310.png': { hOffset: 20, vOffset: 0 },
+    '312.png': { hOffset: 30, vOffset: 2 },
+    '313.png': { hOffset: 23, vOffset: 2 },
+    '314.png': { hOffset: 50, vOffset: -4 },
+    '315.png': { hOffset: 24, vOffset: 4 },
+    '316.png': { hOffset: 34, vOffset: -1 },
+    '317.png': { hOffset: 25, vOffset: -1 },
+    '318.png': { hOffset: 38, vOffset: 2 },
+    '319.png': { hOffset: 23, vOffset: -12 },
+    '320.png': { hOffset: 42, vOffset: -3 },
+    '321.png': { hOffset: 47, vOffset: -6 },
+    '322.png': { hOffset: 26, vOffset: 4 },
+    '323.png': { hOffset: 60, vOffset: 0 },
+    '324.png': { hOffset: 32, vOffset: -7 },
+    '325.png': { hOffset: 47, vOffset: -22 },
+    '326.png': { hOffset: 41, vOffset: -5 },
+    '328.png': { hOffset: 57, vOffset: 0 },
+    '329.png': { hOffset: 23, vOffset: -3 },
+};
+var bodies = {
+    '293_95.png': 61,
+    '0002.png': 25,
+    '0003.png': 24,
+    '0004.png': 40,
+    '0005.png': 44,
+    '235_95.png': 44,
+    '236_95.png': 42,
+    '237_95.png': 57,
+    '238_95.png': 40,
+    '239_95.png': 42,
+    '240_95.png': 30,
+    '251_95.png': 48,
+    '252_95.png': 31,
+    '253_95.png': 41,
+    '254_95.png': 55,
+    '255_95.png': 39,
+    '256_95.png': 25,
+    '259_95.png': 44,
+    '260_95.png': 50,
+    '261_95.png': 21,
+    '262_95.png': 49,
+    '278_95.png': 34,
+    '279_95.png': 53,
+    '281_95.png': 34,
+    '282_95.png': 54,
+    '283_95.png': 93,
+    '284_95.png': 59,
+    '286_95.png': 65,
+    '287_95.png': 47,
+    '288_95.png': 73,
+    '289_95.png': 38,
+    '290_95.png': 67,
+    '291_95.png': 74,
+    '292_95.png': 63,
+    '0001.png': 37,
+};
+
+
+			function basename(path) {
+    			return path.replace(/\\/g,'/').replace( /.*\//, '' );
+			}
+
+			function showSizeCode(ratio) {
+				alert(getSizeCode(ratio));
+			}
+
+			function getSizeCode(ratio) {
+				if (ratio === null || ratio === undefined)
+				    ratio = 1;
+				var ret = "var clothes = {\n";
+				$("#clothes").children().each(function (_, node) {
+					node = $(node);
+					var file = basename(node.find('input[name=radio_cloth]').attr('data-file'));
+					var hOffset = Math.floor($.trim(node.find('input[name=h_offset]').val()) * ratio);
+					var vOffset = Math.floor($.trim(node.find('input[name=v_offset]').val()) * ratio);
+					ret += "    '" + file + "': { hOffset: " + hOffset +", vOffset: " + vOffset + " },\n";
+				});
+				ret += "};\n";
+
+				ret += "var bodies = {\n";
+				$("#bodies").children().each(function (_, node) {
+					node = $(node);
+					var file = basename(node.find('input[name=radio_body]').attr('data-file'));
+					var offset = Math.floor($.trim(node.find('input.offset').val()) * ratio);
+					ret += "    '" + file + "': " + offset + ",\n";
+				});
+				ret += "};\n";				
+				return ret;
+			}
+
+            function putCloth() {
+				var radio = $(this);
+				var node = $("#preview_cloth");
+                var inputH = $(radio.data('inputH'));
+                var inputV = $(radio.data('inputV'));
+                var hOffset = $.trim(inputH.val());
+                var vOffset = $.trim(inputV.val());
+                var file = radio.attr('data-file');
+                node.contents().remove();
+                console.log('hoffset', hOffset, 'voffset', vOffset, 'file', file, 'node', node);
+                node.append($('<img>').attr('src', file));
+
+				var previewNode = $("#preview");
+                var previewCentralAxe = previewNode.width() / 2;
+                var nodeLeft = previewCentralAxe - hOffset;
+                node.css('left', nodeLeft + 'px');
+                node.css('top',  vOffset + 'px');
+            }
+
+            function putBody() {
+            	var radio = $(this);
+                var node = $("#preview_body");
+                var input = $(radio.data('input'));
+                var offset = input.val();
+                var file = radio.attr('data-file');
+                node.contents().remove();
+                console.log('offset', offset, 'file', file, 'node', node);
+                node.append($('<img>').attr('src', file));
+
+				var previewNode = $("#preview");
+                var previewCentralAxe = previewNode.width() / 2;
+                var nodeLeft = previewCentralAxe - offset;
+                console.log('left', nodeLeft + 'px');
+                node.css('left', nodeLeft + 'px');
+            }
+
+            function addBody(node, template, file, offset) {
+                var item = template.clone();
+                item.find('img').attr('src', file);
+                item.find('.offset').text(offset + 'px');
+                var offsetInput = item.find('input[type=text]').val(offset);
+                var radio = item.find('input[type=radio]')
+                                .change(function () {
+
+                                });
+                offsetInput.change(function () {
+                    if (radio.is(':checked')) {
+                        radio.click();
+                    }
+                });
+                radio
+                      .attr('data-file', file)
+                      .data('input', offsetInput)
+                      .click(putBody);
+                item.find('.file').text(file);
+                node.append(item);
+            }
+
+            function addCloth(node, template, file, hOffset, vOffset) {
+                var item = template.clone();
+                item.find('img').attr('src', file);
+                item.find('input[name=h_offset]').text(hOffset + 'px');
+                item.find('input[name=v_offset]').text(vOffset + 'px');
+                var hOffsetInput = item.find('input[name=h_offset]').val(hOffset);
+                var vOffsetInput = item.find('input[name=v_offset]').val(vOffset)
+                var radio = item.find('input[type=radio]')
+                                .change(function () {
+
+                                });
+                hOffsetInput.add(vOffsetInput).change(function () {
+                    if (radio.is(':checked')) {
+                        radio.click();
+                    }
+                });
+                radio
+                      .attr('data-file', file)
+                      .data('inputH', hOffsetInput)
+                      .data('inputV', vOffsetInput)
+                      .click(putCloth);
+                item.find('.file').text(file);
+                node.append(item);
+            }
+
+            $(document).ready(function() {
+                var template = $('#template');
+                template.removeAttr('id');
+                $.each(clothes, function (file, offsets) {
+                    addCloth($("#clothes"), $("#template_cloth"), 'clothes/' + file, offsets.hOffset, offsets.vOffset);
+                });
+                $.each(bodies, function (file, offset) {
+                    addBody($("#bodies"), $("#template_body"), 'body/' + file, offset);
+                });
+            });
+        </script>
+        <style>
+            #left { position:absolute; left: 0px; top: 0px; bottom: 0px; overflow-y: scroll; overflow-x: hidden; }
+            #right { position: absolute; width: 50%; top: 0px; bottom: 0px; right: 0px; padding: 5px; }
+
+            .clothes, .bodies { float: left; width: 200px; }
+            .offset { width: 30px; }
+            .item { margin: 5px; padding: 5px; border: 1px solid #e0e0e0;}
+            #preview { height: 242px; width: 200px; position: relative; }
+            #preview_wrap { float: left; padding: 0px; margin: 5px; border: 1px solid green; }
+            #preview_cloth { position: absolute; top: 0px; overflow: hidden;}
+            #preview_body { position: absolute; bottom: 0px; overflow: hidden; }
+            #preview_axe { position: absolute; top: 0px; bottom: 0px; left: 50%; width: 1px; background-color: red; }
+            img { display: block; }
+            body { font-size: 12px; }
+            .file { color: green; }
+        </style>
+    </head>
+    <body>
+        <div id="left">
+            <table>
+                <tr>
+                    <td valign="top">
+                        <div id="clothes"></div> 
+                    </td>
+                    <td valign="top">
+                        <div id="bodies"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="right">
+            <p>Preview:</p>
+            <div id="preview_wrap">
+                <div id="preview">
+                    <div id="preview_body"></div>
+                    <div id="preview_cloth"></div>
+                    <div id="preview_axe"></div>
+                </div>
+            </div>
+            Scale: <input name="scale" value="1">
+            <button onClick="showSizeCode($.trim($('input[name=scale]').val()));">Show sizes</button>
+        </div>
+        <div style="display: none;">
+            <div id="template_body" class="item">
+                <div>
+                    <input type="radio" name="radio_body">
+                </div>
+                <div>
+                    <img src=""><br>
+                    <div class="file"></div>
+                    Offset: <input class="offset" type="text">
+                </div>
+            </div>
+            <div id="template_cloth" class="item">
+                <div>
+                    <input type="radio" name="radio_cloth">
+                </div>
+                <div>
+                    <img src=""><br>
+                    <div class="file"></div>
+                    H Offset: <input class="offset" name="h_offset" type="text"><BR>
+                    V Offset: <input class="offset" name="v_offset" type="text">
+                </div>
+            </div>
+        </div>
+        <script>
+
+        </script>
+    </body>
+</html>
