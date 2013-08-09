@@ -332,7 +332,6 @@ create_rf([Prefix242, Prefix140], {ok, Filelist}, [Size242, Size140], Part, Gend
                 Module:create([
                     {head,         Bfilename},
                     {number,        Number},
-                    {alias,         Bfilename},
                     {'size',        242},
                     {ismale,        ismale(Gender)},
                     {file_id,       File_id_242},
@@ -346,7 +345,6 @@ create_rf([Prefix242, Prefix140], {ok, Filelist}, [Size242, Size140], Part, Gend
                 Module:create([
                     {head,          Bfilename},
                     {number,        Number},
-                    {alias,         Bfilename},
                     {'size',        140},
                     {ismale,        ismale(Gender)},
                     {file_id,       File_id_140},
@@ -365,7 +363,6 @@ create_rf([Prefix242, Prefix140], {ok, Filelist}, [Size242, Size140], Part, Gend
                     ]),
                     {number,        Number},
                     {head,          Bfilename},
-                    {alias,         Bfilename},
                     {'size',        242},
                     {ismale,        ismale(Gender)},
                     {file_id,       File_id_242},
@@ -380,7 +377,6 @@ create_rf([Prefix242, Prefix140], {ok, Filelist}, [Size242, Size140], Part, Gend
                     ]),
                     {number,        Number},
                     {head,          Bfilename},
-                    {alias,         Bfilename},
                     {'size',        140},
                     {ismale,        ismale(Gender)},
                     {file_id,       File_id_140},
@@ -395,6 +391,9 @@ create_rf([Prefix242, Prefix140], {ok, Filelist}, [Size242, Size140], Part, Gend
 
 
 ismale(head_man) ->
+    true;
+
+ismale(body_man) ->
     true;
 
 ismale(_) ->

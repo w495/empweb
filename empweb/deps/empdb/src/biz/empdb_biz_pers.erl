@@ -420,9 +420,11 @@ create_default_call(Module, Con, Params) ->
         Module:get(
             Con,
             [
-                {limit, 1},
-                {ismale, Ismale},
-                {fields, [id]}
+                {limit,     1},
+                {ismale,    Ismale},
+                {isdeleted, false},
+                {'size',    140},
+                {fields,    [id]}
             ]
         ),
     proplists:get_value(id, Objpl).

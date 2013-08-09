@@ -3634,7 +3634,7 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
 -------------------------------------------------------------------------
 -------------------------------------------------------------------------
 -------------------------------------------------------------------------
-
+/*
     create sequence seq_perspicparttype_id;
     create table perspicparttype(
         id          decimal primary key default nextval('seq_perspicparttype_id'),
@@ -3666,6 +3666,7 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
         --('242', 242),
         --();
 
+*/
 
 -------------------------------------------------------------------------
 -------------------------------------------------------------------------
@@ -3707,12 +3708,6 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
 
 -------------------------------------------------------------------------
 
-    update doc set isdeleted = true
-        where id in (select doc_id from perspichead );
-
-    update doc set isdeleted = true
-        where id in (select doc_id from perspicbody );
-
 
 
     alter table perspichead add column number
@@ -3728,3 +3723,24 @@ insert into tr (text, ta, ti, lang_id, trtype_id)
         decimal default null;
 
 
+    update doc set isdeleted = true
+        where id in (select doc_id from perspichead where size is null );
+
+    update doc set isdeleted = true
+        where id in (select doc_id from perspicbody where size is null);
+
+
+    update doc set isdeleted = true
+        where id in (select doc_id from perspichead where size is null );
+
+    update doc set isdeleted = true
+        where id in (select doc_id from perspicbody where size is null);
+
+
+alter table pers drop constraint pers_perspicbody_id_fkey;
+
+alter table pers drop constraint pers_perspichead_id_fkey;
+
+update pers set perspichead_id = (select doc_id from perspichead as p  where p.size = 140  and p.ismale = pers.ismale limit 1);
+
+update pers set perspicbody_id = (select doc_id from perspicbody as p  where p.size = 140 and p.ismale = pers.ismale limit 1);

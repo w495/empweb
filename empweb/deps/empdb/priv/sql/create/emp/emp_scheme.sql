@@ -532,8 +532,8 @@ create table pers(
 
 
     perspicphoto_id      decimal references perspichead(id)   default null,
-    perspichead_id      decimal references perspichead(id)   default null,
-    perspicbody_id      decimal references perspicbody(id)   default null,
+    perspichead_id      decimal references perspichead(doc_id)   default null,
+    perspicbody_id      decimal references perspicbody(doc_id)   default null,
 
 
     show_money_acctype_id     decimal         references acctype(id)    default null,
