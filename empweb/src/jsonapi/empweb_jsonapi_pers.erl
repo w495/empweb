@@ -599,7 +599,6 @@ handle(_req, #empweb_hap{
 handle(_req, #empweb_hap{
         action=count_pers,
         params=Params,
-        is_auth=true,
         pers_id = Pers_id
     } = Hap) ->
     ?evman_args(Hap, <<" = count pers">>),
