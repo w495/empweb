@@ -617,6 +617,28 @@ handle(_req, #empweb_hap{
         Hap
     );
 
+handle(_req, #empweb_hap{
+        action=cp,
+        params=Params,
+        pers_id = Pers_id
+    } = Hap) ->
+    ?evman_args(Hap, <<" = count pers">>),
+    % io:format("Params = ~p~n~n", [Params]),
+    empweb_jsonapi:handle_params(
+        %% проверка входных параметров и приведение к нужному типу
+        norm:norm(Params, empweb_norm_pers:norm('count')),
+        fun(Data)->
+            {ok,[{[{count,Count}]}]} = empweb_biz_pers:count(Data#norm.return),
+            {ok,
+                empweb_jsonapi:resp(
+                    {ok,[{[{count,Count + 1679751}]}]}
+                ),
+                Hap
+            }
+        end,
+        Hap
+    );
+
 
 %
 % %%

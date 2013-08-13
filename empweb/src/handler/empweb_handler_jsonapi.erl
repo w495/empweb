@@ -1415,6 +1415,12 @@ empweb_jsonapi_map(Req, {List}, State) ->
                     handler         =   empweb_jsonapi_pers,
                     action          =   count_pers
                 };
+
+            <<"cp">> ->
+                Eh#empweb_hap{
+                    handler         =   empweb_jsonapi_pers,
+                    action          =   cp
+                };
             %%
             %% {"fname": "get_all_perss", "params":{}}
             %%

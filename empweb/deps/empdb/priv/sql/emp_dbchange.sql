@@ -1737,6 +1737,11 @@ select setval('seq_tr_id',      1000000);
 
 
 
+select setval('seq_pers_id',  2000000);
+
+select setval('seq_doc_id',  8000000);
+
+
 SELECT nextval('seq_static_ti');
 
 insert into tr (text, ta, ti, lang_id, trtype_id)
