@@ -158,7 +158,7 @@ call(Req, Hap) ->
 
 call_extention({ok, Reply = #empweb_resp{body={Bodypl}}}, Hap = #empweb_hap{extention = 1}, Req) ->
     {
-        #empweb_resp{
+        Reply#empweb_resp{
             body =
                 {   %Bodypl
                     [
