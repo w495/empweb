@@ -788,6 +788,14 @@ handle(_req, #empweb_hap{
                         key = live_room_pos,
                         types = [nullable, 'float']
                     },
+                    #norm_rule{
+                        key = left_pers_id,
+                        types = [nullable, integer]
+                    },
+                    #norm_rule{
+                        key = right_pers_id,
+                        types = [nullable, integer]
+                    },
                 %% Тип комнаты
                     #norm_rule{
                         key         = live_roomtype_id,

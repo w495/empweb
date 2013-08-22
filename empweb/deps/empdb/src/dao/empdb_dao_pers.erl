@@ -193,6 +193,7 @@ table({fields, all})->
         authority_level,
         position,
 
+
         exper,
         experlack,
         experlackprice,
@@ -223,6 +224,9 @@ table({fields, all})->
         live_room_head,
         live_room_pos,
         geo_id,
+
+        left_pers_id,
+        right_pers_id,
 
         live_roomtype_id,
         live_roomtype_alias,

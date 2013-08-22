@@ -3749,3 +3749,12 @@ alter table pers drop constraint pers_perspichead_id_fkey;
 update pers set perspichead_id = (select doc_id from perspichead as p  where p.size = 140  and p.ismale = pers.ismale limit 1);
 
 update pers set perspicbody_id = (select doc_id from perspicbody as p  where p.size = 140 and p.ismale = pers.ismale limit 1);
+
+
+
+
+
+
+
+alter table pers add column left_pers_id  decimal         references pers(id) ;
+alter table pers add column right_pers_id  decimal         references pers(id) ;
