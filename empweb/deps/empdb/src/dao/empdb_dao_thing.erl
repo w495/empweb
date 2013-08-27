@@ -98,7 +98,7 @@ get(Con, What) ->
             [] ->
                 lists:append([
                     empdb_dao_thing:table({fields, select}),
-                    [image_width, image_height, file_id, path]
+                    empdb_dao_fileinfo:table({fields, additional})
                 ]);
             _ ->
                 Truefields

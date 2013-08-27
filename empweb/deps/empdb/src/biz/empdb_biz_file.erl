@@ -686,6 +686,49 @@ mullnull(null, _) ->
 mullnull(X, Y) ->
     erlang:trunc(X * Y).
 
+
+proportional(
+    null,
+    null,
+    Orig_width,
+    Orig_height
+)->
+    {
+        Orig_width,
+        Orig_height
+    };
+
+proportional(
+    Width,
+    null,
+    Orig_width,
+    Orig_height
+)->
+    {
+        Width,
+        erlang:trunc(Orig_height * Width / Orig_width)
+    };
+
+proportional(
+    null,
+    Height,
+    Orig_width,
+    Orig_height
+)->
+    {
+        erlang:trunc(Orig_width * Height / Orig_height),
+        Height
+    };
+
+proportional(
+    Width,
+    Height,
+    Orig_width,
+    Orig_height
+)->
+    {Width, Height}.
+
+
 get_handle_picture_param(Phobjpl, What) ->
 
     Phobjpl_aspect_width =
@@ -732,7 +775,7 @@ get_handle_picture_param(Phobjpl, What) ->
                 undefined
         end,
 
-    Res_image_width     =
+    Req_image_width     =
         proplists:get_value(
             image_width,
             What,
@@ -754,7 +797,8 @@ get_handle_picture_param(Phobjpl, What) ->
                 end
             end
         ),
-    Res_image_height     =
+
+    Req_image_height     =
         proplists:get_value(
             image_height,
             What,
@@ -775,6 +819,14 @@ get_handle_picture_param(Phobjpl, What) ->
                         )
                 end
             end
+        ),
+
+    {Res_image_width, Res_image_height} =
+        proportional(
+            Req_image_width,
+            Req_image_height,
+            Phobjpl_orig_image_width,
+            Phobjpl_orig_image_height
         ),
 
     [
