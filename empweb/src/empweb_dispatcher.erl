@@ -19,10 +19,26 @@ dispatch()->
                     {path, <<"priv/files/photo">>}
                 ]
             },
+            {   <<"/jsonapi/ext/1/photo/upload">>,
+                empweb_handler_jsonapi_photo,
+                [
+                    {action, upload},
+                    {extention, 1},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
             {   <<"/jsonapi/photo/[...]">>,
                 empweb_handler_static,
                 [
                     {path, <<"deps/empdb/priv/data/">>},
+                    {is_auth, true}
+                ]
+            },
+            {   <<"/jsonapi/ext/1/photo/[...]">>,
+                empweb_handler_static,
+                [
+                    {path, <<"deps/empdb/priv/data/">>},
+                    {extention, 1},
                     {is_auth, true}
                 ]
             },
@@ -32,7 +48,21 @@ dispatch()->
                     {path, <<"priv/files/photo">>}
                 ]
             },
+            {   <<"/jsonapi/ext/1/res/upload">>,
+                empweb_handler_jsonapi_res,
+                [   {action, upload},
+                    {extention, 1},
+                    {path, <<"priv/files/photo">>}
+                ]
+            },
             {   <<"/jsonapi/res/[...]">>,
+                empweb_handler_static,
+                [
+                    {path, <<"priv/data/res/">>},
+                    {is_auth, true}
+                ]
+            },
+            {   <<"/jsonapi/ext/1/res/[...]">>,
                 empweb_handler_static,
                 [
                     {path, <<"priv/data/res/">>},

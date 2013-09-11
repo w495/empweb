@@ -105,15 +105,25 @@ create(Params)->
         %% -------------------------------------------------------------------
         %% Выбираем тип файла.
         %% -------------------------------------------------------------------
-        {ok, [{Filetypepl}]} = empdb_dao_filetype:get(Con, [
-            {ext, Ulext},
-            {limit, 1}
-        ]),
 
-        Filetype_id =
-            proplists:get_value(id,           Filetypepl),
-        Filetype_mimesuptype =
-            proplists:get_value(mimesuptype,  Filetypepl),
+        {Filetype_id, Filetype_mimesuptype} =
+            case empdb_dao_filetype:get(Con, [
+                {ext, Ulext},
+                {limit, 1}
+            ]) of
+                {ok, [{Filetypepl}]} ->
+                    {
+                        proplists:get_value(id,           Filetypepl),
+                        proplists:get_value(mimesuptype,  Filetypepl)
+                    };
+                _ ->
+                    {null, null}
+            end,
+
+        %Filetype_id =
+            %proplists:get_value(id,           Filetypepl),
+        %Filetype_mimesuptype =
+            %proplists:get_value(mimesuptype,  Filetypepl),
 
 
         %% -------------------------------------------------------------------
@@ -129,24 +139,24 @@ create(Params)->
         File_id = proplists:get_value(id, File),
 
 
-        io:format("~n~n~n ~p ~n~n~n", [
-            [
-                {fileinfotype_alias,    filesystem},
-                {doc_id,                Doc_id},
-                {owner_id,              Owner_id},
-                {filetype_id,           Filetype_id},
-                {'size',                Ulsize},
-                {tokenstring,           Token_string},
-                {tokenlong,             Token_long},
-                {md5string,             Md5string},
-                {md5long,               Md5long},
-                {dir,                   Fsdir},
-                {file_id,               File_id},
-                {path,                  Fspath_ext}
-            ]
-        ]),
+        %io:format("~n~n~n ~p ~n~n~n", [
+            %[
+                %{fileinfotype_alias,    filesystem},
+                %{doc_id,                Doc_id},
+                %{owner_id,              Owner_id},
+                %{filetype_id,           Filetype_id},
+                %{'size',                Ulsize},
+                %{tokenstring,           Token_string},
+                %{tokenlong,             Token_long},
+                %{md5string,             Md5string},
+                %{md5long,               Md5long},
+                %{dir,                   Fsdir},
+                %{file_id,               File_id},
+                %{path,                  Fspath_ext}
+            %]
+        %]),
 
-        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+        %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         Whpl =
             case Filetype_mimesuptype of
@@ -156,7 +166,7 @@ create(Params)->
                     %%
                     Whpl_ = gm:identify(Fspath_full, [width, height, type]),
 
-                    io:format("~n~n~n Whpl_ = ~p ~n~n~n", [Whpl_]),
+                    %io:format("~n~n~n Whpl_ = ~p ~n~n~n", [Whpl_]),
 
                     Whpl_image_width    =
                         proplists:get_value(width, Whpl_),
@@ -236,7 +246,7 @@ create(Params)->
                     ]
             end,
 
-        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+        %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
 
         %% -------------------------------------------------------------------
@@ -260,7 +270,7 @@ create(Params)->
                 |Whpl
             ]),
 
-        io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
+        %io:format("~n~n~n ~p in ~p ~n~n~n", [?MODULE, ?LINE]),
 
         %% -------------------------------------------------------------------
         %% Создаем описание файла,
@@ -887,7 +897,6 @@ get_handle_picture(Con, {Phobjpl}, What1, Fields, _, _) ->
                 ]),
             get_transform(Copypl, Phobjpl, Fields, Options);
         {ok, [{Respl}]} ->
-            io:format("Respl = ~p ~n~n", [Respl]),
             get_transform(Respl, Phobjpl, Fields, Options);
         Error ->
             Error
@@ -1047,7 +1056,7 @@ md5(Bin) ->
 gcd(A, 0) ->
     A;
 gcd(A, B) ->
-    io:format("~n~n A = ~p ~n~n", [A]),
-    io:format("~n~n B = ~p ~n~n", [B]),
+    %io:format("~n~n A = ~p ~n~n", [A]),
+    %io:format("~n~n B = ~p ~n~n", [B]),
     gcd(B, A rem B).
 

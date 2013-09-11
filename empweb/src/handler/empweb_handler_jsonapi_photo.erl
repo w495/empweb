@@ -50,19 +50,23 @@
  %rr(empweb_handler_jsonapi_photo).%rr(cowboy_req).
 
 
-init(_, Req, _Opts) ->
+init(_, Req, Opts) ->
     ?evman_warning({erlang:time(), Req}),
     {Auth, Req1}    =   empweb_http:auth(Req),
     Is_auth         =   empweb_biz_pers:is_auth(Auth),
     Pid             =   empweb_biz_pers:get_pers_id(Auth),
     Pperm_names     =   empweb_biz_pers:get_perm_names(Auth),
+
+    Extention       =   proplists:get_value(extention, Opts, undefined),
+
     {ok, Req1, #state{
         empweb_hap  =
             #empweb_hap {
                 auth            =   Auth,
                 is_auth         =   Is_auth,
                 pers_id         =   Pid,
-                pers_perm_names =   Pperm_names
+                pers_perm_names =   Pperm_names,
+                extention       =   Extention
             }
     }}.
 

@@ -121,11 +121,8 @@ call(Req1, Hap, Fname) ->
     {fname(Res, Fname), Req}.
 
 call(Req, Hap) ->
-    io:format(" ~n~n~n Hap = ~p ~n~n~n", [Hap]),
 
     Call = empweb_http:call(Req, Hap),
-
-    io:format(" ~n~n~n Call = ~p ~n~n~n", [Call]),
 
     call_extention(
         Call,
