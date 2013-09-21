@@ -1897,6 +1897,16 @@ get_opt(Con, Params, [], Proplist)
 
 get_opt(Con,Params, [Option|Options], [{Acc}])->
     Fields = proplists:get_value(fields, Params, []),
+
+    Image_scale_width   =
+        proplists:get_value(image_scale_width,  Params,
+            proplists:get_value(image_scale,  Params, null)
+        ),
+    Image_scale_height   =
+        proplists:get_value(image_scale_height, Params,
+            proplists:get_value(image_scale,  Params, null)
+        ),
+
     io:format(" ~n~n~nOption = ~p ~p ~n~n~n", [Option, Fields]),
     case lists:member(Option, Fields) or (Fields =:= []) of
         true ->
@@ -2200,6 +2210,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     [
                                         {id, Perspichead_id},
                                         {limit, 1},
+                                        {image_scale_width,  Image_scale_width},
+                                        {image_scale_height, Image_scale_height},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
                                 ) of
@@ -2223,6 +2235,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     [
                                         {id, Perspicbody_id},
                                         {limit, 1},
+                                        {image_scale_width,  Image_scale_width},
+                                        {image_scale_height, Image_scale_height},
                                         {fields, [path, x, y, file_id, id]}
                                     ]
                                 ) of

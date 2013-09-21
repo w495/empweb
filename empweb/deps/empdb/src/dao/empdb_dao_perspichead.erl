@@ -131,9 +131,13 @@ get(Con, What) ->
             List =
                 empdb_biz_file:get_handle_pictures(Con, Phobjs, What, Fields, [], []),
             Image_scale_width   =
-                proplists:get_value(image_scale_width,  What, null),
+                proplists:get_value(image_scale_width,  What,
+                    proplists:get_value(image_scale,  What, null)
+                ),
             Image_scale_height   =
-                proplists:get_value(image_scale_height, What, null),
+                proplists:get_value(image_scale_height, What,
+                    proplists:get_value(image_scale,  What, null)
+                ),
             Res =
                 lists:map(
                     fun({Pl}) ->
