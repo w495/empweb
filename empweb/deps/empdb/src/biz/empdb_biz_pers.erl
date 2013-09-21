@@ -2312,6 +2312,8 @@ get_opt(Con,Params, [Option|Options], [{Acc}])->
                                     [
                                         {id, Costume_thingbuy_id},
                                         {limit, 1},
+                                        {image_scale_width,  Image_scale_width},
+                                        {image_scale_height, Image_scale_height},
                                         {fields, [path, file_id, id]}
                                     ]
                                 ) of
