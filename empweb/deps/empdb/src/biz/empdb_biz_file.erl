@@ -759,9 +759,13 @@ get_handle_picture_param(Phobjpl, What) ->
         proplists:get_value(window_height, What, null),
 
     Req_image_scale_width   =
-        proplists:get_value(image_scale_width,  What, null),
+        proplists:get_value(image_scale_width,  What,
+            proplists:get_value(image_scale,  What, null)
+        ),
     Req_image_scale_height   =
-        proplists:get_value(image_scale_height, What, null),
+        proplists:get_value(image_scale_height, What,
+            proplists:get_value(image_scale,  What, null)
+        ),
 
     Window_hw =
         case
