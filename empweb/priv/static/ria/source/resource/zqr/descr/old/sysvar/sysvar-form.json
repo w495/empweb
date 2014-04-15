@@ -1,7 +1,0 @@
-{
-    type : "form",
-    controller : "sysvarForm",
-    toolbar : [
-        {type : "back"}
-    ]
-}

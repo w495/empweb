@@ -1,7 +1,0 @@
-{
-    type : "form",
-    controller : "permissionForm",
-    toolbar : [
-        {type : "back"}
-    ]
-}

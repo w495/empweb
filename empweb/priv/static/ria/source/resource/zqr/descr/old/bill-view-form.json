@@ -1,9 +1,0 @@
-{
-    "type"          : "form",
-    "readOnly"      : true,
-    "controller"    : "billViewForm",
-    "toolbar"       :
-        [
-            {"type" : "back"}
-        ]
-}

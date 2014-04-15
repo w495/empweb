@@ -1,8 +1,0 @@
-{
-    type : "form",
-    controller : "acvVideoCopy",
-    toolbar : [
-        {type : "back"}
-    ]
-
-}

@@ -1,8 +1,0 @@
-{
-    type : "form",
-    controller : "customerGroupForm",
-    toolbar : [
-        {type : "back"}
-    ]
-    //controller : zqr.view.GenericForm.num
-}

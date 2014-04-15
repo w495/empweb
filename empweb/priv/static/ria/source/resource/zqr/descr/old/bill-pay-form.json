@@ -1,7 +1,0 @@
-{
-    "type" : "form",
-    "controller" : "billPayForm",
-    "toolbar" : [
-        {"type" : "back"}
-    ]
-}
